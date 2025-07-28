@@ -1,0 +1,68 @@
+{
+  "name": "@inspatial/run",
+  "version": "0.4.0",
+  "license": "Intentional-License-1.0",
+  "description": "InSpatial Run - Universal development framework for cross-platform and spatial applications",
+  "type": "module",
+  "author": "InSpatial Labs",
+  "bugs": "https://github.com/inspatiallabs/inspatial-dev/issues",
+  "homepage": "https://github.com/inspatiallabs/inspatial-dev",
+  "keywords": [
+    "inspatial",
+    "ude",
+    "jsx",
+    "reactive",
+    "realtime",
+    "server",
+    "client",
+    "signals",
+    "spatial",
+    "ar",
+    "vr",
+    "mr",
+    "xr",
+    "web",
+    "web-gpu",
+    "frontend",
+    "native",
+    "ios",
+    "android",
+    "androidxr",
+    "windows",
+    "macos",
+    "visionos",
+    "horizonos",
+    "embedded",
+    "cross-platform",
+    "universal-renderer",
+    "universal-development-envrionemnt"
+  ],
+  "exports": {
+    ".": "./src/index.ts",
+    "./renderer": "./src/renderer/index.ts",
+    "./kit": "./src/kit/index.ts",
+    "./runtime/": "./src/runtime/index.ts",
+    "./signal": "./src/signal.ts",
+    "./trigger": "./src/trigger/index.ts",
+    "./env": "./src/env/index.ts",
+    "./hmr": "./src/hmr/index.ts",
+    "./debug": "./src/debug/index.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/inspatiallabs/inspatial-dev.git"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "@types/node": "^22.7.7"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  }
+}
