@@ -1,4 +1,4 @@
-import { read, type SignalValueType } from "../../../signal.ts";
+import { read, type SignalValueType } from "../../../signal/index.ts";
 import { Fn } from "../fn/index.ts";
 
 export interface ParseProps {

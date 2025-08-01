@@ -5,8 +5,6 @@
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "noEmit": true,
-    "outDir": "./dist",
-    "rootDir": "./src",
     "strict": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -15,20 +13,17 @@
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "jsx": "preserve",
     "jsxImportSource": "@inspatial/run",
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "isolatedModules": true,
-    "emitDeclarationOnly": false
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*",
+    "vite.config.ts"
+  ],
   "exclude": [
-    "template/**/*",
     "node_modules",
-    "dist",
-    "dist-cjs",
-    "scripts",
-    "**/*.test.ts",
-    "**/*.spec.ts"
+    "dist"
   ]
-}
+} 

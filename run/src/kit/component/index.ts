@@ -4,15 +4,15 @@ import {
   isSignal,
   type Signal,
   type SignalDisposerFunctionType,
-} from "../../signal.ts";
+} from "../../signal/index.ts";
 import {
   hotReloadEnabler,
   enableHotReload,
-} from "../../hmr/hot-reload/index.ts";
+} from "../../hot/hot-reload/index.ts";
 import { removeFromArr, isThenable, isPrimitive } from "../../utils.ts";
 import { env } from "../../env/index.ts";
 import type { DebugContext } from "../../debug/index.ts";
-import { List, If, Fn } from "../control-flow/index.ts";
+import { List, Show, Fn } from "../control-flow/index.ts";
 import { _asyncContainer, Async } from "../control-flow/async/index.ts";
 import { _dynContainer, Dynamic } from "../control-flow/dynamic/index.ts";
 import { Render, type RenderFunction } from "../control-flow/render/index.ts";
@@ -260,7 +260,7 @@ export const createComponent = (function () {
     const builtins = new Set<Function>([
       Fn,
       List,
-      If,
+      Show,
       Dynamic,
       Async,
       Render,

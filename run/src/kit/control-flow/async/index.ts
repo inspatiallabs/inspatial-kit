@@ -5,7 +5,7 @@ import {
   watch,
   read,
   nextTick,
-} from "../../../signal.ts";
+} from "../../../signal/index.ts";
 import {
   type ComponentProps,
   type ComponentFunction,

@@ -6,7 +6,7 @@ import {
   peek,
   onDispose,
   nextTick,
-} from "../../../signal.ts";
+} from "../../../signal/index.ts";
 import { nop } from "../../../utils.ts";
 import {
   type ComponentFunction,

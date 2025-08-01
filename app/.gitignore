@@ -13,6 +13,12 @@ dist-ssr
 .vite
 *.local
 
+# Bundle files 
+bundle.js
+bundle.js.map
+*.bundle.js
+*.bundle.js.map
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

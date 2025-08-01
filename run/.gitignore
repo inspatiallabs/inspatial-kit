@@ -24,6 +24,12 @@ test/*.dev.js.map
 node_modules/
 deno.lock
 
+# Bundle files
+bundle.js
+bundle.js.map
+*.bundle.js
+*.bundle.js.map
+
 # local tools
 publish
 /out

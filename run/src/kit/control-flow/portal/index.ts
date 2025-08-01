@@ -1,4 +1,4 @@
-import { createSignal, onDispose } from "../../../signal.ts";
+import { createSignal, onDispose } from "../../../signal/index.ts";
 import { removeFromArr } from "../../../utils.ts";
 import { disposeComponent, getCurrentSelf } from "../../component/index.ts";
 import { Fn } from "../fn/index.ts";

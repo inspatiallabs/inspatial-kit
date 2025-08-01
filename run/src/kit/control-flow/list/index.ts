@@ -8,7 +8,9 @@ import {
   collectDisposers,
   watch,
   read,
-} from "../../../signal.ts";
+  isSignal,
+  $,
+} from "../../../signal/index.ts";
 import { removeFromArr } from "../../../utils.ts";
 import {
   type ComponentFunction,
@@ -18,17 +20,24 @@ import { type RenderFunction } from "../render/index.ts";
 
 export interface ListProps<T = any> {
   name?: string;
-  each: SignalValueType<T[]>;
+  each: SignalValueType<T[]> | T[]; // Accept both signals and static arrays
   track?: SignalValueType<keyof T>;
   indexed?: boolean;
   unkeyed?: boolean;
+  children?: any; // Support direct JSX children
 }
 
 export function List<T>(
   props: ListProps<T>,
-  itemTemplate: ComponentFunction
+  itemTemplate?: ComponentFunction | any
 ): RenderFunction {
-  const { name = "List", each, track, indexed, unkeyed } = props;
+  const { name = "List", each: eachProp, track, indexed, unkeyed, children } = props;
+  
+  // Support both children prop and second parameter
+  const actualTemplate = children ?? itemTemplate;
+  
+  // Auto-convert static arrays to signals for consistent handling  
+  const each = isSignal(eachProp) ? eachProp : (typeof eachProp === 'function' ? $(eachProp) : $(()=> eachProp));
   let currentData: any[] = [];
 
   let kv = track && new Map();
@@ -94,10 +103,10 @@ export function List<T>(
       const rawEntries = read(each);
       const oldLength = rawSigEntries.length;
       rawSigEntries.length = rawEntries.length;
-      for (let i in rawEntries) {
-        if (rawSigEntries[i]) rawSigEntries[i].value = rawEntries[i];
-        else rawSigEntries[i] = createSignal(rawEntries[i]);
-      }
+              for (const i in rawEntries) {
+          if (rawSigEntries[i]) rawSigEntries[i].value = rawEntries[i];
+          else rawSigEntries[i] = createSignal(rawEntries[i]);
+        }
 
       if (oldLength !== rawEntries.length) sigEntries!.trigger();
     });
@@ -115,10 +124,18 @@ export function List<T>(
           idxSig = createSignal(0);
           ks.set(itemKey, idxSig);
         }
+        
+        // Simplify item access - automatically unwrap signals and provide direct access
+        const wrappedTemplate = typeof actualTemplate === 'function' 
+          ? actualTemplate
+          : () => actualTemplate;
+        
         const dispose = collectDisposers(
           [],
           function () {
-            node = R.c(itemTemplate, { item, index: idxSig });
+            // Pass the raw item data directly instead of wrapped in { item }
+            // This eliminates the need for derivedExtract
+            node = R.c(wrappedTemplate, item, idxSig);
             nodeCache.set(itemKey, node);
           },
           function (batch?: boolean) {
@@ -154,13 +171,16 @@ export function List<T>(
         for (let i = 0; i < currentData.length; i++) {
           const itemKey = i;
           const item = currentData[i];
-          let idxSig = ks ? createSignal(i) : i;
+          const idxSig = ks ? createSignal(i) : i;
           if (ks) ks.set(itemKey, idxSig);
 
           const dispose = collectDisposers(
             [],
             function () {
-              const node = R.c(itemTemplate, { item, index: idxSig });
+              const wrappedTemplate = typeof actualTemplate === 'function' 
+                ? actualTemplate
+                : () => actualTemplate;
+              const node = R.c(wrappedTemplate, item, idxSig);
               nodeCache.set(itemKey, node);
               R.appendNode(fragment, node);
             },
@@ -211,7 +231,7 @@ export function List<T>(
           newData = currentData;
         } else {
           if (obsoleteDataKeys.length) {
-            for (let oldItemKey of obsoleteDataKeys) {
+            for (const oldItemKey of obsoleteDataKeys) {
               disposers.get(oldItemKey)!();
               removeFromArr(oldData, oldItemKey);
             }
@@ -293,12 +313,12 @@ export function List<T>(
                 backSet[i + 1] = bChunk.concat(backSet[i + 1]);
                 bChunk.length = 0;
 
-                for (let itemKey of fChunk) {
+                for (const itemKey of fChunk) {
                   R.insertBefore(getItemNode(itemKey), beforeAnchor);
                 }
               } else if (backSet[i + 1].length) {
                 const beforeAnchor = getItemNode(backSet[i + 1][0]);
-                for (let itemKey of bChunk) {
+                for (const itemKey of bChunk) {
                   R.insertBefore(getItemNode(itemKey), beforeAnchor);
                 }
               } else {
@@ -314,7 +334,7 @@ export function List<T>(
       }
 
       if (newData) {
-        for (let newItemKey of newData) {
+        for (const newItemKey of newData) {
           const node = getItemNode(newItemKey);
           if (node) R.appendNode(fragment, node);
         }

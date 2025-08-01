@@ -5,7 +5,7 @@ import {
   type Signal,
   read,
   createSignal,
-} from "../../../signal.ts";
+} from "../../../signal/index.ts";
 import {
   type ComponentProps,
   type ComponentFunction,

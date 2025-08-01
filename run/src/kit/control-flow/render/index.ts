@@ -1,4 +1,4 @@
-import { type SignalValueType, read } from "../../../signal.ts";
+import { type SignalValueType, read } from "../../../signal/index.ts";
 import {
   type ComponentContext,
   KEY_CTX,

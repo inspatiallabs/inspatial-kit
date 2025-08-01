@@ -1,4 +1,4 @@
-import { isSignal } from "../signal.ts";
+import { isSignal } from "../signal/index.ts";
 import { nop } from "../utils.ts";
 
 interface DebugInfo {

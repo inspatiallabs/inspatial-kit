@@ -1,4 +1,4 @@
-import { isSignal, type Signal } from "../signal.ts";
+import { isSignal, type Signal } from "../signal/index.ts";
 import { type Component, createComponent, Fn, render } from "../kit/index.ts";
 import { removeFromArr } from "../utils.ts";
 import { env } from "../env/index.ts";

@@ -1,6 +1,6 @@
-import { removeFromArr } from "./utils.ts";
-import { env } from "./env/index.ts";
-import { DebugContext } from "./debug/index.ts";
+import { removeFromArr } from "../utils.ts";
+import { env } from "../env/index.ts";
+import type { DebugContext } from "../debug/index.ts";
 
 // Type definitions
 export type SignalEffectType<T = any> = () => T;
@@ -341,9 +341,9 @@ export class Signal<T = any> {
     } else if (isSignal(value)) {
       (value as any).connect(pure(this.set.bind(this, value)));
     }
-    
+
     // Track signal creation
-    globalDebugCtx?.trackSignal('create', id, value);
+    globalDebugCtx?.trackSignal("create", id, value);
   }
 
   static ensure<T>(val: SignalValueType<T>): Signal<T> {
@@ -353,7 +353,9 @@ export class Signal<T = any> {
     return createSignal(val as T);
   }
 
-  static ensureAll<T extends SignalValueType<any>[]>(...vals: T): Signal<any>[] {
+  static ensureAll<T extends SignalValueType<any>[]>(
+    ...vals: T
+  ): Signal<any>[] {
     return vals.map(this.ensure);
   }
 
@@ -364,7 +366,7 @@ export class Signal<T = any> {
   set value(val: T) {
     this.set(val);
     // Track signal update
-    globalDebugCtx?.trackSignal('update', this._.id, val);
+    globalDebugCtx?.trackSignal("update", this._.id, val);
   }
 
   get connected(): boolean {
@@ -536,6 +538,100 @@ export class Signal<T = any> {
     });
   }
 
+  gte(val: SignalValueType<T>): Signal<boolean> {
+    return createSignal(this, function (i: T): boolean {
+      return i >= read(val);
+    });
+  }
+
+  lte(val: SignalValueType<T>): Signal<boolean> {
+    return createSignal(this, function (i: T): boolean {
+      return i <= read(val);
+    });
+  }
+
+  // Boolean checks
+  isTruthy(): Signal<boolean> {
+    return createSignal(this, function (i: T): boolean {
+      return !!i;
+    });
+  }
+
+  isFalsy(): Signal<boolean> {
+    return createSignal(this, function (i: T): boolean {
+      return !i;
+    });
+  }
+
+  // Range checks
+  between(min: SignalValueType<T>, max: SignalValueType<T>): Signal<boolean> {
+    return createSignal(this, function (i: T): boolean {
+      const minVal = read(min);
+      const maxVal = read(max);
+      return i >= minVal && i <= maxVal;
+    });
+  }
+
+  outside(min: SignalValueType<T>, max: SignalValueType<T>): Signal<boolean> {
+    return createSignal(this, function (i: T): boolean {
+      const minVal = read(min);
+      const maxVal = read(max);
+      return i < minVal || i > maxVal;
+    });
+  }
+
+  // Array/String methods (for signals containing arrays or strings)
+  isEmpty(): Signal<boolean> {
+    return createSignal(this, function (i: T): boolean {
+      return (i as any)?.length === 0;
+    });
+  }
+
+  isNotEmpty(): Signal<boolean> {
+    return createSignal(this, function (i: T): boolean {
+      return (i as any)?.length > 0;
+    });
+  }
+
+  includes(item: SignalValueType<any>): Signal<boolean> {
+    return createSignal(this, function (i: T): boolean {
+      const itemVal = read(item);
+      return (i as any)?.includes?.(itemVal) ?? false;
+    });
+  }
+
+  excludes(item: SignalValueType<any>): Signal<boolean> {
+    return createSignal(this, function (i: T): boolean {
+      const itemVal = read(item);
+      return !(i as any)?.includes?.(itemVal) ?? true;
+    });
+  }
+
+  // Type checks
+  isNull(): Signal<boolean> {
+    return createSignal(this, function (i: T): boolean {
+      return i === null;
+    });
+  }
+
+  isUndefined(): Signal<boolean> {
+    return createSignal(this, function (i: T): boolean {
+      return i === undefined;
+    });
+  }
+
+  isNullish(): Signal<boolean> {
+    return createSignal(this, function (i: T): boolean {
+      return i == null;
+    });
+  }
+
+  isDefined(): Signal<boolean> {
+    return createSignal(this, function (i: T): boolean {
+      return i != null;
+    });
+  }
+
   toJSON(): T {
     return this.get();
   }
@@ -655,7 +751,10 @@ function write<T>(val: SignalValueType<T>, newVal: T | ((prev: T) => T)): T {
   return newVal;
 }
 
-function listen<T>(vals: SignalValueType<T>[], cb: SignalEffectFunctionType): void {
+function listen<T>(
+  vals: SignalValueType<T>[],
+  cb: SignalEffectFunctionType
+): void {
   for (const val of vals) {
     if (isSignal(val)) {
       val.connect(cb);
@@ -679,7 +778,9 @@ function _merged<T extends any[], R>(
 function merge<T extends SignalValueType<any>[], R>(
   vals: T,
   handler: (
-    ...args: { [K in keyof T]: T[K] extends SignalValueType<infer U> ? U : T[K] }
+    ...args: {
+      [K in keyof T]: T[K] extends SignalValueType<infer U> ? U : T[K];
+    }
   ) => R
 ): Signal<R> {
   return $(_merged.bind(handler, vals)) as Signal<R>;

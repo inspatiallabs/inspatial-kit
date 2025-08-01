@@ -81,13 +81,13 @@ export async function createRenderer(options: RenderModeOptions = {}): Promise<a
     renderer._debugCtx = debugCtx;
     
     // Set debug context globally for signals and components
-    const { setSignalDebugContext } = await import("../signal.ts");
+    const { setSignalDebugContext } = await import("../signal/index.ts");
     const { setComponentDebugContext } = await import("../kit/component/index.ts");
     
     setSignalDebugContext(debugCtx);
     setComponentDebugContext(debugCtx);
     
-    // Also make it available globally for HMR and other systems
+    // Also make it available globally for HOT and other systems
     (globalThis as any).debug = debugCtx.debug;
   }
 
