@@ -1,0 +1,67 @@
+@import "./kit.css";
+
+/*###################################################( FONTS )###################################################*/
+
+@font-face {
+  font-family: "editors-note";
+  src: url("./font/editors-note-extralight.otf") format("opentype"),
+    url("https://inspatial-storage.s3.eu-west-2.amazonaws.com/fonts/editors-note/editors-note-extralight.otf")
+      format("opentype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "editors-note-lightitalic";
+  src: url("./font/editors-note-lightitalic.otf") format("opentype"),
+    url("https://inspatial-storage.s3.eu-west-2.amazonaws.com/fonts/editors-note/editors-note-lightitalic.otf")
+      format("opentype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "inter";
+  src: url("./font/inter.ttf") format("truetype"),
+    url("https://inspatial-storage.s3.eu-west-2.amazonaws.com/fonts/inter/inter.ttf")
+      format("truetype");
+  font-display: swap;
+}
+
+/*###################################################( THEME )###################################################*/
+
+@theme {
+  --window: hsla(0, 0%, 100%, 1);
+  --surface: hsla(21, 35%, 92%, 1);
+  --background: hsla(0, 0%, 100%, 1);
+
+  /*** Brand Colors ***/
+  --brand: hsla(334, 83%, 54%, 1);
+
+  /*** Primary & Secondary Colors ***/
+  --primary: hsla(240, 27%, 18%, 1); /*** for text and icons ***/
+  --secondary: hsla(240, 27%, 18%, 1) / 0.5; /*** for borders, text, and icons ***/
+
+  /*** Fonts ***/
+  --font-editors-note-lightitalic: "editors-note-lightitalic", sans-serif; /*** Added here only because InSpatial Does not seperate fonts by weight ***/
+}
+
+/*###################################################( BASE )###################################################*/
+
+@layer base {
+  body {
+    font-family: var(--font-inter);
+  }
+}
+
+/*###################################################( COMPONENTS )###################################################*/
+
+@layer components {
+  /* .gh-content {
+    color: var(--brand);
+  } */
+}
+
+/*###################################################( UTILITIES )###################################################*/
+@layer utilities {
+  .brand {
+    color: var(--brand);
+  }
+}

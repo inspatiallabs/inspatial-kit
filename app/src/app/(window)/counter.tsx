@@ -23,7 +23,7 @@ export function Counter() {
   return (
     <>
       <div className="flex flex-col h-screen justify-center items-center gap-10 bg-black">
-        <h1 className="text-purple-500 text-8xl">🚀 InSpatial App!</h1>
+        <h1 className="text-yellow-500 text-8xl">🚀 InSpatial App!</h1>
         <List each={entries} track="id">
           {(entry: Entry) => (
             <p className="flex flex-col text-2xl text-white">{entry.name}</p>
@@ -33,15 +33,15 @@ export function Counter() {
           when={count.gte(10)}
           otherwise={() => <p className="text-white">Count is less than 10</p>}
         >
-          <p className="text-white text-2xl">Count is 10 or greater! 🎉</p>
+          <p className="text-white text-8xl">Count is 10 or greater! 🎉</p>
         </Show>
         <button
           type="button"
           id="increment"
-          className="bg-purple-500 p-6 rounded-full text-white font-bold text-2xl shadow-lg hover:bg-purple-600 transition-colors"
+          className="bg-red-500 p-6 rounded-full text-white font-bold text-2xl shadow-lg hover:bg-purple-600 transition-colors"
           on:click={() => count.value++}
         >
-          {message}
+          {message}  
         </button>
       </div>
     </>

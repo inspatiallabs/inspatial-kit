@@ -1,11 +1,12 @@
 {
   "nodeModulesDir": "auto",
   "tasks": {
-    "run": "deno run -A --node-modules-dir npm:vite",
-    "build": "deno run -A --node-modules-dir npm:vite build",
-    "bundle": "deno bundle src/config/render.ts dist/bundle.js --platform=browser --sourcemap --minify",
-    "preview": "deno run -A --node-modules-dir npm:vite preview",
-    "serve": "deno run --allow-net --allow-read jsr:@std/http@1/file-server dist/",
+    "css:watch": "deno run -A npm:@tailwindcss/cli@latest -i src/config/app.css -o dist/kit.css --content 'src/**/*.{ts,tsx,js,jsx}' --watch",
+    "js:watch": "deno bundle --platform=browser --output=dist/bundle.js --sourcemap --watch src/config/render.ts",
+    "build-dev": "deno task setup && deno task css:watch && deno bundle --platform=browser --output=dist/bundle.js --sourcemap --watch src/config/render.ts",
+    "build": "deno task setup && deno bundle --platform=browser --output=dist/bundle.js --sourcemap --minify src/config/render.ts",
+    "setup": "powershell -Command \"New-Item -ItemType Directory -Force -Path dist/asset; deno run -A npm:@tailwindcss/cli@latest -i src/config/app.css -o dist/kit.css --content 'src/**/*.{ts,tsx,js,jsx}'; Copy-Item src/asset/favicon.png dist/asset/favicon.png; Copy-Item index.html dist/index.html\"",
+    "serve": "deno run --allow-net --allow-read --allow-write --allow-env --allow-run src/config/serve.ts",
     "clean": "rm -rf dist && rm -rf node_modules && rm -rf deno.lock"
   },
   "compilerOptions": {
@@ -14,24 +15,25 @@
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "lib": ["ES2022", "DOM", "DOM.Iterable", "deno.ns"],
-    "jsxFactory": "R.c",
-    "jsxFragmentFactory": "R.f",
     "jsxImportSource": "@inspatial/run",
     "jsx": "react-jsx"
   },
   "imports": {
+    "@app/": "./src/app/",
+    "@inspatial/cloud-client": "jsr:@inspatial/cloud-client@^0.1.22",
     "@inspatial/run": "../run/src/index.ts",
     "@inspatial/run/signal": "../run/src/signal/index.ts",
     "@inspatial/run/kit": "../run/src/kit/index.ts",
     "@inspatial/run/renderer": "../run/src/renderer/index.ts",
     "@inspatial/run/runtime": "../run/src/runtime/index.ts",
+    "@inspatial/run/jsx-runtime": "../run/src/runtime/jsx-runtime.ts",
+    "@inspatial/run/jsx-dev-runtime": "../run/src/runtime/jsx-dev-runtime.ts",
     "@inspatial/run/trigger": "../run/src/trigger/index.ts",
     "@inspatial/run/env": "../run/src/env/index.ts",
     "@inspatial/run/hot": "../run/src/hot/index.ts",
     "@inspatial/run/debug": "../run/src/debug/index.ts",
-    "@deno/vite-plugin": "npm:@deno/vite-plugin@^1.0.5",
-    "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.1.11",
-    "tailwindcss": "npm:tailwindcss@^4.1.11",
-    "vite": "npm:vite@^7.0.6"
+    "@inspatial/serve": "../run/src/hot/inspatial-serve/index.ts",
+    "@tailwindcss/cli": "npm:@tailwindcss/cli@^4.1.11",
+    "tailwindcss": "npm:tailwindcss@^4.1.11"
   }
 }

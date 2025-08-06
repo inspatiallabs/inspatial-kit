@@ -1,11 +1,10 @@
 // deno-lint-ignore-file
-import "./kit.css";
 import { createRenderer } from "@inspatial/run/renderer";
-import { App } from "../app/window/flat.tsx";
+import { App } from "@app/(window)/flat.tsx";
 
 // 1. Create InSpatial renderer
 createRenderer({
-  mode: "browser",
+  mode: "auto",
   debug: "verbose",
 }).then((InSpatial: any) => {
   InSpatial.render(document.getElementById("app"), App);
