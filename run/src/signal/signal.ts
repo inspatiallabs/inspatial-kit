@@ -383,12 +383,16 @@ export class Signal<T = any> {
     return this._.value;
   }
 
-  set(val: SignalValueType<T>): void {
+  set(val: SignalValueType<T>, context?: string): void {
     const { compute, value } = this._;
     const newVal = compute ? peek(compute(read(val))) : read(val);
     if (value !== newVal) {
+      // Store context for enhanced subscriptions
+      (this as any)._updateContext = context;
       this._.value = newVal;
       this.trigger();
+      // Clear context after trigger
+      (this as any)._updateContext = undefined;
     }
   }
 
@@ -416,6 +420,41 @@ export class Signal<T = any> {
         this.trigger();
       }
     }
+  }
+
+  subscribe(listener: (value: T) => void): () => void {
+    const effect = () => listener(this.get());
+    this.connect(effect, false);
+    return () => {
+      const { userEffects } = this._;
+      removeFromArr(userEffects, effect);
+    };
+  }
+
+  /**
+   * Enhanced subscription with change event details
+   */
+  on(
+    event: "change",
+    listener: (newValue: T, oldValue: T, context?: string) => void
+  ): () => void {
+    let previousValue = this.peek();
+
+    const effect = () => {
+      const currentValue = this.get();
+      if (currentValue !== previousValue) {
+        // Get context from the current update context if available
+        const context = (this as any)._updateContext || undefined;
+        listener(currentValue, previousValue, context);
+        previousValue = currentValue;
+      }
+    };
+
+    this.connect(effect, false);
+    return () => {
+      const { userEffects } = this._;
+      removeFromArr(userEffects, effect);
+    };
   }
 
   connect(effect?: SignalEffectFunctionType | null, runImmediate = true): void {
@@ -838,27 +877,6 @@ function bind<T>(
   }
 }
 
-function createTriggerAction<T>(
-  val: SignalValueType<T>,
-  compute?: SignalComputeFunctionType<T, T>
-): [(cb: (val: T) => void) => void, (newVal: T) => void] {
-  const actionSignal = isSignal(val)
-    ? compute
-      ? createSignal(val, compute)
-      : val
-    : createSignal(val as T);
-  function onAction(cb: (val: T) => void): void {
-    actionSignal.connect(function () {
-      cb(actionSignal.peek());
-    }, false);
-  }
-  function trigger(newVal: T): void {
-    actionSignal.value = newVal;
-    actionSignal.trigger();
-  }
-  return [onAction, trigger];
-}
-
 function derive<T, K extends keyof T, R>(
   sig: SignalValueType<T>,
   key: K,
@@ -1057,7 +1075,6 @@ export {
   $,
   connect,
   bind,
-  createTriggerAction,
   derive,
   extract,
   derivedExtract,

@@ -2,11 +2,10 @@
 export {
   createSignal,
   isSignal,
-  computed,
+  computed, 
   $,
   connect,
   bind,
-  createTriggerAction,
   derive,
   extract,
   derivedExtract,
