@@ -1,4 +1,24 @@
 import { createState, createTrigger, createStorage, State } from "@inspatial/state";
+import type { Signal } from "@inspatial/signal";
+import { cloud } from "@inspatial/app/api/inspatial-cloud.api.ts";
+
+
+
+
+// ########################## (CLOUD) ##########################
+
+cloud.auth.login("user@inspatial.com", "password").then((user: any) => {
+  console.log(user);
+  cloud.entry.getEntryList("user").then((entries: any) => {
+    console.log(entries);
+  });
+})
+
+
+
+
+
+// ########################## (STATE & TRIGGERS) ##########################
 
 export interface Entry {
   id: number;
@@ -6,19 +26,21 @@ export interface Entry {
 }
 
 // ==================== PATTERN 1: (EXPLICIT) ====================
-export const counterStateExplicit = createState({
+type ExplicitStateType = { count: number; message: string };
+
+export const counterStateExplicit = createState<ExplicitStateType>({
   id: "counter-explicit",
   initialState: {
     count: 0,
     message: "Config pattern works!"
   },
-  trigger: (state: State<{ count: number; message: string }>) => ({
-    increment: (amount = 1) => state.count.set(state.count.get() + amount),
-    decrement: (amount = 1) => state.count.set(state.count.get() - amount),
-    setMessage: (msg: string) => state.message.set(msg),
+  trigger: (signals: { count: Signal<number>; message: Signal<string> }) => ({
+    increment: (amount = 1) => signals.count.set(signals.count.get() + amount),
+    decrement: (amount = 1) => signals.count.set(signals.count.get() - amount),
+    setMessage: (msg: string) => signals.message.set(msg),
     reset: () => {
-      state.count.set(0);
-      state.message.set("Config pattern works!");
+      signals.count.set(0);
+      signals.message.set("Config pattern works!");
     }
   }),
   storage: {
@@ -96,20 +118,20 @@ export const directIncrement = createTrigger(
 
 export const directAddEntry = createTrigger(
   counterState.entries,
-  (entries, text: string) => [...entries, { id: Date.now(), name: text }],
+  (entries: Entry[], text: string) => [...entries, { id: Date.now(), name: text }],
   { name: "direct-add-entry", debounce: 200 }
 );
 
 // Pattern 2: State Property Tuple (type-safe property targeting)
 export const tupleDouble = createTrigger(
   [counterState, 'count'],
-  (current) => current * 2,
+  (current: number) => current * 2,
   { name: "tuple-double" }
 );
 
 export const tupleSetMultiplier = createTrigger(
   [counterState, 'multiplier'],
-  (_, newValue: number) => newValue,
+  (_: number, newValue: number) => newValue,
   { name: "tuple-set-multiplier" }
 );
 
@@ -117,12 +139,12 @@ export const tupleSetMultiplier = createTrigger(
 export const batchOperations = createTrigger(counterState, {
   multiplyByFactor: {
     key: 'count',
-    action: (count) => count * counterState.multiplier.peek(),
+    action: (count: number) => count * counterState.multiplier.peek(),
     options: { name: "multiply-by-factor" }
   },
   addBonusEntry: {
     key: 'entries',
-    action: (entries) => [
+    action: (entries: Entry[]) => [
       ...entries,
       { id: Date.now(), name: `🎁 Bonus entry! Count: ${counterState.count.peek()}` }
     ],
@@ -139,7 +161,7 @@ export const batchOperations = createTrigger(counterState, {
 export const advancedOperations = createTrigger(counterState, {
   smartIncrement: {
     key: 'count',
-    action: (count) => {
+    action: (count: number) => {
       const multiplier = counterState.multiplier.peek();
       return count + multiplier;
     },
@@ -147,7 +169,7 @@ export const advancedOperations = createTrigger(counterState, {
   },
   celebrationEntry: {
     key: 'entries',
-    action: (entries) => {
+    action: (entries: Entry[]) => {
       const count = counterState.count.peek();
       if (count % 10 === 0) {
         return [...entries, { 
@@ -162,7 +184,7 @@ export const advancedOperations = createTrigger(counterState, {
 });
 
 // Enhanced subscription with change events
-counterState.count.on("change", (newVal, oldVal, context) => {
+counterState.count.on("change", (newVal: number, oldVal: number, context?: string) => {
   console.log(
     `🌍 Global counter changed from ${oldVal} to ${newVal} via: ${
       context || "unknown"

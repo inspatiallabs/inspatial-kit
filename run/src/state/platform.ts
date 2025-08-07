@@ -218,10 +218,10 @@ export function createPlatformTrigger<T, P extends any[]>(
  */
 function detectPlatform(): PlatformType {
   // Simple detection logic - can be enhanced
-  if (typeof window !== 'undefined' && window.document) {
+  if (typeof globalThis !== 'undefined' && globalThis.document) {
     return 'dom';
   }
-  if (typeof global !== 'undefined' && global.process) {
+  if (typeof globalThis !== 'undefined' && (globalThis as any).process) {
     return 'native';
   }
   return 'dom'; // Default

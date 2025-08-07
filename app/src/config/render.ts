@@ -1,6 +1,6 @@
 // deno-lint-ignore-file
-import { createRenderer } from "@inspatial/run/renderer";
-import { App } from "@app/(window)/flat.tsx";
+import { createRenderer } from "@inspatial/renderer";
+import { App } from "@inspatial/app/(application)/(window)/flat.tsx";
 
 // 1. Create InSpatial renderer
 createRenderer({
