@@ -1,6 +1,6 @@
 import { createRenderer } from './create-renderer.ts';
 
-export interface GenericXRRendererOptions {
+export interface GenericXRExtensions {
   rendererID?: string;
   [key: string]: any;
 }
@@ -8,7 +8,7 @@ export interface GenericXRRendererOptions {
 /**
  * Generic XR renderer fallback
  */
-export function GenericXRRenderer(options: GenericXRRendererOptions = {}): any {
+export function GenericXRRenderer(options: GenericXRExtensions = {}): any {
   const { rendererID = "GenericXR" } = options;
 
   // Basic XR renderer for WebXR environments

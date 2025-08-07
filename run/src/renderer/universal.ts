@@ -9,13 +9,13 @@ import { NativeScriptRenderer } from "./nativescript.ts";
 /**
  * Universal Renderer Configuration
  */
-export interface UniversalRendererOptions {
+export interface UniversalExtensions {
   /** Force a specific renderer type instead of auto-detection */
   forceRenderer?: "dom" | "html" | "native" | "xr";
   /** Environment detection override */
   environment?: EnvironmentInfo;
   /** Renderer-specific options */
-  rendererOptions?: any;
+  extensions?: any;
   /** Enable debug logging */
   debug?: boolean;
 }
@@ -25,12 +25,12 @@ export interface UniversalRendererOptions {
  * and chooses the appropriate renderer implementation
  */
 export async function createUniversalRenderer(
-  options: UniversalRendererOptions = {}
+  options: UniversalExtensions = {}
 ): Promise<any> {
   const {
     forceRenderer,
     environment,
-    rendererOptions = {},
+    extensions = {},
     debug = false,
   } = options;
 
@@ -56,7 +56,7 @@ export async function createUniversalRenderer(
       const { DOMRenderer } = await import("./dom.ts");
       const renderer = DOMRenderer({
         rendererID: "Universal-DOM",
-        ...rendererOptions,
+        ...extensions,
       });
 
       if (debug) {
@@ -70,7 +70,7 @@ export async function createUniversalRenderer(
       // Create NativeScript renderer for native mobile apps
       const nativeRenderer = NativeScriptRenderer({
         rendererID: "Universal-NativeScript",
-        ...rendererOptions,
+        ...extensions,
       });
 
       if (debug) {
@@ -85,7 +85,7 @@ export async function createUniversalRenderer(
       const xrRenderer = XRRenderer({
         rendererID: "Universal-XR",
         environment: env,
-        ...rendererOptions,
+        ...extensions,
       });
 
       if (debug) {
@@ -100,7 +100,7 @@ export async function createUniversalRenderer(
       const { HTMLRenderer } = await import("./html.ts");
       const renderer = HTMLRenderer({
         rendererID: "Universal-HTML",
-        ...rendererOptions,
+        ...extensions,
       });
 
       if (debug) {
@@ -115,7 +115,7 @@ export async function createUniversalRenderer(
       const { DOMRenderer } = await import("./dom.ts");
       const renderer = DOMRenderer({
         rendererID: "Universal-DOM-Fallback",
-        ...rendererOptions,
+        ...extensions,
       });
 
       if (debug) {

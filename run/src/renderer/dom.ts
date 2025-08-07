@@ -6,7 +6,7 @@ import { wrap } from "../runtime/jsx-runtime.ts";
 
 const defaultRendererID = "DOM";
 
-export interface DOMRendererOptions {
+export interface DOMExtensions {
   rendererID?: string;
   doc?: Document;
   namespaces?: Record<string, string>;
@@ -16,7 +16,7 @@ export interface DOMRendererOptions {
   onDirective?: (prefix: string, key: string, prop: string) => any;
 }
 
-export function DOMRenderer(options: DOMRendererOptions = {}) {
+export function DOMRenderer(options: DOMExtensions = {}) {
   const {
     rendererID = defaultRendererID,
     doc = document,

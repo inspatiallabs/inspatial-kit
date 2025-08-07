@@ -1,15 +1,9 @@
 {
   "version": "5",
   "specifiers": {
-    "jsr:@inspatial/cloud-client@~0.1.22": "0.1.22",
     "npm:@tailwindcss/cli@^4.1.11": "4.1.11",
     "npm:@tailwindcss/cli@latest": "4.1.11",
     "npm:tailwindcss@^4.1.11": "4.1.11"
-  },
-  "jsr": {
-    "@inspatial/cloud-client@0.1.22": {
-      "integrity": "4e6cf150409d25927c6694a63e7c1cc6b17f0d50f29f4156e963c33209cb21fb"
-    }
   },
   "npm": {
     "@ampproject/remapping@2.3.0": {

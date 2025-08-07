@@ -2,7 +2,7 @@ import {
   detectEnvironment,
   type EnvironmentInfo,
 } from "./environment.ts";
-import { createDebugContext, type DebugMode, type DebugContext } from "../debug/index.ts";
+import { createDebugContext, type DebugMode } from "../debug/index.ts";
 
 /**
  * Render Mode Configuration
@@ -17,7 +17,7 @@ export interface RenderModeOptions {
   /** Environment detection override */
   environment?: EnvironmentInfo;
   /** Renderer-specific options */
-  rendererOptions?: any;
+  extensions?: any;
   /** Debug mode - true, false, or configuration */
   debug?: DebugMode;
 }
@@ -32,7 +32,7 @@ export async function createRenderer(options: RenderModeOptions = {}): Promise<a
     target = 'auto',
     platform = 'auto',
     environment,
-    rendererOptions = {},
+    extensions = {},
     debug = false,
   } = options;
 
@@ -55,25 +55,25 @@ export async function createRenderer(options: RenderModeOptions = {}): Promise<a
   let renderer;
   switch (resolvedMode) {
     case 'browser':
-      renderer = await createBrowserRenderer({ target, env, rendererOptions, debugCtx });
+      renderer = await createBrowserRenderer({ target, env, extensions, debugCtx });
       break;
 
     case 'xr':
-      renderer = await createXRRenderer({ platform, env, rendererOptions, debugCtx });
+      renderer = await createXRRenderer({ platform, env, extensions, debugCtx });
       break;
 
     case 'native':
-      renderer = await createNativeRenderer({ platform, env, rendererOptions, debugCtx });
+      renderer = await createNativeRenderer({ platform, env, extensions, debugCtx });
       break;
 
     case 'server':
-      renderer = await createServerRenderer({ env, rendererOptions, debugCtx });
+      renderer = await createServerRenderer({ env, extensions, debugCtx });
       break;
 
     default:
       // Ultimate fallback: DOM renderer (works in most environments)
       debugCtx?.debug.warn('renderer', `Unknown mode "${resolvedMode}", falling back to browser mode`);
-      renderer = await createBrowserRenderer({ target: 'auto', env, rendererOptions, debugCtx });
+      renderer = await createBrowserRenderer({ target: 'auto', env, extensions, debugCtx });
   }
 
   // Attach debug context to renderer and global systems
@@ -120,7 +120,7 @@ function autoDetectMode(env: EnvironmentInfo): string {
 /**
  * Create browser-mode renderer (DOM/HTML smart selection)
  */
-async function createBrowserRenderer({ target, env, rendererOptions, debugCtx }: any): Promise<any> {
+async function createBrowserRenderer({ target, env, extensions, debugCtx }: any): Promise<any> {
   // Smart target detection within browser mode
   let resolvedTarget = target;
   if (target === 'auto') {
@@ -137,7 +137,7 @@ async function createBrowserRenderer({ target, env, rendererOptions, debugCtx }:
     const { HTMLRenderer } = await import("./html.ts");
     const renderer = HTMLRenderer({
       rendererID: 'Browser-Static',
-      ...rendererOptions,
+      ...extensions,
     });
 
     debugCtx?.logRendererCreation('Browser-Static', renderer);
@@ -147,7 +147,7 @@ async function createBrowserRenderer({ target, env, rendererOptions, debugCtx }:
     const { DOMRenderer } = await import("./dom.ts");
     const renderer = DOMRenderer({
       rendererID: 'Browser-Interactive',
-      ...rendererOptions,
+      ...extensions,
     });
 
     debugCtx?.logRendererCreation('Browser-Interactive', renderer);
@@ -158,14 +158,14 @@ async function createBrowserRenderer({ target, env, rendererOptions, debugCtx }:
 /**
  * Create XR-mode renderer (WebXR default with platform fallbacks)
  */
-async function createXRRenderer({ platform, env, rendererOptions, debugCtx }: any): Promise<any> {
+async function createXRRenderer({ platform, env, extensions, debugCtx }: any): Promise<any> {
   const { XRRenderer } = await import("./xr.ts");
   
   // XR mode defaults to WebXR (GenericXR) unless specific platform detected
   const renderer = XRRenderer({
     rendererID: 'XR-Mode',
     environment: env,
-    ...rendererOptions,
+    ...extensions,
   });
 
   debugCtx?.logRendererCreation(`XR-${env.type || 'WebXR'}`, renderer);
@@ -175,12 +175,12 @@ async function createXRRenderer({ platform, env, rendererOptions, debugCtx }: an
 /**
  * Create native-mode renderer
  */
-async function createNativeRenderer({ platform, env, rendererOptions, debugCtx }: any): Promise<any> {
+async function createNativeRenderer({ platform, env, extensions, debugCtx }: any): Promise<any> {
   const { NativeScriptRenderer } = await import("./nativescript.ts");
   
   const renderer = NativeScriptRenderer({
     rendererID: 'Native-Mode',
-    ...rendererOptions,
+    ...extensions,
   });
 
   debugCtx?.logRendererCreation('Native-NativeScript', renderer);
@@ -190,12 +190,12 @@ async function createNativeRenderer({ platform, env, rendererOptions, debugCtx }
 /**
  * Create server-mode renderer (HTML for SSR)
  */
-async function createServerRenderer({ env, rendererOptions, debugCtx }: any): Promise<any> {
+async function createServerRenderer({ env, extensions, debugCtx }: any): Promise<any> {
   const { HTMLRenderer } = await import("./html.ts");
   
   const renderer = HTMLRenderer({
     rendererID: 'Server-SSR',
-    ...rendererOptions,
+    ...extensions,
   });
 
   debugCtx?.logRendererCreation('Server-SSR', renderer);

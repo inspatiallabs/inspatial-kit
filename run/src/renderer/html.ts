@@ -4,12 +4,12 @@ import { nop } from "../utils.ts";
 
 const defaultRendererID = "HTML";
 
-export interface HTMLRendererOptions {
+export interface HTMLExtensions {
   rendererID?: string;
   selfClosingTags?: Set<string>;
 }
 
-export function HTMLRenderer(options: HTMLRendererOptions = {}) {
+export function HTMLRenderer(options: HTMLExtensions = {}) {
   const {
     rendererID = defaultRendererID,
     selfClosingTags = new Set([

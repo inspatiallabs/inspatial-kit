@@ -1,1 +1,1 @@
-export { withDirectives } from "./directives.ts";
+export { withTriggerProps, registerTriggerHandler } from "./props.ts";

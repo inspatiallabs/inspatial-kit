@@ -4,7 +4,7 @@ import { HorizonOSRenderer } from './horizon-os.ts';
 import { GenericXRRenderer } from './generic-xr.ts';
 import type { EnvironmentInfo } from './environment.ts';
 
-export interface XRRendererOptions {
+export interface XRExtensions {
   rendererID?: string;
   environment?: EnvironmentInfo;
   [key: string]: any;
@@ -13,7 +13,7 @@ export interface XRRendererOptions {
 /**
  * XR renderer for AndroidXR, VisionOS, and HorizonOS platforms
  */
-export function XRRenderer(options: XRRendererOptions = {}): any {
+export function XRRenderer(options: XRExtensions = {}): any {
   const { rendererID = "XR", environment } = options;
 
   // Platform-specific XR implementation

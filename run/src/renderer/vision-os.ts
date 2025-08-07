@@ -1,6 +1,6 @@
 import { createRenderer } from './create-renderer.ts';
 
-export interface VisionOSRendererOptions {
+export interface VisionOSExtensions {
   rendererID?: string;
   [key: string]: any;
 }
@@ -8,7 +8,7 @@ export interface VisionOSRendererOptions {
 /**
  * VisionOS renderer for Apple Vision Pro
  */
-export function VisionOSRenderer(options: VisionOSRendererOptions = {}): any {
+export function VisionOSRenderer(options: VisionOSExtensions = {}): any {
   const { rendererID = "VisionOS" } = options;
 
   // TODO: Implement VisionOS-specific rendering

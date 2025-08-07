@@ -1,6 +1,6 @@
 import { createRenderer } from './create-renderer.ts';
 
-export interface NativeScriptRendererOptions {
+export interface NativeScriptExtensions {
   rendererID?: string;
   [key: string]: any;
 }
@@ -8,7 +8,7 @@ export interface NativeScriptRendererOptions {
 /**
  * NativeScript renderer 
  */
-export function NativeScriptRenderer(options: NativeScriptRendererOptions = {}): any {
+export function NativeScriptRenderer(options: NativeScriptExtensions = {}): any {
   const { rendererID = "NativeScript" } = options;
 
   // TODO: Implement NativeScript renderer

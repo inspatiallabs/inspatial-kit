@@ -1,6 +1,6 @@
 import { createRenderer } from './create-renderer.ts';
 
-export interface AndroidXRRendererOptions {
+export interface AndroidXRExtensions {
   rendererID?: string;
   [key: string]: any;
 }
@@ -8,7 +8,7 @@ export interface AndroidXRRendererOptions {
 /**
  * AndroidXR renderer for Android Extended Reality
  */
-export function AndroidXRRenderer(options: AndroidXRRendererOptions = {}): any {
+export function AndroidXRRenderer(options: AndroidXRExtensions = {}): any {
   const { rendererID = "AndroidXR" } = options;
 
   // TODO: Implement AndroidXR-specific rendering

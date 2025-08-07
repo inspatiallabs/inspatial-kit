@@ -4,7 +4,7 @@
  */
 
 // Basic platform types
-export type PlatformType = "dom" | "native" | "inreal";
+export type PlatformType = "dom" | "native" | "gpu";
 
 // Native sub-platform types
 export type NativeSubPlatformType =

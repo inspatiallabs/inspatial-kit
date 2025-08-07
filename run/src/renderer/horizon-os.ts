@@ -1,6 +1,6 @@
 import { createRenderer } from './create-renderer.ts';
 
-export interface HorizonOSRendererOptions {
+export interface HorizonOSExtensions {
   rendererID?: string;
   [key: string]: any;
 }
@@ -8,7 +8,7 @@ export interface HorizonOSRendererOptions {
 /**
  * HorizonOS renderer for Meta Quest/VR platforms
  */
-export function HorizonOSRenderer(options: HorizonOSRendererOptions = {}): any {
+export function HorizonOSRenderer(options: HorizonOSExtensions = {}): any {
   const { rendererID = "HorizonOS" } = options;
 
   // TODO: Implement HorizonOS-specific rendering

@@ -14,6 +14,11 @@ import {
   type Signal,
 } from "../signal/index.ts";
 import { createStorage, type StorageProps } from "./storage.ts";
+import {
+  createTrigger,
+  type UnifiedTriggerDefs,
+  type TriggerOptions,
+} from "./trigger.ts";
 
 export type State<T extends Record<string, any>> = {
   [K in keyof T]: Signal<T[K]>;
@@ -37,6 +42,45 @@ export type State<T extends Record<string, any>> = {
    * Subscribe to all state changes
    */
   subscribe: (listener: (snapshot: T) => void) => () => void;
+
+  /**
+   * Add a trigger at runtime (enhanced explicit pattern)
+   */
+  addTrigger?: (name: string, triggerDef: UnifiedTriggerDefs[string]) => void;
+
+  /**
+   * Remove a trigger at runtime (enhanced explicit pattern)
+   */
+  removeTrigger?: (name: string) => void;
+
+  /**
+   * Add storage configuration at runtime (enhanced explicit pattern)
+   */
+  addStorage?: (storageConfig: StorageProps) => () => void;
+
+  /**
+   * Remove storage by key (enhanced explicit pattern)
+   */
+  removeStorage?: (key: string) => void;
+
+  /**
+   * Get storage status and management info (enhanced explicit pattern)
+   */
+  getStorageInfo?: () => Array<{
+    key: string;
+    backend: string;
+    active: boolean;
+  }>;
+
+  /**
+   * Pause all storage operations (enhanced explicit pattern)
+   */
+  pauseStorage?: () => void;
+
+  /**
+   * Resume all storage operations (enhanced explicit pattern)
+   */
+  resumeStorage?: () => void;
 };
 
 export interface StateConfig<T extends Record<string, any>> {
@@ -51,19 +95,30 @@ export interface StateConfig<T extends Record<string, any>> {
   initialState: T;
 
   /**
-   * State mutation trigger - encapsulated version of createTrigger
-   * These are convenience trigger built into your state for common mutations
+   * State mutation trigger - full createTrigger integration
+   * Supports all trigger patterns with same power as separation pattern
    */
-  trigger?: (signals: { [K in keyof T]: Signal<T[K]> }) => Record<
-    string,
-    (...args: any[]) => void
-  >;
+  trigger?:
+    | UnifiedTriggerDefs
+    | {
+        /**
+         * Legacy factory pattern (maintained for backwards compatibility)
+         */
+        factory: (signals: { [K in keyof T]: Signal<T[K]> }) => Record<
+          string,
+          (...args: any[]) => void
+        >;
+        /**
+         * Global options applied to all triggers from factory
+         */
+        options?: TriggerOptions;
+      };
 
   /**
    * Automatic persistence configuration
-   * When provided, state will be automatically persisted to storage
+   * Supports single storage or multiple storage backends
    */
-  storage?: StorageProps;
+  storage?: StorageProps | StorageProps[];
 }
 
 /**
@@ -71,6 +126,44 @@ export interface StateConfig<T extends Record<string, any>> {
  *
  * @example
  * ```typescript
+
+ *
+ * #########################################################
+ * // Explicit Pattern
+ * #########################################################
+ * const state = createState({
+ *   id: "counter-state",
+ *   initialState: { count: 0, name: "Ben" },
+ *   trigger: {
+ *     // Key-based 
+ *     increment: { key: 'count', action: (c, n = 1) => c + n },
+ *     
+ *     // Direct signal targeting 
+ *     directIncrement: { target: () => state.count, action: (c) => c + 1 },
+ *     
+ *     // Cross-state operations
+ *     syncWithOther: { 
+ *       key: 'count', 
+ *       action: (c) => {
+ *         otherState.value.set(c); // Access external state!
+ *         return c + 1;
+ *       }
+ *     },
+ *     
+ *     // State tuple targeting
+ *     externalTrigger: { 
+ *       target: [externalState, 'property'], 
+ *       action: (val) => val * 2 
+ *     }
+ *   },
+ *   storage: { key: 'counter-state', backend: 'local' }
+ * });
+ * 
+ * // Dynamic management - same power as separation!
+ * state.addTrigger('runtime', { key: 'count', action: (c) => c + 10 });
+ * state.addStorage({ key: 'runtime', backend: 'session' });
+ * 
+ * 
  * #########################################################
  * // Separation Pattern
  * #########################################################
@@ -79,16 +172,10 @@ export interface StateConfig<T extends Record<string, any>> {
  *
  * //2. Create State Triggers (optional)
  * const trigger = createTrigger(...)
- *
- * #########################################################
- * // Explicit Pattern
- * #########################################################
- * const state = createState({
- *   id: "counter-state",
- *   initialState: { count: 0, name: "Ben" },
- *   trigger: (signals) => ({ ... }),
- *   storage: { key: 'counter-state', backend: 'local' }
- * });
+ * 
+ * // 3. Create State Storage (optional)
+ * const storage = createStorage(...);
+ * 
  * ```
  */
 export function createState<T extends Record<string, any>>(
@@ -111,24 +198,19 @@ export function createState<T extends Record<string, any>>(
     "initialState" in configOrInitialState;
 
   let initialState: T;
-  let triggerFactory:
-    | ((signals: { [K in keyof T]: Signal<T[K]> }) => Record<
-        string,
-        (...args: any[]) => void
-      >)
-    | undefined;
-  let persistOptions: StorageProps | undefined;
+  let triggerConfig: StateConfig<T>["trigger"];
+  let persistOptions: StorageProps | StorageProps[] | undefined;
 
   if (isExplicitPattern) {
     // Explicit pattern
     const config = configOrInitialState as StateConfig<T>;
     initialState = config.initialState;
-    triggerFactory = config.trigger;
+    triggerConfig = config.trigger;
     persistOptions = config.storage;
   } else {
     // Separation pattern
     initialState = configOrInitialState as T;
-    triggerFactory = undefined;
+    triggerConfig = undefined;
     persistOptions = undefined;
   }
 
@@ -175,8 +257,13 @@ export function createState<T extends Record<string, any>>(
   });
   isInitializing = false;
 
-  // Create trigger using the signals (fixes circular reference)
-  const trigger = triggerFactory ? triggerFactory(signals) : {};
+  // Prepare trigger creation (will be created after state is constructed)
+  const trigger: Record<string, (...args: any[]) => void> = {};
+
+  // Storage management for enhanced explicit pattern
+  const storageCleanups = new Map<string, () => void>();
+  const storageConfigs = new Map<string, StorageProps>();
+  let storagesPaused = false;
 
   // Create the state interface
   const state: State<T> & {
@@ -217,14 +304,150 @@ export function createState<T extends Record<string, any>>(
     },
 
     trigger,
+
+    // Dynamic trigger management (only for explicit pattern)
+    addTrigger: isExplicitPattern
+      ? (name: string, triggerDef: UnifiedTriggerDefs[string]) => {
+          if (trigger[name]) {
+            console.warn(`Trigger "${name}" already exists. Overwriting.`);
+          }
+
+          // Create single trigger using enhanced logic
+          const singleTriggerDef = { [name]: triggerDef };
+          const newTriggers = createTrigger(state, singleTriggerDef);
+          Object.assign(trigger, newTriggers);
+
+          console.log(`✨ Dynamic trigger "${name}" added to state`);
+        }
+      : undefined,
+
+    removeTrigger: isExplicitPattern
+      ? (name: string) => {
+          if (trigger[name]) {
+            delete trigger[name];
+            console.log(`🗑️ Trigger "${name}" removed from state`);
+          } else {
+            console.warn(`Trigger "${name}" not found`);
+          }
+        }
+      : undefined,
+
+    // Enhanced storage management (only for explicit pattern)
+    addStorage: isExplicitPattern
+      ? (storageConfig: StorageProps) => {
+          if (storageCleanups.has(storageConfig.key)) {
+            console.warn(
+              `Storage with key "${storageConfig.key}" already exists. Removing old one.`
+            );
+            state.removeStorage?.(storageConfig.key);
+          }
+
+          const cleanup = createStorage(state, storageConfig);
+          storageCleanups.set(storageConfig.key, cleanup);
+          storageConfigs.set(storageConfig.key, storageConfig);
+
+          console.log(
+            `💾 Dynamic storage "${storageConfig.key}" added to state`
+          );
+          return cleanup;
+        }
+      : undefined,
+
+    removeStorage: isExplicitPattern
+      ? (key: string) => {
+          const cleanup = storageCleanups.get(key);
+          if (cleanup) {
+            cleanup();
+            storageCleanups.delete(key);
+            storageConfigs.delete(key);
+            console.log(`🗑️ Storage "${key}" removed from state`);
+          } else {
+            console.warn(`Storage "${key}" not found`);
+          }
+        }
+      : undefined,
+
+    getStorageInfo: isExplicitPattern
+      ? () => {
+          return Array.from(storageConfigs.entries()).map(([key, config]) => ({
+            key,
+            backend:
+              typeof config.backend === "string" ? config.backend : "custom",
+            active: storageCleanups.has(key) && !storagesPaused,
+          }));
+        }
+      : undefined,
+
+    pauseStorage: isExplicitPattern
+      ? () => {
+          storagesPaused = true;
+          console.log(`⏸️ Storage operations paused`);
+        }
+      : undefined,
+
+    resumeStorage: isExplicitPattern
+      ? () => {
+          storagesPaused = false;
+          console.log(`▶️ Storage operations resumed`);
+        }
+      : undefined,
   };
 
-  // Setup automatic persistence if configured
+  // Setup automatic trigger integration if configured
+  if (triggerConfig) {
+    if (
+      typeof triggerConfig === "object" &&
+      "factory" in triggerConfig &&
+      typeof triggerConfig.factory === "function"
+    ) {
+      // Legacy factory pattern with options support
+      const factoryTriggers = triggerConfig.factory(signals);
+      Object.assign(trigger, factoryTriggers);
+      console.log(
+        `🔧 Factory-based triggers enabled for state: ${Object.keys(
+          factoryTriggers
+        ).join(", ")}`
+      );
+    } else {
+      // UnifiedTriggerDefs pattern - use full createTrigger API with enhanced capabilities
+      const unifiedTriggers = triggerConfig as UnifiedTriggerDefs;
+      const createdTriggers = createTrigger(state, unifiedTriggers);
+      Object.assign(trigger, createdTriggers);
+      console.log(
+        `🚀 Enhanced triggers enabled for state: ${Object.keys(
+          createdTriggers
+        ).join(", ")}`
+      );
+    }
+  }
+
+  // Setup automatic persistence if configured (supports multiple storages)
   if (persistOptions) {
-    createStorage(state, persistOptions);
-    console.log(
-      `🔄 Auto-persistence enabled for state with key: ${persistOptions.key}`
-    );
+    if (Array.isArray(persistOptions)) {
+      // Multiple storage configurations
+      persistOptions.forEach((storageConfig) => {
+        const cleanup = createStorage(state, storageConfig);
+        if (isExplicitPattern) {
+          storageCleanups.set(storageConfig.key, cleanup);
+          storageConfigs.set(storageConfig.key, storageConfig);
+        }
+      });
+      console.log(
+        `🔄 Multi-storage enabled for state with keys: ${persistOptions
+          .map((s) => s.key)
+          .join(", ")}`
+      );
+    } else {
+      // Single storage configuration
+      const cleanup = createStorage(state, persistOptions);
+      if (isExplicitPattern) {
+        storageCleanups.set(persistOptions.key, cleanup);
+        storageConfigs.set(persistOptions.key, persistOptions);
+      }
+      console.log(
+        `🔄 Auto-persistence enabled for state with key: ${persistOptions.key}`
+      );
+    }
   }
 
   // Return state (TypeScript will handle the overloading)
