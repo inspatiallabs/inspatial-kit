@@ -7,7 +7,7 @@ export {
   type BatchTriggerDefs,
 } from "./trigger.ts";
 
-export { persistState, type PersistOptions } from "./persistence.ts";
+export { createStorage, type StorageProps } from "./storage.ts";
 
 export {
   connectPlatformTrigger,

@@ -1,86 +1,84 @@
 /**
- * # State Persistence
+ * # State Storage
  * @summary #### Automatic state persistence with multiple storage backends
  */
-
-import { createEffect, isSignal } from "../signal/index.ts";
 import type { State } from "./state.ts";
 
-export interface PersistOptions {
+export interface StorageProps {
   /**
    * Storage key
    */
   key: string;
-  
+
   /**
    * Storage backend
    */
-  storage?: 'localStorage' | 'sessionStorage' | StorageAdapter;
-  
+  backend?: "local" | "session" | "memory" | StorageExtensionProp;
+
   /**
    * Debounce save operations (milliseconds)
    */
   debounce?: number;
-  
+
   /**
    * Fields to include (if not specified, all fields are included)
    */
   include?: string[];
-  
+
   /**
    * Fields to exclude from persistence
    */
   exclude?: string[];
-  
+
   /**
    * Transform state before saving
    */
   serialize?: (state: any) => string;
-  
+
   /**
    * Transform state after loading
    */
   deserialize?: (data: string) => any;
 }
 
-export interface StorageAdapter {
+export interface StorageExtensionProp {
   getItem(key: string): string | null | Promise<string | null>;
   setItem(key: string, value: string): void | Promise<void>;
   removeItem(key: string): void | Promise<void>;
 }
 
 /**
- * Setup persistence for a state object
- * 
+ * Setup storage backend for a state object
+ *
  * @example
  * ```typescript
- * const state = createState({ count: 0, name: "John" });
- * 
- * // Basic persistence
- * const cleanup = persistState(state, {
+ * const state = createState({ count: 0, name: "Ben" });
+ *
+ * // Basic storage
+ * const cleanup = createStorage(state, {
  *   key: 'my-app-state'
  * });
- * 
+ *
  * // With options
- * persistState(state, {
+ * createStorage(state, {
  *   key: 'my-app-state',
- *   storage: 'sessionStorage',
+ *   backend: 'session',  // 'local' | 'session' | 'memory'
  *   exclude: ['tempData'],
  *   debounce: 1000
  * });
  * ```
  */
-export function persistState<T extends Record<string, any>>(
+export function createStorage<T extends Record<string, any>>(
   state: State<T>,
-  options: PersistOptions
+  options: StorageProps
 ): () => void {
-  const storage = getStorage(options.storage);
+  const storage = getStorage(options.backend);
   const serialize = options.serialize || JSON.stringify;
   const deserialize = options.deserialize || JSON.parse;
-  
+
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
   let isLoading = false;
-  
+
   // Filter function for included/excluded fields
   const shouldPersist = (key: string): boolean => {
     if (options.include && !options.include.includes(key)) {
@@ -91,50 +89,50 @@ export function persistState<T extends Record<string, any>>(
     }
     return true;
   };
-  
+
   // Save state to storage
   const saveState = async () => {
     const snapshot = state.snapshot();
     const filtered: Record<string, any> = {};
-    
+
     for (const [key, value] of Object.entries(snapshot)) {
       if (shouldPersist(key)) {
         filtered[key] = value;
       }
     }
-    
+
     try {
       const data = serialize(filtered);
       await storage.setItem(options.key, data);
     } catch (error) {
-      console.error('Failed to persist state:', error);
+      console.error("Failed to persist state:", error);
     }
   };
-  
+
   // Debounced save
   const debouncedSave = () => {
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
-    
+
     if (options.debounce) {
       timeoutId = setTimeout(saveState, options.debounce);
     } else {
       saveState();
     }
   };
-  
+
   // Load state from storage
   const loadState = async () => {
     isLoading = true;
-    
+
     try {
       const data = await storage.getItem(options.key);
       if (data) {
         const parsed = deserialize(data);
-        
+
         // Update state with loaded values
-        state.batch(s => {
+        state.batch((s) => {
           for (const [key, value] of Object.entries(parsed)) {
             if (key in s && shouldPersist(key)) {
               (s as any)[key].set(value);
@@ -143,22 +141,22 @@ export function persistState<T extends Record<string, any>>(
         });
       }
     } catch (error) {
-      console.error('Failed to load persisted state:', error);
+      console.error("Failed to load persisted state:", error);
     } finally {
       isLoading = false;
     }
   };
-  
+
   // Load initial state
   loadState();
-  
+
   // Watch for changes
   const unsubscribe = state.subscribe(() => {
     if (!isLoading) {
       debouncedSave();
     }
   });
-  
+
   // Cleanup function
   return () => {
     unsubscribe();
@@ -169,47 +167,63 @@ export function persistState<T extends Record<string, any>>(
 }
 
 /**
- * Get storage adapter
+ * Get storage extension
  */
-function getStorage(storage?: 'localStorage' | 'sessionStorage' | StorageAdapter): StorageAdapter {
-  if (!storage || storage === 'localStorage') {
-    return window.localStorage;
+function getStorage(
+  backend?: "local" | "session" | "memory" | StorageExtensionProp
+): StorageExtensionProp {
+  if (!backend || backend === "local") {
+    return globalThis.localStorage;
   }
-  if (storage === 'sessionStorage') {
-    return window.sessionStorage;
+  if (backend === "session") {
+    return globalThis.sessionStorage;
   }
-  return storage;
+  if (backend === "memory") {
+    return createMemoryStorage();
+  }
+  return backend;
 }
 
 /**
- * Create a custom storage adapter
- * 
+ * Create a custom storage extension
+ *
  * @example
  * ```typescript
- * const memoryStorage = createMemoryStorage();
- * persistState(state, {
+ * // Preferred: Use built-in memory backend
+ * createStorage(state, {
  *   key: 'test',
- *   storage: memoryStorage
+ *   backend: 'memory'  // ✨ Built-in option
+ * });
+ *
+ * // Alternative: Custom memory storage instance
+ * const memoryStorage = createMemoryStorage();
+ * createStorage(state, {
+ *   key: 'test',
+ *   backend: memoryStorage
  * });
  * ```
  */
-export function createMemoryStorage(): StorageAdapter {
+export function createMemoryStorage(): StorageExtensionProp {
   const store = new Map<string, string>();
-  
+
   return {
     getItem: (key) => store.get(key) || null,
-    setItem: (key, value) => { store.set(key, value); },
-    removeItem: (key) => { store.delete(key); }
+    setItem: (key, value) => {
+      store.set(key, value);
+    },
+    removeItem: (key) => {
+      store.delete(key);
+    },
   };
 }
 
 /**
- * Create an async storage adapter wrapper
+ * Create an async storage extension wrapper
  */
 export function createAsyncStorage(
   getItem: (key: string) => Promise<string | null>,
   setItem: (key: string, value: string) => Promise<void>,
   removeItem: (key: string) => Promise<void>
-): StorageAdapter {
+): StorageExtensionProp {
   return { getItem, setItem, removeItem };
 }

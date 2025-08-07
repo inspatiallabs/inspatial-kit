@@ -5,7 +5,7 @@
 import { assertEquals, assertExists } from "https://deno.land/std/testing/asserts.ts";
 import { createState } from "./state.ts";
 import { createTrigger } from "./trigger.ts";
-import { persistState, createMemoryStorage } from "./persistence.ts";
+import { createStorage, createMemoryStorage } from "./storage.ts";
 import { isSignal, $ } from "./index.ts";
 
 Deno.test("State V2 Tests", async (t) => {
@@ -193,7 +193,7 @@ Deno.test("State V2 Tests", async (t) => {
     const storage = createMemoryStorage();
     const state = createState({ count: 0, name: "test" });
     
-    const cleanup = persistState(state, {
+    const cleanup = createStorage(state, {
       key: "test-persist",
       storage
     });
@@ -207,7 +207,7 @@ Deno.test("State V2 Tests", async (t) => {
     
     // Create new state and load
     const state2 = createState({ count: 0, name: "" });
-    persistState(state2, {
+    createStorage(state2, {
       key: "test-persist",
       storage
     });
@@ -229,7 +229,7 @@ Deno.test("State V2 Tests", async (t) => {
       alsoSaved: "yes"
     });
     
-    persistState(state, {
+    createStorage(state, {
       key: "test-filter",
       storage,
       include: ["saved", "alsoSaved"],

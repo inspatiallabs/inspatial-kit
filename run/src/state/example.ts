@@ -1,6 +1,6 @@
 import { createState } from "./state.ts";
 import { createTrigger } from "./trigger.ts";
-import { persistState } from "./persistence.ts";
+import { createStorage } from "./storage.ts";
 import { connectPlatformState } from "./platform.ts";
 import { $ } from "./index.ts";
 
@@ -40,7 +40,7 @@ export function counterExample() {
   });
   
   // Setup persistence
-  persistState(state, {
+  createStorage(state, {
     key: 'counter-state',
     debounce: 500
   });
@@ -227,7 +227,7 @@ export function comparisonExample() {
   // NEW WAY (simple, direct)  
   const state = createState({ count: 0 });
   const increment = createTrigger(state.count, (c, amount = 1) => c + amount);
-  persistState(state, { key: 'count' });
+  createStorage(state, { key: 'count' });
   
   increment(5); // That's it!
   

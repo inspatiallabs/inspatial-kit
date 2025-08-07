@@ -1,6 +1,6 @@
 /**
  * # createState
- * @summary #### InSpatial State 
+ * @summary #### InSpatial State
  *
  * Creates a state object where each property is a signal, providing
  * reactive state management with minimal overhead.
@@ -13,6 +13,7 @@ import {
   createEffect,
   type Signal,
 } from "../signal/index.ts";
+import { createStorage, type StorageProps } from "./storage.ts";
 
 export type State<T extends Record<string, any>> = {
   [K in keyof T]: Signal<T[K]>;
@@ -57,9 +58,13 @@ export interface StateConfig<T extends Record<string, any>> {
     string,
     (...args: any[]) => void
   >;
+
+  /**
+   * Automatic persistence configuration
+   * When provided, state will be automatically persisted to storage
+   */
+  storage?: StorageProps;
 }
-
-
 
 /**
  * Create a reactive state object
@@ -71,17 +76,18 @@ export interface StateConfig<T extends Record<string, any>> {
  * #########################################################
  * // 1. Create State
  * const state = createState({ count: 0, name: "Ben" });
- * 
+ *
  * //2. Create State Triggers (optional)
  * const trigger = createTrigger(...)
- * 
+ *
  * #########################################################
  * // Explicit Pattern
  * #########################################################
  * const state = createState({
  *   id: "counter-state",
  *   initialState: { count: 0, name: "Ben" },
- *   trigger: (signals) => ({ ... })
+ *   trigger: (signals) => ({ ... }),
+ *   storage: { key: 'counter-state', backend: 'local' }
  * });
  * ```
  */
@@ -95,24 +101,35 @@ export function createState<T extends Record<string, any>>(
 
 export function createState<T extends Record<string, any>>(
   configOrInitialState: StateConfig<T> | T
-): State<T> | (State<T> & { trigger: Record<string, (...args: any[]) => void> }) {
+):
+  | State<T>
+  | (State<T> & { trigger: Record<string, (...args: any[]) => void> }) {
   // Determine if we're using the separation pattern or explicit pattern
-  const isExplicitPattern = configOrInitialState && 
-    typeof configOrInitialState === 'object' && 
-    'initialState' in configOrInitialState;
+  const isExplicitPattern =
+    configOrInitialState &&
+    typeof configOrInitialState === "object" &&
+    "initialState" in configOrInitialState;
 
   let initialState: T;
-  let triggerFactory: ((signals: { [K in keyof T]: Signal<T[K]> }) => Record<string, (...args: any[]) => void>) | undefined;
+  let triggerFactory:
+    | ((signals: { [K in keyof T]: Signal<T[K]> }) => Record<
+        string,
+        (...args: any[]) => void
+      >)
+    | undefined;
+  let persistOptions: StorageProps | undefined;
 
   if (isExplicitPattern) {
     // Explicit pattern
     const config = configOrInitialState as StateConfig<T>;
     initialState = config.initialState;
     triggerFactory = config.trigger;
+    persistOptions = config.storage;
   } else {
     // Separation pattern
     initialState = configOrInitialState as T;
     triggerFactory = undefined;
+    persistOptions = undefined;
   }
 
   // Store initial values for reset
@@ -202,8 +219,14 @@ export function createState<T extends Record<string, any>>(
     trigger,
   };
 
+  // Setup automatic persistence if configured
+  if (persistOptions) {
+    createStorage(state, persistOptions);
+    console.log(
+      `🔄 Auto-persistence enabled for state with key: ${persistOptions.key}`
+    );
+  }
+
   // Return state (TypeScript will handle the overloading)
   return state as any;
 }
-
-

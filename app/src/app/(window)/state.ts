@@ -1,4 +1,4 @@
-import { createState, createTrigger, State } from "@inspatial/state";
+import { createState, createTrigger, createStorage, State } from "@inspatial/state";
 
 export interface Entry {
   id: number;
@@ -13,7 +13,6 @@ export const counterStateExplicit = createState({
     message: "Config pattern works!"
   },
   trigger: (state: State<{ count: number; message: string }>) => ({
-    // Built-in encapsulated trigger
     increment: (amount = 1) => state.count.set(state.count.get() + amount),
     decrement: (amount = 1) => state.count.set(state.count.get() - amount),
     setMessage: (msg: string) => state.message.set(msg),
@@ -21,7 +20,12 @@ export const counterStateExplicit = createState({
       state.count.set(0);
       state.message.set("Config pattern works!");
     }
-  })
+  }),
+  storage: {
+    key: 'inspatial-counter-explicit-builtin',
+    backend: 'local',
+    debounce: 300
+  }
 });
 
 
@@ -165,3 +169,19 @@ counterState.count.on("change", (newVal, oldVal, context) => {
     }`
   );
 });
+
+// ==================== PERSISTENCE SETUP ====================
+// 🎯 SEPARATION PATTERN: External persistence setup
+// Persist the main counter state to localStorage  
+// This will save: count, multiplier, entries
+createStorage(counterState, {
+  key: 'inspatial-counter-state',
+  backend: 'local',
+  debounce: 500, // Save after 500ms of inactivity
+  // All fields persisted: count, multiplier, entries
+});
+
+console.log('🔄 State persistence enabled for both counter states');
+console.log('📦 Separation pattern: External createStorage() call');
+console.log('✨ Explicit pattern: Built-in persist option');
+console.log('🔄 Reload the page to see state restoration in action!');
