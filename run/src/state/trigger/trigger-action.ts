@@ -5,7 +5,7 @@
 import { type Signal, untrack, tick, isSignal } from "../../signal/index.ts";
 import type { State } from "../core/state.ts";
 
-export interface TriggerOptions {
+export interface TriggerActionProps {
   /**
    * Optional name for the trigger
    */
@@ -30,7 +30,7 @@ export interface TriggerOptions {
 export interface BatchTriggerDef {
   key: string;
   action: (current: any, ...args: any[]) => any;
-  options?: TriggerOptions;
+  options?: TriggerActionProps;
 }
 
 export interface EnhancedTriggerDef {
@@ -51,7 +51,7 @@ export interface EnhancedTriggerDef {
   /**
    * Trigger options
    */
-  options?: TriggerOptions;
+  options?: TriggerActionProps;
 }
 
 // Union type for backward compatibility and new features
@@ -59,6 +59,46 @@ export type UnifiedTriggerDef = BatchTriggerDef | EnhancedTriggerDef;
 export type UnifiedTriggerDefs = Record<string, UnifiedTriggerDef>;
 
 export type BatchTriggerDefs = Record<string, BatchTriggerDef>;
+
+// Typed trigger defs bound to a specific state shape
+export type KeyedTriggerDefFor<
+  T extends Record<string, any>,
+  K extends keyof T
+> = {
+  key: Extract<K, string>;
+  action: (current: T[K], ...args: any[]) => T[K];
+  options?: TriggerActionProps;
+};
+
+export type EnhancedTriggerDefFor<T extends Record<string, any>> =
+  | {
+      target: () => Signal<any>;
+      action: (current: any, ...args: any[]) => any;
+      options?: TriggerActionProps;
+    }
+  | {
+      target: [any, string];
+      action: (current: any, ...args: any[]) => any;
+      options?: TriggerActionProps;
+    };
+
+export type TriggerDefsFor<T extends Record<string, any>> = Record<
+  string,
+  KeyedTriggerDefFor<T, keyof T> | EnhancedTriggerDefFor<T>
+>;
+
+/**
+ * Map trigger definitions to callable trigger function signatures
+ */
+export type TriggerFunctionsFromDefs<
+  D extends Record<string, { action: (current: any, ...args: any[]) => any }>
+> = {
+  [K in keyof D]: D[K] extends {
+    action: (current: any, ...args: infer P) => any;
+  }
+    ? (...args: P) => void
+    : (...args: any[]) => void;
+};
 
 /**
  * Create a trigger with unified API supporting multiple patterns
@@ -83,7 +123,7 @@ export type BatchTriggerDefs = Record<string, BatchTriggerDef>;
 export function createTrigger<T, P extends any[]>(
   target: Signal<T>,
   action: (current: T, ...payload: P) => T,
-  options?: TriggerOptions
+  options?: TriggerActionProps
 ): (...payload: P) => void;
 
 export function createTrigger<
@@ -93,7 +133,7 @@ export function createTrigger<
 >(
   target: [State<T>, K],
   action: (current: T[K], ...payload: P) => T[K],
-  options?: TriggerOptions
+  options?: TriggerActionProps
 ): (...payload: P) => void;
 
 export function createTrigger<T extends Record<string, any>>(
@@ -102,10 +142,15 @@ export function createTrigger<T extends Record<string, any>>(
   options?: never
 ): Record<string, (...args: any[]) => void>;
 
+export function createTrigger<
+  T extends Record<string, any>,
+  D extends TriggerDefsFor<T>
+>(target: State<T>, batchDefs: D, options?: never): TriggerFunctionsFromDefs<D>;
+
 export function createTrigger(
   target: any,
   action: any,
-  options?: TriggerOptions
+  options?: TriggerActionProps
 ): any {
   // Case 1: Direct signal
   if (isSignal(target)) {
@@ -137,7 +182,7 @@ export function createTrigger(
 function createSignalTrigger<T, P extends any[]>(
   signal: Signal<T>,
   action: (current: T, ...payload: P) => T,
-  options?: TriggerOptions
+  options?: TriggerActionProps
 ): (...payload: P) => void {
   let lastCall = 0;
   let timeoutId: ReturnType<typeof setTimeout> | null = null;

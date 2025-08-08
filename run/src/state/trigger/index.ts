@@ -8,10 +8,10 @@ export { triggerPropExtension } from "./trigger-prop-extension.ts";
 // #####################(Trigger Action)#####################
 export {
     createTrigger,
-    type TriggerOptions,
-    type BatchTriggerDef,
-    type BatchTriggerDefs,
-    type EnhancedTriggerDef,
+    type TriggerActionProps,
     type UnifiedTriggerDef,
     type UnifiedTriggerDefs,
+    type TriggerDefsFor,
+    type KeyedTriggerDefFor,
+    type EnhancedTriggerDefFor,
   } from "./trigger-action.ts";

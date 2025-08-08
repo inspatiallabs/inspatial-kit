@@ -14,11 +14,13 @@ import type { RendererExtension } from "../../renderer/extensions.ts";
  */
 export const triggerPropExtension: RendererExtension = {
   name: "trigger",
-  onDirective: withTriggerProps.onTriggerProp,
-  namespaces: withTriggerProps.namespaces,
-  tagNamespaceMap: withTriggerProps.tagNamespaceMap,
-  tagAliases: withTriggerProps.tagAliases,
-  propAliases: withTriggerProps.propAliases,
+  props: {
+    onDirective: withTriggerProps.onTriggerProp,
+    namespaces: withTriggerProps.namespaces,
+    tagNamespaceMap: withTriggerProps.tagNamespaceMap,
+    tagAliases: withTriggerProps.tagAliases,
+    propAliases: withTriggerProps.propAliases,
+  },
   setup: () => {
     registerStandardDOMEvents();
   },

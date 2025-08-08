@@ -19,7 +19,7 @@ export interface Entry {
 // ==================== PATTERN 1: (EXPLICIT) ====================
 type ExplicitStateType = { count: number; message: string };
 
-export const counterStateExplicit = createState<ExplicitStateType>({
+export const counterStateExplicit = createState.in({
   id: "counter-explicit",
   initialState: {
     count: 0,
@@ -230,7 +230,7 @@ type EnhancedExplicitStateType = {
   status: string;
 };
 
-export const enhancedExplicitState = createState<EnhancedExplicitStateType>({
+export const enhancedExplicitState = createState.in({
   id: "enhanced-explicit",
   initialState: {
     advancedCount: 0,
@@ -292,7 +292,7 @@ type StorageEnhancedStateType = {
   temp: string;
 };
 
-export const storageEnhancedState = createState<StorageEnhancedStateType>({
+export const storageEnhancedState = createState.in({
   id: "storage-enhanced",
   initialState: {
     data: "persistent data",
@@ -333,8 +333,12 @@ export const storageEnhancedState = createState<StorageEnhancedStateType>({
       key: "storage-enhanced-memory",
       backend: "memory",
       include: ["count"], // Memory backup for count
-      serialize: (data) => JSON.stringify(data),
-      deserialize: (data) => JSON.parse(data),
+      serialize: ((data: unknown) => JSON.stringify(data)) as (
+        state: any
+      ) => string,
+      deserialize: ((data: string) => JSON.parse(data)) as (
+        data: string
+      ) => any,
     },
   ],
 });

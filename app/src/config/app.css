@@ -43,11 +43,24 @@
   --font-editors-note-lightitalic: "editors-note-lightitalic", sans-serif; /*** Added here only because InSpatial Does not seperate fonts by weight ***/
 }
 
+/* Dark theme overrides */
+[data-theme="dark"] {
+  /* base surfaces */
+  --window: hsla(220, 15%, 10%, 1);
+  --surface: hsla(220, 15%, 15%, 1);
+  --background: hsla(220, 15%, 10%, 1);
+  /* text */
+  --primary: hsla(0, 0%, 98%, 1);
+  --secondary: hsla(0, 0%, 98%, 1) / 0.6;
+}
+
 /*###################################################( BASE )###################################################*/
 
 @layer base {
   body {
     font-family: var(--font-inter);
+    background-color: var(--background);
+    color: var(--primary);
   }
 }
 

@@ -17,7 +17,8 @@ import { createStorage, type StorageProps } from "./storage.ts";
 import {
   createTrigger,
   type UnifiedTriggerDefs,
-  type TriggerOptions,
+  type TriggerActionProps,
+  type TriggerDefsFor,
 } from "../trigger/trigger-action.ts";
 
 export type State<T extends Record<string, any>> = {
@@ -83,6 +84,43 @@ export type State<T extends Record<string, any>> = {
   resumeStorage?: () => void;
 };
 
+/**
+ * Helper types to provide better type inference for the explicit pattern
+ */
+type TriggerFunctionsFromDefs<D extends UnifiedTriggerDefs> = {
+  [K in keyof D]: D[K] extends {
+    action: (current: any, ...args: infer P) => any;
+  }
+    ? (...args: P) => void
+    : (...args: any[]) => void;
+};
+
+type ExplicitEnhancements = {
+  addTrigger: (name: string, triggerDef: UnifiedTriggerDefs[string]) => void;
+  removeTrigger: (name: string) => void;
+  addStorage: (storageConfig: StorageProps) => () => void;
+  removeStorage: (key: string) => void;
+  getStorageInfo: () => Array<{
+    key: string;
+    backend: string;
+    active: boolean;
+  }>;
+  pauseStorage: () => void;
+  resumeStorage: () => void;
+};
+
+type ExplicitReturnFromConfig<C> = C extends { trigger: infer TR }
+  ? TR extends UnifiedTriggerDefs
+    ? { trigger: TriggerFunctionsFromDefs<TR> } & ExplicitEnhancements
+    : TR extends { factory: (...args: any[]) => infer R }
+    ? { trigger: R } & ExplicitEnhancements
+    : {
+        trigger: Record<string, (...args: any[]) => void>;
+      } & ExplicitEnhancements
+  : {
+      trigger: Record<string, (...args: any[]) => void>;
+    } & ExplicitEnhancements;
+
 export interface StateConfig<T extends Record<string, any>> {
   /**
    * Optional unique identifier for the state
@@ -99,7 +137,7 @@ export interface StateConfig<T extends Record<string, any>> {
    * Supports all trigger patterns with same power as separation pattern
    */
   trigger?:
-    | UnifiedTriggerDefs
+    | TriggerDefsFor<T>
     | {
         /**
          * Legacy factory pattern (maintained for backwards compatibility)
@@ -111,7 +149,7 @@ export interface StateConfig<T extends Record<string, any>> {
         /**
          * Global options applied to all triggers from factory
          */
-        options?: TriggerOptions;
+        options?: TriggerActionProps;
       };
 
   /**
@@ -120,6 +158,10 @@ export interface StateConfig<T extends Record<string, any>> {
    */
   storage?: StorageProps | StorageProps[];
 }
+
+// Explicit config alias that’s discoverable via createState.in
+export interface ExplicitStateConfig<T extends Record<string, any>>
+  extends StateConfig<T> {}
 
 /**
  * Create a reactive state object
@@ -178,19 +220,17 @@ export interface StateConfig<T extends Record<string, any>> {
  * 
  * ```
  */
+export function createState<C extends StateConfig<any>>(
+  config: C
+): State<C["initialState"]> & ExplicitReturnFromConfig<C>;
+
 export function createState<T extends Record<string, any>>(
   initialState: T
 ): State<T>;
 
 export function createState<T extends Record<string, any>>(
-  config: StateConfig<T>
-): State<T> & { trigger: Record<string, (...args: any[]) => void> };
-
-export function createState<T extends Record<string, any>>(
   configOrInitialState: StateConfig<T> | T
-):
-  | State<T>
-  | (State<T> & { trigger: Record<string, (...args: any[]) => void> }) {
+): any {
   // Determine if we're using the separation pattern or explicit pattern
   const isExplicitPattern =
     configOrInitialState &&
@@ -453,3 +493,25 @@ export function createState<T extends Record<string, any>>(
   // Return state (TypeScript will handle the overloading)
   return state as any;
 }
+
+// Attach discoverable explicit alias: createState.in
+export const createStateIn = <C extends ExplicitStateConfig<any>>(config: C) =>
+  (createState(config as any) as State<C["initialState"]> & ExplicitReturnFromConfig<C>);
+
+// Use bracket syntax to avoid reserved identifier issues
+// Consumers can call createState["in"](...) or createState.in(...)
+(createState as any)["in"] = createStateIn;
+
+// Provide a typed interface for `createState["in"]` using declaration merging via interface
+// Augment the exported function type so TS sees the `in` property
+type CreateStateType = typeof createState & {
+  in: <C extends ExplicitStateConfig<any>>(
+    config: C
+  ) => State<C["initialState"]> & ExplicitReturnFromConfig<C>;
+};
+
+// Assign the runtime property
+(createState as unknown as { [key: string]: any }).in = createStateIn;
+
+// Re-export a widened typing so importers see `.in`
+export const createStateWithIn = createState as CreateStateType;

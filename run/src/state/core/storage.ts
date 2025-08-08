@@ -41,6 +41,15 @@ export interface StorageProps {
   deserialize?: (data: string) => any;
 }
 
+// Typed storage props bound to a state shape
+export type StoragePropsFor<T extends Record<string, any>> = Omit<
+  StorageProps,
+  "include" | "exclude"
+> & {
+  include?: (keyof T)[];
+  exclude?: (keyof T)[];
+};
+
 export interface StorageExtensionProp {
   getItem(key: string): string | null | Promise<string | null>;
   setItem(key: string, value: string): void | Promise<void>;
@@ -71,6 +80,16 @@ export interface StorageExtensionProp {
 export function createStorage<T extends Record<string, any>>(
   state: State<T>,
   options: StorageProps
+): () => void;
+
+export function createStorage<T extends Record<string, any>>(
+  state: State<T>,
+  options: StoragePropsFor<T>
+): () => void;
+
+export function createStorage<T extends Record<string, any>>(
+  state: State<T>,
+  options: StorageProps | StoragePropsFor<T>
 ): () => void {
   const storage = getStorage(options.backend);
   const serialize = options.serialize || JSON.stringify;

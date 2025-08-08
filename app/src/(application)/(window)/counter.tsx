@@ -47,7 +47,7 @@ export function Counter() {
 
   return (
     <>
-      <div className="flex flex-col h-screen justify-center items-center gap-10 bg-black">
+      <div className="flex flex-col h-screen justify-center items-center gap-10">
         <h1 className="text-yellow-500 text-8xl">🚀 InSpatial App</h1>
         <div className="max-w-2xl">
           <List each={counterState.entries} track="id">

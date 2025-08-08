@@ -1,3 +1,5 @@
+import type { Signal } from "../signal/signal.ts"
+
 export type PropSetter = (node: Element, value: unknown) => void;
 export type DirectiveResolver = (
   prefix: string,
@@ -5,17 +7,26 @@ export type DirectiveResolver = (
   prop?: string
 ) => PropSetter | undefined;
 
+export type ExtensionSignal<T> = Pick<Signal<T>, "get" | "peek" | "connect" | "subscribe">
+
+/**
+ * Renderer-agnostic extension surface
+ * Keep this minimal and generic.
+ */
 export interface RendererExtension {
   name: string;
-  onDirective?: DirectiveResolver | DirectiveResolver[];
-  namespaces?: Record<string, string>;
-  tagNamespaceMap?: Record<string, string>;
-  tagAliases?: Record<string, string>;
-  propAliases?: Record<string, string>;
-  /** Optional setup hook, called after renderer is created */
+  /** Global setup hook, called after renderer is created */
   setup?: (renderer: any) => void;
   /** Optional validation hook in dev builds */
   validate?: () => void;
+  /** Renderer-specific capability buckets */
+  props?: {
+    onDirective?: DirectiveResolver | DirectiveResolver[];
+    namespaces?: Record<string, string>;
+    tagNamespaceMap?: Record<string, string>;
+    tagAliases?: Record<string, string>;
+    propAliases?: Record<string, string>;
+  };
 }
 
 export type RendererExtensions =
@@ -47,14 +58,7 @@ export function normalizeExtensions(
   const setups: Array<(renderer: any) => void> = [];
 
   for (const ext of extArray) {
-    if (ext?.namespaces) Object.assign(namespaces, ext.namespaces);
-    if (ext?.tagNamespaceMap)
-      Object.assign(tagNamespaceMap, ext.tagNamespaceMap);
-    if (ext?.tagAliases) Object.assign(tagAliases, ext.tagAliases);
-    if (ext?.propAliases) Object.assign(propAliases, ext.propAliases);
-    const r = ext?.onDirective;
-    if (Array.isArray(r)) resolvers.push(...r.filter(Boolean));
-    else if (r) resolvers.push(r);
+    // Global setup
     if (ext?.setup) setups.push(ext.setup);
     if (ext?.validate) {
       try {
@@ -62,6 +66,18 @@ export function normalizeExtensions(
       } catch (e) {
         console.warn(`[extensions] validate() failed for ${ext.name}:`, e);
       }
+    }
+
+    // Props capability (renderer-agnostic directive layer)
+    const props = ext?.props;
+    if (props) {
+      if (props.namespaces) Object.assign(namespaces, props.namespaces);
+      if (props.tagNamespaceMap) Object.assign(tagNamespaceMap, props.tagNamespaceMap);
+      if (props.tagAliases) Object.assign(tagAliases, props.tagAliases);
+      if (props.propAliases) Object.assign(propAliases, props.propAliases);
+      const r = props.onDirective;
+      if (Array.isArray(r)) resolvers.push(...r.filter(Boolean));
+      else if (r) resolvers.push(r);
     }
   }
 

@@ -1,6 +1,7 @@
 // Primary mode-based API (recommended approach)
 export { createRenderer, type RenderModeOptions } from "./modes.ts";
 export type {
+  ExtensionSignal,
   RendererExtension,
   RendererExtensions,
   NormalizedExtensions,
