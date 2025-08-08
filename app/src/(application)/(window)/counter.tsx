@@ -12,40 +12,38 @@ import {
   type Entry,
 } from "./state.ts";
 
-
 // ########################## (TRIGGER PROPS TEST SIGNALS) ##########################
 
-
 export function Counter() {
+  // Test signals for trigger props
+  const testSignals = {
+    // Dynamic colors based on count
+    backgroundColor: $(() => {
+      const count = counterState.count.get();
+      if (count > 20) return "rgb(34, 197, 94)"; // green
+      if (count > 10) return "rgb(59, 130, 246)"; // blue
+      if (count > 5) return "rgb(245, 158, 11)"; // yellow
+      return "rgb(239, 68, 68)"; // red
+    }),
 
+    // Dynamic text color
+    textColor: $(() => {
+      const count = counterState.count.get();
+      return count > 15 ? "white" : "black";
+    }),
 
-// Test signals for trigger props
-const testSignals = {
-  // Dynamic colors based on count
-  backgroundColor: $(() => {
-    const count = counterState.count.get();
-    if (count > 20) return "rgb(34, 197, 94)"; // green
-    if (count > 10) return "rgb(59, 130, 246)"; // blue
-    if (count > 5) return "rgb(245, 158, 11)"; // yellow
-    return "rgb(239, 68, 68)"; // red
-  }),
-  
-  // Dynamic text color
-  textColor: $(() => {
-    const count = counterState.count.get();
-    return count > 15 ? "white" : "black";
-  }),
-  
-  // Dynamic classes
-  isHighCount: $(() => counterState.count.get() > 10),
-  isPulseActive: $(() => counterState.count.get() % 5 === 0 && counterState.count.get() > 0),
-  
-  // Dynamic styles
-  borderWidth: $(() => Math.max(1, Math.floor(counterState.count.get() / 3))),
-  fontSize: $(() => Math.max(16, 16 + counterState.count.get())),
-};
+    // Dynamic classNamees
+    isHighCount: $(() => counterState.count.get() > 10),
+    isPulseActive: $(
+      () => counterState.count.get() % 5 === 0 && counterState.count.get() > 0
+    ),
 
-/*******************************(Render)*************************************/
+    // Dynamic styles
+    borderWidth: $(() => Math.max(1, Math.floor(counterState.count.get() / 3))),
+    fontSize: $(() => Math.max(16, 16 + counterState.count.get())),
+  };
+
+  /*******************************(Render)*************************************/
 
   return (
     <>
@@ -83,9 +81,9 @@ const testSignals = {
         {/* ✅ TRIGGER PROPS TEST SECTION */}
         <div className="bg-gray-900 p-6 rounded-lg text-center border-2 border-green-500">
           <h2 className="text-green-400 text-xl mb-4">🎯 Trigger Props Test</h2>
-          
+
           {/* Test style: trigger props */}
-          <div 
+          <div
             className="p-4 rounded-lg mb-4 transition-all duration-300"
             style:background-color={testSignals.backgroundColor}
             style:color={testSignals.textColor}
@@ -95,30 +93,15 @@ const testSignals = {
             Dynamic Styles! Count: {$(() => counterState.count.get())}
           </div>
 
-          {/* Test class: trigger props */}
-          <div 
+          {/* Test className: trigger props */}
+          <div
             className="p-4 rounded-lg mb-4 transition-all duration-300"
-            class:animate-pulse={testSignals.isPulseActive}
-            class:scale-110={testSignals.isHighCount}
-            class:bg-gradient-to-r={testSignals.isHighCount}
-            class:from-purple-500={testSignals.isHighCount}
-            class:to-pink-500={testSignals.isHighCount}
-          >
-            Dynamic Classes! {testSignals.isHighCount.get() ? "HIGH COUNT!" : "Low count"}
-          </div>
-
-          <div className="text-sm text-green-300 mb-4">
-            ✅ style:background-color, style:color, style:border-width, style:font-size<br/>
-            ✅ class:animate-pulse, class:scale-110, class:bg-gradient-to-r<br/>
-            Try clicking buttons to see dynamic trigger props in action!
-          </div>
-
-          <div className="text-sm text-green-300">
-            📚 See <code>registerTriggerHandler()</code> JSDoc for examples of creating custom platform-specific triggers like:<br/>
-            • <code>on:swipe</code> - Custom touch gesture detection<br/>
-            • <code>on:iosOnlyInput</code> - iOS-enhanced input with fallback<br/>
-            • <code>on:spatialTap</code> - XR spatial events with click fallback
-          </div>
+            className:animate-pulse={testSignals.isPulseActive}
+            className:scale-110={testSignals.isHighCount}
+            className:bg-gradient-to-r={testSignals.isHighCount}
+            className:from-purple-500={testSignals.isHighCount}
+            className:to-pink-500={testSignals.isHighCount}
+          />
         </div>
 
         {/* Explicit Pattern Demo */}
@@ -272,34 +255,43 @@ const testSignals = {
 
         {/* ✅ COMPREHENSIVE UNIFIED TRIGGER TEST */}
         <div className="bg-gradient-to-r from-emerald-900 to-teal-900 p-6 rounded-lg text-center max-w-4xl">
-          <h2 className="text-emerald-300 text-2xl mb-4">🚀 Unified Trigger System Demo</h2>
-          
+          <h2 className="text-emerald-300 text-2xl mb-4">
+            🚀 Unified Trigger System Demo
+          </h2>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             {/* Built-in Trigger Props */}
             <div className="bg-emerald-800 p-4 rounded">
-              <h3 className="text-emerald-200 font-bold mb-2">Built-in Props</h3>
-              <div 
+              <h3 className="text-emerald-200 font-bold mb-2">
+                Built-in Props
+              </h3>
+              <div
                 className="p-2 rounded mb-2 transition-all duration-300"
                 style:background-color={testSignals.backgroundColor}
-                style:transform={$(() => `scale(${1 + counterState.count.get() * 0.01})`)}
-                class:animate-bounce={$(() => counterState.count.get() % 10 === 0)}
+                style:transform={$(
+                  () => `scale(${1 + counterState.count.get() * 0.01})`
+                )}
+                className:animate-bounce={$(
+                  () => counterState.count.get() % 10 === 0
+                )}
               >
                 Count: {$(() => counterState.count.get())}
               </div>
               <div className="text-xs text-emerald-300">
-                ✅ style: props<br/>
-                ✅ class: props<br/>
-                ✅ Dynamic reactivity
+                ✅ style: props
+                <br />
+                ✅ className: props
+                <br />✅ Dynamic reactivity
               </div>
             </div>
-            
+
             {/* Standard Event Triggers */}
             <div className="bg-teal-800 p-4 rounded">
               <h3 className="text-teal-200 font-bold mb-2">Standard Events</h3>
               <button
                 className="bg-teal-600 px-3 py-1 rounded mb-1 text-white w-full"
                 on:click={() => {
-                  console.log('✅ Standard on:click working!');
+                  console.log("✅ Standard on:click working!");
                   builtInTrigger.increment();
                 }}
               >
@@ -309,27 +301,32 @@ const testSignals = {
                 className="bg-teal-700 px-2 py-1 rounded text-white w-full text-sm"
                 placeholder="on:input test"
                 on:input={(e: any) => {
-                  console.log('✅ Standard on:input working!', e.target.value);
+                  console.log("✅ Standard on:input working!", e.target.value);
                 }}
               />
               <div className="text-xs text-teal-300 mt-1">
-                ✅ on:click events<br/>
-                ✅ on:input events<br/>
-                ✅ DOM integration
+                ✅ on:click events
+                <br />
+                ✅ on:input events
+                <br />✅ DOM integration
               </div>
             </div>
-            
+
             {/* Extensible Registry */}
             <div className="bg-cyan-800 p-4 rounded">
-              <h3 className="text-cyan-200 font-bold mb-2">Extensible Registry</h3>
+              <h3 className="text-cyan-200 font-bold mb-2">
+                Extensible Registry
+              </h3>
               <div className="bg-cyan-700 px-3 py-2 rounded mb-2 text-white text-sm">
                 <code>registerTriggerHandler()</code>
               </div>
               <div className="text-xs text-cyan-300">
-                ✅ Custom trigger registration<br/>
-                ✅ Platform-specific handlers<br/>
-                ✅ Automatic fallbacks<br/>
-                ✅ See JSDoc for examples
+                ✅ Custom trigger registration
+                <br />
+                ✅ Platform-specific handlers
+                <br />
+                ✅ Automatic fallbacks
+                <br />✅ See JSDoc for examples
               </div>
             </div>
           </div>

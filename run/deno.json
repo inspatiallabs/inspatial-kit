@@ -8,6 +8,7 @@
     "./kit": "./src/kit/index.ts",
     "./kit/control-flow": "./src/kit/control-flow/index.ts",
     "./renderer": "./src/renderer/index.ts",
+    "./renderer/extensions": "./src/renderer/extensions.ts",
     "./renderer/create-renderer": "./src/renderer/create-renderer.ts",
     "./renderer/dom": "./src/renderer/dom.ts",
     "./renderer/html": "./src/renderer/html.ts",
@@ -22,6 +23,7 @@
     "./jsx-runtime": "./src/runtime/jsx-runtime.ts",
     "./jsx-dev-runtime": "./src/runtime/jsx-dev-runtime.ts",
     "./trigger": "./src/trigger/index.ts",
+    "./trigger/triggerPropExtension": "./src/trigger/trigger-prop-extension.ts",
     "./env": "./src/env/index.ts",
     "./hot": "./src/hot/index.ts",
     "./debug": "./src/debug/index.ts"

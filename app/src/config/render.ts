@@ -1,19 +1,13 @@
 // deno-lint-ignore-file
 import { createRenderer } from "@inspatial/renderer";
-// import { withTriggerProps } from "@inspatial/trigger";
+import { triggerPropExtension } from "@inspatial/state";
 import { App } from "@inspatial/app/(application)/(window)/flat.tsx";
 
 // 1. Create InSpatial renderer with trigger props integration
 createRenderer({
   mode: "auto",
   debug: "minimal",
-  // extensions: {
-  //   onDirective: withTriggerProps.onTriggerProp,
-  //   namespaces: withTriggerProps.namespaces,
-  //   tagNamespaceMap: withTriggerProps.tagNamespaceMap,
-  //   tagAliases: withTriggerProps.tagAliases,
-  //   propAliases: withTriggerProps.propAliases,
-  // }
+  extensions: [triggerPropExtension],
 }).then((InSpatial: any) => {
   InSpatial.render(document.getElementById("app"), App);
 });

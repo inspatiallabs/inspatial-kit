@@ -3,17 +3,12 @@
   "tasks": {
     "css:watch": "deno run -A npm:@tailwindcss/cli@latest -i src/config/app.css -o dist/kit.css --content 'src/**/*.{ts,tsx,js,jsx}' --watch",
     "js:watch": "deno bundle --platform=browser --output=dist/bundle.js --sourcemap --watch src/config/render.ts",
-    "build-dev": "deno task setup && deno task css:watch && deno bundle --platform=browser --output=dist/bundle.js --sourcemap --watch src/config/render.ts",
     "build": "deno task setup && deno bundle --platform=browser --output=dist/bundle.js --sourcemap --minify src/config/render.ts",
     "setup": "powershell -Command \"New-Item -ItemType Directory -Force -Path dist/asset; deno run -A npm:@tailwindcss/cli@latest -i src/config/app.css -o dist/kit.css --content 'src/**/*.{ts,tsx,js,jsx}'; Copy-Item src/asset/favicon.png dist/asset/favicon.png; Copy-Item index.html dist/index.html\"",
     "serve": "deno run --allow-net --allow-read --allow-write --allow-env --allow-run src/config/serve.ts",
     "clean": "rm -rf dist && rm -rf node_modules && rm -rf deno.lock"
   },
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
     "lib": ["ES2022", "DOM", "DOM.Iterable", "deno.ns"],
     "jsxImportSource": "@inspatial/run",
     "jsx": "react-jsx"
@@ -25,11 +20,12 @@
     "@inspatial/runtime": "../run/src/runtime/index.ts",
     "@inspatial/run/jsx-runtime": "../run/src/runtime/jsx-runtime.ts",
     "@inspatial/run/jsx-dev-runtime": "../run/src/runtime/jsx-dev-runtime.ts",
-    "@inspatial/state": "../run/src/state/index.ts",
-    "@inspatial/signal": "../run/src/signal/index.ts",
     "@inspatial/kit": "../run/src/kit/index.ts",
     "@inspatial/renderer": "../run/src/renderer/index.ts",
-    "@inspatial/trigger": "../run/src/trigger/index.ts",
+    "@inspatial/signal": "../run/src/signal/index.ts",
+    "@inspatial/state": "../run/src/state/index.ts",
+    "@inspatial/state/core": "../run/src/state/core/index.ts",
+    "@inspatial/state/trigger": "../run/src/state/trigger/index.ts",
     "@inspatial/env": "../run/src/env/index.ts",
     "@inspatial/hot": "../run/src/hot/index.ts",
     "@inspatial/debug": "../run/src/debug/index.ts",

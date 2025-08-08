@@ -1,9 +1,4 @@
-import {
-  createState,
-  createTrigger,
-  createStorage,
-} from "../../../../run/src/state/index.ts";
-import { $ } from "../../../../run/src/signal/index.ts";
+import { createState, createStorage, createTrigger } from "@inspatial/state";
 // import { cloud } from "@inspatial/app/api/inspatial-cloud.api.ts";
 
 // ########################## (CLOUD) ##########################
@@ -230,8 +225,8 @@ createStorage(counterState, {
 // ==================== ENHANCED EXPLICIT PATTERN DEMO ====================
 // 🚀 Explicit pattern now has SAME POWER as separation pattern!
 
-type EnhancedExplicitStateType = { 
-  advancedCount: number; 
+type EnhancedExplicitStateType = {
+  advancedCount: number;
   status: string;
 };
 
@@ -239,63 +234,61 @@ export const enhancedExplicitState = createState<EnhancedExplicitStateType>({
   id: "enhanced-explicit",
   initialState: {
     advancedCount: 0,
-    status: "🚀 Enhanced explicit!"
+    status: "🚀 Enhanced explicit!",
   },
   trigger: {
     // 🔧 Traditional key-based
     increment: {
-      key: 'advancedCount',
+      key: "advancedCount",
       action: (current: number, amount = 1) => current + amount,
-      options: { name: "enhanced-increment", throttle: 50 }
+      options: { name: "enhanced-increment", throttle: 50 },
     },
-    
-    // 🌐 NEW: Cross-state operations in explicit pattern!
+
     syncWithOtherStates: {
-      key: 'advancedCount',
+      key: "advancedCount",
       action: (current: number) => {
         // Access external states during mutation!
         const separationCount = counterState.count.get();
         counterState.multiplier.set(current); // Modify external state!
         return current + separationCount;
       },
-      options: { name: "cross-state-operations" }
+      options: { name: "cross-state-operations" },
     },
-    
-    // 📍 NEW: External state targeting via tuple!
+
     incrementExternalState: {
-      target: [counterState, 'count'],
+      target: [counterState, "count"],
       action: (current: number) => current + 10,
-      options: { name: "external-state-increment", debounce: 200 }
+      options: { name: "external-state-increment", debounce: 200 },
     },
-    
+
     updateStatus: {
-      key: 'status',
+      key: "status",
       action: (_: string, newStatus: string) => `🚀 ${newStatus}`,
-      options: { name: "status-update", debounce: 300 }
-    }
+      options: { name: "status-update", debounce: 300 },
+    },
   },
   storage: {
-    key: 'enhanced-explicit-state',
-    backend: 'local'
-  }
+    key: "enhanced-explicit-state",
+    backend: "local",
+  },
 });
 
 // 🔥 Dynamic trigger management demo
 setTimeout(() => {
-  enhancedExplicitState.addTrigger?.('runtimeTrigger', {
-    key: 'advancedCount',
+  enhancedExplicitState.addTrigger?.("runtimeTrigger", {
+    key: "advancedCount",
     action: (current: number) => current + 100,
-    options: { name: 'dynamic-runtime-trigger' }
+    options: { name: "dynamic-runtime-trigger" },
   });
-  console.log('🎉 Runtime trigger added to enhanced explicit state!');
+  console.log("🎉 Runtime trigger added to enhanced explicit state!");
 }, 1000);
 
 // ==================== ENHANCED STORAGE PATTERN DEMO ====================
 // 🚀 Explicit pattern now has SAME STORAGE POWER as separation pattern!
 
-type StorageEnhancedStateType = { 
-  data: string; 
-  count: number; 
+type StorageEnhancedStateType = {
+  data: string;
+  count: number;
   temp: string;
 };
 
@@ -304,70 +297,69 @@ export const storageEnhancedState = createState<StorageEnhancedStateType>({
   initialState: {
     data: "persistent data",
     count: 0,
-    temp: "temporary data"
+    temp: "temporary data",
   },
   trigger: {
     updateData: {
-      key: 'data',
+      key: "data",
       action: (_: string, newData: string) => newData,
-      options: { name: "update-data", debounce: 300 }
+      options: { name: "update-data", debounce: 300 },
     },
     incrementCount: {
-      key: 'count',
+      key: "count",
       action: (current: number) => current + 1,
-      options: { name: "increment-count" }
+      options: { name: "increment-count" },
     },
     updateTemp: {
-      key: 'temp',
+      key: "temp",
       action: (_: string, newTemp: string) => newTemp,
-      options: { name: "update-temp" }
-    }
+      options: { name: "update-temp" },
+    },
   },
-  // 🚀 NEW: Multiple storage backends in explicit pattern!
   storage: [
     {
-      key: 'storage-enhanced-main',
-      backend: 'local',
-      exclude: ['temp'], // Don't persist temp data
-      debounce: 500
+      key: "storage-enhanced-main",
+      backend: "local",
+      exclude: ["temp"], // Don't persist temp data
+      debounce: 500,
     },
     {
-      key: 'storage-enhanced-session',
-      backend: 'session',
-      include: ['temp'], // Only persist temp to session
-      debounce: 100
+      key: "storage-enhanced-session",
+      backend: "session",
+      include: ["temp"], // Only persist temp to session
+      debounce: 100,
     },
     {
-      key: 'storage-enhanced-memory',
-      backend: 'memory',
-      include: ['count'], // Memory backup for count
+      key: "storage-enhanced-memory",
+      backend: "memory",
+      include: ["count"], // Memory backup for count
       serialize: (data) => JSON.stringify(data),
-      deserialize: (data) => JSON.parse(data)
-    }
-  ]
+      deserialize: (data) => JSON.parse(data),
+    },
+  ],
 });
 
 // 🔥 Dynamic storage management demo
 setTimeout(() => {
   // Add more storage at runtime!
   const _cleanup = storageEnhancedState.addStorage?.({
-    key: 'runtime-storage',
-    backend: 'local',
-    include: ['data'],
-    debounce: 200
+    key: "runtime-storage",
+    backend: "local",
+    include: ["data"],
+    debounce: 200,
   });
-  
-  console.log('💾 Runtime storage added!');
-  console.log('📊 Storage info:', storageEnhancedState.getStorageInfo?.());
-  
+
+  console.log("💾 Runtime storage added!");
+  console.log("📊 Storage info:", storageEnhancedState.getStorageInfo?.());
+
   // Test storage management
   setTimeout(() => {
     storageEnhancedState.pauseStorage?.();
-    console.log('⏸️ Storage paused');
-    
+    console.log("⏸️ Storage paused");
+
     setTimeout(() => {
       storageEnhancedState.resumeStorage?.();
-      console.log('▶️ Storage resumed');
+      console.log("▶️ Storage resumed");
     }, 1000);
   }, 2000);
 }, 1500);

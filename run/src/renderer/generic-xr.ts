@@ -1,15 +1,17 @@
-import { createRenderer } from './create-renderer.ts';
+import { createRenderer } from "./create-renderer.ts";
+import { normalizeExtensions, type RendererExtensions } from "./extensions.ts";
 
-export interface GenericXRExtensions {
+export interface GenericXROptions {
   rendererID?: string;
-  [key: string]: any;
+  extensions?: RendererExtensions;
 }
 
 /**
  * Generic XR renderer fallback
  */
-export function GenericXRRenderer(options: GenericXRExtensions = {}): any {
+export function GenericXRRenderer(options: GenericXROptions = {}): any {
   const { rendererID = "GenericXR" } = options;
+  const { setups } = normalizeExtensions(options.extensions);
 
   // Basic XR renderer for WebXR environments
   console.log("Using generic XR renderer for WebXR environment");
@@ -50,6 +52,13 @@ export function GenericXRRenderer(options: GenericXRExtensions = {}): any {
     insertBefore: () => {},
     setProps: (node: any, props: any) => Object.assign(node.props, props),
   };
-
-  return createRenderer(nodeOps, rendererID);
-} 
+  const renderer = createRenderer(nodeOps, rendererID);
+  setups.forEach((fn) => {
+    try {
+      fn(renderer);
+    } catch (e) {
+      console.warn("[extensions] setup() failed:", e);
+    }
+  });
+  return renderer;
+}

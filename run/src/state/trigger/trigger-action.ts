@@ -1,9 +1,9 @@
 /**
- * Trigger System
+ * Trigger Action System
  */
 
-import { type Signal, untrack, tick, isSignal } from "../signal/index.ts";
-import type { State } from "./state.ts";
+import { type Signal, untrack, tick, isSignal } from "../../signal/index.ts";
+import type { State } from "../core/state.ts";
 
 export interface TriggerOptions {
   /**

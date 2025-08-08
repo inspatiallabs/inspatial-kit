@@ -1,10 +1,8 @@
-import {
-  detectEnvironment,
-  getRendererType,
-  EnvironmentInfo,
-} from "./environment.ts";
+import { detectEnvironment, getRendererType } from "./environment.ts";
+import type { EnvironmentInfo } from "./environment.ts";
 import { XRRenderer } from "./xr.ts";
 import { NativeScriptRenderer } from "./nativescript.ts";
+import { type RendererExtensions } from "./extensions.ts";
 
 /**
  * Universal Renderer Configuration
@@ -15,7 +13,7 @@ export interface UniversalExtensions {
   /** Environment detection override */
   environment?: EnvironmentInfo;
   /** Renderer-specific options */
-  extensions?: any;
+  extensions?: RendererExtensions;
   /** Enable debug logging */
   debug?: boolean;
 }
@@ -27,12 +25,7 @@ export interface UniversalExtensions {
 export async function createUniversalRenderer(
   options: UniversalExtensions = {}
 ): Promise<any> {
-  const {
-    forceRenderer,
-    environment,
-    extensions = {},
-    debug = false,
-  } = options;
+  const { forceRenderer, environment, extensions, debug = false } = options;
 
   // Detect environment
   const env = environment || detectEnvironment();
@@ -54,10 +47,7 @@ export async function createUniversalRenderer(
     case "dom": {
       // Import DOM renderer dynamically to avoid issues in non-DOM environments
       const { DOMRenderer } = await import("./dom.ts");
-      const renderer = DOMRenderer({
-        rendererID: "Universal-DOM",
-        ...extensions,
-      });
+      const renderer = DOMRenderer({ rendererID: "Universal-DOM", extensions });
 
       if (debug) {
         console.log("✅ DOM renderer created");
@@ -70,7 +60,7 @@ export async function createUniversalRenderer(
       // Create NativeScript renderer for native mobile apps
       const nativeRenderer = NativeScriptRenderer({
         rendererID: "Universal-NativeScript",
-        ...extensions,
+        extensions,
       });
 
       if (debug) {
@@ -85,7 +75,7 @@ export async function createUniversalRenderer(
       const xrRenderer = XRRenderer({
         rendererID: "Universal-XR",
         environment: env,
-        ...extensions,
+        extensions,
       });
 
       if (debug) {
@@ -100,7 +90,7 @@ export async function createUniversalRenderer(
       const { HTMLRenderer } = await import("./html.ts");
       const renderer = HTMLRenderer({
         rendererID: "Universal-HTML",
-        ...extensions,
+        extensions,
       });
 
       if (debug) {
@@ -115,7 +105,7 @@ export async function createUniversalRenderer(
       const { DOMRenderer } = await import("./dom.ts");
       const renderer = DOMRenderer({
         rendererID: "Universal-DOM-Fallback",
-        ...extensions,
+        extensions,
       });
 
       if (debug) {

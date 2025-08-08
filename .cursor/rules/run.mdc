@@ -74,14 +74,14 @@ Use the extensive signal operation methods (`.and()`, `.eq()`, `.gt()`, etc.) fo
 
 NOTE: hasValue returns plain boolean. Returns true when the value of the signal is not nullish.
 
-NOTE: Both Signal Core and Lite cover nearly the same APIs with the rules above are specific to `@in/teract/signal-lite`
+NOTE: Both Signal Core and Lite cover nearly the same APIs with the rules above are specific to `@in/teract/signal-ref`
 
 **2. InSpatial State**
-InSpatial State is built-in state management system for InSpatial Run. It is built on top of InSpatial's reactive signal module `@in/interact`. NOTE: InSpatial State is not fully vetted and tested so all state management and interactivity should use the Signal Lite primitives from `@in/teract/signal-lite` as a substitue. \* \*\*Soon...
+InSpatial State is built-in state management system for InSpatial Run. It is built on top of InSpatial's reactive signal module `@in/interact`. NOTE: InSpatial State is not fully vetted and tested so all state management and interactivity should use the Signal Lite primitives from `@in/teract/signal-ref` as a substitue. \* \*\*Soon...
 
 **3. InSpatial Kit & Components:**
 
-- **Structure:** A component is a function `(props, ...children) => (R) => Node`. The inner function receives the renderer `R`.
+- **Structure:** A component is a function `(props, ...children) => Node`. The inner function receives the renderer `R`.
 - **Structure & Control Flow Components:**
   _ `<Show when={signal}>`: Conditional rendering. Supports `true` and `else` props. For one-off static conditions, you can use inline typescript to return the desired branch directly just like in React(but will not have reactivity).
   _ `<List each={signalOfArray} track="key" indexed={true}>`: Efficiently renders lists with reconciliation by handling all list rendering scenarios. Automatically handles static arrays and signals, eliminates need for `derivedExtract`, provides direct item access in templates. Use `track` for stable keys when data changes completely. Exposes `getItem()`, `remove()`, `clear()` methods. Template functions receive raw item data directly for clean, readable syntax. 
@@ -105,15 +105,15 @@ InSpatial State is built-in state management system for InSpatial Run. It is bui
 
 - **Extensible Architecture:** Decouples component logic from rendering environment.
 - **`createRenderer(nodeOps, rendererID?)`:** Creates a custom renderer.
-- **`DOMRenderer(withTriggerProps)` (`@inspatial/run/renderer/dom`):** For interactive web applications.
+- **`DOMRenderer(triggerPropExtension)` (`@inspatial/run/renderer/dom`):** For interactive web applications.
   _ **Triggers & Event Handling:** `on:eventName` (e.g., `on:click`). Supports modifiers like `on-once:`, `on-passive:`, `on-capture:`, `on-prevent:`, `on-stop:`.
   _ **Props & Attributes:** Automatically handles DOM properties vs. HTML attributes. Use `attr:` prefix for attributes, `prop:` for properties(default, usually don't needed).
   _ **Browser Preset Directives:** `class:className={signal}` for conditional classes, `style:property={value}` for individual styling (CSS) properties.
   _ **Handling Dynamic HTML Content:** For inserting dynamic HTML (e.g., from APIs), prefer parsing the HTML into a `DocumentFragment` and rendering it directly within the component. This is more robust and integrates better with InSpatial's retained mode rendering than using `innerHTML` directly, which can have security implications and reconciliation challenges.
 
-- **`NativeRenderer(withTriggerProps)` (`@inspatial/run/renderer/native`):** For interactive iOS, Android and VisionOS applications. \* \*\*Soon...
+- **`NativeRenderer(triggerPropExtension)` (`@inspatial/run/renderer/native`):** For interactive iOS, Android and VisionOS applications. \* \*\*Soon...
 
-- **`GPURenderer(withTriggerProps)` (`@inspatial/run/renderer/spatial`):** For interactive 3D & XR applications. \* \*\*Soon...
+- **`GPURenderer(triggerPropExtension)` (`@inspatial/run/renderer/spatial`):** For interactive 3D & XR applications. \* \*\*Soon...
 
 **5. InSpatial Runtime (JSX):**
 Built on top the universal runtime
@@ -170,8 +170,8 @@ Note: hasValue returns plain boolean. Returns true when the value of the signal 
 
 **Renderer Setup:**
 
-- `DOMRenderer(withTriggerProps)` from `@in/dom`
-- `withTriggerProps` from `@inspatial/run/trigger` to ship the default/core web props i.e `class:` and `style:`
+- `DOMRenderer(triggerPropExtension)` from `@in/dom`
+- `triggerPropExtension` from `@inspatial/run/trigger` to ship the default/core web props i.e `class:` and `style:`
 - Trigger system & Event handling: `on:event`, `on-once:event`, `on-passive:event`, `on-capture:event`
 - Attributes: `attr:name`, `prop:name`, automatic detection for most cases
 
@@ -181,9 +181,31 @@ Note: hasValue returns plain boolean. Returns true when the value of the signal 
 
 JSX runtime is essential when using InSpatial together with runtimes like [Deno](https://github.com/denoland/deno/issues/29584), compilers like [SWC](https://github.com/swc-project/swc/issues/10553) or generators like [MDX](https://mdxjs.com/), since they lack the ability to correctly transform JSX via parameters.
 
-### Setup
 
-To use it, you first need to configure your build tool (like Vite, Rollup with Babel, Rspack or Webpack) to use InSpatial's JSX runtime.
+### Setup with InSpatial Serve (Default)
+InSpatial auto takes care of everything you would need to get started for its built on deno which bundles, mininfies, serves, style/css transforms, and supports smart file system watching and reload.
+
+create a `serve.ts` file in your config folder the same path as your `render.ts` file
+
+```typescript
+import { InSpatialServe } from "@inspatial/run/serve";
+await new InSpatialServe().run();
+```
+
+Then add your deno.json 
+
+```json
+{
+  "tasks": {
+    "serve": "deno run --allow-net --allow-read --allow-write --allow-env --allow-run src/config/serve.ts",
+  },
+}
+  ```
+
+
+### Setup with a build tool (Alternative)
+
+Your setup can be configured too build tool like (Vite, Rollup with Babel, Rspack or Webpack) to use InSpatial's JSX runtime.
 
 #### Vite (`vite.config.ts`)
 
@@ -254,10 +276,11 @@ import "./kit.css";
 import { createRenderer } from "@inspatial/run/renderer";
 import { App } from "../my/app/root.tsx";
 
-// 1. Create InSpatial renderer
+// 1. Create InSpatial renderer with Trigger Props
 createRenderer({
   mode: "browser",
   debug: "verbose",
+  extensions: [triggerPropExtension],
 }).then((InSpatial: any) => {
   InSpatial.render(document.getElementById("app"), App);
 });
@@ -318,9 +341,9 @@ export default defineConfig({
 | `{`Count: ${count}`}`                                       | `{$(() => \`Count: ${count.value}\`)}`or`{t\`Count: ${count}\`}` |
 | `className={isActive ? 'active' : ''}`                      | `class:active={isActive}`                                        |
 | `onClick={() => {}}`                                        | `on:click={() => {}}`                                            |
-| Components are functions                                    | Components return functions `(props) => (R) => JSX`              |
+| Components are functions                                    | Components return functions `(props) => JSX`              |
 | Virtual DOM re-renders                                      | Retained mode, direct DOM updates                                |
-| Conditional: `{condition && <div/>}`                        | `<Show when={signal}>{() => <div/>}</If>`                     |
+| Conditional: `{condition && <div/>}`                        | `<Show when={signal}>{() => <div/>}</Show>`                     |
 | Reactive Lists: `{items.map(item => <div key={item.id}/>)}` | `<List each={items} track="id">{(item) => <div/>}</List>`      |
 
 ---
@@ -339,7 +362,7 @@ const Counter = () => {
 // ✅ The InSpatial way - DO THIS
 const Counter = () => {
   const count = createSignal(0);
-  return (R) => <XStack on:click={() => count.value++}>Count: {count}</XStack>;
+  return () => <XStack on:click={() => count.value++}>Count: {count}</XStack>;
 };
 ```
 
@@ -360,9 +383,9 @@ const App = () => {
 // ✅ The InSpatial way - DO THIS
 const App = () => {
   const isVisible = createSignal(true);
-  return (R) => (
+  return (
     <XStack>
-      <Show when={isVisible}>{() => <div>Visible content</div>}</If>
+      <Show when={isVisible}>{() => <div>Visible content</div>}</Show>
       <Button on:click={() => (isVisible.value = !isVisible.value)}>
         Toggle
       </Button>
@@ -424,7 +447,7 @@ createEffect(() => {
 <button className={isActive ? 'btn active' : 'btn'}/>
 
  // ✅ The InSpatial way - DO THIS
-<Button class="btn" class:active={isActive}>
+<Button className="btn" class:active={isActive}>
 ```
 
 ### 6. Complex Reactive Expressions
@@ -448,7 +471,7 @@ const PostCard = async ({ id }: PostID) => {
   const story = await response.json();
 
   return (
-    <YStack class="story">
+    <YStack className="story">
       <Text>{story.title}</Text>
       <Text>By {story.author}</Text>
     </YStack>
@@ -470,7 +493,7 @@ const PostCard = async ({ id }: PostID) => {
 const count = createSignal(5)
 const isPositive = count.gt(0)          // count > 0
 const isZero = count.eq(0)              // count === 0
-const isEven = count.a../interact/signal-lite/App.jsxmod(2).eq(0)) // count && count % 2 === 0
+const isEven = count.a../interact/signal-ref/App.jsxmod(2).eq(0)) // count && count % 2 === 0
 
 // Conditional matching
 const status = createSignal('loading')
@@ -504,10 +527,10 @@ const templateUrl = t`https://inspatial.store/template?id=${templateId}`;
 ### 11. DOM/Web Renderer
 
 ```typescript
-import { DOMRenderer, withTriggerProps } from "@inspatial/run";
+import { DOMRenderer, triggerPropExtension } from "@inspatial/run";
 import App from "./app.tsx";
 
-const web = DOMRenderer(withTriggerProps);
+const web = DOMRenderer(triggerPropExtension);
 web.render(document.getElementById("root"), App);
 ```
 
@@ -516,7 +539,7 @@ NOTE: prefer the `createRenderer` function as it already encapsulates all the di
 
 ## Common Patterns
 
-1. **Component Structure**: `const MyComponent = (props) => (R) => <JSX/>`
+1. **Component Structure**: `const MyComponent = (props) => <JSX/>`
 2. **State**: `const state = createSignal(initialValue)`
 3. **Computed Values**: `const computed = $(() => state.value * 2)`
 4. **Effects**: `watch(() => { /* reactive code */ })`

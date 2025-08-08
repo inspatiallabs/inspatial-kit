@@ -4,9 +4,9 @@
 
 import { assertEquals, assertExists } from "https://deno.land/std/testing/asserts.ts";
 import { createState } from "./state.ts";
-import { createTrigger } from "./trigger.ts";
+import { createTrigger } from "../trigger/trigger-action.ts";
 import { createStorage, createMemoryStorage } from "./storage.ts";
-import { isSignal, $ } from "./index.ts";
+import { isSignal, $ } from "../../signal/index.ts";
 
 Deno.test("State V2 Tests", async (t) => {
   

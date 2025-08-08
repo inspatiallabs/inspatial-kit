@@ -1,15 +1,17 @@
-import { createRenderer } from './create-renderer.ts';
+import { createRenderer } from "./create-renderer.ts";
+import { normalizeExtensions, type RendererExtensions } from "./extensions.ts";
 
-export interface AndroidXRExtensions {
+export interface AndroidXROptions {
   rendererID?: string;
-  [key: string]: any;
+  extensions?: RendererExtensions;
 }
 
 /**
  * AndroidXR renderer for Android Extended Reality
  */
-export function AndroidXRRenderer(options: AndroidXRExtensions = {}): any {
+export function AndroidXRRenderer(options: AndroidXROptions = {}): any {
   const { rendererID = "AndroidXR" } = options;
+  const { setups } = normalizeExtensions(options.extensions);
 
   // TODO: Implement AndroidXR-specific rendering
   // This would integrate with Google's ARCore/VRCore APIs
@@ -53,6 +55,13 @@ export function AndroidXRRenderer(options: AndroidXRExtensions = {}): any {
     insertBefore: () => {},
     setProps: (node: any, props: any) => Object.assign(node.props, props),
   };
-
-  return createRenderer(nodeOps, rendererID);
-} 
+  const renderer = createRenderer(nodeOps, rendererID);
+  setups.forEach((fn) => {
+    try {
+      fn(renderer);
+    } catch (e) {
+      console.warn("[extensions] setup() failed:", e);
+    }
+  });
+  return renderer;
+}

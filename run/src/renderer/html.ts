@@ -1,15 +1,16 @@
 import { createRenderer } from "./create-renderer.ts";
-import { isSignal, peek, bind } from "../signal/index.ts";
-import { nop } from "../utils.ts";
+import { normalizeExtensions, type RendererExtensions } from "./extensions.ts";
+import { isSignal, peek } from "../signal/index.ts";
 
 const defaultRendererID = "HTML";
 
-export interface HTMLExtensions {
+export interface HTMLOptions {
   rendererID?: string;
   selfClosingTags?: Set<string>;
+  extensions?: RendererExtensions;
 }
 
-export function HTMLRenderer(options: HTMLExtensions = {}) {
+export function HTMLRenderer(options: HTMLOptions = {}): any {
   const {
     rendererID = defaultRendererID,
     selfClosingTags = new Set([
@@ -29,6 +30,8 @@ export function HTMLRenderer(options: HTMLExtensions = {}) {
       "wbr",
     ]),
   } = options;
+  // HTML renderer ignores trigger prop directives e.g. on:click, but we normalize for parity
+  const _normalized = normalizeExtensions(options.extensions);
 
   interface HTMLNode {
     _isHTMLNode: true;

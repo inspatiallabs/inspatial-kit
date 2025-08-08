@@ -12,13 +12,13 @@ import {
   tick,
   createEffect,
   type Signal,
-} from "../signal/index.ts";
+} from "../../signal/index.ts";
 import { createStorage, type StorageProps } from "./storage.ts";
 import {
   createTrigger,
   type UnifiedTriggerDefs,
   type TriggerOptions,
-} from "./trigger.ts";
+} from "../trigger/trigger-action.ts";
 
 export type State<T extends Record<string, any>> = {
   [K in keyof T]: Signal<T[K]>;

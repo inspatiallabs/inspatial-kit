@@ -1,15 +1,17 @@
-import { createRenderer } from './create-renderer.ts';
+import { createRenderer } from "./create-renderer.ts";
+import { normalizeExtensions, type RendererExtensions } from "./extensions.ts";
 
-export interface NativeScriptExtensions {
+export interface NativeScriptOptions {
   rendererID?: string;
-  [key: string]: any;
+  extensions?: RendererExtensions;
 }
 
 /**
- * NativeScript renderer 
+ * NativeScript renderer
  */
-export function NativeScriptRenderer(options: NativeScriptExtensions = {}): any {
+export function NativeScriptRenderer(options: NativeScriptOptions = {}): any {
   const { rendererID = "NativeScript" } = options;
+  const { setups } = normalizeExtensions(options.extensions);
 
   // TODO: Implement NativeScript renderer
   // This will provide a DOM-compatible interface for NativeScript
@@ -44,5 +46,13 @@ export function NativeScriptRenderer(options: NativeScriptExtensions = {}): any 
     setProps: (node: any, props: any) => Object.assign(node.props, props),
   };
 
-  return createRenderer(nodeOps, rendererID);
-} 
+  const renderer = createRenderer(nodeOps, rendererID);
+  setups.forEach((fn) => {
+    try {
+      fn(renderer);
+    } catch (e) {
+      console.warn("[extensions] setup() failed:", e);
+    }
+  });
+  return renderer;
+}

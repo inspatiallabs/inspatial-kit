@@ -327,22 +327,23 @@ export function createRenderer(
 
   function renderComponent(target: any, ...args: any[]): Component {
     const instance = (createComponent as any)(...args);
-    
+
     // Get component name for debug tracking
-    const componentName = args[0] && typeof args[0] === 'function' 
-      ? args[0].name || 'Anonymous' 
-      : 'Component';
-    
+    const componentName =
+      args[0] && typeof args[0] === "function"
+        ? args[0].name || "Anonymous"
+        : "Component";
+
     // Track render if debug context is available
     const debugCtx = (renderer as any)._debugCtx as DebugContext | undefined;
     const trackRender = debugCtx?.trackRender(componentName);
-    
+
     const node = render(instance, renderer);
     if (target && node) appendNode(target, node);
-    
+
     // Complete render tracking
     trackRender?.();
-    
+
     return instance;
   }
 

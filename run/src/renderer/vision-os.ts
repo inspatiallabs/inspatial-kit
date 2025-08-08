@@ -1,15 +1,17 @@
-import { createRenderer } from './create-renderer.ts';
+import { createRenderer } from "./create-renderer.ts";
+import { normalizeExtensions, type RendererExtensions } from "./extensions.ts";
 
-export interface VisionOSExtensions {
+export interface VisionOSOptions {
   rendererID?: string;
-  [key: string]: any;
+  extensions?: RendererExtensions;
 }
 
 /**
  * VisionOS renderer for Apple Vision Pro
  */
-export function VisionOSRenderer(options: VisionOSExtensions = {}): any {
+export function VisionOSRenderer(options: VisionOSOptions = {}): any {
   const { rendererID = "VisionOS" } = options;
+  const { setups } = normalizeExtensions(options.extensions);
 
   // TODO: Implement VisionOS-specific rendering
   // This would integrate with Apple's RealityKit/ARKit APIs
@@ -51,6 +53,13 @@ export function VisionOSRenderer(options: VisionOSExtensions = {}): any {
     insertBefore: () => {},
     setProps: (node: any, props: any) => Object.assign(node.props, props),
   };
-
-  return createRenderer(nodeOps, rendererID);
-} 
+  const renderer = createRenderer(nodeOps, rendererID);
+  setups.forEach((fn) => {
+    try {
+      fn(renderer);
+    } catch (e) {
+      console.warn("[extensions] setup() failed:", e);
+    }
+  });
+  return renderer;
+}

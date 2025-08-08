@@ -1,7 +1,9 @@
-import { nextTick, bind, isSignal } from "../signal/index.ts";
-import type { PlatformType } from "../state/trigger-types.ts";
+import { nextTick, bind, isSignal } from "../../signal/index.ts";
 
-/*#################################(Types)#################################*/
+/*#################################(Types)
+#################################*/
+
+export type PlatformType = "dom" | "native" | "gpu";
 
 /** Mapping of keys to arrays of values */
 type KeyValsMap = Record<string, string[]>;
@@ -193,36 +195,6 @@ export const triggerProps: TriggerPropsType = {
       bind(handler, val);
     };
   },
-  /********************************* (ClassName) *********************************/
-  // className(key: string): TriggerPropHandler {
-  //   return function (node: Element, val: any): void {
-  //     if (val === undefined || val === null) return;
-
-  //     const htmlElement = node as HTMLElement;
-
-  //     function handler(newVal: any): void {
-  //       nextTick(function (): void {
-  //         if (newVal === undefined || newVal === null || newVal === false) {
-  //           htmlElement.className = "";
-  //         } else if (typeof newVal === "string") {
-  //           htmlElement.className = newVal;
-  //         } else if (Array.isArray(newVal)) {
-  //           htmlElement.className = newVal.filter(Boolean).join(" ");
-  //         } else if (typeof newVal === "object") {
-  //           // Handle object format: { 'class1': true, 'class2': false }
-  //           const classes = Object.entries(newVal)
-  //             .filter(([_, active]) => Boolean(active))
-  //             .map(([className, _]) => className);
-  //           htmlElement.className = classes.join(" ");
-  //         } else {
-  //           htmlElement.className = String(newVal);
-  //         }
-  //       });
-  //     }
-
-  //     bind(handler, val);
-  //   };
-  // },
 };
 
 /*#################################(TriggerBridge Registry)#################################*/
@@ -236,19 +208,19 @@ interface TriggerBridgeHandler {
 
 class TriggerBridgeRegistry {
   private handlers = new Map<string, TriggerBridgeHandler>();
-  
+
   register(prefix: string, config: TriggerBridgeHandler): void {
     this.handlers.set(prefix, config);
   }
-  
+
   getHandler(prefix: string): TriggerPropHandler | undefined {
     return this.handlers.get(prefix)?.handler;
   }
-  
+
   has(prefix: string): boolean {
     return this.handlers.has(prefix);
   }
-  
+
   clear(): void {
     this.handlers.clear();
   }
@@ -265,11 +237,14 @@ function onTriggerProp(
   // 1. Check built-in trigger props (style, class) - highest priority
   const builtinHandler = triggerProps[prefix as keyof TriggerPropsType];
   if (builtinHandler) return builtinHandler(key);
-  
+
   // 2. Check platform bridge registry for dynamic handlers
-  const bridgeHandler = triggerBridgeRegistry.getHandler(prefix);
-  if (bridgeHandler) return bridgeHandler;
-  
+  const bridgeHandlerByPrefix = triggerBridgeRegistry.getHandler(prefix);
+  if (bridgeHandlerByPrefix) return bridgeHandlerByPrefix;
+
+  const bridgeHandlerByKey = triggerBridgeRegistry.getHandler(key);
+  if (bridgeHandlerByKey) return bridgeHandlerByKey;
+
   return undefined;
 }
 
@@ -288,13 +263,13 @@ function getDocument(): Document {
 function createDOMEventHandler(eventName: string): TriggerPropHandler {
   return function (node: Element, val: any): void {
     if (!val) return;
-    
+
     function handler(event: Event): void {
-      if (typeof val === 'function') {
+      if (typeof val === "function") {
         val(event);
       }
     }
-    
+
     if (isSignal(val)) {
       let currentHandler: any = null;
       val.connect(function () {
@@ -307,110 +282,80 @@ function createDOMEventHandler(eventName: string): TriggerPropHandler {
           node.addEventListener(eventName, currentHandler);
         }
       });
-    } else if (typeof val === 'function') {
+    } else if (typeof val === "function") {
       node.addEventListener(eventName, handler);
     }
   };
 }
 
-// Register basic DOM events
-triggerBridgeRegistry.register('click', {
-  handler: createDOMEventHandler('click'),
-  platforms: ['dom'],
-});
+/**
+ * Register standard DOM events into the bridge registry.
+ * Call this from an extension setup hook.
+ */
+export function registerStandardDOMEvents(): void {
+  // Pointer events
+  [
+    "click",
+    "dblclick",
+    "pointerdown",
+    "pointerup",
+    "pointermove",
+    "pointerover",
+    "pointerout",
+    "pointerenter",
+    "pointerleave",
+    "contextmenu",
+  ].forEach((event) => {
+    triggerBridgeRegistry.register(event, {
+      handler: createDOMEventHandler(event),
+      platforms: ["dom"],
+    });
+  });
 
-triggerBridgeRegistry.register('input', {
-  handler: createDOMEventHandler('input'),
-  platforms: ['dom'],
-});
+  // Keyboard events
+  ["keydown", "keyup", "keypress"].forEach((event) => {
+    triggerBridgeRegistry.register(event, {
+      handler: createDOMEventHandler(event),
+      platforms: ["dom"],
+    });
+  });
 
-triggerBridgeRegistry.register('change', {
-  handler: createDOMEventHandler('change'),
-  platforms: ['dom'],
-});
+  // Form events
+  [
+    "input",
+    "change",
+    "submit",
+    "reset",
+    "focus",
+    "blur",
+    "focusin",
+    "focusout",
+  ].forEach((event) => {
+    triggerBridgeRegistry.register(event, {
+      handler: createDOMEventHandler(event),
+      platforms: ["dom"],
+    });
+  });
 
-triggerBridgeRegistry.register('focus', {
-  handler: createDOMEventHandler('focus'),
-  platforms: ['dom'],
-});
+  // Touch events
+  ["touchstart", "touchend", "touchmove", "touchcancel"].forEach((event) => {
+    triggerBridgeRegistry.register(event, {
+      handler: createDOMEventHandler(event),
+      platforms: ["dom"],
+    });
+  });
 
-triggerBridgeRegistry.register('blur', {
-  handler: createDOMEventHandler('blur'),
-  platforms: ['dom'],
-});
+  // Other common events
+  ["scroll", "resize", "load", "unload", "error", "abort"].forEach((event) => {
+    triggerBridgeRegistry.register(event, {
+      handler: createDOMEventHandler(event),
+      platforms: ["dom"],
+    });
+  });
+}
 
 /**
  * Register custom platform-specific trigger handlers
- * 
- * @example
- * ```typescript
- * // Example: Custom swipe gesture handler
- * registerTriggerHandler('swipe', function (node: Element, val: any): void {
- *   if (!val) return;
- *   
- *   let startX = 0, startY = 0;
- *   
- *   function handleTouchStart(e: TouchEvent): void {
- *     startX = e.touches[0].clientX;
- *     startY = e.touches[0].clientY;
- *   }
- *   
- *   function handleTouchEnd(e: TouchEvent): void {
- *     const endX = e.changedTouches[0].clientX;
- *     const endY = e.changedTouches[0].clientY;
- *     const deltaX = endX - startX;
- *     const deltaY = endY - startY;
- *     
- *     // Detect swipe (minimum distance of 50px)
- *     if (Math.abs(deltaX) > 50 || Math.abs(deltaY) > 50) {
- *       const direction = Math.abs(deltaX) > Math.abs(deltaY) 
- *         ? (deltaX > 0 ? 'right' : 'left')
- *         : (deltaY > 0 ? 'down' : 'up');
- *       
- *       const swipeEvent = { direction, deltaX, deltaY, isSwipeEvent: true };
- *       if (typeof val === 'function') val(swipeEvent);
- *     }
- *   }
- *   
- *   // Handle signal connections
- *   if (isSignal(val)) {
- *     let currentHandler: any = null;
- *     val.connect(() => {
- *       const newHandler = val.peek();
- *       if (currentHandler) {
- *         node.removeEventListener('touchstart', handleTouchStart);
- *         node.removeEventListener('touchend', handleTouchEnd);
- *       }
- *       if (newHandler) {
- *         currentHandler = newHandler;
- *         node.addEventListener('touchstart', handleTouchStart);
- *         node.addEventListener('touchend', handleTouchEnd);
- *       }
- *     });
- *   } else if (typeof val === 'function') {
- *     node.addEventListener('touchstart', handleTouchStart);
- *     node.addEventListener('touchend', handleTouchEnd);
- *   }
- * }, {
- *   platforms: ['dom', 'native:ios', 'native:android'],
- *   priority: 1
- * });
- * 
- * // Usage in JSX:
- * <div on:swipe={(e) => console.log('Swiped:', e.direction)} />
- * 
- * // iOS-specific input example:
- * registerTriggerHandler('iosOnlyInput', createIOSInputHandler(), {
- *   platforms: ['native:ios'],
- *   fallback: 'input'
- * });
- * 
- * // XR spatial tap example:
- * registerTriggerHandler('spatialTap', createSpatialHandler(), {
- *   platforms: ['native:visionos', 'native:horizonos'],
- *   fallback: 'click'
- * });
- * ```
  */
 export function registerTriggerHandler(
   prefix: string,

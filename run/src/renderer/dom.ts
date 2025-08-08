@@ -1,80 +1,28 @@
-import { isSignal, nextTick, peek, bind } from "../signal/index.ts";
+import { isSignal, peek, bind } from "../signal/index.ts";
 import { createRenderer } from "./create-renderer.ts";
-import { nop, cachedStrKeyNoFalsy, splitFirst } from "../utils.ts";
+import { cachedStrKeyNoFalsy, splitFirst } from "../utils.ts";
 import { env } from "../env/index.ts";
 import { wrap } from "../runtime/jsx-runtime.ts";
+import { normalizeExtensions, type RendererExtensions } from "./extensions.ts";
 
 const defaultRendererID = "DOM";
 
-export interface DOMExtensions {
+export interface DOMOptions {
   rendererID?: string;
   doc?: Document;
-  namespaces?: Record<string, string>;
-  tagNamespaceMap?: Record<string, string>;
-  tagAliases?: Record<string, string>;
-  propAliases?: Record<string, string>;
-  onDirective?: (prefix: string, key: string, prop: string) => any;
+  extensions?: RendererExtensions;
 }
 
-export function DOMRenderer(options: DOMExtensions = {}) {
+export function DOMRenderer(options: DOMOptions = {}): any {
+  const { rendererID = defaultRendererID, doc = document } = options;
   const {
-    rendererID = defaultRendererID,
-    doc = document,
-    namespaces = {},
-    tagNamespaceMap = {},
-    tagAliases = {},
-    propAliases = {},
     onDirective,
-  } = options;
-
-  let eventPassiveSupported = false;
-  let eventOnceSupported = false;
-
-  try {
-    const options = {
-      passive: {
-        get() {
-          eventPassiveSupported = true;
-          return eventPassiveSupported;
-        },
-      },
-      once: {
-        get() {
-          eventOnceSupported = true;
-          return eventOnceSupported;
-        },
-      },
-    };
-    const testEvent = "__refui_event_option_test__";
-    doc.addEventListener(testEvent as any, nop, options as any);
-    doc.removeEventListener(testEvent as any, nop, options as any);
-  } catch (e) {
-    // do nothing
-  }
-
-  // eslint-disable-next-line max-params
-  function eventCallbackFallback(
-    node: any,
-    event: string,
-    handler: Function,
-    options: any
-  ): Function {
-    if (options.once && !eventOnceSupported) {
-      const _handler = handler;
-      handler = function (...args: any[]) {
-        _handler(...args);
-        node.removeEventListener(event, handler, options);
-      };
-    }
-    if (options.passive && !eventPassiveSupported) {
-      const _handler = handler;
-      handler = function (...args: any[]) {
-        nextTick(_handler.bind(null, ...args));
-      };
-    }
-
-    return handler;
-  }
+    namespaces,
+    tagNamespaceMap,
+    tagAliases,
+    propAliases,
+    setups,
+  } = normalizeExtensions(options.extensions);
 
   function isNode(node: any): boolean {
     return !!(node && node.cloneNode);
@@ -137,58 +85,7 @@ export function DOMRenderer(options: DOMExtensions = {}) {
     ref.parentNode.insertBefore(node, ref);
   }
 
-  const getListenerAdder = cachedStrKeyNoFalsy(function (event: string) {
-    const [prefix, eventName] = event.split(":");
-    if (prefix === "on") {
-      return function (node: any, cb: any) {
-        if (!cb) return;
-        if (isSignal(cb)) {
-          let currentHandler: any = null;
-          cb.connect(function () {
-            const newHandler = peek(cb);
-            if (currentHandler)
-              node.removeEventListener(eventName, currentHandler);
-            if (newHandler) node.addEventListener(eventName, newHandler);
-            currentHandler = newHandler;
-          });
-        } else node.addEventListener(eventName, cb);
-      };
-    } else {
-      const optionsArr = prefix.split("-");
-      optionsArr.shift();
-      const options: any = {};
-      for (let option of optionsArr) if (option) options[option] = true;
-      return function (node: any, cb: any) {
-        if (!cb) return;
-        if (isSignal(cb)) {
-          let currentHandler: any = null;
-          cb.connect(function () {
-            let newHandler = peek(cb);
-            if (currentHandler)
-              node.removeEventListener(eventName, currentHandler, options);
-            if (newHandler) {
-              newHandler = eventCallbackFallback(
-                node,
-                eventName,
-                newHandler,
-                options
-              );
-              node.addEventListener(eventName, newHandler, options);
-            }
-            currentHandler = newHandler;
-          });
-        } else
-          node.addEventListener(
-            eventName,
-            eventCallbackFallback(node, eventName, cb, options),
-            options
-          );
-      };
-    }
-  });
-  function addListener(node: any, event: string, cb: any): void {
-    getListenerAdder(event)(node, cb);
-  }
+  // Event listeners removed - now handled entirely by extensions
 
   function setAttr(node: any, attr: string, val: any): void {
     if (val === undefined || val === null || val === false) return;
@@ -222,20 +119,24 @@ export function DOMRenderer(options: DOMExtensions = {}) {
     if (key) {
       switch (prefix) {
         default: {
-          if (prefix === "on" || prefix.startsWith("on-")) {
-            return function (node: any, val: any) {
-              return addListener(node, prop, val);
-            };
-          }
+          // All directives now go through extensions
           if (onDirective) {
             const setter = onDirective(prefix, key, prop);
             if (setter) {
               return setter;
             }
           }
-          const nsuri = namespaces[prefix] || prefix;
-          return function (node: any, val: any) {
-            return setAttrNS(node, key, val, nsuri);
+          // Quietly ignore unknown directive-like props if no extensions handle them
+          // If a known namespace is provided, set as namespaced attribute
+          const nsuri = namespaces[prefix];
+          if (nsuri) {
+            return function (node: any, val: any) {
+              return setAttrNS(node, key, val, nsuri);
+            };
+          }
+          // Otherwise, ignore unsupported prefixed directives when no extension is connected
+          return function () {
+            /* no-op without trigger extensions */
           };
         }
         case "attr": {
@@ -285,6 +186,15 @@ export function DOMRenderer(options: DOMExtensions = {}) {
 
   // Automatically wrap JSX runtime with this renderer
   wrap(renderer);
+
+  // Run extension setup hooks
+  setups.forEach((fn) => {
+    try {
+      fn(renderer);
+    } catch (e) {
+      console.warn(`[extensions] setup() failed:`, e);
+    }
+  });
 
   return renderer;
 }

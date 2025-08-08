@@ -1,15 +1,17 @@
-import { createRenderer } from './create-renderer.ts';
+import { createRenderer } from "./create-renderer.ts";
+import { normalizeExtensions, type RendererExtensions } from "./extensions.ts";
 
-export interface HorizonOSExtensions {
+export interface HorizonOSOptions {
   rendererID?: string;
-  [key: string]: any;
+  extensions?: RendererExtensions;
 }
 
 /**
  * HorizonOS renderer for Meta Quest/VR platforms
  */
-export function HorizonOSRenderer(options: HorizonOSExtensions = {}): any {
+export function HorizonOSRenderer(options: HorizonOSOptions = {}): any {
   const { rendererID = "HorizonOS" } = options;
+  const { setups } = normalizeExtensions(options.extensions);
 
   // TODO: Implement HorizonOS-specific rendering
   // This would integrate with Meta's Spatial SDK and WebXR
@@ -53,6 +55,13 @@ export function HorizonOSRenderer(options: HorizonOSExtensions = {}): any {
     insertBefore: () => {},
     setProps: (node: any, props: any) => Object.assign(node.props, props),
   };
-
-  return createRenderer(nodeOps, rendererID);
-} 
+  const renderer = createRenderer(nodeOps, rendererID);
+  setups.forEach((fn) => {
+    try {
+      fn(renderer);
+    } catch (e) {
+      console.warn("[extensions] setup() failed:", e);
+    }
+  });
+  return renderer;
+}

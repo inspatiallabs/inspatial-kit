@@ -56,7 +56,9 @@ function sortQueue(
   a: SignalEffectFunctionType[],
   b: SignalEffectFunctionType[]
 ): number {
-  return ((a as any)._id ?? 0) - ((b as any)._id ?? 0);
+  const aId = (a as any)._id;
+  const bId = (b as any)._id;
+  return (aId == null ? 0 : aId) - (bId == null ? 0 : bId);
 }
 
 function flushQueue(
@@ -635,14 +637,14 @@ export class Signal<T = any> {
   includes(item: SignalValueType<any>): Signal<boolean> {
     return createSignal(this, function (i: T): boolean {
       const itemVal = read(item);
-      return (i as any)?.includes?.(itemVal) ?? false;
+      return Boolean((i as any)?.includes?.(itemVal));
     });
   }
 
   excludes(item: SignalValueType<any>): Signal<boolean> {
     return createSignal(this, function (i: T): boolean {
       const itemVal = read(item);
-      return !(i as any)?.includes?.(itemVal) ?? true;
+      return !Boolean((i as any)?.includes?.(itemVal));
     });
   }
 
