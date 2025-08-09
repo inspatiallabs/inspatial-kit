@@ -1,4 +1,5 @@
 import type { RendererExtension, ExtensionSignal } from "@inspatial/renderer";
+import { supportsFeature } from "@inspatial/run";
 
 /*################################(Types)################################*/
 
@@ -7,15 +8,25 @@ interface ThemeProps {
 }
 
 /*################################(Extension)################################*/
-export const ThemeExtension: RendererExtension = {
-  name: "ThemeExtension",
-  setup() {
+/**
+ * InSpatial Theme Extension
+ * @description This extension is used to apply and control the theme of your application.
+ */
+export const InTheme: RendererExtension = {
+  name: "InTheme",
+  setup(_renderer?: any) {
     // Lazy import to avoid circular graph issues
     import("./state.ts").then((m: ThemeProps) => {
       const { themeState } = m;
       const apply = () => {
         const mode = themeState.mode.peek?.() ?? themeState.mode.get?.();
-        if (mode) document.documentElement.setAttribute("data-theme", mode);
+        // For DOM Renderers
+        if (supportsFeature("hasDocument")) {
+          if (mode) document.documentElement.setAttribute("data-theme", mode);
+          return;
+        }
+        // Non-DOM environments (native/gpu/etc...): no-op for now
+        // Future: integrate per-renderer theming here
       };
       // Initial apply
       apply();

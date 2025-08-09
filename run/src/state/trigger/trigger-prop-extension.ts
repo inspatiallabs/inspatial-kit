@@ -9,10 +9,10 @@ import type { RendererExtension } from "../../renderer/extensions.ts";
  * @description This extension is used to add trigger prop functionality to the InSpatial renderer. Without this extension, the trigger prop functionality will not be available so event listeners will not be triggered.
  * @example
  * ```tsx
- * import { triggerPropExtension } from "@inspatial/state";
+ * import { InTriggerProp } from "@inspatial/state";
  * ```
  */
-export const triggerPropExtension: RendererExtension = {
+export const InTriggerProp: RendererExtension = {
   name: "trigger",
   props: {
     onDirective: withTriggerProps.onTriggerProp,

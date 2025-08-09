@@ -30,8 +30,8 @@ export function HTMLRenderer(options: HTMLOptions = {}): any {
       "wbr",
     ]),
   } = options;
-  // HTML renderer ignores trigger prop directives e.g. on:click, but we normalize for parity
-  const _normalized = normalizeExtensions(options.extensions);
+  // Normalize extensions and capture setups for parity with DOM renderer
+  const { setups } = normalizeExtensions(options.extensions);
 
   interface HTMLNode {
     _isHTMLNode: true;
@@ -122,7 +122,7 @@ export function HTMLRenderer(options: HTMLOptions = {}): any {
     };
   }
 
-  function removeNode(node: HTMLNode): void {
+  function removeNode(_node: HTMLNode): void {
     // HTML renderer doesn't need to track removal for string generation
   }
 
@@ -162,7 +162,18 @@ export function HTMLRenderer(options: HTMLOptions = {}): any {
     removeNode,
   };
 
-  return createRenderer(nodeOps, rendererID);
+  const renderer = createRenderer(nodeOps, rendererID);
+
+  // Run extension setup hooks to keep behavior consistent across renderers
+  setups.forEach((fn) => {
+    try {
+      fn(renderer);
+    } catch (e) {
+      console.warn(`[extensions] setup() failed:`, e);
+    }
+  });
+
+  return renderer;
 }
 
 export { defaultRendererID };

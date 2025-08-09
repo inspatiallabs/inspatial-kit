@@ -12,6 +12,7 @@ export {
   createUniversalRenderer,
   createRenderer as createAutoRenderer,
   detectEnvironment,
+  supportsFeature,
 } from "./universal.ts";
 
 // Base renderer factory (for advanced users)

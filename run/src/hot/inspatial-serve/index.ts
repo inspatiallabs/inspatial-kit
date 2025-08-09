@@ -1,57 +1,57 @@
 #!/usr/bin/env -S deno run --allow-net --allow-read --allow-write --allow-env --allow-run
 /**
  * @fileoverview InSpatial Development Server
- * 
+ *
  * The InSpatial Development Server (`InSpatialServe`) is a comprehensive development environment that provides:
- * 
+ *
  * ## Features
- * 
+ *
  * - **File Serving**: Serves your InSpatial app from the `dist` directory
- * - **File Watching**: Monitors source files for changes  
+ * - **File Watching**: Monitors source files for changes
  * - **Smart Building**: Automatically rebuilds JavaScript, CSS, and HTML assets
  * - **Hot Reload**: Instant browser refresh via WebSocket connection *
- *  
+ *
  * ## Usage
- * 
+ *
  * ### From deno.json task (recommended)
  * ```bash
  * # From the app directory
  * deno task serve
  * ```
- * 
+ *
  * ### Direct execution
  * ```bash
  * # From the app directory
  * deno run --allow-net --allow-read --allow-write --allow-env --allow-run src/config/serve.ts
  * ```
- * 
+ *
  * ### As import
  * ```typescript
  * import { InSpatialServe } from "@inspatial/serve";
- * 
+ *
  * // Create and run server
  * await new InSpatialServe().run();
  * ```
- * 
+ *
  * ## Configuration
- * 
+ *
  * ### Default Ports
  * - **App Server**: `http://localhost:6310`
  * - **WebSocket (Hot Reload)**: `ws://localhost:8888`
- * 
+ *
  * ### File Watching
  * - Watches `./src/**` for source files
  * - Watches `./index.html` for HTML changes
  * - Supports: `.ts`, `.tsx`, `.js`, `.jsx`, `.css`, `.scss`
- * 
+ *
  * ### Build Process
  * - **CSS First**: When both JS and CSS need rebuilding, CSS builds first to ensure Tailwind classes are ready
  * - **Smart Triggers**: TypeScript/JSX changes trigger both JS and CSS rebuilds (for new Tailwind classes)
  * - **File Stability**: Waits for CSS files to stabilize before triggering reload
  * - **Race Condition Prevention**: Sequential CSS-first building prevents style reset issues
- * 
+ *
  * ## Architecture
- * 
+ *
  * ```
  * InSpatialServe
  * ├── BuildQueue           # Manages build operations with debouncing
@@ -60,15 +60,15 @@
  * ├── HTTP Server          # Serves app files (port 6310)
  * └── Hot Reload Client    # Browser-side reload script
  * ```
- * 
+ *
  * ## Hot Reload System
- * 
+ *
  * - `InSpatialServe` - Native Development server for Bare InSpatial apps
  * - `InVite` - Vite plugin
- * - `InPack` - Webpack plugin  
+ * - `InPack` - Webpack plugin
  * - Hot reload utilities
- * 
- * 
+ *
+ *
  * @author InSpatial Team
  * @version 2.0.0
  * @since 1.0.0
@@ -77,7 +77,7 @@
 /**
  * Build queue to handle multiple file changes efficiently with debouncing.
  * Prevents excessive rebuilds when multiple files change rapidly.
- * 
+ *
  * @internal
  */
 class BuildQueue {
@@ -158,7 +158,8 @@ class BuildQueue {
   private async buildJavaScript(): Promise<void> {
     console.log("📦 Building JavaScript bundle...");
 
-    const buildProcess = new Deno.Command("deno", {
+    const DenoNS: any = (globalThis as any).Deno;
+    const buildProcess = new DenoNS.Command("deno", {
       args: [
         "bundle",
         "--platform=browser",
@@ -166,7 +167,7 @@ class BuildQueue {
         "--sourcemap",
         "src/config/render.ts",
       ],
-      cwd: Deno.cwd(),
+      cwd: DenoNS.cwd(),
     });
 
     const { code, stderr } = await buildProcess.output();
@@ -182,7 +183,8 @@ class BuildQueue {
   private async buildCSS(): Promise<void> {
     console.log("🎨 Building CSS...");
 
-    const buildProcess = new Deno.Command("deno", {
+    const DenoNS: any = (globalThis as any).Deno;
+    const buildProcess = new DenoNS.Command("deno", {
       args: [
         "run",
         "-A",
@@ -194,7 +196,7 @@ class BuildQueue {
         "--content",
         "src/**/*.{ts,tsx,js,jsx}",
       ],
-      cwd: Deno.cwd(),
+      cwd: DenoNS.cwd(),
     });
 
     const { code, stderr } = await buildProcess.output();
@@ -211,7 +213,8 @@ class BuildQueue {
     console.log("📄 Copying HTML...");
 
     try {
-      await Deno.copyFile("index.html", "dist/index.html");
+      const DenoNS: any = (globalThis as any).Deno;
+      await DenoNS.copyFile("index.html", "dist/index.html");
       console.log("✅ HTML updated");
     } catch (error) {
       throw new Error(`HTML copy failed: ${error}`);
@@ -225,27 +228,27 @@ class BuildQueue {
 
 /**
  * InSpatial Development Server
- * 
+ *
  * A comprehensive development server that provides file serving, hot reload,
  * smart building, and file watching for InSpatial applications.
- * 
+ *
  * ## Key Features:
  * - Automatic builds on file changes
  * - Hot reload via WebSocket
  * - Tailwind CSS v4 support with race condition prevention
  * - CSS-first building strategy
  * - File stability checking
- * 
+ *
  * @example
  * ```typescript
  * // Basic usage
  * const server = new InSpatialServe();
  * await server.run();
- * 
+ *
  * // One-liner usage
  * await new InSpatialServe().run();
  * ```
- * 
+ *
  * @public
  */
 export class InSpatialServe {
@@ -256,17 +259,17 @@ export class InSpatialServe {
 
   /**
    * Runs the InSpatial Development Server
-   * 
+   *
    * This method initializes all components of the development server:
    * - Sets up the build environment and creates necessary directories
    * - runs the WebSocket server for hot reload communication
    * - Begins smart file watching for source changes
    * - Launches the HTTP server for serving application files
    * - Triggers initial builds for all assets
-   * 
+   *
    * @returns {Promise<void>} Resolves when the server is fully runed
    * @throws {Error} If server setup fails
-   * 
+   *
    * @example
    * ```typescript
    * const server = new InSpatialServe();
@@ -298,12 +301,16 @@ export class InSpatialServe {
 
     try {
       // Create dist directory if it doesn't exist
-      await Deno.mkdir("dist", { recursive: true });
-      await Deno.mkdir("dist/asset", { recursive: true });
+      const DenoNS: any = (globalThis as any).Deno;
+      await DenoNS.mkdir("dist", { recursive: true });
+      await DenoNS.mkdir("dist/asset", { recursive: true });
 
       // Copy static assets
       try {
-        await Deno.copyFile("src/asset/favicon.png", "dist/asset/favicon.png");
+        await DenoNS.copyFile(
+          "src/asset/favicon.png",
+          "dist/asset/favicon.png"
+        );
       } catch {
         console.log("⚠️ No favicon found, skipping...");
       }
@@ -322,13 +329,14 @@ export class InSpatialServe {
   }
 
   private runWebSocketServer() {
-    const _wsServer = Deno.serve({ port: 8888 }, (request: Request) => {
+    const DenoNS: any = (globalThis as any).Deno;
+    const _wsServer = DenoNS.serve({ port: 8888 }, (request: Request) => {
       const upgrade = request.headers.get("upgrade");
       if (upgrade !== "websocket") {
         return new Response("Not a websocket request", { status: 400 });
       }
 
-      const { socket, response } = Deno.upgradeWebSocket(request);
+      const { socket, response } = DenoNS.upgradeWebSocket(request);
 
       socket.onopen = () => {
         this.clients.add(socket);
@@ -357,11 +365,12 @@ export class InSpatialServe {
   private runSmartWatching() {
     try {
       // Watch source files
-      const srcWatcher = Deno.watchFs("./src", { recursive: true });
+      const DenoNS: any = (globalThis as any).Deno;
+      const srcWatcher = DenoNS.watchFs("./src", { recursive: true });
       this.watchers.push(srcWatcher);
 
       // Watch root files (index.html, etc.)
-      const rootWatcher = Deno.watchFs("./", { recursive: false });
+      const rootWatcher = DenoNS.watchFs("./", { recursive: false });
       this.watchers.push(rootWatcher);
 
       // Process source file changes
@@ -399,7 +408,9 @@ export class InSpatialServe {
 
     console.log(
       `📝 Source files changed: ${relevantFiles
-        .map((p: string) => p.replace(Deno.cwd(), "."))
+        .map((p: string) =>
+          p.replace((globalThis as any).Deno?.cwd?.() ?? "", ".")
+        )
         .join(", ")}`
     );
 
@@ -479,7 +490,8 @@ export class InSpatialServe {
 
       while (attempts < 10) {
         try {
-          const stat = await Deno.stat(cssPath);
+          const DenoNS: any = (globalThis as any).Deno;
+          const stat = await DenoNS.stat(cssPath);
           const currentSize = stat.size;
 
           // If file size hasn't changed in the last 100ms, consider it stable
@@ -532,7 +544,8 @@ export class InSpatialServe {
   }
 
   private runFileServer() {
-    const _server = Deno.serve({ port: 6310 }, async (request: Request) => {
+    const DenoNS: any = (globalThis as any).Deno;
+    const _server = DenoNS.serve({ port: 6310 }, async (request: Request) => {
       const url = new URL(request.url);
       let pathname = url.pathname;
 
@@ -544,7 +557,7 @@ export class InSpatialServe {
       try {
         // Serve from dist directory
         const filePath = `./dist${pathname}`;
-        const content = await Deno.readFile(filePath);
+        const content = await DenoNS.readFile(filePath);
 
         // Inject InSpatial hot reload client for HTML files
         if (pathname.endsWith(".html")) {
@@ -613,3 +626,37 @@ export class InSpatialServe {
     }
   }
 }
+
+// ------------------------------
+// Renderer Extension Integration
+// ------------------------------
+import type { RendererExtension } from "../../renderer/extensions.ts";
+import { detectEnvironment } from "../../renderer/environment.ts";
+
+/**
+ * Renderer extension that boots the dev server when executed in a server
+ * environment (Deno/Node/Bun without DOM). No-ops in the browser.
+ */
+export const InServe: RendererExtension = {
+  name: "InSpatialServe",
+  async setup() {
+    try {
+      const env = detectEnvironment();
+      const isServerSide =
+        (env.type === "deno" || env.type === "node" || env.type === "bun") &&
+        !env.features.hasDOM;
+
+      if (!isServerSide) return; // only run on server-side CLIs
+
+      // Prevent duplicate boots in the same process
+      const flagKey = "__inspatialServeStarted";
+      if ((globalThis as any)[flagKey]) return;
+      (globalThis as any)[flagKey] = true;
+
+      // Fire and forget; the server manages its own async loops
+      await new InSpatialServe().run();
+    } catch (_) {
+      // Silently ignore in environments where serving isn't possible
+    }
+  },
+};

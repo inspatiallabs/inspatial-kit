@@ -10,7 +10,7 @@
 - All trigger behavior is centralized in `trigger-props.ts` (and its bridge registry).
 - Triggers are decoupled and disabled by default. The trigger prop registry helps create and mix different platform trigger props e.g you can unify the click event from web/dom and android, ios etc... give it a simple name e.g `tap` then all of those platforms will respond to the tap. 
 - Unknown directive-like props are ignored unless an extension resolves them.
-- Use `triggerPropExtension` (or custom extensions) to enable triggers.
+- Use `InTriggerProp` (or custom extensions) to enable triggers.
 
 #### 1. No Built-in Trigger (Prop) Support in Renderers
 
@@ -26,7 +26,7 @@ All trigger functionality must be explicitly enabled via the renderer extensions
 ```typescript
 createRenderer({
   mode: "auto",
-  extensions: [triggerPropExtension]
+  extensions: [InTriggerProp]
 })
 ```
 

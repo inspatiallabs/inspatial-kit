@@ -5,7 +5,7 @@
     "js:watch": "deno bundle --platform=browser --output=dist/bundle.js --sourcemap --watch src/config/render.ts",
     "build": "deno task setup && deno bundle --platform=browser --output=dist/bundle.js --sourcemap --minify src/config/render.ts",
     "setup": "powershell -Command \"New-Item -ItemType Directory -Force -Path dist/asset; deno run -A npm:@tailwindcss/cli@latest -i src/config/app.css -o dist/kit.css --content 'src/**/*.{ts,tsx,js,jsx}'; Copy-Item src/asset/favicon.png dist/asset/favicon.png; Copy-Item index.html dist/index.html\"",
-    "serve": "deno run --allow-net --allow-read --allow-write --allow-env --allow-run src/config/serve.ts",
+    "serve": "deno run --allow-net --allow-read --allow-write --allow-env --allow-run src/config/render.ts",
     "clean": "rm -rf dist && rm -rf node_modules && rm -rf deno.lock"
   },
   "compilerOptions": {
@@ -14,7 +14,7 @@
     "jsx": "react-jsx"
   },
   "imports": {
-    "@inspatial/app/": "../app/src/",
+    "@inspatial/app/": "./src/",
     "@inspatial/cloud-client": "jsr:@inspatial/cloud-client@^0.1.22",
     "@inspatial/run": "../run/src/index.ts",
     "@inspatial/runtime": "../run/src/runtime/index.ts",

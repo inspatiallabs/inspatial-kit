@@ -1,16 +1,20 @@
 // deno-lint-ignore-file
-import { createRenderer } from "@inspatial/renderer";
-import { triggerPropExtension } from "@inspatial/state";
+import { createRenderer, supportsFeature } from "@inspatial/renderer";
+import { InTriggerProp } from "@inspatial/state";
 import { App } from "@inspatial/app/(application)/(window)/flat.tsx";
-import { ThemeExtension } from "@inspatial/app/(application)/(window)/theme/extension.ts";
+import { InTheme } from "@inspatial/app/(application)/(window)/theme/extension.ts";
+import { InServe } from "@inspatial/serve";
 
 // 1. Create InSpatial renderer with trigger props integration
 createRenderer({
   mode: "auto",
   debug: "minimal",
-  extensions: [triggerPropExtension, ThemeExtension],
+  extensions: [InServe, InTriggerProp, InTheme],
 }).then((InSpatial: any) => {
-  InSpatial.render(document.getElementById("app"), App);
+  // Only attempt DOM mount when running in a browser/DOM environment
+  if (supportsFeature("hasDocument")) {
+    InSpatial.render(document.getElementById("app"), App);
+  }
 });
 
 // 2. Set up typescript for JSX Components
