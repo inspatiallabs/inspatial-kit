@@ -2,6 +2,10 @@ import { wrap as wrapDev } from "./jsx-dev-runtime.ts";
 import { nop } from "../utils.ts";
 import { env } from "../env/index.ts";
 
+/*################################(JSX Props Type Declaration)################################*/
+import "./jsx-global.d.ts";
+/*############################################################################################*/
+
 interface JSXRenderer {
   c: (tag: any, props: any, ...children: any[]) => any;
   f: any;

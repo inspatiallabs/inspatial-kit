@@ -28,19 +28,17 @@ export function Counter() {
 
     // Dynamic text color
     textColor: $(() => {
-      const count = counterState.count.get();
+      const count = counterState.count;
       return count > 15 ? "white" : "black";
     }),
 
-    // Dynamic classNamees
-    isHighCount: $(() => counterState.count.get() > 10),
-    isPulseActive: $(
-      () => counterState.count.get() % 5 === 0 && counterState.count.get() > 0
-    ),
+    // Dynamic class Names
+    isHighCount: $(() => counterState.count > 10),
+    isPulseActive: $(() => counterState.count % 5 === 0 && counterState.count > 0),
 
     // Dynamic styles
-    borderWidth: $(() => Math.max(1, Math.floor(counterState.count.get() / 3))),
-    fontSize: $(() => Math.max(16, 16 + counterState.count.get())),
+    borderWidth: $(() => Math.max(1, Math.floor(counterState.count / 3))),
+    fontSize: $(() => Math.max(16, 16 + counterState.count)),
   };
 
   /*******************************(Render)*************************************/
@@ -63,7 +61,7 @@ export function Counter() {
         <input
           type="number"
           className="bg-gray-800 p-3 rounded-lg outline-none text-white text-2xl"
-          value={counterState.count.get()}
+          value={counterState.count}
           on:input={(event: any) => {
             counterState.count.set(Number(event.target.value));
           }}
@@ -74,7 +72,7 @@ export function Counter() {
         <div className="bg-gray-800 p-6 rounded-lg text-center">
           <h2 className="text-white text-2xl mb-2">Current </h2>
           <div className="text-6xl font-bold text-yellow-400">
-            {$(() => counterState.count.get())}
+            {counterState.count}
           </div>
         </div>
 
@@ -85,34 +83,42 @@ export function Counter() {
           {/* Test style: trigger props */}
           <div
             className="p-4 rounded-lg mb-4 transition-all duration-300"
-            style:background-color={testSignals.backgroundColor}
-            style:color={testSignals.textColor}
-            style:border-width={testSignals.borderWidth}
-            style:font-size={testSignals.fontSize}
+            style={{
+              web: {
+                backgroundColor: testSignals.backgroundColor,
+                color: testSignals.textColor,
+                borderWidth: testSignals.borderWidth,
+                fontSize: testSignals.fontSize,
+              },
+            }}
           >
-            Dynamic Styles! Count: {$(() => counterState.count.get())}
+            Dynamic Styles! Count: {counterState.count}
           </div>
 
           {/* Test className: trigger props */}
           <div
-            className="p-4 rounded-lg mb-4 transition-all duration-300"
-            className:animate-pulse={testSignals.isPulseActive}
-            className:scale-110={testSignals.isHighCount}
-            className:bg-gradient-to-r={testSignals.isHighCount}
-            className:from-purple-500={testSignals.isHighCount}
-            className:to-pink-500={testSignals.isHighCount}
+            className={{
+              "p-4": true,
+              "rounded-lg": true,
+              "mb-4": true,
+              "transition-all": true,
+              "duration-300": true,
+              "animate-pulse": testSignals.isPulseActive,
+              "scale-110 bg-gradient-to-r from-purple-500 to-pink-500":
+                testSignals.isHighCount,
+            }}
           />
         </div>
 
         {/* Explicit Pattern Demo */}
         <div className="bg-blue-900 p-4 rounded-lg text-center max-w-md">
           <h3 className="text-white text-lg mb-2">Explicit Pattern Demo</h3>
-          <div className="text-2xl font-bold text-blue-300 mb-2">
-            {$(() => counterStateExplicit.count.get())}
-          </div>
-          <div className="text-sm text-blue-200 mb-3">
-            {$(() => counterStateExplicit.message.get())}
-          </div>
+            <div className="text-2xl font-bold text-blue-300 mb-2">
+              {counterStateExplicit.count}
+            </div>
+            <div className="text-sm text-blue-200 mb-3">
+              {counterStateExplicit.message}
+            </div>
           <div className="flex gap-2 justify-center">
             <button
               type="button"
@@ -134,7 +140,7 @@ export function Counter() {
         </div>
 
         <Show
-          when={$(() => counterState.count.get() >= 10)}
+          when={$(() => counterState.count >= 10)}
           otherwise={() => <p className="text-white">Count is less than 10</p>}
         >
           <p className="text-white text-4xl">Count is 10 or greater! 🎉</p>
@@ -181,7 +187,7 @@ export function Counter() {
             className="bg-blue-500 p-4 rounded-full text-white font-bold text-lg shadow-lg hover:bg-blue-600 transition-colors"
             on:click={() =>
               builtInTrigger.addEntry(
-                `Entry #${counterState.entries.get().length + 1} added!`
+                `Entry #${counterState.entries.peek().length + 1} added!`
               )
             }
           >
@@ -193,7 +199,7 @@ export function Counter() {
             on:click={() => {
               console.log("🔄 Manual set with context");
               counterState.count.set(
-                counterState.count.get() + 10,
+                counterState.count.peek() + 10,
                 "manual-boost"
               );
             }}
@@ -216,7 +222,7 @@ export function Counter() {
             on:click={() => {
               // Force a re-render without changing count to show the difference
               console.log("🔄 Forcing re-render (no count change)");
-              counterState.entries.set([...counterState.entries.get()]);
+              counterState.entries.set([...counterState.entries.peek()]);
             }}
           >
             Force Re-render
@@ -266,21 +272,28 @@ export function Counter() {
                 Built-in Props
               </h3>
               <div
-                className="p-2 rounded mb-2 transition-all duration-300"
-                style:background-color={testSignals.backgroundColor}
-                style:transform={$(
-                  () => `scale(${1 + counterState.count.get() * 0.01})`
-                )}
-                className:animate-bounce={$(
-                  () => counterState.count.get() % 10 === 0
-                )}
+                className={{
+                  "p-2": true,
+                  "rounded": true,
+                  "mb-2": true,
+                  "transition-all": true,
+                  "duration-300": true,
+                  "animate-bounce": $(() => counterState.count % 10 === 0),
+                }}
+                style={{
+                  web: {
+                    backgroundColor: testSignals.backgroundColor,
+                    transform: $(
+                      () => `scale(${1 + counterState.count * 0.01})`
+                    ),
+                  },
+                }}
               >
-                Count: {$(() => counterState.count.get())}
+                Count: {counterState.count}
               </div>
               <div className="text-xs text-emerald-300">
-                ✅ style: props
-                <br />
-                ✅ className: props
+                ✅ structured style prop
+                <br />✅ className via computed string
                 <br />✅ Dynamic reactivity
               </div>
             </div>
@@ -340,10 +353,10 @@ export function Counter() {
 
           <div className="bg-purple-800 p-3 rounded mb-4">
             <div className="text-2xl font-bold text-purple-200 mb-2">
-              {$(() => enhancedExplicitState.advancedCount.get())}
+              {enhancedExplicitState.advancedCount}
             </div>
             <div className="text-sm text-purple-300">
-              {$(() => enhancedExplicitState.status.get())}
+              {enhancedExplicitState.status}
             </div>
           </div>
 

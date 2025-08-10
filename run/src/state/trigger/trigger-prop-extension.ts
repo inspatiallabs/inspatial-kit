@@ -1,8 +1,9 @@
 import {
   withTriggerProps,
-  registerStandardDOMEvents,
+  registerStandardDOMProps,
+  registerUniversalTriggerProps,
 } from "./trigger-props.ts";
-import type { RendererExtension } from "../../renderer/extensions.ts";
+import { createExtension } from "../../renderer/extensions.ts";
 
 /**
  * InSpatial trigger prop extension
@@ -12,16 +13,35 @@ import type { RendererExtension } from "../../renderer/extensions.ts";
  * import { InTriggerProp } from "@inspatial/state";
  * ```
  */
-export const InTriggerProp: RendererExtension = {
-  name: "trigger",
-  props: {
-    onDirective: withTriggerProps.onTriggerProp,
-    namespaces: withTriggerProps.namespaces,
-    tagNamespaceMap: withTriggerProps.tagNamespaceMap,
-    tagAliases: withTriggerProps.tagAliases,
-    propAliases: withTriggerProps.propAliases,
+export const InTriggerProp = createExtension({
+  meta: {
+    key: "intriggerprop",
+    name: "trigger",
+    description: "Universal trigger props and directive resolver",
+    author: { name: "InSpatial" },
+    verified: true,
+    price: 0,
+    status: "installed",
+    type: "Universal",
+    version: "0.1.0",
   },
-  setup: () => {
-    registerStandardDOMEvents();
+  scope: {
+    clientScope: "progressive",
+    editorScopes: ["Windows", "Scenes", "Cloud", "InDev"],
   },
-};
+  capabilities: {
+    rendererProps: {
+      onDirective: withTriggerProps.onTriggerProp,
+      namespaces: withTriggerProps.namespaces,
+      tagNamespaceMap: withTriggerProps.tagNamespaceMap,
+      tagAliases: withTriggerProps.tagAliases,
+      propAliases: withTriggerProps.propAliases,
+    },
+  },
+  lifecycle: {
+    setup: () => {
+      registerStandardDOMProps();
+      registerUniversalTriggerProps()
+    },
+  },
+});

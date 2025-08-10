@@ -1,4 +1,6 @@
 import { nextTick, bind, isSignal } from "../../signal/index.ts";
+import type { Signal } from "../../signal/index.ts";
+import { detectEnvironment } from "../../renderer/environment.ts";
 
 /*#################################(Types)
 #################################*/
@@ -9,7 +11,10 @@ export type PlatformType = "dom" | "native" | "gpu";
 type KeyValsMap = Record<string, string[]>;
 
 /** TriggerProp handler function type */
-export type TriggerPropHandler = (node: Element, value: any) => void;
+export type TriggerPropHandler<Value = any> = (
+  node: Element,
+  value: Value
+) => void;
 
 /** TriggerProp factory function type */
 export type TriggerPropFactory = (key: string) => TriggerPropHandler;
@@ -52,12 +57,9 @@ function reverseMap(keyValsMap: KeyValsMap): Record<string, string> {
   return reversed;
 }
 
-function prefix(prefixStr: string, keyArr: string[]): Record<string, string> {
-  return Object.fromEntries(
-    keyArr.map(function (i: string): [string, string] {
-      return [i, `${prefixStr}${i}`];
-    })
-  );
+function prefix(_unused: string, keyArr: string[]): Record<string, string> {
+  // no longer using attr:/prop: prefixes; return identity map
+  return Object.fromEntries(keyArr.map((i) => [i, i] as [string, string]));
 }
 
 /*#################################(Constants)#################################*/
@@ -73,8 +75,7 @@ const namespaces: Record<string, string> = {
 export const tagAliases: Record<string, string> = {};
 
 const attributes: string[] = [
-  "class",
-  "style",
+  // reserved/directed via `style:*` and `class:*`; others should be handled by native attrs
   "viewBox",
   "d",
   "tabindex",
@@ -150,7 +151,10 @@ const namespaceToTagsMap: NamespaceToTagsMap = {
 
 export const tagNamespaceMap: Record<string, string> =
   reverseMap(namespaceToTagsMap);
-export const propAliases: Record<string, string> = prefix("attr:", attributes);
+// Removed attr:/prop: magic; keep only select aliases as plain attrs
+export const propAliases: Record<string, string> = Object.fromEntries(
+  attributes.map((k) => [k, k])
+);
 
 /*#################################(TriggerProps)#################################*/
 
@@ -199,22 +203,25 @@ export const triggerProps: TriggerPropsType = {
 
 /*#################################(TriggerBridge Registry)#################################*/
 
-interface TriggerBridgeHandler {
-  handler: TriggerPropHandler;
+interface TriggerBridgeHandler<Value = any> {
+  handler: TriggerPropHandler<Value>;
   platforms?: PlatformType[];
   fallback?: string;
   priority?: number;
 }
 
 class TriggerBridgeRegistry {
-  private handlers = new Map<string, TriggerBridgeHandler>();
+  private handlers = new Map<string, TriggerBridgeHandler<any>>();
 
-  register(prefix: string, config: TriggerBridgeHandler): void {
-    this.handlers.set(prefix, config);
+  register<Name extends string, V = any>(
+    name: Name,
+    config: TriggerBridgeHandler<V>
+  ): void {
+    this.handlers.set(name, config as TriggerBridgeHandler<any>);
   }
 
-  getHandler(prefix: string): TriggerPropHandler | undefined {
-    return this.handlers.get(prefix)?.handler;
+  getHandler(name: string): TriggerPropHandler | undefined {
+    return this.handlers.get(name)?.handler as TriggerPropHandler | undefined;
   }
 
   has(prefix: string): boolean {
@@ -259,16 +266,60 @@ function getDocument(): Document {
 
 /*#################################(Platform Event Handlers)#################################*/
 
+// Event name groups as const tuples for DX typing helpers
+export const DOM_POINTER_EVENTS = [
+  "click",
+  "dblclick",
+  "pointerdown",
+  "pointerup",
+  "pointermove",
+  "pointerover",
+  "pointerout",
+  "pointerenter",
+  "pointerleave",
+  "contextmenu",
+] as const;
+
+export const DOM_KEYBOARD_EVENTS = ["keydown", "keyup", "keypress"] as const;
+
+export const DOM_FORM_EVENTS = [
+  "input",
+  "change",
+  "submit",
+  "reset",
+  "focus",
+  "blur",
+  "focusin",
+  "focusout",
+] as const;
+
+export const DOM_TOUCH_EVENTS = [
+  "touchstart",
+  "touchend",
+  "touchmove",
+  "touchcancel",
+] as const;
+
+export const DOM_MISC_EVENTS = [
+  "scroll",
+  "resize",
+  "load",
+  "unload",
+  "error",
+  "abort",
+] as const;
+
 // Create DOM event handler factory
-function createDOMEventHandler(eventName: string): TriggerPropHandler {
-  return function (node: Element, val: any): void {
+type AnyEventHandler = (...args: any[]) => any;
+type MaybeSignalHandler = AnyEventHandler | Signal<AnyEventHandler>;
+
+function createDOMEventHandler(
+  eventName: string
+): TriggerPropHandler<MaybeSignalHandler> {
+  return function (node: Element, val: MaybeSignalHandler): void {
     if (!val) return;
 
-    function handler(event: Event): void {
-      if (typeof val === "function") {
-        val(event);
-      }
-    }
+    function _handler(_event: Event): void {}
 
     if (isSignal(val)) {
       let currentHandler: any = null;
@@ -279,11 +330,11 @@ function createDOMEventHandler(eventName: string): TriggerPropHandler {
         }
         if (newHandler) {
           currentHandler = (event: Event) => newHandler(event);
-          node.addEventListener(eventName, currentHandler);
+          node.addEventListener(eventName, currentHandler as AnyEventHandler);
         }
       });
     } else if (typeof val === "function") {
-      node.addEventListener(eventName, handler);
+      node.addEventListener(eventName, val as AnyEventHandler);
     }
   };
 }
@@ -292,20 +343,28 @@ function createDOMEventHandler(eventName: string): TriggerPropHandler {
  * Register standard DOM events into the bridge registry.
  * Call this from an extension setup hook.
  */
-export function registerStandardDOMEvents(): void {
+export function registerStandardDOMProps(): void {
+  // Exported event name groups for DX typing helpers
+  // Keeping as const tuples to power literal union types
+
   // Pointer events
-  [
-    "click",
-    "dblclick",
-    "pointerdown",
-    "pointerup",
-    "pointermove",
-    "pointerover",
-    "pointerout",
-    "pointerenter",
-    "pointerleave",
-    "contextmenu",
-  ].forEach((event) => {
+  /** @internal */
+  // deno-lint-ignore no-explicit-any
+  (globalThis as any).INTERNAL_IN_POINTER_EVENTS = DOM_POINTER_EVENTS;
+  // Keyboard events
+  // deno-lint-ignore no-explicit-any
+  (globalThis as any).INTERNAL_IN_KEYBOARD_EVENTS = DOM_KEYBOARD_EVENTS;
+  // Form events
+  // deno-lint-ignore no-explicit-any
+  (globalThis as any).INTERNAL_IN_FORM_EVENTS = DOM_FORM_EVENTS;
+  // Touch events
+  // deno-lint-ignore no-explicit-any
+  (globalThis as any).INTERNAL_IN_TOUCH_EVENTS = DOM_TOUCH_EVENTS;
+  // Misc events
+  // deno-lint-ignore no-explicit-any
+  (globalThis as any).INTERNAL_IN_MISC_EVENTS = DOM_MISC_EVENTS;
+  // Pointer events
+  DOM_POINTER_EVENTS.forEach((event: (typeof DOM_POINTER_EVENTS)[number]) => {
     triggerBridgeRegistry.register(event, {
       handler: createDOMEventHandler(event),
       platforms: ["dom"],
@@ -313,7 +372,7 @@ export function registerStandardDOMEvents(): void {
   });
 
   // Keyboard events
-  ["keydown", "keyup", "keypress"].forEach((event) => {
+  DOM_KEYBOARD_EVENTS.forEach((event: (typeof DOM_KEYBOARD_EVENTS)[number]) => {
     triggerBridgeRegistry.register(event, {
       handler: createDOMEventHandler(event),
       platforms: ["dom"],
@@ -321,16 +380,7 @@ export function registerStandardDOMEvents(): void {
   });
 
   // Form events
-  [
-    "input",
-    "change",
-    "submit",
-    "reset",
-    "focus",
-    "blur",
-    "focusin",
-    "focusout",
-  ].forEach((event) => {
+  DOM_FORM_EVENTS.forEach((event: (typeof DOM_FORM_EVENTS)[number]) => {
     triggerBridgeRegistry.register(event, {
       handler: createDOMEventHandler(event),
       platforms: ["dom"],
@@ -338,7 +388,7 @@ export function registerStandardDOMEvents(): void {
   });
 
   // Touch events
-  ["touchstart", "touchend", "touchmove", "touchcancel"].forEach((event) => {
+  DOM_TOUCH_EVENTS.forEach((event: (typeof DOM_TOUCH_EVENTS)[number]) => {
     triggerBridgeRegistry.register(event, {
       handler: createDOMEventHandler(event),
       platforms: ["dom"],
@@ -346,7 +396,7 @@ export function registerStandardDOMEvents(): void {
   });
 
   // Other common events
-  ["scroll", "resize", "load", "unload", "error", "abort"].forEach((event) => {
+  DOM_MISC_EVENTS.forEach((event: (typeof DOM_MISC_EVENTS)[number]) => {
     triggerBridgeRegistry.register(event, {
       handler: createDOMEventHandler(event),
       platforms: ["dom"],
@@ -354,19 +404,80 @@ export function registerStandardDOMEvents(): void {
   });
 }
 
+/*#################################(Universal Triggers)#################################*/
+
+export type UniversalTriggerProps =
+  | "tap"
+  | "longpress"
+  | "change"
+  | "submit"
+  | "focus";
+
+function createDOMLongPressHandler(durationMs = 500): TriggerPropHandler {
+  return function (node: Element, val: any): void {
+    if (!val) return;
+    let timeoutId: number | null = null;
+
+    const onDown = () => {
+      cleanup();
+      timeoutId = setTimeout(() => {
+        if (typeof val === "function") val({ type: "longpress" });
+      }, durationMs) as unknown as number;
+    };
+    const cleanup = () => {
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+    };
+    const onUp = cleanup;
+    const onLeave = cleanup;
+
+    node.addEventListener("pointerdown", onDown);
+    node.addEventListener("pointerup", onUp);
+    node.addEventListener("pointerleave", onLeave);
+  };
+}
+
+/** Register platform-bridged universal triggers */
+export function registerUniversalTriggerProps(): void {
+  const env = detectEnvironment();
+
+  // DOM/Web bridge
+  if (
+    env.type === "dom" ||
+    env.type === "electron" ||
+    env.type === "lynx"
+  ) {
+    // tap → click
+    registerTriggerHandler("tap", createDOMEventHandler("click"));
+    // longpress → synth from pointer events
+    registerTriggerHandler("longpress", createDOMLongPressHandler());
+    // change → change
+    registerTriggerHandler("change", createDOMEventHandler("change"));
+    // submit → submit
+    registerTriggerHandler("submit", createDOMEventHandler("submit"));
+    // focus → focus
+    registerTriggerHandler("focus", createDOMEventHandler("focus"));
+    return;
+  }
+  // TODO(@benemma): Native/XR bridges (stubs for now to avoid crashes)
+  // Keep API stable for future expansion
+}
+
 /**
  * Register custom platform-specific trigger handlers
  */
-export function registerTriggerHandler(
-  prefix: string,
-  handler: TriggerPropHandler,
+export function registerTriggerHandler<Name extends string, V = any>(
+  name: Name,
+  handler: TriggerPropHandler<V>,
   options?: {
     platforms?: PlatformType[];
     fallback?: string;
     priority?: number;
   }
 ): void {
-  triggerBridgeRegistry.register(prefix, {
+  triggerBridgeRegistry.register<Name, V>(name, {
     handler,
     ...options,
   });

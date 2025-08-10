@@ -138,7 +138,7 @@ function autoDetectMode(env: EnvironmentInfo): string {
   }
 
   // Native mobile environments
-  if (env.type === "nativescript" || env.type === "react-native") {
+  if (env.type === "nativescript" || env.type === "lynx") {
     return "native";
   }
 
@@ -175,9 +175,9 @@ async function createBrowserRenderer({
   }
 
   if (resolvedTarget === "static" || resolvedTarget === "ssr") {
-    // Use HTML renderer for static/SSR
-    const { HTMLRenderer } = await import("./html.ts");
-    const renderer = HTMLRenderer({
+    // Use SSR renderer for static/SSR
+    const { SSRRenderer } = await import("./ssr.ts");
+    const renderer = SSRRenderer({
       rendererID: "Browser-Static",
       extensions,
     });
@@ -247,9 +247,9 @@ async function createServerRenderer({
   extensions,
   debugCtx,
 }: any): Promise<any> {
-  const { HTMLRenderer } = await import("./html.ts");
+  const { SSRRenderer } = await import("./ssr.ts");
 
-  const renderer = HTMLRenderer({
+  const renderer = SSRRenderer({
     rendererID: "Server-SSR",
     extensions,
   });

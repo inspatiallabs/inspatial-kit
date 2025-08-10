@@ -1,7 +1,8 @@
 
 
 // #####################(Trigger Props)#####################
-export { withTriggerProps, registerTriggerHandler } from "./trigger-props.ts";
+export { withTriggerProps, registerTriggerHandler, registerStandardDOMProps,
+  registerUniversalTriggerProps, } from "./trigger-props.ts";
 export { InTriggerProp } from "./trigger-prop-extension.ts";
 
 

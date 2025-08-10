@@ -1,5 +1,5 @@
 import { createRenderer } from "./create-renderer.ts";
-import { normalizeExtensions, type RendererExtensions } from "./extensions.ts";
+import { composeExtensions, type RendererExtensions } from "./extensions.ts";
 
 export interface VisionOSOptions {
   rendererID?: string;
@@ -11,7 +11,7 @@ export interface VisionOSOptions {
  */
 export function VisionOSRenderer(options: VisionOSOptions = {}): any {
   const { rendererID = "VisionOS" } = options;
-  const { setups } = normalizeExtensions(options.extensions);
+  const { setups } = composeExtensions(options.extensions);
 
   // TODO: Implement VisionOS-specific rendering
   // This would integrate with Apple's RealityKit/ARKit APIs

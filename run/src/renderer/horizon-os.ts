@@ -1,5 +1,5 @@
 import { createRenderer } from "./create-renderer.ts";
-import { normalizeExtensions, type RendererExtensions } from "./extensions.ts";
+import { composeExtensions, type RendererExtensions } from "./extensions.ts";
 
 export interface HorizonOSOptions {
   rendererID?: string;
@@ -11,7 +11,7 @@ export interface HorizonOSOptions {
  */
 export function HorizonOSRenderer(options: HorizonOSOptions = {}): any {
   const { rendererID = "HorizonOS" } = options;
-  const { setups } = normalizeExtensions(options.extensions);
+  const { setups } = composeExtensions(options.extensions);
 
   // TODO: Implement HorizonOS-specific rendering
   // This would integrate with Meta's Spatial SDK and WebXR

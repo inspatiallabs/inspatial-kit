@@ -5,7 +5,7 @@ import { App } from "@inspatial/app/(application)/(window)/flat.tsx";
 import { InTheme } from "@inspatial/app/(application)/(window)/theme/extension.ts";
 import { InServe } from "@inspatial/serve";
 
-// 1. Create InSpatial renderer with trigger props integration
+/*################################(Create InSpatial Renderer)################################*/
 createRenderer({
   mode: "auto",
   debug: "minimal",
@@ -16,12 +16,3 @@ createRenderer({
     InSpatial.render(document.getElementById("app"), App);
   }
 });
-
-// 2. Set up typescript for JSX Components
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      [key: string]: any;
-    }
-  }
-}

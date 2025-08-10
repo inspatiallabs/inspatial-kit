@@ -803,8 +803,14 @@ function listen<T>(
   }
 }
 
-function computed<T>(fn: () => T): Signal<T> {
-  return createSignal(null as any, fn as any);
+// Support auto-coercion: if the computed function returns a Signal, read it.
+function computed<T>(fn: () => T): Signal<T>;
+function computed<T>(fn: () => SignalValueType<T>): Signal<T>;
+function computed<T>(fn: () => SignalValueType<T>): Signal<T> {
+  return createSignal(null as any, function (): T {
+    // Read the function's return; if it's a Signal, this tracks and unwraps it.
+    return read(fn());
+  }) as Signal<T>;
 }
 
 const $ = computed;

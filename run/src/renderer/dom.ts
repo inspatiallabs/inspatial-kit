@@ -3,7 +3,8 @@ import { createRenderer } from "./create-renderer.ts";
 import { cachedStrKeyNoFalsy, splitFirst } from "../utils.ts";
 import { env } from "../env/index.ts";
 import { wrap } from "../runtime/jsx-runtime.ts";
-import { normalizeExtensions, type RendererExtensions } from "./extensions.ts";
+import { composeExtensions, type RendererExtensions } from "./extensions.ts";
+import { applyWebStyle, computeClassString } from "./helpers.ts";
 
 const defaultRendererID = "DOM";
 
@@ -15,14 +16,8 @@ export interface DOMOptions {
 
 export function DOMRenderer(options: DOMOptions = {}): any {
   const { rendererID = defaultRendererID, doc = document } = options;
-  const {
-    onDirective,
-    namespaces,
-    tagNamespaceMap,
-    tagAliases,
-    propAliases,
-    setups,
-  } = normalizeExtensions(options.extensions);
+  const { onDirective, namespaces, tagNamespaceMap, tagAliases, setups } =
+    composeExtensions(options.extensions);
 
   function isNode(node: any): boolean {
     return !!(node && node.cloneNode);
@@ -77,7 +72,7 @@ export function DOMRenderer(options: DOMOptions = {}): any {
     node.parentNode.removeChild(node);
   }
   function appendNode(parent: any, ...nodes: any[]): void {
-    for (let node of nodes) {
+    for (const node of nodes) {
       parent.insertBefore(node, null);
     }
   }
@@ -113,61 +108,105 @@ export function DOMRenderer(options: DOMOptions = {}): any {
     bind(handler, val);
   }
 
-  const getPropSetter = cachedStrKeyNoFalsy(function (prop: string) {
-    prop = propAliases[prop] || prop;
+  function applyClass(node: HTMLElement, value: any): void {
+    node.className = computeClassString(value);
+  }
+
+  const getPropSetter = cachedStrKeyNoFalsy(function (_prop: string) {
+    const prop = _prop;
     const [prefix, key] = splitFirst(prop, ":");
     if (key) {
-      switch (prefix) {
-        default: {
-          // All directives now go through extensions
-          if (onDirective) {
-            const setter = onDirective(prefix, key, prop);
-            if (setter) {
-              return setter;
+      // Delegate directive-like prefixes to extensions or namespaces
+      // Unknown prefixes are ignored safely
+      if (onDirective) {
+        const setter = onDirective(prefix, key, prop);
+        if (setter) return setter;
+      }
+      const nsuri = namespaces[prefix];
+      if (nsuri) {
+        return function (node: any, val: any) {
+          return setAttrNS(node, key, val, nsuri);
+        };
+      }
+      return function () {
+        /* no-op for unrecognized directive prefixes */
+      };
+    }
+
+    // Structured reactive className handling
+    if (prop === "class" || prop === "className") {
+      return function (node: any, val: any) {
+        if (val === undefined || val === null) return;
+        if (isSignal(val)) {
+          val.connect(function () {
+            applyClass(node as HTMLElement, peek(val));
+          });
+          // Initial
+          applyClass(node as HTMLElement, peek(val));
+        } else {
+          // Connect to nested signals inside arrays/objects (best-effort)
+          if (Array.isArray(val)) {
+            for (const item of val) {
+              if (isSignal(item)) {
+                item.connect(function () {
+                  applyClass(node as HTMLElement, val);
+                });
+              }
+            }
+          } else if (typeof val === "object") {
+            for (const enabled of Object.values(val)) {
+              if (isSignal(enabled)) {
+                enabled.connect(function () {
+                  applyClass(node as HTMLElement, val);
+                });
+              }
             }
           }
-          // Quietly ignore unknown directive-like props if no extensions handle them
-          // If a known namespace is provided, set as namespaced attribute
-          const nsuri = namespaces[prefix];
-          if (nsuri) {
-            return function (node: any, val: any) {
-              return setAttrNS(node, key, val, nsuri);
-            };
-          }
-          // Otherwise, ignore unsupported prefixed directives when no extension is connected
-          return function () {
-            /* no-op without trigger extensions */
-          };
+          applyClass(node as HTMLElement, val);
         }
-        case "attr": {
-          return function (node: any, val: any) {
-            return setAttr(node, key, val);
-          };
+      };
+    }
+
+    // Structured universal style prop
+    if (prop === "style") {
+      return function (node: any, val: any) {
+        if (val === undefined || val === null) return;
+        if (isSignal(val)) {
+          val.connect(function () {
+            applyWebStyle(node as HTMLElement, peek(val));
+          });
+        } else {
+          applyWebStyle(node as HTMLElement, val);
         }
-        case "prop": {
-          prop = key;
-        }
-      }
-    } else if (prop.indexOf("-") > -1) {
+      };
+    }
+
+    // Hyphenated keys are always attributes (e.g., data-*, aria-*)
+    if (prop.indexOf("-") > -1) {
       return function (node: any, val: any) {
         return setAttr(node, prop, val);
       };
     }
 
+    // Default: prefer property assignment when available; otherwise attribute
     return function (node: any, val: any) {
       if (val === undefined || val === null) return;
+      const useProperty = prop in node;
       if (isSignal(val)) {
         val.connect(function () {
-          node[prop] = peek(val);
+          const next = peek(val);
+          if (useProperty) (node as any)[prop] = next;
+          else setAttr(node, prop, next);
         });
       } else {
-        node[prop] = val;
+        if (useProperty) (node as any)[prop] = val;
+        else setAttr(node, prop, val);
       }
     };
   });
 
   function setProps(node: any, props: Record<string, any>): void {
-    for (let prop in props) getPropSetter(prop)(node, props[prop]);
+    for (const prop in props) getPropSetter(prop)(node, props[prop]);
   }
 
   const nodeOps = {

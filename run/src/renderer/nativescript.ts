@@ -1,5 +1,5 @@
 import { createRenderer } from "./create-renderer.ts";
-import { normalizeExtensions, type RendererExtensions } from "./extensions.ts";
+import { composeExtensions, type RendererExtensions } from "./extensions.ts";
 
 export interface NativeScriptOptions {
   rendererID?: string;
@@ -11,7 +11,7 @@ export interface NativeScriptOptions {
  */
 export function NativeScriptRenderer(options: NativeScriptOptions = {}): any {
   const { rendererID = "NativeScript" } = options;
-  const { setups } = normalizeExtensions(options.extensions);
+  const { setups } = composeExtensions(options.extensions);
 
   // TODO: Implement NativeScript renderer
   // This will provide a DOM-compatible interface for NativeScript

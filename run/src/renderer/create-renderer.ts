@@ -72,9 +72,6 @@ interface Renderer extends NodeOps {
   f: string;
 }
 
-/** Component renderer function type */
-type ComponentRenderFunction = (instance: Component, renderer: Renderer) => any;
-
 /*#################################(Constants)#################################*/
 
 const Fragment = "<>";

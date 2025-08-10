@@ -1,5 +1,5 @@
 import { createRenderer } from "./create-renderer.ts";
-import { normalizeExtensions, type RendererExtensions } from "./extensions.ts";
+import { composeExtensions, type RendererExtensions } from "./extensions.ts";
 
 export interface GenericXROptions {
   rendererID?: string;
@@ -11,7 +11,7 @@ export interface GenericXROptions {
  */
 export function GenericXRRenderer(options: GenericXROptions = {}): any {
   const { rendererID = "GenericXR" } = options;
-  const { setups } = normalizeExtensions(options.extensions);
+  const { setups } = composeExtensions(options.extensions);
 
   // Basic XR renderer for WebXR environments
   console.log("Using generic XR renderer for WebXR environment");

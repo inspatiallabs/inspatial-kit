@@ -2,14 +2,14 @@ import { detectEnvironment, getRendererType } from "./environment.ts";
 import type { EnvironmentInfo } from "./environment.ts";
 import { XRRenderer } from "./xr.ts";
 import { NativeScriptRenderer } from "./nativescript.ts";
-import { type RendererExtensions } from "./extensions.ts";
+import type { RendererExtensions } from "./extensions.ts";
 
 /**
  * Universal Renderer Configuration
  */
 export interface UniversalExtensions {
   /** Force a specific renderer type instead of auto-detection */
-  forceRenderer?: "dom" | "html" | "native" | "xr";
+  forceRenderer?: "dom" | "ssr" | "native" | "xr";
   /** Environment detection override */
   environment?: EnvironmentInfo;
   /** Renderer-specific options */
@@ -85,16 +85,16 @@ export async function createUniversalRenderer(
       return xrRenderer;
     }
 
-    case "html": {
-      // Import HTML renderer for server-side environments
-      const { HTMLRenderer } = await import("./html.ts");
-      const renderer = HTMLRenderer({
-        rendererID: "Universal-HTML",
+    case "ssr": {
+      // Import SSR renderer for server-side environments
+      const { SSRRenderer } = await import("./ssr.ts");
+      const renderer = SSRRenderer({
+        rendererID: "Universal-SSR",
         extensions,
       });
 
       if (debug) {
-        console.log("✅ HTML renderer created");
+        console.log("✅ SSR renderer created");
       }
 
       return renderer;
@@ -133,7 +133,7 @@ export {
 
 // Re-export individual renderers
 export { DOMRenderer } from "./dom.ts";
-export { HTMLRenderer } from "./html.ts";
+export { SSRRenderer } from "./ssr.ts";
 export { AndroidXRRenderer } from "./android-xr.ts";
 export { VisionOSRenderer } from "./vision-os.ts";
 export { HorizonOSRenderer } from "./horizon-os.ts";

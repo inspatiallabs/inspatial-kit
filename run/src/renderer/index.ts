@@ -4,8 +4,9 @@ export type {
   ExtensionSignal,
   RendererExtension,
   RendererExtensions,
-  NormalizedExtensions,
+  ComposedExtensions,
 } from "./extensions.ts";
+export { createExtension } from "./extensions.ts";
 
 // Legacy universal renderer (for backwards compatibility)
 export {
@@ -20,7 +21,7 @@ export { createRenderer as createBaseRenderer } from "./create-renderer.ts";
 
 // Individual renderers (for direct control - Only for advanced users and framework authors)
 export { DOMRenderer } from "./dom.ts";
-export { HTMLRenderer } from "./html.ts";
+export { SSRRenderer } from "./ssr.ts";
 export { AndroidXRRenderer } from "./android-xr.ts";
 export { VisionOSRenderer } from "./vision-os.ts";
 export { HorizonOSRenderer } from "./horizon-os.ts";

@@ -10,7 +10,7 @@
     "./renderer": "./src/renderer/index.ts",
     "./renderer/create-renderer": "./src/renderer/create-renderer.ts",
     "./renderer/dom": "./src/renderer/dom.ts",
-    "./renderer/html": "./src/renderer/html.ts",
+    "./renderer/ssr": "./src/renderer/ssr.ts",
     "./renderer/universal": "./src/renderer/universal.ts",
     "./renderer/xr": "./src/renderer/xr.ts",
     "./renderer/android-xr": "./src/renderer/android-xr.ts",

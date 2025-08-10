@@ -2,7 +2,7 @@ import { createSignal } from "../../signal/index.ts";
 import { isPrimitive } from "../../utils.ts";
 import { env } from "../../env/index.ts";
 
-// Hot module replacement interfaces for type safety
+/*################################(Hot Module Replacement Interfaces)################################*/
 interface HotModuleReplacement {
   accept(): void;
   dispose(callback: (data: any) => void): void;
@@ -10,6 +10,7 @@ interface HotModuleReplacement {
   data?: any;
 }
 
+/*################################(Extended Import Meta)################################*/
 interface ExtendedImportMeta {
   hot?: HotModuleReplacement;
   webpackHot?: any;

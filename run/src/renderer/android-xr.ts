@@ -1,5 +1,5 @@
 import { createRenderer } from "./create-renderer.ts";
-import { normalizeExtensions, type RendererExtensions } from "./extensions.ts";
+import { composeExtensions, type RendererExtensions } from "./extensions.ts";
 
 export interface AndroidXROptions {
   rendererID?: string;
@@ -11,7 +11,7 @@ export interface AndroidXROptions {
  */
 export function AndroidXRRenderer(options: AndroidXROptions = {}): any {
   const { rendererID = "AndroidXR" } = options;
-  const { setups } = normalizeExtensions(options.extensions);
+  const { setups } = composeExtensions(options.extensions);
 
   // TODO: Implement AndroidXR-specific rendering
   // This would integrate with Google's ARCore/VRCore APIs

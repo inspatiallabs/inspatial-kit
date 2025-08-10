@@ -1,4 +1,6 @@
-import type { Signal } from "../signal/signal.ts"
+import type { Signal } from "../signal/signal.ts";
+
+/*################################(Prop Setter & Directive Resolver)################################*/
 
 export type PropSetter = (node: Element, value: unknown) => void;
 export type DirectiveResolver = (
@@ -7,26 +9,119 @@ export type DirectiveResolver = (
   prop?: string
 ) => PropSetter | undefined;
 
-export type ExtensionSignal<T> = Pick<Signal<T>, "get" | "peek" | "connect" | "subscribe">
+/*################################(Extension Signals)################################*/
+export type ExtensionSignal<T> = Pick<
+  Signal<T>,
+  "get" | "peek" | "connect" | "subscribe"
+>;
 
-/**
- * Renderer-agnostic extension surface
- * Keep this minimal and generic.
- */
-export interface RendererExtension {
+/*################################(Extension Metadata)################################*/
+
+// Marketplace and identity metadata
+export interface ExtensionMeta {
+  key: string;
   name: string;
-  /** Global setup hook, called after renderer is created */
-  setup?: (renderer: any) => void;
-  /** Optional validation hook in dev builds */
-  validate?: () => void;
-  /** Renderer-specific capability buckets */
-  props?: {
-    onDirective?: DirectiveResolver | DirectiveResolver[];
-    namespaces?: Record<string, string>;
-    tagNamespaceMap?: Record<string, string>;
-    tagAliases?: Record<string, string>;
-    propAliases?: Record<string, string>;
+  description?: string;
+  icon?: string;
+  media?: string[];
+  author?: { name: string; url?: string; contact?: string };
+  verified?: boolean;
+  price?: number; // default 0
+  status?: "installed" | "uninstalled";
+  type?: "InDev" | "NonDev" | "Universal";
+  version?: string;
+  compatibility?: {
+    minRunVersion?: string;
+    maxRunVersion?: string;
+    minCloudVersion?: string;
+    engines?: string[];
   };
+}
+
+/*################################(Extension Scopes)################################*/
+// Scope model
+export type ServerScope = "mcp" | "incloud" | "devserver";
+export type ClientScope = "popup" | "progressive" | "full";
+export type EditorScope = "Windows" | "Scenes" | "Cloud" | "InDev";
+
+export interface WindowsSubScopes {
+  numbers?: string[]; // e.g., cornerRadius, opacity
+  strings?: string[]; // e.g., fontFamily, fontWeight
+}
+
+export interface ExtensionScopeConfig {
+  serverScope?: ServerScope;
+  clientScope?: ClientScope;
+  editorScopes?: EditorScope[];
+  subScopes?: {
+    windows?: WindowsSubScopes;
+    // future: scenes?: {...}, cloud?: {...}
+  };
+}
+
+/*################################(Extension Permissions)################################*/
+// Permissions
+export interface ExtensionPermissions {
+  network?: true | { domains: string[] };
+  storage?: { local?: boolean; session?: boolean; indexed?: boolean };
+  env?: { keys: string[] };
+  renderer?: { props?: boolean; directives?: string[] };
+  triggers?: { needs: string[] };
+  cloud?: { apiGroups?: string[]; roles?: string[] };
+  files?: { read?: string[]; write?: string[] };
+}
+
+/*################################(Extension Capabilities)################################*/
+// Capability buckets
+export interface RendererPropsCaps {
+  onDirective?: DirectiveResolver | DirectiveResolver[];
+  namespaces?: Record<string, string>;
+  tagNamespaceMap?: Record<string, string>;
+  tagAliases?: Record<string, string>;
+  // propAliases removed: prefer native prop vs attribute resolution in renderer
+}
+
+export interface ExtensionCapabilities {
+  rendererProps?: RendererPropsCaps;
+  // triggers, uiSurfaces, serverHooks, settings, i18n can be added progressively
+}
+
+/*################################(Extension Lifecycle)################################*/
+// Lifecycle
+export interface ExtensionLifecycle {
+  onInstall?: () => void | Promise<void>;
+  onUninstall?: () => void | Promise<void>;
+  onEnable?: () => void | Promise<void>;
+  onDisable?: () => void | Promise<void>;
+  setup?: (renderer?: any) => void | Promise<void>;
+  validate?: () => void;
+}
+
+/*################################(Extension Props)################################*/
+export interface ExtensionProps {
+  meta: ExtensionMeta;
+  scope?: ExtensionScopeConfig;
+  permissions?: ExtensionPermissions;
+  capabilities?: ExtensionCapabilities;
+  lifecycle?: ExtensionLifecycle;
+}
+
+/*################################(Extension Renderer)################################*/
+/**
+ * RendererExtension (next-gen) — the single canonical shape used everywhere.
+ * It carries metadata plus the renderer-facing surface.
+ */
+/*##################################################################################*/
+export interface RendererExtension {
+  // Renderer surface consumed by renderers/composeExtensions
+  name: string;
+
+  // Rich metadata for host/runtime and marketplace
+  meta: ExtensionMeta;
+  scope?: ExtensionScopeConfig;
+  permissions?: ExtensionPermissions;
+  capabilities?: ExtensionCapabilities;
+  lifecycle?: ExtensionLifecycle;
 }
 
 export type RendererExtensions =
@@ -34,18 +129,18 @@ export type RendererExtensions =
   | RendererExtension[]
   | undefined;
 
-export interface NormalizedExtensions {
+/*################################(Normalized Extensions)################################*/
+export interface ComposedExtensions {
   onDirective?: DirectiveResolver;
   namespaces: Record<string, string>;
   tagNamespaceMap: Record<string, string>;
   tagAliases: Record<string, string>;
-  propAliases: Record<string, string>;
   setups: Array<(renderer: any) => void>;
 }
 
-export function normalizeExtensions(
+export function composeExtensions(
   extensions?: RendererExtensions
-): NormalizedExtensions {
+): ComposedExtensions {
   const extArray = (
     !extensions ? [] : Array.isArray(extensions) ? extensions : [extensions]
   ) as RendererExtension[];
@@ -53,28 +148,29 @@ export function normalizeExtensions(
   const namespaces: Record<string, string> = {};
   const tagNamespaceMap: Record<string, string> = {};
   const tagAliases: Record<string, string> = {};
-  const propAliases: Record<string, string> = {};
   const resolvers: DirectiveResolver[] = [];
   const setups: Array<(renderer: any) => void> = [];
 
   for (const ext of extArray) {
-    // Global setup
-    if (ext?.setup) setups.push(ext.setup);
-    if (ext?.validate) {
+    // Global setup & validation from lifecycle
+    const setup = ext?.lifecycle?.setup;
+    if (setup) setups.push(setup);
+    const validate = ext?.lifecycle?.validate;
+    if (validate) {
       try {
-        ext.validate();
+        validate();
       } catch (e) {
         console.warn(`[extensions] validate() failed for ${ext.name}:`, e);
       }
     }
 
     // Props capability (renderer-agnostic directive layer)
-    const props = ext?.props;
+    const props = ext?.capabilities?.rendererProps;
     if (props) {
       if (props.namespaces) Object.assign(namespaces, props.namespaces);
-      if (props.tagNamespaceMap) Object.assign(tagNamespaceMap, props.tagNamespaceMap);
+      if (props.tagNamespaceMap)
+        Object.assign(tagNamespaceMap, props.tagNamespaceMap);
       if (props.tagAliases) Object.assign(tagAliases, props.tagAliases);
-      if (props.propAliases) Object.assign(propAliases, props.propAliases);
       const r = props.onDirective;
       if (Array.isArray(r)) resolvers.push(...r.filter(Boolean));
       else if (r) resolvers.push(r);
@@ -97,7 +193,27 @@ export function normalizeExtensions(
     namespaces,
     tagNamespaceMap,
     tagAliases,
-    propAliases,
     setups,
   };
+}
+
+/*################################(Create Extension)################################*/
+/**
+ * Create a unified InSpatial extension. Returns the canonical RendererExtension
+ * shape that renderers consume and hosts use for metadata/scoping.
+ */
+/*##################################################################################*/
+export function createExtension(props: ExtensionProps): RendererExtension {
+  const { meta, scope, permissions, capabilities, lifecycle } = props;
+
+  const rendererExt: RendererExtension = {
+    name: meta.name || meta.key,
+    meta,
+    scope,
+    permissions,
+    capabilities,
+    lifecycle,
+  };
+
+  return rendererExt;
 }

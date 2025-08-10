@@ -49,7 +49,7 @@ debug.configure({
 - **performance**: Timing information and performance metrics
 - **lifecycle**: Application lifecycle events
 - **xr**: XR-specific operations (AndroidXR, VisionOS, HorizonOS)
-- **native**: Native platform operations (NativeScript, React Native)
+- **native**: Native platform operations (NativeScript, Lynx)
 - **general**: General application logging
 
 ## Usage Examples

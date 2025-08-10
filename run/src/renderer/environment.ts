@@ -10,7 +10,7 @@ export interface EnvironmentInfo {
     | "node"
     | "deno"
     | "bun"
-    | "react-native"
+    | "lynx"
     | "electron"
     | "webworker"
     | "nativescript"
@@ -192,7 +192,7 @@ export function detectEnvironment(): EnvironmentInfo {
   // NativeScript Environment (Native Mobile)
   if (hasNativeScript && !hasWindow) {
     let platform: "android" | "ios" | "unknown" = "unknown";
-    let version: string | undefined;
+    const _version: string | undefined = undefined;
 
     if (hasAndroid) {
       platform = "android";
@@ -203,12 +203,12 @@ export function detectEnvironment(): EnvironmentInfo {
     // Try to get NativeScript version
     const runtimeVersion = safeGlobalAccess("__runtimeVersion");
     const appVersion = safeGlobalAccess("Application");
-    version = runtimeVersion || appVersion?.version;
+    const versionResolved = runtimeVersion || appVersion?.version;
 
     return {
       type: "nativescript",
       runtime: "NativeScript",
-      version,
+      version: versionResolved,
       platform,
       features: {
         hasDOM: false,
@@ -234,11 +234,11 @@ export function detectEnvironment(): EnvironmentInfo {
     hasDocument &&
     typeof (globalThis as any).document?.createElement === "function"
   ) {
-    // Check for React Native
-    if (hasWindow && safeGlobalAccess("ReactNativeWebView")) {
+    // Check for Lynx 
+    if (hasWindow && safeGlobalAccess("LynxWebView")) {
       return {
-        type: "react-native",
-        runtime: "React Native WebView",
+        type: "lynx",
+        runtime: "Lynx WebView",
         platform: "web",
         features: {
           hasDOM: true,
@@ -438,13 +438,13 @@ export function detectEnvironment(): EnvironmentInfo {
  */
 export function getRendererType(
   env?: EnvironmentInfo
-): "dom" | "html" | "text" | "native" | "xr" {
+): "dom" | "ssr" | "text" | "native" | "xr" {
   const environment = env || detectEnvironment();
 
   switch (environment.type) {
     case "dom":
     case "electron":
-    case "react-native":
+    case "lynx":
       return "dom";
 
     case "nativescript":
@@ -459,15 +459,15 @@ export function getRendererType(
     case "node":
     case "deno":
     case "bun":
-      return "html";
+      return "ssr";
 
     case "webworker":
-      // Web workers can't access DOM, use HTML for string generation
-      return "html";
+      // Web workers can't access DOM, use SSR for string generation
+      return "ssr";
 
     default:
-      // Safe fallback - HTML renderer works everywhere
-      return "html";
+      // Safe fallback - DOM renderer is the default
+      return "dom";
   }
 }
 
