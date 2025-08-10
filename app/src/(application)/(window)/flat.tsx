@@ -1,5 +1,5 @@
 import { Counter } from "@inspatial/app/(application)/(window)/counter.tsx";
-import { themeState } from "./theme/state.ts";
+import { useTheme } from "./theme/state.ts";
 import { $ } from "@inspatial/state";
 
 export function App() {
@@ -17,10 +17,10 @@ export function App() {
               padding: "10px",
             },
           }}
-          on:tap={() => themeState.trigger.toggle()}
+          on:tap={() => useTheme.action.setToggle()}
         >
           {$(() =>
-            String(themeState.mode) === "dark"
+            String(useTheme.mode) === "dark"
               ? "Switch to Light"
               : "Switch to Dark"
           )}

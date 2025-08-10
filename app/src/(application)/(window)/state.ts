@@ -1,4 +1,4 @@
-import { createState, createStorage, createTrigger } from "@inspatial/state";
+import { createState, createStorage, createAction } from "@inspatial/state";
 // import { cloud } from "@inspatial/app/api/inspatial-cloud.api.ts";
 
 // ########################## (CLOUD) ##########################
@@ -11,44 +11,44 @@ import { createState, createStorage, createTrigger } from "@inspatial/state";
 // );
 
 // ########################## (STATE & TRIGGERS) ##########################
-export interface Entry {
+export interface EntryProps {
   id: number;
   name: string;
 }
 
 // ==================== PATTERN 1: (EXPLICIT) ====================
-type ExplicitStateType = { count: number; message: string };
+type CounterProps = { count: number; message: string };
 
-export const counterStateExplicit = createState.in({
+export const useCounterExplicit = createState.in({
   id: "counter-explicit",
-  initialState: {
+  initialState: <CounterProps>{
     count: 0,
     message: "Config pattern works!",
   },
-  trigger: {
-    increment: {
+  action: {
+    setIncrement: {
       key: "count",
-      action: (current: number, amount = 1) => current + amount,
+      fn: (current: number, amount = 1) => current + amount,
       options: { name: "explicit-increment", throttle: 50 },
     },
-    decrement: {
+    setDecrement: {
       key: "count",
-      action: (current: number, amount = 1) => current - amount,
+      fn: (current: number, amount = 1) => current - amount,
       options: { name: "explicit-decrement", throttle: 50 },
     },
     setMessage: {
       key: "message",
-      action: (_: string, msg: string) => msg,
+      fn: (_: string, msg: string) => msg,
       options: { name: "explicit-set-message", debounce: 200 },
     },
-    reset: {
+    setReset: {
       key: "count",
-      action: () => 0,
+      fn: () => 0,
       options: { name: "explicit-reset", once: false },
     },
-    resetMessage: {
+    setResetMessage: {
       key: "message",
-      action: () => "Config pattern works!",
+      fn: () => "Config pattern works!",
       options: { name: "explicit-reset-message" },
     },
   },
@@ -60,51 +60,51 @@ export const counterStateExplicit = createState.in({
 });
 
 // ==================== PATTERN 2: (SEPARATION) ====================
-export const counterState = createState({
+export const useCounter = createState({
   count: 0,
   multiplier: 2,
   entries: [
-    { id: 1, name: "🚀 Unified createTrigger API!" },
+    { id: 1, name: "🚀 Unified createAction API!" },
     { id: 2, name: "🧠 75% cognitive load reduction!" },
     { id: 3, name: "✨ One function, three patterns!" },
     { id: 4, name: "🎯 Simple mental model!" },
-  ] as Entry[],
+  ] as EntryProps[],
 });
 
-// Built-in convenience functions using unified createTrigger
-export const builtInTrigger = createTrigger(counterState, {
-  increment: {
+// Built-in convenience functions using unified createAction
+export const handleCounter = createAction(useCounter, {
+  setIncrement: {
     key: "count",
-    action: (current: number, amount = 1) => current + amount,
+    fn: (current: number, amount = 1) => current + amount,
     options: { name: "built-in-increment" },
   },
-  decrement: {
+  setDecrement: {
     key: "count",
-    action: (current: number, amount = 1) => current - amount,
+    fn: (current: number, amount = 1) => current - amount,
     options: { name: "built-in-decrement" },
   },
   setCount: {
     key: "count",
-    action: (_: number, value: number) => value,
+    fn: (_: number, value: number) => value,
     options: { name: "built-in-set-count" },
   },
-  addEntry: {
+  setAddEntry: {
     key: "entries",
-    action: (entries: Entry[], text: string) => [
+    fn: (entries: EntryProps[], text: string) => [
       ...entries,
       { id: Date.now(), name: text },
     ],
     options: { name: "built-in-add-entry" },
   },
-  reset: {
+  setReset: {
     key: "count",
-    action: () => 0,
+    fn: () => 0,
     options: { name: "built-in-reset" },
   },
-  resetEntries: {
+  setResetEntries: {
     key: "entries",
-    action: (): Entry[] => [
-      { id: 1, name: "🚀 Unified createTrigger API!" },
+    fn: (): EntryProps[] => [
+      { id: 1, name: "🚀 Unified createAction API!" },
       { id: 2, name: "🧠 75% cognitive load reduction!" },
       { id: 3, name: "✨ One function, three patterns!" },
       { id: 4, name: "🔄 Reset complete!" },
@@ -113,19 +113,19 @@ export const builtInTrigger = createTrigger(counterState, {
   },
 });
 
-// ==================== UNIFIED createTrigger API SHOWCASE ====================
+// ==================== UNIFIED createAction API SHOWCASE ====================
 // Three Patterns, One Function!
 
 // Pattern 1: Direct Signal (simplest - for single signal operations)
-export const directIncrement = createTrigger(
-  counterState.count,
+export const handleDirectIncrement = createAction(
+  useCounter.count,
   (current: number) => current + 1,
   { name: "direct-increment", throttle: 100 }
 );
 
-export const directAddEntry = createTrigger(
-  counterState.entries,
-  (entries: Entry[], text: string) => [
+export const handleDirectAddEntry = createAction(
+  useCounter.entries,
+  (entries: EntryProps[], text: string) => [
     ...entries,
     { id: Date.now(), name: text },
   ],
@@ -133,57 +133,57 @@ export const directAddEntry = createTrigger(
 );
 
 // Pattern 2: State Property Tuple (type-safe property targeting)
-export const tupleDouble = createTrigger(
-  [counterState, "count"],
+export const handleTupleDouble = createAction(
+  [useCounter, "count"],
   (current: number) => current * 2,
   { name: "tuple-double" }
 );
 
-export const tupleSetMultiplier = createTrigger(
-  [counterState, "multiplier"],
+export const handleTupleSetMultiplier = createAction(
+  [useCounter, "multiplier"],
   (_: number, newValue: number) => newValue,
   { name: "tuple-set-multiplier" }
 );
 
 // Pattern 3: Batch Triggers (organized multi-property operations)
-export const batchOperations = createTrigger(counterState, {
-  multiplyByFactor: {
+export const handleBatch = createAction(useCounter, {
+  setMultiplyByFactor: {
     key: "count",
-    action: (count: number) => count * counterState.multiplier.peek(),
+    fn: (count: number) => count * useCounter.multiplier.peek(),
     options: { name: "multiply-by-factor" },
   },
-  addBonusEntry: {
+  setAddBonusEntry: {
     key: "entries",
-    action: (entries: Entry[]) => [
+    fn: (entries: EntryProps[]) => [
       ...entries,
       {
         id: Date.now(),
-        name: `🎁 Bonus entry! Count: ${counterState.count.peek()}`,
+        name: `🎁 Bonus entry! Count: ${useCounter.count.peek()}`,
       },
     ],
     options: { name: "add-bonus-entry", debounce: 300 },
   },
-  powerReset: {
+  setPowerReset: {
     key: "count",
-    action: () => 100,
+    fn: () => 100,
     options: { name: "power-reset" },
   },
 });
 
 // 🚀 BONUS: Advanced combined operations
-export const advancedOperations = createTrigger(counterState, {
-  smartIncrement: {
+export const handleAdvanced = createAction(useCounter, {
+  setSmartIncrement: {
     key: "count",
-    action: (count: number) => {
-      const multiplier = counterState.multiplier.peek();
+    fn: (count: number) => {
+      const multiplier = useCounter.multiplier.peek();
       return count + multiplier;
     },
     options: { name: "smart-increment", throttle: 50 },
   },
-  celebrationEntry: {
+  setCelebrationEntry: {
     key: "entries",
-    action: (entries: Entry[]) => {
-      const count = counterState.count.peek();
+    fn: (entries: EntryProps[]) => {
+      const count = useCounter.count.peek();
       if (count % 10 === 0) {
         return [
           ...entries,
@@ -200,7 +200,7 @@ export const advancedOperations = createTrigger(counterState, {
 });
 
 // Enhanced subscription with change events
-counterState.count.on(
+useCounter.count.on(
   "change",
   (newVal: number, oldVal: number, context?: string) => {
     console.log(
@@ -215,7 +215,7 @@ counterState.count.on(
 // 🎯 SEPARATION PATTERN: External persistence setup
 // Persist the main counter state to localStorage
 // This will save: count, multiplier, entries
-createStorage(counterState, {
+createStorage(useCounter, {
   key: "inspatial-counter-state",
   backend: "local",
   debounce: 500, // Save after 500ms of inactivity
@@ -225,45 +225,45 @@ createStorage(counterState, {
 // ==================== ENHANCED EXPLICIT PATTERN DEMO ====================
 // 🚀 Explicit pattern now has SAME POWER as separation pattern!
 
-type EnhancedExplicitStateType = {
+type EnhancedCounterProps = {
   advancedCount: number;
   status: string;
 };
 
-export const enhancedExplicitState = createState.in({
+export const useEnhancedExplicit = createState.in({
   id: "enhanced-explicit",
-  initialState: {
+  initialState: <EnhancedCounterProps>{
     advancedCount: 0,
     status: "🚀 Enhanced explicit!",
   },
-  trigger: {
+  action: {
     // 🔧 Traditional key-based
-    increment: {
+    setIncrement: {
       key: "advancedCount",
-      action: (current: number, amount = 1) => current + amount,
+      fn: (current: number, amount = 1) => current + amount,
       options: { name: "enhanced-increment", throttle: 50 },
     },
 
-    syncWithOtherStates: {
+    setSyncWithOtherStates: {
       key: "advancedCount",
-      action: (current: number) => {
+      fn: (current: number) => {
         // Access external states during mutation!
-        const separationCount = counterState.count.get();
-        counterState.multiplier.set(current); // Modify external state!
+        const separationCount = useCounter.count.get();
+        useCounter.multiplier.set(current); // Modify external state!
         return current + separationCount;
       },
       options: { name: "cross-state-operations" },
     },
 
-    incrementExternalState: {
-      target: [counterState, "count"],
-      action: (current: number) => current + 10,
+    setIncrementExternalState: {
+      target: [useCounter, "count"],
+      fn: (current: number) => current + 10,
       options: { name: "external-state-increment", debounce: 200 },
     },
 
-    updateStatus: {
+    setUpdateStatus: {
       key: "status",
-      action: (_: string, newStatus: string) => `🚀 ${newStatus}`,
+      fn: (_: string, newStatus: string) => `🚀 ${newStatus}`,
       options: { name: "status-update", debounce: 300 },
     },
   },
@@ -275,9 +275,9 @@ export const enhancedExplicitState = createState.in({
 
 // 🔥 Dynamic trigger management demo
 setTimeout(() => {
-  enhancedExplicitState.addTrigger?.("runtimeTrigger", {
+  useEnhancedExplicit.addAction?.("runtimeTrigger", {
     key: "advancedCount",
-    action: (current: number) => current + 100,
+    fn: (current: number) => current + 100,
     options: { name: "dynamic-runtime-trigger" },
   });
   console.log("🎉 Runtime trigger added to enhanced explicit state!");
@@ -286,33 +286,33 @@ setTimeout(() => {
 // ==================== ENHANCED STORAGE PATTERN DEMO ====================
 // 🚀 Explicit pattern now has SAME STORAGE POWER as separation pattern!
 
-type StorageEnhancedStateType = {
+type StorageCounterProps = {
   data: string;
   count: number;
   temp: string;
 };
 
-export const storageEnhancedState = createState.in({
+export const useStorageEnhanced = createState.in({
   id: "storage-enhanced",
-  initialState: {
+  initialState: <StorageCounterProps>{
     data: "persistent data",
     count: 0,
     temp: "temporary data",
   },
-  trigger: {
-    updateData: {
+  action: {
+    setUpdateData: {
       key: "data",
-      action: (_: string, newData: string) => newData,
+      fn: (_: string, newData: string) => newData,
       options: { name: "update-data", debounce: 300 },
     },
-    incrementCount: {
+    setIncrementCount: {
       key: "count",
-      action: (current: number) => current + 1,
+      fn: (current: number) => current + 1,
       options: { name: "increment-count" },
     },
-    updateTemp: {
+    setUpdateTemp: {
       key: "temp",
-      action: (_: string, newTemp: string) => newTemp,
+      fn: (_: string, newTemp: string) => newTemp,
       options: { name: "update-temp" },
     },
   },
@@ -346,7 +346,7 @@ export const storageEnhancedState = createState.in({
 // 🔥 Dynamic storage management demo
 setTimeout(() => {
   // Add more storage at runtime!
-  const _cleanup = storageEnhancedState.addStorage?.({
+  const _cleanup = useStorageEnhanced.addStorage?.({
     key: "runtime-storage",
     backend: "local",
     include: ["data"],
@@ -354,15 +354,15 @@ setTimeout(() => {
   });
 
   console.log("💾 Runtime storage added!");
-  console.log("📊 Storage info:", storageEnhancedState.getStorageInfo?.());
+  console.log("📊 Storage info:", useStorageEnhanced.getStorageInfo?.());
 
   // Test storage management
   setTimeout(() => {
-    storageEnhancedState.pauseStorage?.();
+    useStorageEnhanced.pauseStorage?.();
     console.log("⏸️ Storage paused");
 
     setTimeout(() => {
-      storageEnhancedState.resumeStorage?.();
+      useStorageEnhanced.resumeStorage?.();
       console.log("▶️ Storage resumed");
     }, 1000);
   }, 2000);

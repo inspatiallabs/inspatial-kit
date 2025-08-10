@@ -18,7 +18,11 @@ interface ExtendedImportMeta {
 
 export const hotReloadEnabler =
   !env.isProduction() &&
-  !!(/* @inspatial webpack */ (import.meta as ExtendedImportMeta).hot);
+  (
+    !!(/* @inspatial webpack */ (import.meta as ExtendedImportMeta).hot) ||
+    // Enable when served by InSpatial dev server HMR client
+    (globalThis as any).__inspatialHMR === true
+  );
 
 export const KEY_HOTWRAP = Symbol("K_HOTWRAP");
 export const KEY_HOTWRAPPED = Symbol("K_HOTWARPPED");

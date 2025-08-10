@@ -57,11 +57,6 @@ function reverseMap(keyValsMap: KeyValsMap): Record<string, string> {
   return reversed;
 }
 
-function prefix(_unused: string, keyArr: string[]): Record<string, string> {
-  // no longer using attr:/prop: prefixes; return identity map
-  return Object.fromEntries(keyArr.map((i) => [i, i] as [string, string]));
-}
-
 /*#################################(Constants)#################################*/
 
 const namespaces: Record<string, string> = {
@@ -313,7 +308,7 @@ export const DOM_MISC_EVENTS = [
 type AnyEventHandler = (...args: any[]) => any;
 type MaybeSignalHandler = AnyEventHandler | Signal<AnyEventHandler>;
 
-function createDOMEventHandler(
+function DOMEventHandler(
   eventName: string
 ): TriggerPropHandler<MaybeSignalHandler> {
   return function (node: Element, val: MaybeSignalHandler): void {
@@ -343,7 +338,7 @@ function createDOMEventHandler(
  * Register standard DOM events into the bridge registry.
  * Call this from an extension setup hook.
  */
-export function registerStandardDOMProps(): void {
+export function StandardDOMProps(): void {
   // Exported event name groups for DX typing helpers
   // Keeping as const tuples to power literal union types
 
@@ -366,7 +361,7 @@ export function registerStandardDOMProps(): void {
   // Pointer events
   DOM_POINTER_EVENTS.forEach((event: (typeof DOM_POINTER_EVENTS)[number]) => {
     triggerBridgeRegistry.register(event, {
-      handler: createDOMEventHandler(event),
+      handler: DOMEventHandler(event),
       platforms: ["dom"],
     });
   });
@@ -374,7 +369,7 @@ export function registerStandardDOMProps(): void {
   // Keyboard events
   DOM_KEYBOARD_EVENTS.forEach((event: (typeof DOM_KEYBOARD_EVENTS)[number]) => {
     triggerBridgeRegistry.register(event, {
-      handler: createDOMEventHandler(event),
+      handler: DOMEventHandler(event),
       platforms: ["dom"],
     });
   });
@@ -382,7 +377,7 @@ export function registerStandardDOMProps(): void {
   // Form events
   DOM_FORM_EVENTS.forEach((event: (typeof DOM_FORM_EVENTS)[number]) => {
     triggerBridgeRegistry.register(event, {
-      handler: createDOMEventHandler(event),
+      handler: DOMEventHandler(event),
       platforms: ["dom"],
     });
   });
@@ -390,7 +385,7 @@ export function registerStandardDOMProps(): void {
   // Touch events
   DOM_TOUCH_EVENTS.forEach((event: (typeof DOM_TOUCH_EVENTS)[number]) => {
     triggerBridgeRegistry.register(event, {
-      handler: createDOMEventHandler(event),
+      handler: DOMEventHandler(event),
       platforms: ["dom"],
     });
   });
@@ -398,7 +393,7 @@ export function registerStandardDOMProps(): void {
   // Other common events
   DOM_MISC_EVENTS.forEach((event: (typeof DOM_MISC_EVENTS)[number]) => {
     triggerBridgeRegistry.register(event, {
-      handler: createDOMEventHandler(event),
+      handler: DOMEventHandler(event),
       platforms: ["dom"],
     });
   });
@@ -413,7 +408,7 @@ export type UniversalTriggerProps =
   | "submit"
   | "focus";
 
-function createDOMLongPressHandler(durationMs = 500): TriggerPropHandler {
+function DOMLongPressHandler(durationMs = 500): TriggerPropHandler {
   return function (node: Element, val: any): void {
     if (!val) return;
     let timeoutId: number | null = null;
@@ -444,21 +439,17 @@ export function registerUniversalTriggerProps(): void {
   const env = detectEnvironment();
 
   // DOM/Web bridge
-  if (
-    env.type === "dom" ||
-    env.type === "electron" ||
-    env.type === "lynx"
-  ) {
+  if (env.type === "dom" || env.type === "electron" || env.type === "lynx") {
     // tap → click
-    registerTriggerHandler("tap", createDOMEventHandler("click"));
+    createTriggerHandle("tap", DOMEventHandler("click"));
     // longpress → synth from pointer events
-    registerTriggerHandler("longpress", createDOMLongPressHandler());
+    createTriggerHandle("longpress", DOMLongPressHandler());
     // change → change
-    registerTriggerHandler("change", createDOMEventHandler("change"));
+    createTriggerHandle("change", DOMEventHandler("change"));
     // submit → submit
-    registerTriggerHandler("submit", createDOMEventHandler("submit"));
+    createTriggerHandle("submit", DOMEventHandler("submit"));
     // focus → focus
-    registerTriggerHandler("focus", createDOMEventHandler("focus"));
+    createTriggerHandle("focus", DOMEventHandler("focus"));
     return;
   }
   // TODO(@benemma): Native/XR bridges (stubs for now to avoid crashes)
@@ -468,7 +459,7 @@ export function registerUniversalTriggerProps(): void {
 /**
  * Register custom platform-specific trigger handlers
  */
-export function registerTriggerHandler<Name extends string, V = any>(
+export function createTriggerHandle<Name extends string, V = any>(
   name: Name,
   handler: TriggerPropHandler<V>,
   options?: {

@@ -2,19 +2,20 @@ import { createState } from "@inspatial/state";
 
 /*################################(Types)################################*/
 
-export type ThemeMode = "light" | "dark";
+export type ThemeModeProps = "light" | "dark";
 
 /*################################(State)################################*/
-export const themeState = createState.in({
+export const useTheme = createState.in({
   initialState: {
-    mode: "light" as ThemeMode,
+    mode: "light" as ThemeModeProps,
   },
-  trigger: {
-    setLight: { key: "mode", action: () => "light" as ThemeMode },
-    setDark: { key: "mode", action: () => "dark" as ThemeMode },
-    toggle: {
+  action: {
+    setLight: { key: "mode", fn: () => "light" as ThemeModeProps },
+    setDark: { key: "mode", fn: () => "dark" as ThemeModeProps },
+    setToggle: {
       key: "mode",
-      action: (current: ThemeMode) => (current === "dark" ? "light" : "dark"),
+      fn: (current: ThemeModeProps) =>
+        current === "dark" ? "light" : "dark",
     },
   },
   storage: {

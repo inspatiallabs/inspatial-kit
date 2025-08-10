@@ -4,8 +4,8 @@ import { createExtension } from "@inspatial/renderer";
 
 /*################################(Types)################################*/
 
-interface ThemeProps {
-  themeState: { mode: ExtensionSignal<string> };
+interface ThemeExtensionProps {
+  useTheme: { mode: ExtensionSignal<string> };
 }
 
 /*################################(Extension)################################*/
@@ -31,17 +31,17 @@ export const InTheme = createExtension({
   },
   lifecycle: {
     setup() {
-      import("./state.ts").then((m: ThemeProps) => {
-        const { themeState } = m;
+      import("./state.ts").then((m: ThemeExtensionProps) => {
+        const { useTheme } = m;
         const apply = () => {
-          const mode = themeState.mode.peek?.() ?? themeState.mode.get?.();
+          const mode = useTheme.mode.peek?.() ?? useTheme.mode.get?.();
           if (supportsFeature("hasDocument")) {
             if (mode) document.documentElement.setAttribute("data-theme", mode);
           }
         };
         apply();
-        if (themeState.mode?.connect) {
-          themeState.mode.connect(apply);
+        if (useTheme.mode?.connect) {
+          useTheme.mode.connect(apply);
         }
       });
     },

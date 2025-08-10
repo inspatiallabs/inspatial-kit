@@ -4,7 +4,7 @@
 
 import { assertEquals, assertExists } from "https://deno.land/std/testing/asserts.ts";
 import { createState } from "./state.ts";
-import { createTrigger } from "../trigger/trigger-action.ts";
+import { createAction } from "../trigger/trigger-action.ts";
 import { createStorage, createMemoryStorage } from "./storage.ts";
 import { isSignal, $ } from "../../signal/index.ts";
 
@@ -107,9 +107,9 @@ Deno.test("State V2 Tests", async (t) => {
 
   
   // Trigger tests
-  await t.step("createTrigger works with signals", () => {
+  await t.step("createAction works with signals", () => {
     const count = createState({ value: 0 }).value;
-    const increment = createTrigger(count, (c, amount = 1) => c + amount);
+    const increment = createAction(count, (c, amount = 1) => c + amount);
     
     increment();
     assertEquals(count.get(), 1);
@@ -118,9 +118,9 @@ Deno.test("State V2 Tests", async (t) => {
     assertEquals(count.get(), 6);
   });
   
-  await t.step("createTrigger works with state properties using tuple syntax", () => {
+  await t.step("createAction works with state properties using tuple syntax", () => {
     const state = createState({ count: 0, multiplier: 2 });
-    const multiply = createTrigger(
+    const multiply = createAction(
       [state, 'count'], 
       (c) => c * state.multiplier.peek()
     );
@@ -130,12 +130,12 @@ Deno.test("State V2 Tests", async (t) => {
     assertEquals(state.count.get(), 10);
   });
   
-  await t.step("createTrigger creates multiple triggers using batch syntax", () => {
+  await t.step("createAction creates multiple triggers using batch syntax", () => {
     const state = createState({ x: 0, y: 0 });
-    const triggers = createTrigger(state, {
-      moveX: { key: 'x', action: (x, delta: number) => x + delta },
-      moveY: { key: 'y', action: (y, delta: number) => y + delta },
-      reset: { key: 'x', action: () => 0 }
+    const triggers = createAction(state, {
+      moveX: { key: 'x', fn: (x, delta: number) => x + delta },
+      moveY: { key: 'y', fn: (y, delta: number) => y + delta },
+      reset: { key: 'x', fn: () => 0 }
     });
     
     triggers.moveX(5);
@@ -149,7 +149,7 @@ Deno.test("State V2 Tests", async (t) => {
   
   await t.step("trigger throttling works", async () => {
     const state = createState({ count: 0 });
-    const increment = createTrigger(
+    const increment = createAction(
       state.count,
       c => c + 1,
       { throttle: 50 }
@@ -170,7 +170,7 @@ Deno.test("State V2 Tests", async (t) => {
   
   await t.step("trigger debouncing works", async () => {
     const state = createState({ count: 0 });
-    const increment = createTrigger(
+    const increment = createAction(
       state.count,
       c => c + 1,
       { debounce: 50 }

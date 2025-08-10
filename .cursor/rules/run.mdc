@@ -1,41 +1,168 @@
-InSpatial Run is based on InSpatial's own signal reactive primitives `@in/teract` that sematically shares sytax with the likes of React, SolidJS and Preact.
+InSpatial Run is based on InSpatial's own signal reactive primitives `@in/teract`. InSpatial sematically shares sytax with the likes of React, SolidJS and Preact.
 
 InSpatial Run is the Framework Runtime for InSpatial universal renderer `@in/renderer` which targets all platforms with support for multiple templating e.g JSX.
 
-**Important** InSpatial Run is its own independent self-contained framework powered by its own dev modules, concept, opinions and renderers and as such IT IS IS DIFFERENT FROM REACT, SOLIDJS, PREACT or other framework.
+**Important** InSpatial Run is its own independent self-contained framework powered by its own dev modules, concept, opinions and renderers and as such IT IS IS DIFFERENT FROM REACT, SOLIDJS, PREACT or any other framework.
 
 InSpatial Run is the highest layer of abstraction for both InSpatial dev and cloud UDE modules. All core utilities, actions and APIs are encapsulated into simpler functions and file routes essentially removing the need for any form of project initialization or configurations. InSpatial Run removes the need to install or use any of InSpatial's stand-alone dev and cloud modules as they come bundled with it by default.
 
 ### NOTE
 
-Build success doesn't mean no runtime issues. Check carefully if you have made any existing variables disappear during the edit, or the new variables has not been declared.
+- **THIS IS NOT A REACT PROJECT**: Do not import, write or use React apis and hooks.
 
-If you want to check build errors in deno use the deno core command `deno check` for pnpm use `pnpm build`, do not use `pnpm dev`, as `pnpm dev` spawns a blocking dev server that never automatically exits.
+- All InSpatial Dev Modules start with `@in` directive
+
+- Build success doesn't mean no runtime issues. Check carefully if you have made any existing variables disappear during an edit, or the new variables has not been declared.
+
+- If you want to check build errors in deno use the deno core command `deno task build` when using `InServe` renderer extension. Use `deno check` or `deno lint` too for comprehensive checks. For pnpm use `pnpm build`, do not use `pnpm dev`, as `pnpm dev` spawns a blocking dev server that never automatically exits.
 
 ## AI contribution rules (apply to every task)
 
 1. Preserve existing code style, indentation, variable names, resource naming, and line endings; never re-format unrelated code.
 2. Make the smallest possible change set that fully addresses the task; do not touch out-of-scope files.
-3. **No extra comments**: do not introduce or translate comments unless explicitly asked.
-4. Fix root causes rather than masking symptoms; avoid defensive checks unless requested.
-5. Do not change public APIs or existing functionality unless required by the task.
-6. Do not easily remove/change parts you don't understand. Ask users if you really want them changed.
-7. **THIS IS NOT A REACT PROJECT**: Do not write React code, hooks, or JSX patterns. This uses InSpatial with different patterns and concepts.
+3. Fix root causes rather than masking symptoms; avoid defensive checks unless requested.
+4. Do not change public APIs or existing functionality unless required by the task.
+5. Do not easily remove/change parts you don't understand. Ask users if you really want them changed.
 
 **Important Notes for this Project:**
 
 - **Retained Mode Rendering:** InSpatial directly manages the DOM based on state, unlike virtual DOM libraries.
 - **Browser Preset:** The project specifically uses `@in/dom` an InSpatial DOM/Web renderer module which is a sibling to `@in/native` for native (iOS, Android, and VisionOS) rendering as well as `@in/gpu` for 3D & XR rendering.
-- **Reactivity:** Use InSpatial primary Signal Ref apis `signal`, `computed`/`$`, `watch`, for interactity and state management.
-- **Kit:** Use InSpatial Kit control-flow primitives like `List`, and `If`
-- **InSpatial Cloud:** All datasource and backend functionality must use `@inspatial/cloud` and `@inspatial/cloud-client.
-- **Vite Build System:** Vite is used for development and building, including Hot Reload also known as Hot Module Replacement (HMR).
+- **Reactivity:** Use InSpatial primary Signal apis `signal`, `computed`/`$`, `watch`, for interactity and state management.
+- **Kit:** Use InSpatial Kit control-flow primitives like `List`, and `Show`
+- **InSpatial Cloud:** All datasource and backend functionality must ONLY use `@inspatial/cloud` and `@inspatial/cloud-client.
+- **No 3rd Party Dependecies or NPM Packages**: MUST not install third-party packages or NPM packages. All packages must be installed from JSR and only InSpatial Dev Modules which start with `@in` or `@inspatial` directives.
+- **InSpatial Serve:** All new projects MUST use InSpatial Serve and its `InServe` extension to bundle, mininify, serve, style/css transform, and hot-reload. Basically replaces the need for tools like Vite, RSPack or WebPack. Do not ever install or use those tools to Run an InSpatial App.
 
 ---
 
-**InSpatial Run Primary Concepts & Usage Summary:**
+# InSpatial Run Concepts & Guide
 
-**1. Signals (Interactivity):**
+## Styling & UI
+
+**1. InSpatial Renderer:**
+
+- **Extensible Architecture:** Decouples component logic from rendering environment.
+- **`createRenderer(nodeOps, rendererID?)`:** Creates a custom renderer.
+- **`DOMRenderer(InTriggerProp)` (`@inspatial/run/renderer/dom`):** For interactive web applications.
+  _ **Triggers & Event Handling:** `on:eventName` (e.g., `on:click`). Supports modifiers like `on-once:`, `on-passive:`, `on-capture:`, `on-prevent:`, `on-stop:`.
+  _ **Browser Preset Directives:** `class:className={signal}` for conditional classes, `style:property={value}` for individual styling (CSS) properties.
+  \_ **Handling Dynamic HTML Content:** For inserting dynamic HTML (e.g., from APIs), prefer parsing the HTML into a `DocumentFragment` and rendering it directly within the component. This is more robust and integrates better with InSpatial's retained mode rendering than using `innerHTML` directly, which can have security implications and reconciliation challenges.
+
+- **`NativeRenderer(InTriggerProp)` (`@inspatial/run/renderer/native`):** For interactive iOS, Android and VisionOS applications. \* \*\*Soon...
+
+- **`GPURenderer(InTriggerProp)` (`@inspatial/run/renderer/spatial`):** For interactive 3D & XR applications. \* \*\*Soon...
+
+**2. InSpatial Runtime (JSX):**
+Built on top the universal runtime
+
+- **Retained Mode:** JSX templates are evaluated once to build the initial UI.
+- **Pragma Transform (Recommended)::** Provides maximum flexibility. Requires configuring `jsxFactory: 'R.c'` and `jsxFragment: 'R.f'` in build tools (Vite, Babel). Components receive `R` as an argument.
+- **Automatic Runtime:** Easier setup, but less flexible. Configures `jsx: 'automatic'` and `jsxImportSource: 'InSpatial'`.
+- **Hot Reload:** Use `InVite` extension for vite-rollup/rolldown and `InPack` for webpack/rspack client development.
+
+**3. InSpatial Kit:**
+
+- **Structure:** A component is a function `(props, ...children) => Node`. The inner function receives the renderer `R`.
+- **Structure & Control Flow Components:**
+  _ `<Show when={signal}>`: Conditional rendering. Supports `true` and `else` props. For one-off static conditions, you can use inline typescript to return the desired branch directly just like in React(but will not have reactivity).
+  _ `<List each={signalOfArray} track="key" indexed={true}>`: Efficiently renders lists with reconciliation by handling all list rendering scenarios. Automatically handles static arrays and signals, eliminates need for `derivedExtract`, provides direct item access in templates. Use `track` for stable keys when data changes completely. Exposes `getItem()`, `remove()`, `clear()` methods. Template functions receive raw item data directly for clean, readable syntax.
+  _ `<Async future={promise}>`: Manages asynchronous operations (pending, resolved, rejected states). `async` components automatically get `fallback` and `catch` props.
+  _ **Error Handling in Asynchronous Components:** Implement robust error handling within `async` components. Utilize the `catch` prop of `<Async>` components or direct `fallback`/`catch` props on async components, and `try...catch` blocks for network requests to gracefully manage and display errors to the user.
+  _ `<Dynamic is={componentOrTag}>`: Renders a component or HTML tag that can change dynamically.
+  _ `<Fn ctx={value} catch={errorHandler}>`: Executes a function that returns a render function, useful for complex logic with error boundaries. \* **List Management:** Use `List` component's exposed methods (`getItem()`, `remove()`, `clear()`) for imperative list manipulation when needed.
+
+- **`$ref`:** Special prop to get a reference to a DOM element or component instance (as a signal or function). **Critical for hot reload in dev mode:** always use `$ref` for component references, not `createComponent()` return values.
+- **`expose()`:** Allows child components to expose properties/methods to their parent via `$ref`.
+- **`capture()`:** Captures the current rendering context, useful for running functions (e.g., `expose()`) after `await` calls in async components.
+- **Importing:** All built-in components can be imported directly from package `InSpatial`
+- **`createComponent(template, props?, ...children)`:** Creates component instances
+  **`renderer.render(container, component, props, ...children)`:** Renders a component into a container, with optional props and children.
+  **`dispose(instance)`:** Cleans up component resources
+  **`getCurrentSelf()`:** Gets current component instance
+  **`snapshot()`:** Creates context snapshots for async operations
+- **JSX Children in Control Flow Components:** When using components like `<Show>` and `<List>`, ensure their render function children return either a _single root element_ or a `Fragment` (`<>...</>`) if rendering multiple sibling elements. This prevents unexpected rendering issues.
+
+**6. InSpatial Styling:**
+InSpatial Style Sheet (ISS) or `@inspatial/style` is built on InSpatial's `@in/style`module a variant based styling engine largely inspired by Stiches.
+
+Don’t use peek()/get() inside style objects. Pass the Signals directly so the renderer can subscribe.
+
+Example
+
+```typescript
+// Function
+const my = {
+  textColor: $(() => {...}),
+}
+
+// Render
+<Component
+ style={{
+    web: {
+      // ❌  DON'T DO THIS
+      color: my.textColor.get(),
+
+      // ✅ DO THIS
+      color: my.textColor,
+    },
+  }}
+/>
+```
+
+You can style using two props `style` and `className` which is an alias for `class` (they both work just the same).
+
+NOTE:
+
+1. both `style` and (`className` or `class`) are reactive at the core. This means you don't have to parse computed/$ to...
+
+2. Template strings are non-reactive. A plain backtick string evaluates once, so it can’t auto‑update. Use the object/array forms (or a Signal) for reactivity.
+
+```typescript
+// ❌  DON'T DO THIS
+<Component
+  className={`p-4 rounded-lg mb-4 transition-all duration-300 ${
+    signal.isPulseActive ? "animate-pulse" : ""
+  } ${
+    signal.isHighCount
+      ? "scale-110 bg-gradient-to-r from-purple-500 to-pink-500"
+      : ""
+  }`}
+/>
+
+// ✅ DO THIS
+<Component
+className={{
+    "p-4": true,
+    "rounded-lg": true,
+    "mb-4": true,
+    "transition-all": true,
+    "duration-300": true,
+    "animate-pulse": signal.isPulseActive,
+    "scale-110 bg-gradient-to-r from-purple-500 to-pink-500":
+      testSignals.isHighCount,
+  }}
+/>
+```
+
+#### Styling Alternative (Not-recommended)
+
+Subsequently styling can be done by calling multiple style props e.g
+
+```typescript
+<Component
+  style:color="black"
+  style:background-color="yellow"
+  style:font-size="20px"
+/>
+```
+
+- **Styling Dynamic Elements:** For dynamically styled elements, leverage InSpatial's browser preset capabilities for conditional classes (`class:active={signal}`) and inline styles (`style:property={value}`) to ensure styles update correctly with state changes. \* \*\*Soon...
+
+## Interactivity
+
+### 1. Signals (@in/teract/signal)
+
 InSpatial Run is fundamentally reactive signal based system. The core signal primitives InSpatial State is that `@in/teract` is an signal based interactivity and state management system. It is subdivided into two types of reactive systems. There is Signal Core and Signal Lite each inspired by SolidJS and Preact respectively.
 
 - **Definition:** Reactive containers (`createSignal()`) that notify observers on value changes.
@@ -71,142 +198,224 @@ Use the extensive signal operation methods (`.and()`, `.eq()`, `.gt()`, etc.) fo
 - **Focus Management:** Use the `$ref` prop with a `setTimeout` to reliably manage focus on elements, especially after asynchronous operations.
 - **Template Literals:** Use `tpl\`...\`` for reactive template strings or the simple template literal \`...\` for string interpolation in URLs.
 - **Reactivity Pitfalls:** Remember to wrap expressions in `$(...)` within JSX when they need to be reactive. Be mindful of when to use `peek()` or `untrack()` to control signal dependencies and avoid unnecessary re-renders.
+- **Auto Coercion:**
+  `.get()` is auto-coerced e.g if you have a value `signal.count` it would auto append or use `.get()` hence making it the same as `signal.count.get()`.
+  While `.get()` is the default appended value you can opt out because `.get()` assumes your function is reactive by default and that may not always be the case, if this is not the case and you want to avoid tracking or create dependencies in imperative `.set()` calls, then use `.peek()`. Also don't be a stranger and utilize all the other available interactive signal operators at your disposal for their appropriate use case.
 
 NOTE: hasValue returns plain boolean. Returns true when the value of the signal is not nullish.
 
-NOTE: Both Signal Core and Lite cover nearly the same APIs with the rules above are specific to `@in/teract/signal-ref`
+### 2. InSpatial State (@inspatial/state)
 
-**2. InSpatial State**
-InSpatial State is built-in state management system for InSpatial Run. It is built on top of InSpatial's reactive signal module `@in/interact`. NOTE: InSpatial State is not fully vetted and tested so all state management and interactivity should use the Signal Lite primitives from `@in/teract/signal-ref` as a substitue. \* \*\*Soon...
+InSpatial State is built-in state management system for InSpatial Run. InSpatial State provides a higher-level abstraction built on top of InSpatial's reactive signal module `@in/teract/signal`.
 
-**3. InSpatial Kit & Components:**
+You can use InSpatial State in two ways:
 
-- **Structure:** A component is a function `(props, ...children) => Node`. The inner function receives the renderer `R`.
-- **Structure & Control Flow Components:**
-  _ `<Show when={signal}>`: Conditional rendering. Supports `true` and `else` props. For one-off static conditions, you can use inline typescript to return the desired branch directly just like in React(but will not have reactivity).
-  _ `<List each={signalOfArray} track="key" indexed={true}>`: Efficiently renders lists with reconciliation by handling all list rendering scenarios. Automatically handles static arrays and signals, eliminates need for `derivedExtract`, provides direct item access in templates. Use `track` for stable keys when data changes completely. Exposes `getItem()`, `remove()`, `clear()` methods. Template functions receive raw item data directly for clean, readable syntax.
-  _ `<Async future={promise}>`: Manages asynchronous operations (pending, resolved, rejected states). `async` components automatically get `fallback` and `catch` props.
-  _ **Error Handling in Asynchronous Components:** Implement robust error handling within `async` components. Utilize the `catch` prop of `<Async>` components or direct `fallback`/`catch` props on async components, and `try...catch` blocks for network requests to gracefully manage and display errors to the user.
-  _ `<Dynamic is={componentOrTag}>`: Renders a component or HTML tag that can change dynamically.
-  _ `<Fn ctx={value} catch={errorHandler}>`: Executes a function that returns a render function, useful for complex logic with error boundaries. \* **List Management:** Use `List` component's exposed methods (`getItem()`, `remove()`, `clear()`) for imperative list manipulation when needed.
+- Explicit pattern: everything in one place via `createState.in()`
+- Separation pattern: compose `createState`, `createAction`, `createStorage`
 
-- **`$ref`:** Special prop to get a reference to a DOM element or component instance (as a signal or function). **Critical for hot reload in dev mode:** always use `$ref` for component references, not `createComponent()` return values.
-- **`expose()`:** Allows child components to expose properties/methods to their parent via `$ref`.
-- **`capture()`:** Captures the current rendering context, useful for running functions (e.g., `expose()`) after `await` calls in async components.
-- **Importing:** All built-in components can be imported directly from package `InSpatial`
-- **`createComponent(template, props?, ...children)`:** Creates component instances
-  **`renderer.render(container, component, props, ...children)`:** Renders a component into a container, with optional props and children.
-  **`dispose(instance)`:** Cleans up component resources
-  **`getCurrentSelf()`:** Gets current component instance
-  **`snapshot()`:** Creates context snapshots for async operations
-- **JSX Children in Control Flow Components:** When using components like `<Show>` and `<List>`, ensure their render function children return either a _single root element_ or a `Fragment` (`<>...</>`) if rendering multiple sibling elements. This prevents unexpected rendering issues.
+Key capabilities: batch, reset, snapshot, subscribe, derived values, and a unified trigger API.
 
-**4. InSpatial Renderers:**
+#### Explicit pattern (recommended)
 
-- **Extensible Architecture:** Decouples component logic from rendering environment.
-- **`createRenderer(nodeOps, rendererID?)`:** Creates a custom renderer.
-- **`DOMRenderer(InTriggerProp)` (`@inspatial/run/renderer/dom`):** For interactive web applications.
-  _ **Triggers & Event Handling:** `on:eventName` (e.g., `on:click`). Supports modifiers like `on-once:`, `on-passive:`, `on-capture:`, `on-prevent:`, `on-stop:`.
-  _ **Browser Preset Directives:** `class:className={signal}` for conditional classes, `style:property={value}` for individual styling (CSS) properties.
-  \_ **Handling Dynamic HTML Content:** For inserting dynamic HTML (e.g., from APIs), prefer parsing the HTML into a `DocumentFragment` and rendering it directly within the component. This is more robust and integrates better with InSpatial's retained mode rendering than using `innerHTML` directly, which can have security implications and reconciliation challenges.
+```ts
+const counterState = createState.in({
+  initialState: { count: 0, name: "user" },
+  action: {
+    increment: { key: "count", fn: (c, n = 1) => c + n },
+    setName: { key: "name", fn: (_, name: string) => name },
+  },
+  storage: { key: "counterState", backend: "local" },
+});
 
-- **`NativeRenderer(InTriggerProp)` (`@inspatial/run/renderer/native`):** For interactive iOS, Android and VisionOS applications. \* \*\*Soon...
-
-- **`GPURenderer(InTriggerProp)` (`@inspatial/run/renderer/spatial`):** For interactive 3D & XR applications. \* \*\*Soon...
-
-**5. InSpatial Runtime (JSX):**
-Built on top the universal runtime
-
-- **Retained Mode:** JSX templates are evaluated once to build the initial UI.
-- **Pragma Transform (Recommended)::** Provides maximum flexibility. Requires configuring `jsxFactory: 'R.c'` and `jsxFragment: 'R.f'` in build tools (Vite, Babel). Components receive `R` as an argument.
-- **Automatic Runtime:** Easier setup, but less flexible. Configures `jsx: 'automatic'` and `jsxImportSource: 'InSpatial'`.
-- **Hot Reload:** Use `InVite` extension for vite-rollup/rolldown and `InPack` for webpack/rspack client development.
-
-**6. InSpatial Styling:**
-InSpatial Style Sheet (ISS) or `@inspatial/style` is built on InSpatial's `@in/style`module a variant based styling engine largely inspired by Stiches.
-
-Don’t use peek()/get() inside style objects. Pass the Signals directly so the renderer can subscribe.
-
-Example
-
-```typescript
-// Function
-const my = {
-  textColor: $(() => {...}),
-}
-
-// Render
-<Component
- style={{
-    web: {
-      // ❌  DON'T DO THIS
-      color: my.textColor.get(),
-
-      // ✅ DO THIS
-      color: my.textColor,
-    },
-  }}
-/>
+counterState.action.increment();
+counterState.count.get();
 ```
 
-You can style using two props `style` and `className` which is an alias for `class` (they both work just the same).
-with `style`:
+#### Separation pattern (advanced)
 
-```typescript
+```ts
+const gameState = createState({ x: 0, y: 0, hp: 100, score: 0 });
 
+// Direct signal trigger
+const addScore = createAction(gameState.score, (s, n = 1) => s + n);
+
+// Tuple trigger
+const damage = createAction([gameState, "hp"], (hp, amt = 10) =>
+  Math.max(0, hp - amt)
+);
+
+// Batch triggers
+const move = createAction(gameState, {
+  moveX: { key: "x", fn: (x, dx: number) => x + dx },
+  moveY: { key: "y", fn: (y, dy: number) => y + dy },
+});
+
+// Optional persistence
+createStorage(gameState, {
+  key: "gameState",
+  backend: "local",
+  include: ["hp", "score"],
+});
 ```
 
-with `className` or `class`:
+#### Feature snippets
+
+- Signals on every key
+  ```ts
+  const s = createState({ a: 1, b: 2 });
+  s.a.set(3);
+  s.b.get();
+  ```
+- Batch/reset/snapshot/subscribe
+  ```ts
+  s.batch((v) => {
+    v.a.set(10);
+    v.b.set(20);
+  });
+  s.reset();
+  s.snapshot();
+  const off = s.subscribe((snap) => console.log(snap));
+  off();
+  ```
+- Derived values
+  ```ts
+  const score2x = $(() => gameState.score.get() * 2);
+  ```
+- Trigger options
+  ```ts
+  const inc = createAction(s.a, (v) => v + 1, { throttle: 50, once: false });
+  ```
+
+#### Choosing InSpatial State Pattern
+
+Is this a module or extension?
+├── Yes → Use Separation Pattern  
+└── No → Use Explicit Pattern
+
+Is this an app or website?
+├── No → Use Separation Pattern
+└── Yes → Use Explicit Pattern
+
+Is this a game or xr?
+├── Yes → Use Separation Pattern
+└── No → Use Explicit Pattern
+
+Both patterns have the same power... pick the ergonomics that fit the job.
+
+### 3. InSpatial Triggers (Props Registry)
+
+InSpatial Triggers are grouped into `Props` and `Actions`.
+
+- **Trigger Props**: declarative, platform-bridged event/directive attributes like `on:tap`, `style:*`, `class:*` resolved by the renderer via an extension-backed registry.
+- **Action Triggers**: imperative state mutations via `createAction()` (covered in State section).
+
+**NOTE**
+
+- Trigger Props are disabled by default. Install the `InTriggerProp` extension to enable resolution of `on:*`, `style:*`, and `class:*`.
+- Use `createTriggerHandle()` to register new or override existing trigger props in the registry.
+- Import surface for trigger props is provided by `@inspatial/state`:
+  ```ts
+  import { InTriggerProp, createTriggerHandle } from "@inspatial/trigger";
+  ```
+
+#### Trigger (Actions)
+
+Action triggers are part of State (see InSpatial State). Use `createAction()` for direct, tuple, or batch state updates.
+
+#### Trigger (Props)
+
+- Triggers are decoupled and disabled by default. The trigger prop registry helps create and mix different platform trigger props e.g you can unify the click event from web/dom and android, ios etc... give it a simple name e.g `tap` then all of those platforms will respond to the tap.
+- Use `InTriggerProp` (or custom extensions) to enable triggers props.
+- Use `createTriggerHandle` to register a new trigger prop e.g `on:dooropen`
+
+#### Trigger Prop Extension
+
+Enable trigger props by installing `InTriggerProp` in your renderer. This extension:
+
+- Registers standard DOM events (click, input, keydown, etc.)
+- Registers universal props (`tap`, `longpress`, `change`, `submit`, `focus`)
+- Wires `style:*` and `class:*` for reactive styling
 
 ```typescript
+import { createRenderer } from "@inspatial/renderer";
+import { InTriggerProp } from "@inspatial/trigger";
 
+createRenderer({
+  mode: "auto",
+  extensions: [InTriggerProp],
+});
 ```
 
-NOTE:
+#### How Triggers Props Work Now
 
-1. both `style` and (`className` or `class`) are reactive at the core. This means you don't have to parse computed/$ to...
+1. **JSX Compilation**: `<button on:click={handler} />` compiles to props object
+2. **Renderer Processing**: Renderer calls `setProps(node, props)`
+3. **Extension Routing**: `onDirective` callback routes `on:` prefixes to trigger system
+4. **Trigger Handler**: `withTriggerProps.onTriggerProp` returns appropriate handler
+5. **Event Binding**: Handler binds event to DOM/platform API
 
-2. Template strings are non-reactive. A plain backtick string evaluates once, so it can’t auto‑update. Use the object/array forms (or a Signal) for reactivity.
+#### Creating New Trigger Props
+
+Register custom trigger props via the registry. Handlers receive the `node` and the prop `value` (function or signal):
 
 ```typescript
-// ❌  DON'T DO THIS
-<Component
-  className={`p-4 rounded-lg mb-4 transition-all duration-300 ${
-    signal.isPulseActive ? "animate-pulse" : ""
-  } ${
-    signal.isHighCount
-      ? "scale-110 bg-gradient-to-r from-purple-500 to-pink-500"
-      : ""
-  }`}
-/>
+import { createTriggerHandle } from "@inspatial/state";
 
-// ✅ DO THIS
-<Component
-className={{
-    "p-4": true,
-    "rounded-lg": true,
-    "mb-4": true,
-    "transition-all": true,
-    "duration-300": true,
-    "animate-pulse": signal.isPulseActive,
-    "scale-110 bg-gradient-to-r from-purple-500 to-pink-500":
-      testSignals.isHighCount,
-  }}
-/>
+// Example: basic hover state callback
+createTriggerHandle("hover", (node, cb?: (e: Event) => void) => {
+  if (!cb) return;
+  const enter = (e: Event) => cb({ ...(e as any), type: "hoverenter" });
+  const leave = (e: Event) => cb({ ...(e as any), type: "hoverleave" });
+  node.addEventListener("mouseenter", enter);
+  node.addEventListener("mouseleave", leave);
+});
+
+// Example: swipe with pointer events
+createTriggerHandle(
+  "swipe",
+  (node, cb?: (e: { type: string; dx: number }) => void) => {
+    if (!cb) return;
+    let startX = 0;
+    const down = (e: PointerEvent) => (startX = e.clientX);
+    const up = (e: PointerEvent) =>
+      cb({ type: "swipe", dx: e.clientX - startX });
+    node.addEventListener("pointerdown", down);
+    node.addEventListener("pointerup", up);
+  }
+);
 ```
 
-- **Styling Dynamic Elements:** For dynamically styled elements, leverage InSpatial's browser preset capabilities for conditional classes (`class:active={signal}`) and inline styles (`style:property={value}`) to ensure styles update correctly with state changes. \* \*\*Soon...
+#### Trigger Prop Platform-Specific Considerations
 
-**.7. InSpatial Motion:**
+Different platforms can have different trigger implementations:
+
+- **DOM**: Uses `addEventListener`
+- **XR**: Can use spatial input APIs
+- **Native**: Can use platform-specific gesture recognizers
+  etc...
+
+The trigger bridge system handles these differences transparently. `InTriggerProp` auto-registers a universal bridge so `on:tap` maps to `click` on the web, and `longpress` is synthesized from pointer events.
+
+**.4. InSpatial Motion:**
 InSpatial Motion is built on InSpatial's `@in/motion`. \* \*\*Soon...
 
-**.8. InSpatial Route:**
+#### NOTE On Interactivity
+
+NOTE: Signals are the most low-level reactive primitives you should only ever use `createSignal()` API from `@in/teract/signal` directly only when building frameworks. Otherwise application development MUST use `createState()` api from `@inspatial/state` which builds upon signals.
+
+## Routing & Navigation
+
+**.7. InSpatial Route:**
 InSpatial Route is built on InSpatial's `@in/route` module. \* \*\*Soon...
 
-**.9. InSpatial Test:**
+## Testing
+
+**.8. InSpatial Test:**
 InSpatial Test is built on InSpatial's `@in/test`. \* \*\*Soon...
 
-**.10. InSpatial Cloud:**
+## Cloud & Backend
+
+**.9. InSpatial Cloud:**
 InSpatial Cloud is built on `@inspatial/cloud` and exposes `@inspatial/cloud` APIs for comprehensive backend and data management across all platforms. \* \*\*Soon...
 
 ---
@@ -250,8 +459,6 @@ Note: hasValue returns plain boolean. Returns true when the value of the signal 
 JSX runtime is essential when using InSpatial together with runtimes like [Deno](https://github.com/denoland/deno/issues/29584), compilers like [SWC](https://github.com/swc-project/swc/issues/10553) or generators like [MDX](https://mdxjs.com/), since they lack the ability to correctly transform JSX via parameters.
 
 ### Setup with (@Inspatial/serve) Renderer Extensions
-
-InSpatial auto takes care of everything you would need to get started for its built on deno which bundles, mininfies, serves, style/css transforms, and supports smart file system watching and reload.
 
 ```typescript
 // render.ts
@@ -408,7 +615,7 @@ export default defineConfig({
 
 ---
 
-## How to use InSpatial (Kit X Signal)
+## How to use InSpatial (Kit X State)
 
 ### 1. Basic Component with State
 
@@ -419,10 +626,16 @@ const Counter = () => {
   return <div onClick={() => setCount(count + 1)}>Count: {count}</div>;
 };
 
-// ✅ The InSpatial way - DO THIS
+// ✅ The InSpatial way - DO THIS (State)
+import { createState } from "@inspatial/state";
+
 const Counter = () => {
-  const count = createSignal(0);
-  return () => <XStack on:click={() => count.value++}>Count: {count}</XStack>;
+  const counter = createState({ count: 0 });
+  return () => (
+    <XStack on:tap={() => counter.count.set(counter.count.peek() + 1)}>
+      Count: {counter.count}
+    </XStack>
+  );
 };
 ```
 
@@ -440,13 +653,15 @@ const App = () => {
   );
 };
 
-// ✅ The InSpatial way - DO THIS
+// ✅ The InSpatial way - DO THIS (State)
+import { createState } from "@inspatial/state";
+
 const App = () => {
-  const isVisible = createSignal(true);
+  const ui = createState({ isVisible: true });
   return (
     <XStack>
-      <Show when={isVisible}>{() => <div>Visible content</div>}</Show>
-      <Button on:click={() => (isVisible.value = !isVisible.value)}>
+      <Show when={ui.isVisible}>{() => <div>Visible content</div>}</Show>
+      <Button on:click={() => ui.isVisible.set(!ui.isVisible.peek())}>
         Toggle
       </Button>
     </XStack>
@@ -469,12 +684,14 @@ const TodoList = () => {
   );
 };
 
-// ✅ The InSpatial way - DO THIS
+// ✅ The InSpatial way - DO THIS (State)
+import { createState } from "@inspatial/state";
+
 const TodoList = () => {
-  const todos = createSignal([{ id: 1, text: "Learn InSpatial" }]);
+  const state = createState({ todos: [{ id: 1, text: "Learn InSpatial" }] });
   return (
     <YStack>
-      <List each={todos} track="id">
+      <List each={state.todos} track="id">
         {(todo) => <Text>{todo.text}</Text>}
       </List>
     </YStack>
@@ -494,7 +711,7 @@ useEffect(() => {
 
 // ✅ The InSpatial way - DO THIS
 createEffect(() => {
-  registerTriggerHandler("swipe", createResizeHandler(), {
+  createTriggerHandle("swipe", createResizeHandler(), {
     platforms: ["dom", "native:ios", "native:android"],
     fallback: "resize",
   });
@@ -515,12 +732,15 @@ createEffect(() => {
 
 ```javascript
 // ❌ React way - DON'T DO THIS
-const message = `Count is: ${count}`
+const message = `Count is: ${count}`;
 
-// ✅ The InSpatial way - DO THIS
-const message = $(() => `Count is: ${count.value}`)
+// ✅ The InSpatial way - DO THIS (State)
+import { createState, $ } from "@inspatial/state";
+
+const s = createState({ count: 0 });
+const message = $(() => `Count is: ${s.count.get()}`);
 // or inline:
-<XStack>{t`Count is: ${count}`}</XStack>
+<XStack>{$(() => `Count is: ${s.count.get()}`)}</XStack>;
 ```
 
 ### 7. Async Components
@@ -547,31 +767,26 @@ const PostCard = async ({ id }: PostID) => {
 />;
 ```
 
-### 8. Signal Operations (Advanced)
+### 8. State Signal Operations (Advanced)
 
 ```typescript
-// Signal comparisons and operations
-const count = createSignal(5)
-const isPositive = count.gt(0)          // count > 0
-const isZero = count.eq(0)              // count === 0
-const isEven = count.a../interact/signal-ref/App.jsxmod(2).eq(0)) // count && count % 2 === 0
+import { createState, $ } from "@inspatial/state";
 
-// Conditional matching
-const status = createSignal('loading')
-const matchStatus = onCondition(status)
-const isLoading = matchStatus('loading')
-const isError = matchStatus('error')
+// State-backed signal comparisons and derived values
+const s = createState({ count: 5, status: "loading" });
+const isPositive = s.count.gt(0); // count > 0
+const isZero = s.count.eq(0); // count === 0
+const isEven = $(() => s.count.get() % 2 === 0);
 
-// Derived properties
-const user = createSignal({name: 'Ben', age: 24})
-const {name, age} = derivedExtract(user, 'name', 'age')
+// Derived values remain the same using $()
+const label = $(() => `Status: ${s.status.get()}`);
 ```
 
 ### 9. Event Handling with Modifiers
 
 ```javascript
 // Different event modifiers
-<Button on:click={() => console.log('normal')}>Click</Button>
+<Button on:tap={() => console.log('normal')}>Click</Button>
 <Button on-once:click={() => console.log('only once')}>Click Once</Button>
 <ScrollView on-passive:scroll={() => console.log('passive scroll')}>Scrollable</ScrollView>
 <Link to="#" on-prevent:click={() => console.log('prevented')}>Link</Link>
@@ -580,34 +795,56 @@ const {name, age} = derivedExtract(user, 'name', 'age')
 ### 10. Template Literals for URLs
 
 ```javascript
-// Template literals with reactive interpolation
-const templateId = createSignal(123);
-const templateUrl = t`https://inspatial.store/template?id=${templateId}`;
+// Template literals with reactive interpolation (State)
+import { createState } from "@inspatial/state";
+
+const s = createState({ templateId: 123 });
+const templateUrl = t`https://inspatial.store/template?id=${s.templateId}`;
 ```
 
-### 11. DOM/Web Renderer
-
-```typescript
-import { DOMRenderer, InTriggerProp } from "@inspatial/run";
-import App from "./app.tsx";
-
-const web = DOMRenderer(InTriggerProp);
-web.render(document.getElementById("root"), App);
-```
-
-## NOTE: prefer the `createRenderer` function as it already encapsulates all the different renderers.
-
-## Common Patterns
+## Common InSpatial Patterns
 
 1. **Component Structure**: `const MyComponent = (props) => <JSX/>`
-2. **State**: `const state = createSignal(initialValue)`
+2. **State**: `const state = createState({ initialState })`
 3. **Computed Values**: `const computed = $(() => state.value * 2)`
 4. **Effects**: `watch(() => { /* reactive code */ })`
 5. **Cleanup**: `createEffect(() => { /* setup */; return () => { /* cleanup */ } })`
 6. **Conditional Classes**: `class:active={isActive}`
-7. **Lists**: `<List each={items}>{(item) => <Item data={item}/>}</List>`
+7. **Lists**: `<List each={entries}>{(entry) => <Entry data={entry}/>}</List>`
 8. **Conditions**: `<Show when={isVisible}>{() => <>Visible content</>}</Show>`
 9. **Async**: Components can be `async` functions with `fallback` and `catch` props
 10. **Signal Operations**: Use `.eq()`, `.gt()`, `.and()`, etc. for comparisons
 11. **Render**: `InSpatial.render(container, component, props, ...children)`
     `
+
+### Naming Pattern
+
+```
+@(window)/
+├── State Variables (useX)
+│   ├── useCounter
+│   ├── useTheme
+│   └── useAuth
+│
+├── State Types (XProps)
+│   ├── CounterProps
+│   ├── ThemeProps
+│   └── AuthProps
+│
+├── Action Triggers (handleX)
+│   ├── handleCounter
+│   └── handleAuth
+│
+│
+└── Action Declarations (setX)
+    ├── setIncrement
+    ├── setToggle
+    └── setReset
+```
+
+**Benefits**
+
+- **Zero cognitive load** - developers know exactly what to expect
+- **Searchable** - easy to find all states (search `use`), triggers (search `handle`), actions (search `set`)
+- **Consistent** - same pattern across entire codebase
+- **Maintainable** - refactoring becomes predictable

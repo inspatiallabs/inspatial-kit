@@ -5,4 +5,5 @@
  * @version 1.0.0
  * @since 1.0.0
  */
-export const InZero: any = (globalThis as any).Deno;
+// @ts-ignore
+export const InZero = (globalThis as any).Deno as typeof Deno;

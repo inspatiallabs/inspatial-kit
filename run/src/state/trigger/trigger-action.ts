@@ -27,18 +27,18 @@ export interface TriggerActionProps {
   once?: boolean;
 }
 
-export interface BatchTriggerDef {
+export interface BatchActionTriggerDef {
   key: string;
-  action: (current: any, ...args: any[]) => any;
+  fn: (current: any, ...args: any[]) => any;
   options?: TriggerActionProps;
 }
 
-export interface EnhancedTriggerDef {
+export interface EnhancedActionTriggerDef {
   /**
-   * Target for the trigger - supports all createTrigger patterns
+   * Target for the trigger - supports all createAction patterns
    */
   target:
-    | string // Key-based (existing BatchTriggerDef compatibility)
+    | string // Key-based (existing BatchActionTriggerDef compatibility)
     | Signal<any> // Direct signal
     | [any, string] // State tuple [state, key]
     | (() => Signal<any>); // Signal factory for dynamic/computed signals
@@ -46,7 +46,7 @@ export interface EnhancedTriggerDef {
   /**
    * Action function
    */
-  action: (current: any, ...args: any[]) => any;
+  fn: (current: any, ...args: any[]) => any;
 
   /**
    * Trigger options
@@ -55,10 +55,10 @@ export interface EnhancedTriggerDef {
 }
 
 // Union type for backward compatibility and new features
-export type UnifiedTriggerDef = BatchTriggerDef | EnhancedTriggerDef;
+export type UnifiedTriggerDef = BatchActionTriggerDef | EnhancedActionTriggerDef;
 export type UnifiedTriggerDefs = Record<string, UnifiedTriggerDef>;
 
-export type BatchTriggerDefs = Record<string, BatchTriggerDef>;
+export type BatchActionTriggerDefs = Record<string, BatchActionTriggerDef>;
 
 // Typed trigger defs bound to a specific state shape
 export type KeyedTriggerDefFor<
@@ -66,35 +66,35 @@ export type KeyedTriggerDefFor<
   K extends keyof T
 > = {
   key: Extract<K, string>;
-  action: (current: T[K], ...args: any[]) => T[K];
+  fn: (current: T[K], ...args: any[]) => T[K];
   options?: TriggerActionProps;
 };
 
-export type EnhancedTriggerDefFor<T extends Record<string, any>> =
+export type EnhancedActionTriggerDefFor<T extends Record<string, any>> =
   | {
       target: () => Signal<any>;
-      action: (current: any, ...args: any[]) => any;
+      fn: (current: any, ...args: any[]) => any;
       options?: TriggerActionProps;
     }
   | {
       target: [any, string];
-      action: (current: any, ...args: any[]) => any;
+      fn: (current: any, ...args: any[]) => any;
       options?: TriggerActionProps;
     };
 
 export type TriggerDefsFor<T extends Record<string, any>> = Record<
   string,
-  KeyedTriggerDefFor<T, keyof T> | EnhancedTriggerDefFor<T>
+  KeyedTriggerDefFor<T, keyof T> | EnhancedActionTriggerDefFor<T>
 >;
 
 /**
  * Map trigger definitions to callable trigger function signatures
  */
 export type TriggerFunctionsFromDefs<
-  D extends Record<string, { action: (current: any, ...args: any[]) => any }>
+  D extends Record<string, { fn: (current: any, ...args: any[]) => any }>
 > = {
   [K in keyof D]: D[K] extends {
-    action: (current: any, ...args: infer P) => any;
+    fn: (current: any, ...args: infer P) => any;
   }
     ? (...args: P) => void
     : (...args: any[]) => void;
@@ -107,81 +107,81 @@ export type TriggerFunctionsFromDefs<
  * ```typescript
  * // Case 1: Direct signal
  * const count = createSignal(0);
- * const increment = createTrigger(count, (current, amount = 1) => current + amount);
+ * const increment = createAction(count, (current, amount = 1) => current + amount);
  *
  * // Case 2: State property tuple
  * const state = createState({ count: 0 });
- * const increment = createTrigger([state, 'count'], (current, amount = 1) => current + amount);
+ * const increment = createAction([state, 'count'], (current, amount = 1) => current + amount);
  *
  * // Case 3: Batch triggers
- * const triggers = createTrigger(state, {
- *   increment: { key: 'count', action: (c, n = 1) => c + n },
- *   decrement: { key: 'count', action: (c, n = 1) => c - n }
+ * const triggers = createAction(state, {
+ *   increment: { key: 'count', fn: (c, n = 1) => c + n },
+ *   decrement: { key: 'count', fn: (c, n = 1) => c - n }
  * });
  * ```
  */
-export function createTrigger<T, P extends any[]>(
+export function createAction<T, P extends any[]>(
   target: Signal<T>,
-  action: (current: T, ...payload: P) => T,
+  fn: (current: T, ...payload: P) => T,
   options?: TriggerActionProps
 ): (...payload: P) => void;
 
-export function createTrigger<
+export function createAction<
   T extends Record<string, any>,
   K extends keyof T,
   P extends any[]
 >(
   target: [State<T>, K],
-  action: (current: T[K], ...payload: P) => T[K],
+  fn: (current: T[K], ...payload: P) => T[K],
   options?: TriggerActionProps
 ): (...payload: P) => void;
 
-export function createTrigger<T extends Record<string, any>>(
+export function createAction<T extends Record<string, any>>(
   target: State<T>,
   batchDefs: UnifiedTriggerDefs,
   options?: never
 ): Record<string, (...args: any[]) => void>;
 
-export function createTrigger<
+export function createAction<
   T extends Record<string, any>,
   D extends TriggerDefsFor<T>
 >(target: State<T>, batchDefs: D, options?: never): TriggerFunctionsFromDefs<D>;
 
-export function createTrigger(
+export function createAction(
   target: any,
-  action: any,
+  fn: any,
   options?: TriggerActionProps
 ): any {
   // Case 1: Direct signal
   if (isSignal(target)) {
-    return createSignalTrigger(target, action, options);
+    return createSignalActionTrigger(target, fn, options);
   }
 
   // Case 2: State property tuple [state, key]
   if (Array.isArray(target) && target.length === 2) {
     const [state, key] = target;
     if (state && typeof key === "string" && key in state) {
-      return createSignalTrigger(state[key], action, options);
+      return createSignalActionTrigger(state[key], fn, options);
     }
     throw new Error(`Invalid state property: ${key} not found in state`);
   }
 
-  // Case 3: Batch triggers (supports both BatchTriggerDefs and UnifiedTriggerDefs)
-  if (target && typeof target === "object" && typeof action === "object") {
-    return createBatchTriggers(target, action);
+  // Case 3: Batch triggers (supports both BatchActionTriggerDefs and UnifiedTriggerDefs)
+  if (target && typeof target === "object" && typeof fn === "object") {
+    return createBatchActionTriggers(target, fn);
   }
 
   throw new Error(
-    "Invalid createTrigger arguments. Expected: Signal, [State, key], or State with batch definitions"
+    "Invalid createAction arguments. Expected: Signal, [State, key], or State with batch definitions"
   );
 }
 
 /**
  * Internal function to create a trigger for a single signal
  */
-function createSignalTrigger<T, P extends any[]>(
+function createSignalActionTrigger<T, P extends any[]>(
   signal: Signal<T>,
-  action: (current: T, ...payload: P) => T,
+  fn: (current: T, ...payload: P) => T,
   options?: TriggerActionProps
 ): (...payload: P) => void {
   let lastCall = 0;
@@ -221,7 +221,7 @@ function createSignalTrigger<T, P extends any[]>(
   const executeAction = (payload: P) => {
     untrack(() => {
       const current = signal.peek();
-      const next = action(current, ...payload);
+      const next = fn(current, ...payload);
       const triggerName = (trigger as any).__triggerName || "trigger";
       signal.set(next, triggerName);
     });
@@ -230,7 +230,7 @@ function createSignalTrigger<T, P extends any[]>(
   };
 
   // Add metadata
-  (trigger as any).__triggerName = options?.name || action.name || "anonymous";
+  (trigger as any).__triggerName = options?.name || fn.name || "anonymous";
   (trigger as any).__isStateTrigger = true;
 
   return trigger;
@@ -239,7 +239,7 @@ function createSignalTrigger<T, P extends any[]>(
 /**
  * Internal function to create batch triggers with enhanced capabilities
  */
-function createBatchTriggers<T extends Record<string, any>>(
+function createBatchActionTriggers<T extends Record<string, any>>(
   state: State<T>,
   triggerDefs: UnifiedTriggerDefs
 ): Record<string, (...args: any[]) => void> {
@@ -250,10 +250,10 @@ function createBatchTriggers<T extends Record<string, any>>(
 
     // Check if it's an enhanced trigger def
     if ("target" in def) {
-      const enhancedDef = def as EnhancedTriggerDef;
+      const enhancedDef = def as EnhancedActionTriggerDef;
 
       if (typeof enhancedDef.target === "string") {
-        // String key - same as BatchTriggerDef
+        // String key - same as BatchActionTriggerDef
         if (!(enhancedDef.target in state)) {
           throw new Error(
             `Invalid trigger definition: key '${enhancedDef.target}' not found in state`
@@ -279,8 +279,8 @@ function createBatchTriggers<T extends Record<string, any>>(
         throw new Error(`Invalid trigger target type for '${name}'`);
       }
     } else {
-      // Legacy BatchTriggerDef
-      const batchDef = def as BatchTriggerDef;
+      // Legacy BatchActionTriggerDef
+      const batchDef = def as BatchActionTriggerDef;
       if (!batchDef.key || !(batchDef.key in state)) {
         throw new Error(
           `Invalid trigger definition: key '${batchDef.key}' not found in state`
@@ -289,7 +289,7 @@ function createBatchTriggers<T extends Record<string, any>>(
       targetSignal = state[batchDef.key];
     }
 
-    triggers[name] = createSignalTrigger(targetSignal, def.action, {
+    triggers[name] = createSignalActionTrigger(targetSignal, def.fn, {
       ...def.options,
       name,
     });
@@ -301,35 +301,35 @@ function createBatchTriggers<T extends Record<string, any>>(
 /**
  * Registry for named triggers
  */
-const triggerRegistry = new Map<string, (...args: any[]) => void>();
+const actionTriggerRegistry = new Map<string, (...args: any[]) => void>();
 
 /**
  * Register a trigger globally by name
  */
-export function registerTrigger(
+export function registerActionTrigger(
   name: string,
-  trigger: (...args: any[]) => void
+  fn: (...args: any[]) => void
 ): void {
-  if (triggerRegistry.has(name)) {
+  if (actionTriggerRegistry.has(name)) {
     console.warn(`Trigger "${name}" already registered. Overwriting.`);
   }
-  triggerRegistry.set(name, trigger);
+  actionTriggerRegistry.set(name, fn);
 }
 
 /**
  * Get a registered trigger by name
  */
-export function getTrigger(
+export function getActionTrigger(
   name: string
 ): ((...args: any[]) => void) | undefined {
-  return triggerRegistry.get(name);
+  return actionTriggerRegistry.get(name);
 }
 
 /**
  * Execute a registered trigger by name
  */
-export function executeTrigger(name: string, ...args: any[]): void {
-  const trigger = getTrigger(name);
+export function executeActionTrigger(name: string, ...args: any[]): void {
+  const trigger = getActionTrigger(name);
   if (!trigger) {
     throw new Error(`Trigger "${name}" not found in registry`);
   }
@@ -339,6 +339,6 @@ export function executeTrigger(name: string, ...args: any[]): void {
 /**
  * Clear all registered triggers
  */
-export function clearTriggerRegistry(): void {
-  triggerRegistry.clear();
+export function clearactionTriggerRegistry(): void {
+  actionTriggerRegistry.clear();
 }

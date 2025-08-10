@@ -157,10 +157,11 @@ export class Component {
       hasExpose: false,
       self: this,
     };
-    
+
     // Track component mounting
-    const componentName = typeof tpl === 'function' ? tpl.name || 'Anonymous' : String(tpl);
-    globalDebugCtx?.trackComponent('mount', componentName);
+    const componentName =
+      typeof tpl === "function" ? tpl.name || "Anonymous" : String(tpl);
+    globalDebugCtx?.trackComponent("mount", componentName);
 
     const prevCtx = currentCtx;
     currentCtx = ctx;
@@ -246,7 +247,7 @@ export const createComponent = (function () {
     const component = new Component(tpl, _props, ...children);
     if ($ref) {
       if (isSignal($ref)) {
-        ($ref as Signal).value = component; // Fixed: was 'node' but should be 'component'
+        ($ref as Signal).value = component;
       } else if (typeof $ref === "function") {
         $ref(component);
       } else if (!env.isProduction()) {

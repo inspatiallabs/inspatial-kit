@@ -1,6 +1,6 @@
 import {
   withTriggerProps,
-  registerStandardDOMProps,
+  StandardDOMProps,
   registerUniversalTriggerProps,
 } from "./trigger-props.ts";
 import { createExtension } from "../../renderer/extensions.ts";
@@ -40,7 +40,7 @@ export const InTriggerProp = createExtension({
   },
   lifecycle: {
     setup: () => {
-      registerStandardDOMProps();
+      StandardDOMProps();
       registerUniversalTriggerProps()
     },
   },

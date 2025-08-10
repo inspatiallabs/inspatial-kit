@@ -15,9 +15,8 @@ import {
 } from "../../signal/index.ts";
 import { createStorage, type StorageProps } from "./storage.ts";
 import {
-  createTrigger,
+  createAction,
   type UnifiedTriggerDefs,
-  type TriggerActionProps,
   type TriggerDefsFor,
 } from "../trigger/trigger-action.ts";
 
@@ -45,14 +44,14 @@ export type State<T extends Record<string, any>> = {
   subscribe: (listener: (snapshot: T) => void) => () => void;
 
   /**
-   * Add a trigger at runtime (enhanced explicit pattern)
+   * Add an action at runtime (enhanced explicit pattern)
    */
-  addTrigger?: (name: string, triggerDef: UnifiedTriggerDefs[string]) => void;
+  addAction?: (name: string, actionDef: UnifiedTriggerDefs[string]) => void;
 
   /**
-   * Remove a trigger at runtime (enhanced explicit pattern)
+   * Remove an action at runtime (enhanced explicit pattern)
    */
-  removeTrigger?: (name: string) => void;
+  removeAction?: (name: string) => void;
 
   /**
    * Add storage configuration at runtime (enhanced explicit pattern)
@@ -89,15 +88,15 @@ export type State<T extends Record<string, any>> = {
  */
 type TriggerFunctionsFromDefs<D extends UnifiedTriggerDefs> = {
   [K in keyof D]: D[K] extends {
-    action: (current: any, ...args: infer P) => any;
+    fn: (current: any, ...args: infer P) => any;
   }
     ? (...args: P) => void
     : (...args: any[]) => void;
 };
 
 type ExplicitEnhancements = {
-  addTrigger: (name: string, triggerDef: UnifiedTriggerDefs[string]) => void;
-  removeTrigger: (name: string) => void;
+  addAction: (name: string, actionDef: UnifiedTriggerDefs[string]) => void;
+  removeAction: (name: string) => void;
   addStorage: (storageConfig: StorageProps) => () => void;
   removeStorage: (key: string) => void;
   getStorageInfo: () => Array<{
@@ -109,16 +108,16 @@ type ExplicitEnhancements = {
   resumeStorage: () => void;
 };
 
-type ExplicitReturnFromConfig<C> = C extends { trigger: infer TR }
+type ExplicitReturnFromConfig<C> = C extends { action: infer TR }
   ? TR extends UnifiedTriggerDefs
-    ? { trigger: TriggerFunctionsFromDefs<TR> } & ExplicitEnhancements
+    ? { action: TriggerFunctionsFromDefs<TR> } & ExplicitEnhancements
     : TR extends { factory: (...args: any[]) => infer R }
-    ? { trigger: R } & ExplicitEnhancements
+    ? { action: R } & ExplicitEnhancements
     : {
-        trigger: Record<string, (...args: any[]) => void>;
+        action: Record<string, (...args: any[]) => void>;
       } & ExplicitEnhancements
   : {
-      trigger: Record<string, (...args: any[]) => void>;
+      action: Record<string, (...args: any[]) => void>;
     } & ExplicitEnhancements;
 
 export interface StateConfig<T extends Record<string, any>> {
@@ -133,24 +132,10 @@ export interface StateConfig<T extends Record<string, any>> {
   initialState: T;
 
   /**
-   * State mutation trigger - full createTrigger integration
-   * Supports all trigger patterns with same power as separation pattern
+   * State mutation actions - full createAction integration
+   * One function, multiple patterns.
    */
-  trigger?:
-    | TriggerDefsFor<T>
-    | {
-        /**
-         * Legacy factory pattern (maintained for backwards compatibility)
-         */
-        factory: (signals: { [K in keyof T]: Signal<T[K]> }) => Record<
-          string,
-          (...args: any[]) => void
-        >;
-        /**
-         * Global options applied to all triggers from factory
-         */
-        options?: TriggerActionProps;
-      };
+  action?: TriggerDefsFor<T>;
 
   /**
    * Automatic persistence configuration
@@ -176,33 +161,33 @@ export interface ExplicitStateConfig<T extends Record<string, any>>
  * const state = createState({
  *   id: "counter-state",
  *   initialState: { count: 0, name: "Ben" },
- *   trigger: {
+ *   action: {
  *     // Key-based 
- *     increment: { key: 'count', action: (c, n = 1) => c + n },
+ *     increment: { key: 'count', fn: (c, n = 1) => c + n },
  *     
  *     // Direct signal targeting 
- *     directIncrement: { target: () => state.count, action: (c) => c + 1 },
+ *     directIncrement: { target: () => state.count, fn: (c) => c + 1 },
  *     
  *     // Cross-state operations
  *     syncWithOther: { 
  *       key: 'count', 
- *       action: (c) => {
+ *       fn: (c) => {
  *         otherState.value.set(c); // Access external state!
  *         return c + 1;
  *       }
  *     },
  *     
  *     // State tuple targeting
- *     externalTrigger: { 
+ *     externalAction: { 
  *       target: [externalState, 'property'], 
- *       action: (val) => val * 2 
+ *       fn: (val) => val * 2 
  *     }
  *   },
  *   storage: { key: 'counter-state', backend: 'local' }
  * });
  * 
  * // Dynamic management - same power as separation!
- * state.addTrigger('runtime', { key: 'count', action: (c) => c + 10 });
+ * state.addAction('runtime', { key: 'count', fn: (c) => c + 10 });
  * state.addStorage({ key: 'runtime', backend: 'session' });
  * 
  * 
@@ -213,7 +198,7 @@ export interface ExplicitStateConfig<T extends Record<string, any>>
  * const state = createState({ count: 0, name: "Ben" });
  *
  * //2. Create State Triggers (optional)
- * const trigger = createTrigger(...)
+ * const trigger = createAction(...)
  * 
  * // 3. Create State Storage (optional)
  * const storage = createStorage(...);
@@ -238,19 +223,19 @@ export function createState<T extends Record<string, any>>(
     "initialState" in configOrInitialState;
 
   let initialState: T;
-  let triggerConfig: StateConfig<T>["trigger"];
+  let actionConfig: StateConfig<T>["action"];
   let persistOptions: StorageProps | StorageProps[] | undefined;
 
   if (isExplicitPattern) {
     // Explicit pattern
     const config = configOrInitialState as StateConfig<T>;
     initialState = config.initialState;
-    triggerConfig = config.trigger;
+    actionConfig = config.action;
     persistOptions = config.storage;
   } else {
     // Separation pattern
     initialState = configOrInitialState as T;
-    triggerConfig = undefined;
+    actionConfig = undefined;
     persistOptions = undefined;
   }
 
@@ -297,8 +282,8 @@ export function createState<T extends Record<string, any>>(
   });
   isInitializing = false;
 
-  // Prepare trigger creation (will be created after state is constructed)
-  const trigger: Record<string, (...args: any[]) => void> = {};
+  // Prepare action creation (will be created after state is constructed)
+  const action: Record<string, (...args: any[]) => void> = {};
 
   // Storage management for enhanced explicit pattern
   const storageCleanups = new Map<string, () => void>();
@@ -307,7 +292,7 @@ export function createState<T extends Record<string, any>>(
 
   // Create the state interface
   const state: State<T> & {
-    trigger: Record<string, (...args: any[]) => void>;
+    action: Record<string, (...args: any[]) => void>;
   } = {
     ...signals,
 
@@ -343,31 +328,31 @@ export function createState<T extends Record<string, any>>(
       };
     },
 
-    trigger,
+    action,
 
-    // Dynamic trigger management (only for explicit pattern)
-    addTrigger: isExplicitPattern
-      ? (name: string, triggerDef: UnifiedTriggerDefs[string]) => {
-          if (trigger[name]) {
-            console.warn(`Trigger "${name}" already exists. Overwriting.`);
+    // Dynamic action management (only for explicit pattern)
+    addAction: isExplicitPattern
+      ? (name: string, actionDef: UnifiedTriggerDefs[string]) => {
+          if (action[name]) {
+            console.warn(`Action "${name}" already exists. Overwriting.`);
           }
 
-          // Create single trigger using enhanced logic
-          const singleTriggerDef = { [name]: triggerDef };
-          const newTriggers = createTrigger(state, singleTriggerDef);
-          Object.assign(trigger, newTriggers);
+          // Create single action using enhanced logic
+          const singleActionDef = { [name]: actionDef };
+          const newActions = createAction(state, singleActionDef);
+          Object.assign(action, newActions);
 
-          console.log(`✨ Dynamic trigger "${name}" added to state`);
+          console.log(`✨ Dynamic action "${name}" added to state`);
         }
       : undefined,
 
-    removeTrigger: isExplicitPattern
+    removeAction: isExplicitPattern
       ? (name: string) => {
-          if (trigger[name]) {
-            delete trigger[name];
-            console.log(`🗑️ Trigger "${name}" removed from state`);
+          if (action[name]) {
+            delete action[name];
+            console.log(`🗑️ Action "${name}" removed from state`);
           } else {
-            console.warn(`Trigger "${name}" not found`);
+            console.warn(`Action "${name}" not found`);
           }
         }
       : undefined,
@@ -433,32 +418,16 @@ export function createState<T extends Record<string, any>>(
       : undefined,
   };
 
-  // Setup automatic trigger integration if configured
-  if (triggerConfig) {
-    if (
-      typeof triggerConfig === "object" &&
-      "factory" in triggerConfig &&
-      typeof triggerConfig.factory === "function"
-    ) {
-      // Legacy factory pattern with options support
-      const factoryTriggers = triggerConfig.factory(signals);
-      Object.assign(trigger, factoryTriggers);
-      console.log(
-        `🔧 Factory-based triggers enabled for state: ${Object.keys(
-          factoryTriggers
-        ).join(", ")}`
-      );
-    } else {
-      // UnifiedTriggerDefs pattern - use full createTrigger API with enhanced capabilities
-      const unifiedTriggers = triggerConfig as UnifiedTriggerDefs;
-      const createdTriggers = createTrigger(state, unifiedTriggers);
-      Object.assign(trigger, createdTriggers);
-      console.log(
-        `🚀 Enhanced triggers enabled for state: ${Object.keys(
-          createdTriggers
-        ).join(", ")}`
-      );
-    }
+  // Setup automatic actions if configured
+  if (actionConfig) {
+    const createdActions = createAction(
+      state,
+      actionConfig as UnifiedTriggerDefs
+    );
+    Object.assign(action, createdActions);
+    console.log(
+      `🚀 Actions enabled for state: ${Object.keys(createdActions).join(", ")}`
+    );
   }
 
   // Setup automatic persistence if configured (supports multiple storages)
@@ -496,7 +465,8 @@ export function createState<T extends Record<string, any>>(
 
 // Attach discoverable explicit alias: createState.in
 export const createStateIn = <C extends ExplicitStateConfig<any>>(config: C) =>
-  (createState(config as any) as State<C["initialState"]> & ExplicitReturnFromConfig<C>);
+  createState(config as any) as State<C["initialState"]> &
+    ExplicitReturnFromConfig<C>;
 
 // Use bracket syntax to avoid reserved identifier issues
 // Consumers can call createState["in"](...) or createState.in(...)

@@ -2,7 +2,7 @@
 
 /*###################################################( FONTS )###################################################*/
 
-@font-face {
+/* @font-face {
   font-family: "editors-note";
   src: url("./font/editors-note-extralight.otf") format("opentype"),
     url("https://inspatial-storage.s3.eu-west-2.amazonaws.com/fonts/editors-note/editors-note-extralight.otf")
@@ -23,7 +23,7 @@
     url("https://inspatial-storage.s3.eu-west-2.amazonaws.com/fonts/inter/inter.ttf")
       format("truetype");
   font-display: swap;
-}
+} */
 
 /*###################################################( THEME )###################################################*/
 

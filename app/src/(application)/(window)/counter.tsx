@@ -2,14 +2,14 @@
 import { $ } from "@inspatial/state";
 import { Show, List } from "@inspatial/kit";
 import {
-  counterState,
-  counterStateExplicit,
-  enhancedExplicitState,
-  builtInTrigger,
-  directIncrement,
-  tupleDouble,
-  batchOperations,
-  type Entry,
+  useCounter,
+  useCounterExplicit,
+  useEnhancedExplicit,
+  handleCounter,
+  handleDirectIncrement,
+  handleTupleDouble,
+  handleBatch,
+  type EntryProps,
 } from "./state.ts";
 
 // ########################## (TRIGGER PROPS TEST SIGNALS) ##########################
@@ -19,7 +19,7 @@ export function Counter() {
   const testSignals = {
     // Dynamic colors based on count
     backgroundColor: $(() => {
-      const count = counterState.count.get();
+      const count = useCounter.count.get();
       if (count > 20) return "rgb(34, 197, 94)"; // green
       if (count > 10) return "rgb(59, 130, 246)"; // blue
       if (count > 5) return "rgb(245, 158, 11)"; // yellow
@@ -28,17 +28,17 @@ export function Counter() {
 
     // Dynamic text color
     textColor: $(() => {
-      const count = counterState.count;
+      const count = useCounter.count;
       return count > 15 ? "white" : "black";
     }),
 
     // Dynamic class Names
-    isHighCount: $(() => counterState.count > 10),
-    isPulseActive: $(() => counterState.count % 5 === 0 && counterState.count > 0),
+    isHighCount: $(() => useCounter.count > 10),
+    isPulseActive: $(() => useCounter.count % 5 === 0 && useCounter.count.get() > 0),
 
     // Dynamic styles
-    borderWidth: $(() => Math.max(1, Math.floor(counterState.count / 3))),
-    fontSize: $(() => Math.max(16, 16 + counterState.count)),
+    borderWidth: $(() => Math.max(1, Math.floor(useCounter.count / 3))),
+    fontSize: $(() => Math.max(16, 16 + useCounter.count)),
   };
 
   /*******************************(Render)*************************************/
@@ -48,8 +48,8 @@ export function Counter() {
       <div className="flex flex-col h-screen justify-center items-center gap-10">
         <h1 className="text-yellow-500 text-8xl">🚀 InSpatial App</h1>
         <div className="max-w-2xl">
-          <List each={counterState.entries} track="id">
-            {(entry: Entry) => (
+          <List each={useCounter.entries} track="id">
+            {(entry: EntryProps) => (
               <p className="flex flex-col text-xl text-white mb-2 bg-gray-800 p-3 rounded">
                 {entry.name}
               </p>
@@ -61,9 +61,9 @@ export function Counter() {
         <input
           type="number"
           className="bg-gray-800 p-3 rounded-lg outline-none text-white text-2xl"
-          value={counterState.count}
+          value={useCounter.count}
           on:input={(event: any) => {
-            counterState.count.set(Number(event.target.value));
+            useCounter.count.set(Number(event.target.value));
           }}
           placeholder="Enter a number..."
         />
@@ -72,7 +72,7 @@ export function Counter() {
         <div className="bg-gray-800 p-6 rounded-lg text-center">
           <h2 className="text-white text-2xl mb-2">Current </h2>
           <div className="text-6xl font-bold text-yellow-400">
-            {counterState.count}
+            {useCounter.count}
           </div>
         </div>
 
@@ -92,7 +92,7 @@ export function Counter() {
               },
             }}
           >
-            Dynamic Styles! Count: {counterState.count}
+            Dynamic Styles! Count: {useCounter.count}
           </div>
 
           {/* Test className: trigger props */}
@@ -114,16 +114,16 @@ export function Counter() {
         <div className="bg-blue-900 p-4 rounded-lg text-center max-w-md">
           <h3 className="text-white text-lg mb-2">Explicit Pattern Demo</h3>
             <div className="text-2xl font-bold text-blue-300 mb-2">
-              {counterStateExplicit.count}
+              {useCounterExplicit.count}
             </div>
             <div className="text-sm text-blue-200 mb-3">
-              {counterStateExplicit.message}
+              {useCounterExplicit.message}
             </div>
           <div className="flex gap-2 justify-center">
             <button
               type="button"
               className="bg-blue-600 px-3 py-1 rounded text-white text-sm hover:bg-blue-700"
-              on:click={() => counterStateExplicit.trigger.increment()}
+              on:click={() => useCounterExplicit.action.setIncrement()}
             >
               +1 Config
             </button>
@@ -131,7 +131,7 @@ export function Counter() {
               type="button"
               className="bg-blue-600 px-3 py-1 rounded text-white text-sm hover:bg-blue-700"
               on:click={() =>
-                counterStateExplicit.trigger.setMessage("Explicit works!")
+                useCounterExplicit.action.setMessage("Explicit works!")
               }
             >
               Update Msg
@@ -140,7 +140,7 @@ export function Counter() {
         </div>
 
         <Show
-          when={$(() => counterState.count >= 10)}
+          when={$(() => useCounter.count >= 10)}
           otherwise={() => <p className="text-white">Count is less than 10</p>}
         >
           <p className="text-white text-4xl">Count is 10 or greater! 🎉</p>
@@ -150,35 +150,35 @@ export function Counter() {
           <button
             type="button"
             className="bg-purple-600 p-4 rounded-full text-white font-bold text-lg shadow-lg hover:bg-purple-700 transition-colors"
-            on:click={() => tupleDouble()}
+            on:click={() => handleTupleDouble()}
           >
             ×2 Tuple
           </button>
           <button
             type="button"
             className="bg-indigo-600 p-4 rounded-full text-white font-bold text-lg shadow-lg hover:bg-indigo-700 transition-colors"
-            on:click={() => batchOperations.multiplyByFactor()}
+            on:click={() => handleBatch.setMultiplyByFactor()}
           >
             ×Factor Batch
           </button>
           <button
             type="button"
             className="bg-green-500 p-4 rounded-full text-white font-bold text-lg shadow-lg hover:bg-green-600 transition-colors"
-            on:click={() => builtInTrigger.increment()}
+            on:click={() => handleCounter.setIncrement()}
           >
             + Trigger
           </button>
           <button
             type="button"
             className="bg-teal-500 p-4 rounded-full text-white font-bold text-lg shadow-lg hover:bg-teal-600 transition-colors"
-            on:click={() => directIncrement()}
+            on:click={() => handleDirectIncrement()}
           >
             + External
           </button>
           <button
             type="button"
             className="bg-red-500 p-4 rounded-full text-white font-bold text-lg shadow-lg hover:bg-red-600 transition-colors"
-            on:click={() => builtInTrigger.decrement()}
+            on:click={() => handleCounter.setDecrement()}
           >
             - Decrement
           </button>
@@ -186,8 +186,8 @@ export function Counter() {
             type="button"
             className="bg-blue-500 p-4 rounded-full text-white font-bold text-lg shadow-lg hover:bg-blue-600 transition-colors"
             on:click={() =>
-              builtInTrigger.addEntry(
-                `Entry #${counterState.entries.peek().length + 1} added!`
+              handleCounter.setAddEntry(
+                `Entry #${useCounter.entries.peek().length + 1} added!`
               )
             }
           >
@@ -198,8 +198,8 @@ export function Counter() {
             className="bg-purple-500 p-4 rounded-full text-white font-bold text-lg shadow-lg hover:bg-purple-600 transition-colors"
             on:click={() => {
               console.log("🔄 Manual set with context");
-              counterState.count.set(
-                counterState.count.peek() + 10,
+              useCounter.count.set(
+                useCounter.count.peek() + 10,
                 "manual-boost"
               );
             }}
@@ -210,8 +210,8 @@ export function Counter() {
             type="button"
             className="bg-orange-500 p-4 rounded-full text-white font-bold text-lg shadow-lg hover:bg-orange-600 transition-colors"
             on:click={() => {
-              builtInTrigger.reset();
-              builtInTrigger.resetEntries();
+              handleCounter.setReset();
+              handleCounter.setResetEntries();
             }}
           >
             🔄 Reset All
@@ -222,7 +222,7 @@ export function Counter() {
             on:click={() => {
               // Force a re-render without changing count to show the difference
               console.log("🔄 Forcing re-render (no count change)");
-              counterState.entries.set([...counterState.entries.peek()]);
+              useCounter.entries.set([...useCounter.entries.peek()]);
             }}
           >
             Force Re-render
@@ -232,30 +232,30 @@ export function Counter() {
         {/* API Showcase */}
         <div className="bg-gray-800 p-4 rounded-lg text-white max-w-2xl">
           <h3 className="text-lg font-bold mb-2">
-            🚀 Unified createTrigger API
+            🚀 Unified createAction API
           </h3>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div className="bg-green-900 p-3 rounded">
               <h4 className="font-bold text-green-300">Batch Trigger</h4>
               <code className="text-xs text-green-200 block mt-1">
-                builtInTrigger.increment()
+                handleCounter.setIncrement()
               </code>
               <p className="text-xs mt-1">Organized, type-safe, convenient</p>
             </div>
             <div className="bg-teal-900 p-3 rounded">
               <h4 className="font-bold text-teal-300">Direct Signal</h4>
               <code className="text-xs text-teal-200 block mt-1">
-                directIncrement() // throttled
+                handleDirectIncrement() // throttled
               </code>
               <p className="text-xs mt-1">Simple, powerful, optimized</p>
             </div>
           </div>
           <div className="mt-3 text-xs text-gray-300">
             🎯 <strong>ONE FUNCTION</strong> - Three patterns with{" "}
-            <code>createTrigger()</code>
-            <br />✅ Direct: <code>createTrigger(signal, action, options)</code>
-            <br />✅ Tuple: <code>createTrigger([state, 'key'], action)</code>
-            <br />✅ Batch: <code>createTrigger(state, definition)</code>
+            <code>createAction()</code>
+            <br />✅ Direct: <code>createAction(signal, action, options)</code>
+            <br />✅ Tuple: <code>createAction([state, 'key'], action)</code>
+            <br />✅ Batch: <code>createAction(state, definition)</code>
           </div>
         </div>
 
@@ -278,18 +278,18 @@ export function Counter() {
                   "mb-2": true,
                   "transition-all": true,
                   "duration-300": true,
-                  "animate-bounce": $(() => counterState.count % 10 === 0),
+                  "animate-bounce": $(() => useCounter.count % 10 === 0),
                 }}
                 style={{
                   web: {
                     backgroundColor: testSignals.backgroundColor,
                     transform: $(
-                      () => `scale(${1 + counterState.count * 0.01})`
+                      () => `scale(${1 + useCounter.count * 0.01})`
                     ),
                   },
                 }}
               >
-                Count: {counterState.count}
+                Count: {useCounter.count}
               </div>
               <div className="text-xs text-emerald-300">
                 ✅ structured style prop
@@ -305,7 +305,7 @@ export function Counter() {
                 className="bg-teal-600 px-3 py-1 rounded mb-1 text-white w-full"
                 on:click={() => {
                   console.log("✅ Standard on:click working!");
-                  builtInTrigger.increment();
+                  handleCounter.setIncrement();
                 }}
               >
                 on:click
@@ -331,7 +331,7 @@ export function Counter() {
                 Extensible Registry
               </h3>
               <div className="bg-cyan-700 px-3 py-2 rounded mb-2 text-white text-sm">
-                <code>registerTriggerHandler()</code>
+                <code>createTriggerHandle()</code>
               </div>
               <div className="text-xs text-cyan-300">
                 ✅ Custom trigger registration
@@ -353,10 +353,10 @@ export function Counter() {
 
           <div className="bg-purple-800 p-3 rounded mb-4">
             <div className="text-2xl font-bold text-purple-200 mb-2">
-              {enhancedExplicitState.advancedCount}
+              {useEnhancedExplicit.advancedCount}
             </div>
             <div className="text-sm text-purple-300">
-              {enhancedExplicitState.status}
+              {useEnhancedExplicit.status}
             </div>
           </div>
 
@@ -365,7 +365,7 @@ export function Counter() {
             <button
               type="button"
               className="bg-purple-600 px-2 py-2 rounded text-white hover:bg-purple-700"
-              on:click={() => enhancedExplicitState.trigger.increment(1)}
+              on:click={() => useEnhancedExplicit.action.setIncrement(1)}
             >
               +1 Traditional
             </button>
@@ -375,7 +375,7 @@ export function Counter() {
               type="button"
               className="bg-indigo-600 px-2 py-2 rounded text-white hover:bg-indigo-700"
               on:click={() =>
-                enhancedExplicitState.trigger.syncWithOtherStates()
+                useEnhancedExplicit.action.setSyncWithOtherStates()
               }
             >
               🌐 Sync States
@@ -386,7 +386,7 @@ export function Counter() {
               type="button"
               className="bg-pink-600 px-2 py-2 rounded text-white hover:bg-pink-700"
               on:click={() =>
-                enhancedExplicitState.trigger.incrementExternalState()
+                useEnhancedExplicit.action.setIncrementExternalState()
               }
             >
               📍 +10 External
@@ -397,7 +397,7 @@ export function Counter() {
               type="button"
               className="bg-cyan-600 px-2 py-2 rounded text-white hover:bg-cyan-700"
               on:click={() =>
-                enhancedExplicitState.trigger.updateStatus("Testing!")
+                useEnhancedExplicit.action.setUpdateStatus("Testing!")
               }
             >
               💬 Update Status
@@ -408,13 +408,13 @@ export function Counter() {
               type="button"
               className="bg-yellow-600 px-2 py-2 rounded text-white hover:bg-yellow-700 col-span-2"
               on:click={() => {
-                enhancedExplicitState.addTrigger?.("testTrigger", {
+                useEnhancedExplicit.addAction?.("testTrigger", {
                   key: "advancedCount",
-                  action: (current: number) => current + 50,
+                  fn: (current: number) => current + 50,
                   options: { name: "test-runtime-trigger" },
                 });
                 // Use the newly added trigger
-                (enhancedExplicitState.trigger as any).testTrigger?.();
+                (useEnhancedExplicit.action as any).testTrigger?.();
               }}
             >
               🔥 Add & Use Dynamic Trigger (+50)

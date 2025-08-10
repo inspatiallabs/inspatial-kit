@@ -85,5 +85,7 @@
       ],
       "exclude": ["no-explicit-any", "ban-ts-comment"]
     }
+  },
+  "imports": {
   }
 }

@@ -1,7 +1,7 @@
 =============================================
 Understanding computed() and/or $()
 =============================================
-NOTE: $() function is the same as computed() only less words
+NOTE: $() is an alias for computed() 
 🔍 What Computed/$ Actually Does
 
 - Reads existing state values

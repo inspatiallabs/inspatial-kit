@@ -1,18 +1,18 @@
 
 
 // #####################(Trigger Props)#####################
-export { withTriggerProps, registerTriggerHandler, registerStandardDOMProps,
+export { withTriggerProps, createTriggerHandle, StandardDOMProps,
   registerUniversalTriggerProps, } from "./trigger-props.ts";
 export { InTriggerProp } from "./trigger-prop-extension.ts";
 
 
 // #####################(Trigger Action)#####################
 export {
-    createTrigger,
+    createAction,
     type TriggerActionProps,
     type UnifiedTriggerDef,
     type UnifiedTriggerDefs,
     type TriggerDefsFor,
     type KeyedTriggerDefFor,
-    type EnhancedTriggerDefFor,
+    type EnhancedActionTriggerDefFor,
   } from "./trigger-action.ts";

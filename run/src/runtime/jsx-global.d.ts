@@ -27,15 +27,32 @@ declare global {
     // Common prop value types
     type PropLike = string | number | boolean | null | undefined;
     type ClassObject = Record<string, boolean | Signal<boolean>>;
-    type ClassArray = Array<string | number | boolean | null | undefined | Signal<any>>;
-    type ClassLike = string | number | boolean | null | undefined | ClassObject | ClassArray | Signal<any>;
-    type PlatformStyle = Record<string, PropLike | Signal<PropLike>>;
-    type UniversalStyle = string | (PlatformStyle & {
-      web?: PlatformStyle;
-      ios?: PlatformStyle;
-      android?: PlatformStyle;
-      [platform: string]: PlatformStyle | PropLike | undefined;
-    });
+    type ClassArray = Array<
+      string | number | boolean | null | undefined | Signal<any>
+    >;
+    type ClassLike =
+      | string
+      | number
+      | boolean
+      | null
+      | undefined
+      | ClassObject
+      | ClassArray
+      | Signal<any>;
+    type PlatformStyle = Record<string, PropLike>;
+    type UniversalStyle =
+      | string
+      | PlatformStyle
+      | {
+          web?: PlatformStyle | CSSStyleDeclaration | undefined;
+          ios?: PlatformStyle;
+          android?: PlatformStyle;
+          [platform: string]:
+            | PlatformStyle
+            | PropLike
+            | CSSStyleDeclaration
+            | undefined;
+        };
 
     // Directive-like props (style:*, class:*, ns:key)
     type StylePropKey = `style:${string}`;
@@ -54,17 +71,18 @@ declare global {
       id?: string;
       class?: ClassLike;
       className?: ClassLike;
-      style?: UniversalStyle | Signal<UniversalStyle>;
+      style?: UniversalStyle;
       children?: any;
       // Permissive catch-all so base JSX works without strict prop maps
       [prop: string]: any;
-    } & // Specific directive groups with narrowed value types
-    { [K in StylePropKey]?: string | number | null | undefined | UniversalStyle } & {
+    } & {
+      // Specific directive groups with narrowed value types
+      [K in StylePropKey]?: string | number | null | undefined | UniversalStyle;
+    } & {
       [K in ClassPropKey]?: boolean | string | number | null | undefined;
     } & {
       [K in TriggerPropKey]?: EventHandler | any;
-    } & // Fallback for other namespaced directives (e.g., svg:xlink)
-    { [K in NamespacePropKey]?: unknown };
+    } & { [K in NamespacePropKey]?: unknown }; // Fallback for other namespaced directives (e.g., svg:xlink)
 
     // Default: allow any tag name with our common/templated props
     interface IntrinsicElements {
