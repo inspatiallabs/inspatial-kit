@@ -7,3 +7,6 @@ export {
 } from "./storage.ts";
 
 export { $ as $, createEffect } from "../../signal/index.ts";
+
+// #####################(Action Trigger)#####################
+export { createAction, type ActionTriggerProps } from "./action.ts";

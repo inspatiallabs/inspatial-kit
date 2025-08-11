@@ -150,7 +150,7 @@ function autoDetectMode(env: EnvironmentInfo): string {
     return "server";
   }
 
-  // Default to browser mode for most cases (DOM, SSR with DOM, electron, web workers, etc.)
+  // Default to browser mode for most cases (DOM, Capacitor, SSR with DOM, electron, web workers, etc.)
   return "browser";
 }
 

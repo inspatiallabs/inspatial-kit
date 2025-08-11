@@ -41,7 +41,7 @@ export const InTriggerProp = createExtension({
   lifecycle: {
     setup: () => {
       StandardDOMProps();
-      registerUniversalTriggerProps()
+      registerUniversalTriggerProps();
     },
   },
 });

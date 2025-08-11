@@ -1,9 +1,19 @@
 {
   "version": "5",
   "specifiers": {
+    "jsr:@inspatial/cloud-client@~0.1.22": "0.1.25",
+    "jsr:@inspatial/cloud-client@~0.1.25": "0.1.25",
     "npm:@tailwindcss/cli@^4.1.11": "4.1.11",
     "npm:@tailwindcss/cli@latest": "4.1.11",
     "npm:tailwindcss@^4.1.11": "4.1.11"
+  },
+  "jsr": {
+    "@inspatial/cloud-client@0.1.25": {
+      "integrity": "aafb449f217b5412eb900c352a7805b3c6c0907e5820608399ca074752c6c27f",
+      "dependencies": [
+        "jsr:@inspatial/cloud-client@~0.1.25"
+      ]
+    }
   },
   "npm": {
     "@ampproject/remapping@2.3.0": {
@@ -474,6 +484,11 @@
       "jsr:@inspatial/cloud-client@~0.1.22",
       "npm:@tailwindcss/cli@^4.1.11",
       "npm:tailwindcss@^4.1.11"
-    ]
+    ],
+    "packageJson": {
+      "dependencies": [
+        "npm:tailwindcss@^4.1.11"
+      ]
+    }
   }
 }

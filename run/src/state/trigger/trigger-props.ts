@@ -406,7 +406,14 @@ export type UniversalTriggerProps =
   | "longpress"
   | "change"
   | "submit"
-  | "focus";
+  | "focus"
+  // Capacitor app lifecycle and navigation
+  | "back"
+  | "resume"
+  | "pause"
+  | "urlopen"
+  | "statechange"
+  | "restored";
 
 function DOMLongPressHandler(durationMs = 500): TriggerPropHandler {
   return function (node: Element, val: any): void {
@@ -452,8 +459,72 @@ export function registerUniversalTriggerProps(): void {
     createTriggerHandle("focus", DOMEventHandler("focus"));
     return;
   }
-  // TODO(@benemma): Native/XR bridges (stubs for now to avoid crashes)
-  // Keep API stable for future expansion
+  // Capacitor (WebView + native App bridge)
+  if (env.type === "capacitor") {
+    // Base DOM mappings still apply
+    createTriggerHandle("tap", DOMEventHandler("click"));
+    createTriggerHandle("longpress", DOMLongPressHandler());
+    createTriggerHandle("change", DOMEventHandler("change"));
+    createTriggerHandle("submit", DOMEventHandler("submit"));
+    createTriggerHandle("focus", DOMEventHandler("focus"));
+
+    // Dynamically attach Capacitor App event trigger props
+    try {
+      const dynamicImport = (s: string) =>
+        new Function("s", "return import(s)")(s);
+      (async () => {
+        try {
+          const { App } = await dynamicImport("@capacitor/app");
+          // Android back button
+          createTriggerHandle("back", (_node, cb: any) => {
+            if (!cb || !App?.addListener) return;
+            App.addListener("backButton", (ev: any) =>
+              cb(ev ?? { type: "back" })
+            );
+          });
+          // App resume
+          createTriggerHandle("resume", (_node, cb: any) => {
+            if (!cb || !App?.addListener) return;
+            App.addListener("resume", (ev: any) =>
+              cb(ev ?? { type: "resume" })
+            );
+          });
+          // App pause
+          createTriggerHandle("pause", (_node, cb: any) => {
+            if (!cb || !App?.addListener) return;
+            App.addListener("pause", (ev: any) => cb(ev ?? { type: "pause" }));
+          });
+          // Deep links
+          createTriggerHandle("urlopen", (_node, cb: any) => {
+            if (!cb || !App?.addListener) return;
+            App.addListener("appUrlOpen", (ev: any) =>
+              cb({ type: "urlopen", ...ev })
+            );
+          });
+          // App active/inactive
+          createTriggerHandle("statechange", (_node, cb: any) => {
+            if (!cb || !App?.addListener) return;
+            App.addListener("appStateChange", (ev: any) =>
+              cb({ type: "statechange", ...ev })
+            );
+          });
+          // Restored result
+          createTriggerHandle("restored", (_node, cb: any) => {
+            if (!cb || !App?.addListener) return;
+            App.addListener("restoredResult", (ev: any) =>
+              cb({ type: "restored", ...ev })
+            );
+          });
+        } catch {
+          // @capacitor/app not installed; skip app triggers
+        }
+      })();
+    } catch {
+      // Dynamic import not supported; skip app triggers
+    }
+    return;
+  }
+  // TODO(@benemma): Native/XR bridges (later)
 }
 
 /**

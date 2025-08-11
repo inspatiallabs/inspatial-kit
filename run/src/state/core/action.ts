@@ -3,9 +3,9 @@
  */
 
 import { type Signal, untrack, tick, isSignal } from "../../signal/index.ts";
-import type { State } from "../core/state.ts";
+import type { State } from "./state.ts";
 
-export interface TriggerActionProps {
+export interface ActionTriggerProps {
   /**
    * Optional name for the trigger
    */
@@ -30,7 +30,7 @@ export interface TriggerActionProps {
 export interface BatchActionTriggerDef {
   key: string;
   fn: (current: any, ...args: any[]) => any;
-  options?: TriggerActionProps;
+  options?: ActionTriggerProps;
 }
 
 export interface EnhancedActionTriggerDef {
@@ -51,7 +51,7 @@ export interface EnhancedActionTriggerDef {
   /**
    * Trigger options
    */
-  options?: TriggerActionProps;
+  options?: ActionTriggerProps;
 }
 
 // Union type for backward compatibility and new features
@@ -67,19 +67,19 @@ export type KeyedTriggerDefFor<
 > = {
   key: Extract<K, string>;
   fn: (current: T[K], ...args: any[]) => T[K];
-  options?: TriggerActionProps;
+  options?: ActionTriggerProps;
 };
 
 export type EnhancedActionTriggerDefFor<T extends Record<string, any>> =
   | {
       target: () => Signal<any>;
       fn: (current: any, ...args: any[]) => any;
-      options?: TriggerActionProps;
+      options?: ActionTriggerProps;
     }
   | {
       target: [any, string];
       fn: (current: any, ...args: any[]) => any;
-      options?: TriggerActionProps;
+      options?: ActionTriggerProps;
     };
 
 export type TriggerDefsFor<T extends Record<string, any>> = Record<
@@ -123,7 +123,7 @@ export type TriggerFunctionsFromDefs<
 export function createAction<T, P extends any[]>(
   target: Signal<T>,
   fn: (current: T, ...payload: P) => T,
-  options?: TriggerActionProps
+  options?: ActionTriggerProps
 ): (...payload: P) => void;
 
 export function createAction<
@@ -133,7 +133,7 @@ export function createAction<
 >(
   target: [State<T>, K],
   fn: (current: T[K], ...payload: P) => T[K],
-  options?: TriggerActionProps
+  options?: ActionTriggerProps
 ): (...payload: P) => void;
 
 export function createAction<T extends Record<string, any>>(
@@ -150,7 +150,7 @@ export function createAction<
 export function createAction(
   target: any,
   fn: any,
-  options?: TriggerActionProps
+  options?: ActionTriggerProps
 ): any {
   // Case 1: Direct signal
   if (isSignal(target)) {
@@ -182,7 +182,7 @@ export function createAction(
 function createSignalActionTrigger<T, P extends any[]>(
   signal: Signal<T>,
   fn: (current: T, ...payload: P) => T,
-  options?: TriggerActionProps
+  options?: ActionTriggerProps
 ): (...payload: P) => void {
   let lastCall = 0;
   let timeoutId: ReturnType<typeof setTimeout> | null = null;

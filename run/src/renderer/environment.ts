@@ -6,6 +6,7 @@
 export interface EnvironmentInfo {
   type:
     | "dom"
+    | "capacitor"
     | "ssr"
     | "node"
     | "deno"
@@ -68,6 +69,7 @@ export function detectEnvironment(): EnvironmentInfo {
   const hasProcess = safeGlobalAccess("process") !== undefined;
   const hasDeno = safeGlobalAccess("Deno") !== undefined;
   const hasBun = safeGlobalAccess("Bun") !== undefined;
+  const hasCapacitor = safeGlobalAccess("Capacitor") !== undefined;
   const hasAndroid = safeGlobalAccess("android") !== undefined;
   const hasIOS = safeGlobalAccess("ios") !== undefined;
   const hasNativeScript =
@@ -234,7 +236,42 @@ export function detectEnvironment(): EnvironmentInfo {
     hasDocument &&
     typeof (globalThis as any).document?.createElement === "function"
   ) {
-    // Check for Lynx 
+    // Capacitor (WebView + native bridge)
+    if (hasCapacitor) {
+      // Try to infer platform via Capacitor if available
+      let platform: EnvironmentInfo["platform"] = "web";
+      try {
+        // deno-lint-ignore no-explicit-any
+        const cap: any = (globalThis as any).Capacitor;
+        const getPlatform = cap?.getPlatform?.() || cap?.platform;
+        if (getPlatform === "ios") platform = "ios" as any;
+        else if (getPlatform === "android") platform = "android" as any;
+      } catch {
+        // Capacitor present but platform unknown; default remains 'web'
+      }
+
+      return {
+        type: "capacitor",
+        runtime: "Capacitor",
+        platform,
+        features: {
+          hasDOM: true,
+          hasDocument: true,
+          hasWindow: true,
+          hasProcess: !!hasProcess,
+          hasGlobal: !!hasGlobal,
+          isServer: false,
+          isBrowser: true,
+          isMobile: true,
+          isDesktop: false,
+          isNative: true,
+          isXR: false,
+          isAR: false,
+          isVR: false,
+        },
+      };
+    }
+    // Check for Lynx
     if (hasWindow && safeGlobalAccess("LynxWebView")) {
       return {
         type: "lynx",

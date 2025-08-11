@@ -18,7 +18,7 @@ import {
   createAction,
   type UnifiedTriggerDefs,
   type TriggerDefsFor,
-} from "../trigger/trigger-action.ts";
+} from "./action.ts";
 
 export type State<T extends Record<string, any>> = {
   [K in keyof T]: Signal<T[K]>;

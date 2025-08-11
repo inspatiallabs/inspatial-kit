@@ -87,5 +87,6 @@
     }
   },
   "imports": {
+    "@inspatial/test": "jsr:@inspatial/test@^0.1.1"
   }
 }
