@@ -2,7 +2,7 @@
 export {
   withTriggerProps,
   createTriggerHandle,
-  StandardDOMProps,
-  registerUniversalTriggerProps,
+  InDOMTriggerProps,
+  InUniversalTriggerProps,
 } from "./trigger-props.ts";
 export { InTriggerProp } from "./trigger-prop-extension.ts";

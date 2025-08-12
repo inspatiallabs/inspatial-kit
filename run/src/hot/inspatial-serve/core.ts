@@ -536,6 +536,17 @@ export class InSpatialServe {
     deadClients.forEach((client) => this.clients.delete(client));
 
     console.log(`🔄 Notified ${this.clients.size} clients to reload`);
+    // Notify any in-process listeners (e.g., virtual manifest consumers)
+    try {
+      const CE = (globalThis as any).CustomEvent;
+      const dispatch = (globalThis as any).dispatchEvent;
+      if (CE && dispatch) {
+        const evt = new CE("inroute:manifest:updated");
+        dispatch(evt);
+      }
+    } catch {
+      // best-effort notification only
+    }
   }
 
   private runFileServer() {

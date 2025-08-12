@@ -338,7 +338,7 @@ function DOMEventHandler(
  * Register standard DOM events into the bridge registry.
  * Call this from an extension setup hook.
  */
-export function StandardDOMProps(): void {
+export function InDOMTriggerProps(): void {
   // Exported event name groups for DX typing helpers
   // Keeping as const tuples to power literal union types
 
@@ -442,7 +442,7 @@ function DOMLongPressHandler(durationMs = 500): TriggerPropHandler {
 }
 
 /** Register platform-bridged universal triggers */
-export function registerUniversalTriggerProps(): void {
+export function InUniversalTriggerProps(): void {
   const env = detectEnvironment();
 
   // DOM/Web bridge

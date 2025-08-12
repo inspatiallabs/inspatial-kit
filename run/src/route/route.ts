@@ -241,7 +241,7 @@ export class Route<T extends BaseRouteConfig, C = null> {
 
   /** Starts the route, attaching event listeners and navigating to the current path. */
   start(): this {
-    window.addEventListener("popstate", this._handlePopState.bind(this));
+    globalThis.addEventListener("popstate", this._handlePopState.bind(this));
     this.interceptLinks &&
       document.addEventListener("click", this._handleClick.bind(this));
     this.delegateUnknown &&
@@ -249,13 +249,16 @@ export class Route<T extends BaseRouteConfig, C = null> {
         `${this.eventName}-delegate`,
         this._onDelegate.bind(this)
       );
-    this.navigate(window.location.pathname + window.location.search, false);
+    this.navigate(
+      globalThis.location.pathname + globalThis.location.search,
+      false
+    );
     return this;
   }
 
   /** Stops the route, removing event listeners. */
   stop(): void {
-    window.removeEventListener("popstate", this._handlePopState);
+    globalThis.removeEventListener("popstate", this._handlePopState);
     this.interceptLinks &&
       document.removeEventListener("click", this._handleClick);
   }
@@ -365,7 +368,7 @@ export class Route<T extends BaseRouteConfig, C = null> {
     }
 
     if (pushState) {
-      window.history.pushState({ path }, "", path);
+      globalThis.history.pushState({ path }, "", path);
     }
 
     this._dispatchEvent(match.route, match.params);
@@ -425,8 +428,8 @@ export class Route<T extends BaseRouteConfig, C = null> {
       detail: {
         route,
         params: params || {},
-        path: window.location.pathname,
-        query: this._parseQuery(window.location.search),
+        path: globalThis.location.pathname,
+        query: this._parseQuery(globalThis.location.search),
       },
       bubbles: true,
     });
@@ -436,7 +439,7 @@ export class Route<T extends BaseRouteConfig, C = null> {
   /** Handles browser back/forward navigation. */
   private async _handlePopState(event: PopStateEvent): Promise<void> {
     await this.navigate(
-      window.location.pathname + window.location.search,
+      globalThis.location.pathname + globalThis.location.search,
       false
     );
   }
@@ -463,7 +466,8 @@ export class Route<T extends BaseRouteConfig, C = null> {
       href.startsWith("mailto:") ||
       href.startsWith("tel:") ||
       !href.startsWith(this.prefix) ||
-      new URL(href, window.location.origin).origin !== window.location.origin
+      new URL(href, globalThis.location.origin).origin !==
+        globalThis.location.origin
     ) {
       return;
     }
