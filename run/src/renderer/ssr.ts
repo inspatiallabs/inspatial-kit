@@ -1,14 +1,17 @@
-import { createRenderer } from "./create-renderer.ts"
-import { composeExtensions, type RendererExtensions } from "./extensions.ts"
-import { isSignal, peek } from "../signal/index.ts"
-import { computeClassString, serializeStyle } from "./helpers.ts"
+import { createRenderer } from "./create-renderer.ts";
+import {
+  composeExtensions,
+  type RendererExtensions,
+} from "./create-extension.ts";
+import { isSignal, peek } from "../signal/index.ts";
+import { computeClassString, serializeStyle } from "./helpers.ts";
 
-const defaultRendererID = "SSR"
+const defaultRendererID = "SSR";
 
 export interface SSROptions {
-  rendererID?: string
-  selfClosingTags?: Set<string>
-  extensions?: RendererExtensions
+  rendererID?: string;
+  selfClosingTags?: Set<string>;
+  extensions?: RendererExtensions;
 }
 
 export function SSRRenderer(options: SSROptions = {}): any {
@@ -30,22 +33,24 @@ export function SSRRenderer(options: SSROptions = {}): any {
       "track",
       "wbr",
     ]),
-  } = options
+  } = options;
   // Normalize extensions and capture setups for parity with DOM renderer
-  const { setups } = composeExtensions(options.extensions)
+  const { setups } = composeExtensions(options.extensions);
 
   interface SSRNode {
-    _isHTMLNode: true
-    tagName: string
-    children: SSRNode[]
-    props: Record<string, any>
-    text?: string
-    parent?: SSRNode
-    toString(): string
+    _isHTMLNode: true;
+    tagName: string;
+    children: SSRNode[];
+    props: Record<string, any>;
+    text?: string;
+    parent?: SSRNode;
+    toString(): string;
   }
 
   function isNode(node: any): boolean {
-    return typeof node === "object" && node !== null && (node as any)._isHTMLNode
+    return (
+      typeof node === "object" && node !== null && (node as any)._isHTMLNode
+    );
   }
 
   function createNode(tagName: string): SSRNode {
@@ -59,29 +64,29 @@ export function SSRRenderer(options: SSROptions = {}): any {
           .filter(([key, value]) => value != null && key !== "children")
           .map(([key, value]) => {
             if (typeof value === "boolean") {
-              return value ? key : ""
+              return value ? key : "";
             }
-            return `${key}="${String(value).replace(/"/g, "&quot;")}` + `"`
+            return `${key}="${String(value).replace(/"/g, "&quot;")}` + `"`;
           })
           .filter(Boolean)
-          .join(" ")
+          .join(" ");
 
-        const propsStr = props ? ` ${props}` : ""
+        const propsStr = props ? ` ${props}` : "";
 
         if (selfClosingTags.has(tagName.toLowerCase())) {
-          return `<${tagName}${propsStr} />`
+          return `<${tagName}${propsStr} />`;
         }
 
         const childrenStr = (this.children || [])
           .map((c) => c.toString())
-          .join("")
-        return `<${tagName}${propsStr}>${childrenStr}</${tagName}>`
+          .join("");
+        return `<${tagName}${propsStr}>${childrenStr}</${tagName}>`;
       },
-    }
+    };
   }
 
   function createTextNode(text: any): SSRNode {
-    const textContent = isSignal(text) ? peek(text) : text
+    const textContent = isSignal(text) ? peek(text) : text;
     return {
       _isHTMLNode: true,
       tagName: "#text",
@@ -92,23 +97,23 @@ export function SSRRenderer(options: SSROptions = {}): any {
         return (this.text || "").replace(/[<>&"]/g, (match) => {
           switch (match) {
             case "<":
-              return "&lt;"
+              return "&lt;";
             case ">":
-              return "&gt;"
+              return "&gt;";
             case "&":
-              return "&amp;"
+              return "&amp;";
             case '"':
-              return "&quot;"
+              return "&quot;";
             default:
-              return match
+              return match;
           }
-        })
+        });
       },
-    }
+    };
   }
 
   function createAnchor(text?: string): SSRNode {
-    return createTextNode(text || "")
+    return createTextNode(text || "");
   }
 
   function createFragment(): SSRNode {
@@ -118,9 +123,9 @@ export function SSRRenderer(options: SSROptions = {}): any {
       children: [],
       props: {},
       toString() {
-        return (this.children || []).map((c) => c.toString()).join("")
+        return (this.children || []).map((c) => c.toString()).join("");
       },
-    }
+    };
   }
 
   function removeNode(_node: SSRNode): void {
@@ -129,41 +134,41 @@ export function SSRRenderer(options: SSROptions = {}): any {
 
   function appendNode(parent: SSRNode, ...nodes: SSRNode[]): void {
     if (parent.children) {
-      parent.children.push(...nodes)
+      parent.children.push(...nodes);
       nodes.forEach((node) => {
-        node.parent = parent
-      })
+        node.parent = parent;
+      });
     }
   }
 
   function insertBefore(node: SSRNode, ref: SSRNode): void {
     if (ref.parent && ref.parent.children) {
-      const index = ref.parent.children.indexOf(ref)
+      const index = ref.parent.children.indexOf(ref);
       if (index >= 0) {
-        ref.parent.children.splice(index, 0, node)
-        node.parent = ref.parent
+        ref.parent.children.splice(index, 0, node);
+        node.parent = ref.parent;
       }
     }
   }
 
   function resolvePropValue(value: any): any {
-    return isSignal(value) ? peek(value) : value
+    return isSignal(value) ? peek(value) : value;
   }
 
   function setProps(node: SSRNode, props: Record<string, any>): void {
-    const out: Record<string, any> = node.props || {}
+    const out: Record<string, any> = node.props || {};
     for (const [key, value] of Object.entries(props || {})) {
       if (key === "class" || key === "className") {
-        out.class = computeClassString(value)
-        continue
+        out.class = computeClassString(value);
+        continue;
       }
       if (key === "style") {
-        out.style = serializeStyle(value)
-        continue
+        out.style = serializeStyle(value);
+        continue;
       }
-      out[key] = resolvePropValue(value)
+      out[key] = resolvePropValue(value);
     }
-    node.props = out
+    node.props = out;
   }
 
   const nodeOps = {
@@ -176,22 +181,20 @@ export function SSRRenderer(options: SSROptions = {}): any {
     insertBefore,
     appendNode,
     removeNode,
-  }
+  };
 
-  const renderer = createRenderer(nodeOps, rendererID)
+  const renderer = createRenderer(nodeOps, rendererID);
 
   // Run extension setup hooks to keep behavior consistent across renderers
   setups.forEach((fn) => {
     try {
-      fn(renderer)
+      fn(renderer);
     } catch (e) {
-      console.warn(`[extensions] setup() failed:`, e)
+      console.warn(`[extensions] setup() failed:`, e);
     }
-  })
+  });
 
-  return renderer
+  return renderer;
 }
 
-export { defaultRendererID }
-
-
+export { defaultRendererID };

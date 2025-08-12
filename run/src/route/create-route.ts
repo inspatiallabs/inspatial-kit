@@ -1,6 +1,7 @@
 import { Route } from "./route.ts";
 import { createSignal, type Signal } from "../signal/index.ts";
 import { isSafeHref, normalizeHref } from "./sanitize.ts";
+import { detectBrowserEngine } from "../env/index.ts";
 
 export type RouterMode = "spa" | "mpa" | "auto";
 
@@ -62,7 +63,15 @@ export function createRoute<T extends { path: string }>(
 
   function updateCanGoBack(): void {
     try {
-      // Heuristic; real impl can inspect history state depth if available
+      const navApi: any = (globalThis as any).navigation;
+      if (navApi && detectBrowserEngine() === "chromium") {
+        const entries = navApi.entries?.() || [];
+        const current = navApi.currentEntry;
+        const idx = entries.findIndex((e: any) => e?.key === current?.key);
+        canGoBack.set(idx > 0);
+        return;
+      }
+      // Fallback heuristic
       canGoBack.set((history as any).length > 1);
     } catch {
       canGoBack.set(false);
@@ -103,14 +112,41 @@ export function createRoute<T extends { path: string }>(
   }
 
   function reload(): void {
+    const navApi: any = (globalThis as any).navigation;
+    if (navApi && detectBrowserEngine() === "chromium") {
+      try {
+        navApi.reload?.();
+        return;
+      } catch {
+        // ignore navigation api reload errors
+      }
+    }
     if (typeof globalThis !== "undefined" && (globalThis as any).location)
       (globalThis as any).location.reload();
   }
   function back(): void {
+    const navApi: any = (globalThis as any).navigation;
+    if (navApi && detectBrowserEngine() === "chromium") {
+      try {
+        navApi.back?.();
+        return;
+      } catch {
+        // ignore navigation api back errors
+      }
+    }
     if (typeof globalThis !== "undefined" && (globalThis as any).history)
       (globalThis as any).history.back();
   }
   function forward(): void {
+    const navApi: any = (globalThis as any).navigation;
+    if (navApi && detectBrowserEngine() === "chromium") {
+      try {
+        navApi.forward?.();
+        return;
+      } catch {
+        // ignore navigation api forward errors
+      }
+    }
     if (typeof globalThis !== "undefined" && (globalThis as any).history)
       (globalThis as any).history.forward();
   }

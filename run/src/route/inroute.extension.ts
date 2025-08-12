@@ -1,7 +1,7 @@
 import {
   type RendererExtension,
   createExtension,
-} from "../renderer/extensions.ts";
+} from "../renderer/create-extension.ts";
 import {
   InDOMTriggerProps,
   InUniversalTriggerProps,

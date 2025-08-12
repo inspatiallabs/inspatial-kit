@@ -34,6 +34,8 @@ type CompiledRoute<T extends BaseRouteConfig> = T & {
 };
 
 /** The Route class for handling navigation and route matching. */
+import { detectBrowserEngine } from "../env/index.ts";
+
 export class Route<T extends BaseRouteConfig, C = null> {
   private mappings: RegExp | null = null;
   private hooks: Hook<T, C>[];
@@ -46,6 +48,16 @@ export class Route<T extends BaseRouteConfig, C = null> {
   private ignoreUnknown: boolean;
   private delegateUnknown: boolean;
   private routeName: string | null = null;
+  // Keep stable references for add/removeEventListener
+  private _onPopStateBound = this._handlePopState.bind(this);
+  private _onClickBound = this._handleClick.bind(this);
+  private _onNavigateBound = this._handleNavigateEvent.bind(this);
+  // Track last navigation result for Navigation API programmatic calls
+  private _lastResult:
+    | { route: CompiledRoute<T>; params: Record<string, string> }
+    | false
+    | undefined;
+  private _handlingNavigationEvent = false;
 
   /**
    * Initialize the route with routes configuration and options.
@@ -176,21 +188,25 @@ export class Route<T extends BaseRouteConfig, C = null> {
     let mappingRegex = "^";
     const names: string[] = [];
 
-    fullPath.replace(SEGMENT_REGEX, (match, literal, param, regex, slash) => {
-      if (literal) {
-        const escaped = "\\/" + literal.replace(/[-\\^$*+?.()|[\]{}]/g, "\\$&");
-        paramRegex += escaped;
-        mappingRegex += escaped;
-      } else if (param) {
-        paramRegex += `\\/(?<${param}>${regex || "[^/]+"})`;
-        mappingRegex += `\\/${regex || "[^/]+"}`;
-        names.push(param);
-      } else if (slash) {
-        paramRegex += "\\/";
-        mappingRegex += "\\/";
+    fullPath.replace(
+      SEGMENT_REGEX,
+      (_matchStr, literal, param, regex, slash) => {
+        if (literal) {
+          const escaped =
+            "\\/" + literal.replace(/[-\\^$*+?.()|[\]{}]/g, "\\$&");
+          paramRegex += escaped;
+          mappingRegex += escaped;
+        } else if (param) {
+          paramRegex += `\\/(?<${param}>${regex || "[^/]+"})`;
+          mappingRegex += `\\/${regex || "[^/]+"}`;
+          names.push(param);
+        } else if (slash) {
+          paramRegex += "\\/";
+          mappingRegex += "\\/";
+        }
+        return "";
       }
-      return "";
-    });
+    );
     paramRegex += "$";
     mappingRegex += "$";
 
@@ -241,26 +257,47 @@ export class Route<T extends BaseRouteConfig, C = null> {
 
   /** Starts the route, attaching event listeners and navigating to the current path. */
   start(): this {
-    globalThis.addEventListener("popstate", this._handlePopState.bind(this));
-    this.interceptLinks &&
-      document.addEventListener("click", this._handleClick.bind(this));
+    const navApi = (globalThis as any).navigation;
+    const isChromium = detectBrowserEngine() === "chromium";
+
+    if (navApi && isChromium) {
+      // Use the Web Navigation API
+      navApi.addEventListener("navigate", this._onNavigateBound);
+      // No need to intercept clicks or listen to popstate in this mode
+      this.navigate(
+        globalThis.location.pathname + globalThis.location.search,
+        false
+      );
+    } else {
+      // Fallback to History API
+      globalThis.addEventListener("popstate", this._onPopStateBound);
+      this.interceptLinks &&
+        document.addEventListener("click", this._onClickBound);
+      this.navigate(
+        globalThis.location.pathname + globalThis.location.search,
+        false
+      );
+    }
     this.delegateUnknown &&
       document.addEventListener(
         `${this.eventName}-delegate`,
         this._onDelegate.bind(this)
       );
-    this.navigate(
-      globalThis.location.pathname + globalThis.location.search,
-      false
-    );
     return this;
   }
 
   /** Stops the route, removing event listeners. */
   stop(): void {
-    globalThis.removeEventListener("popstate", this._handlePopState);
-    this.interceptLinks &&
-      document.removeEventListener("click", this._handleClick);
+    const navApi = (globalThis as any).navigation;
+    const isChromium = detectBrowserEngine() === "chromium";
+
+    if (navApi && isChromium) {
+      navApi.removeEventListener?.("navigate", this._onNavigateBound);
+    } else {
+      globalThis.removeEventListener("popstate", this._onPopStateBound);
+      this.interceptLinks &&
+        document.removeEventListener("click", this._onClickBound);
+    }
   }
 
   /**
@@ -315,7 +352,7 @@ export class Route<T extends BaseRouteConfig, C = null> {
    * @param event - The custom event containing the path another route had no config for.
    * @returns A promise that resolves when the delegate action is complete.
    */
-  private async _onDelegate(e: Event): Promise<void> {
+  private _onDelegate(e: Event): void {
     const event = e as CustomEvent;
     if (event.detail.route !== this.routeName) {
       const match = this._matchRoute(event.detail.path.split("?")[0]);
@@ -339,40 +376,24 @@ export class Route<T extends BaseRouteConfig, C = null> {
   > {
     if (redirectCount > 10) throw new Error("Texivia: redirect limit exceeded");
 
-    const match = this._matchRoute(path.split("?")[0]);
-    if (match === null) {
-      this.delegateUnknown &&
-        document.dispatchEvent(
-          new CustomEvent(`${this.eventName}-delegate`, {
-            detail: { path, route: this.routeName },
-          })
-        );
-      return false;
-    }
-    if (match.route.redirect)
-      return this.navigate(match.route.redirect, pushState, redirectCount + 1);
+    const navApi = (globalThis as any).navigation;
+    const isChromium = detectBrowserEngine() === "chromium";
 
-    for (const hook of [...this.hooks, ...(match.route.hooks || [])]) {
+    if (navApi && isChromium && !this._handlingNavigationEvent) {
+      // Use Web Navigation API; route execution will happen in the navigate handler
+      this._lastResult = undefined;
       try {
-        const result = await hook(match.route, match.params, this.context);
-        if (result === false) {
-          return false;
-        }
-        if (typeof result === "string") {
-          return this.navigate(result, pushState);
-        }
-      } catch (error) {
-        console.error("Error in navigation hook:", error);
-        return false;
+        const result = navApi.navigate(path, {
+          history: pushState ? "auto" : "replace",
+        });
+        await result?.finished;
+      } catch {
+        // fall through to attempt local routing
       }
+      return this._lastResult ?? false;
     }
 
-    if (pushState) {
-      globalThis.history.pushState({ path }, "", path);
-    }
-
-    this._dispatchEvent(match.route, match.params);
-    return { route: match.route, params: match.params };
+    return this._runRouteForPath(path, redirectCount);
   }
 
   /**
@@ -382,7 +403,7 @@ export class Route<T extends BaseRouteConfig, C = null> {
    * @param pushState - Whether to push a new history state.
    * @returns A promise resolving to the matched route and params, or false if navigation is canceled.
    */
-  async navigateToNamed(
+  navigateToNamed(
     name: string,
     params: Record<string, string> = {},
     pushState: boolean = true
@@ -437,7 +458,7 @@ export class Route<T extends BaseRouteConfig, C = null> {
   }
 
   /** Handles browser back/forward navigation. */
-  private async _handlePopState(event: PopStateEvent): Promise<void> {
+  private async _handlePopState(_event: PopStateEvent): Promise<void> {
     await this.navigate(
       globalThis.location.pathname + globalThis.location.search,
       false
@@ -474,5 +495,80 @@ export class Route<T extends BaseRouteConfig, C = null> {
 
     event.preventDefault();
     await this.navigate(href);
+  }
+
+  /** Handle Navigation API navigate event (Chromium) */
+  // deno-lint-ignore no-explicit-any
+  private _handleNavigateEvent(e: any): void {
+    const _event = e as any;
+    try {
+      const destUrl = new URL(
+        _event?.destination?.url || "",
+        globalThis.location.origin
+      );
+      // Only handle same-origin navigations
+      if (destUrl.origin !== globalThis.location.origin) return;
+
+      const path = destUrl.pathname + destUrl.search;
+      _event?.intercept?.({
+        handler: async () => {
+          this._handlingNavigationEvent = true;
+          try {
+            await this._runRouteForPath(path);
+          } finally {
+            this._handlingNavigationEvent = false;
+          }
+        },
+      });
+    } catch {
+      // ignore malformed URLs
+    }
+  }
+
+  /** Run route matching, hooks and dispatch without mutating history */
+  private async _runRouteForPath(
+    path: string,
+    redirectCount: number = 0
+  ): Promise<
+    { route: CompiledRoute<T>; params: Record<string, string> } | false
+  > {
+    if (redirectCount > 10) throw new Error("Texivia: redirect limit exceeded");
+
+    const _match = this._matchRoute(path.split("?")[0]);
+    if (_match === null) {
+      this.delegateUnknown &&
+        document.dispatchEvent(
+          new CustomEvent(`${this.eventName}-delegate`, {
+            detail: { path, route: this.routeName },
+          })
+        );
+      this._lastResult = false;
+      return false;
+    }
+
+    if (_match.route.redirect) {
+      return this.navigate(_match.route.redirect, true, redirectCount + 1);
+    }
+
+    for (const hook of [...this.hooks, ...(_match.route.hooks || [])]) {
+      try {
+        const result = await hook(_match.route, _match.params, this.context);
+        if (result === false) {
+          this._lastResult = false;
+          return false;
+        }
+        if (typeof result === "string") {
+          return this.navigate(result, true);
+        }
+      } catch (error) {
+        console.error("Error in navigation hook:", error);
+        this._lastResult = false;
+        return false;
+      }
+    }
+
+    this._dispatchEvent(_match.route, _match.params);
+    this._lastResult = { route: _match.route, params: _match.params };
+    return this._lastResult;
   }
 }

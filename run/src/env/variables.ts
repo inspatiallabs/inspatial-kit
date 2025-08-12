@@ -1,14 +1,11 @@
-/**
- * Supported JavaScript runtimes
- */
-type Runtime = "deno" | "node" | "bun" | "browser";
-
-/**
- * Interface for environment access across different runtimes
- */
-interface EnvironmentProvider {
-  get(key: string): string | undefined;
-}
+import {
+  detectRuntime,
+  getRuntimeInfo,
+  runtimeProviders,
+  type Runtime,
+  type RuntimeInfo,
+} from "./runtime.ts";
+import type { EnvironmentProvider } from "./environment.ts";
 
 /**
  * Validation constraint options
@@ -55,7 +52,7 @@ interface EnvConfig<T = string> {
 /**
  * Error thrown when environment variables are missing
  */
-export class EnvironmentVariableError extends Error {
+class EnvironmentVariableError extends Error {
   readonly envs: ReadonlySet<string>;
 
   constructor(envs: Set<string>) {
@@ -72,132 +69,6 @@ export class EnvironmentVariableError extends Error {
   override toString(): string {
     return `${this.name}\n  ${Array.from(this.envs).join("\n  ")}`;
   }
-}
-
-/**
- * Runtime-specific environment providers
- */
-const runtimeProviders: Record<Runtime, () => EnvironmentProvider> = {
-  node: () => ({
-    get: (key: string) => (globalThis as any).process?.env[key],
-  }),
-  deno: () => ({
-    get: (key: string) => (globalThis as any).Deno?.env.get(key),
-  }),
-  bun: () => ({
-    get: (key: string) => (globalThis as any).Bun?.env[key],
-  }),
-  browser: () => ({
-    get: (key: string) => {
-      // In browser, try to get from import.meta.env first
-      try {
-        const importMetaEnv = (globalThis as any).import?.meta?.env;
-        if (importMetaEnv && key in importMetaEnv) {
-          const value = importMetaEnv[key];
-          // Convert boolean values to strings for consistency
-          return typeof value === 'boolean' ? String(value) : value;
-        }
-      } catch {
-        // Ignore import.meta access errors
-      }
-      
-      // Fallback: try to access process.env if it exists (some bundlers provide it)
-      try {
-        return (globalThis as any).process?.env?.[key];
-      } catch {
-        // No environment variables available in pure browser environment
-        return undefined;
-      }
-    },
-  }),
-};
-
-/**
- * Detect current runtime
- */
-function detectRuntime(): Runtime | undefined {
-  // Check for browser environment first (has window or import.meta but no server runtimes)
-  const hasWindow = typeof (globalThis as any).window === "object";
-  const hasImportMeta = typeof (globalThis as any).import?.meta === "object";
-  const hasProcess = typeof (globalThis as any).process?.env === "object";
-  const hasDeno = typeof (globalThis as any).Deno?.env?.get === "function";
-  const hasBun = typeof (globalThis as any).Bun?.env === "object";
-  
-  // If we have Deno/Node/Bun specific APIs, detect those first
-  if (hasDeno) return "deno";
-  if (hasProcess && !hasWindow) return "node"; // Node.js without DOM
-  if (hasBun) return "bun";
-  
-  // If we have browser indicators or process.env in a browser context, it's browser
-  if (hasWindow || hasImportMeta || (hasProcess && hasWindow)) {
-    return "browser";
-  }
-  
-  // Default to browser for unknown environments
-  return "browser";
-}
-
-/**
- * Runtime information interface
- */
-interface RuntimeInfo {
-  name: Runtime;
-  version?: string;
-  platform?: string;
-  supportsImportMeta: boolean;
-  supportsProcessEnv: boolean;
-  permissions?: {
-    env: boolean;
-    read?: boolean;
-    write?: boolean;
-  };
-}
-
-/**
- * Get detailed runtime information
- */
-function getRuntimeInfo(): RuntimeInfo | undefined {
-  const runtime = detectRuntime();
-  if (!runtime) return undefined;
-
-  const info: RuntimeInfo = {
-    name: runtime,
-    supportsImportMeta: typeof (globalThis as any).import?.meta !== "undefined",
-    supportsProcessEnv: typeof (globalThis as any).process?.env === "object",
-  };
-
-  switch (runtime) {
-    case "node":
-      info.version = (globalThis as any).process?.version;
-      info.platform = (globalThis as any).process?.platform;
-      info.permissions = { env: true };
-      break;
-
-    // deno-lint-ignore no-case-declarations
-    case "deno":
-      info.version = (globalThis as any).Deno?.version?.deno;
-      info.platform = (globalThis as any).Deno?.build?.os;
-      // Check Deno permissions
-      const denoPermissions = (globalThis as any).Deno?.permissions;
-      if (denoPermissions) {
-        try {
-          info.permissions = {
-            env: true, // We'll assume env access since we're using Deno.env
-          };
-        } catch {
-          info.permissions = { env: false };
-        }
-      }
-      break;
-
-    case "bun":
-      info.version = (globalThis as any).Bun?.version;
-      info.platform = (globalThis as any).process?.platform;
-      info.permissions = { env: true };
-      break;
-  }
-
-  return info;
 }
 
 /**
@@ -283,7 +154,7 @@ function getRuntimeInfo(): RuntimeInfo | undefined {
  *
  * ### ⚡ Performance Tips
  * - Use `getEnv` with configuration options for better type safety
- * - Clear missing variables when reusing the EnvManager instance
+ * - Clear missing variables when reusing the EnvVariableManager instance
  * - Cache frequently accessed values instead of reading repeatedly
  *
  * ### ❌ Common Mistakes
@@ -299,7 +170,7 @@ function getRuntimeInfo(): RuntimeInfo | undefined {
  * @throws {EnvironmentVariableError}
  * Occurs when required environment variables are missing
  */
-export class EnvManager {
+export class EnvVariableManager {
   private readonly provider: EnvironmentProvider;
   private readonly missingVars = new Set<string>();
   private readonly cache = new Map<string, string | undefined>();
@@ -496,13 +367,13 @@ export class EnvManager {
     const viteMode = this.get("MODE");
     const denoEnv = this.get("DENO_ENV");
 
-    // Handle import.meta.env in browser/vite environments  
+    // Handle import.meta.env in browser/vite environments
     // Check for PROD first (explicit production flag)
     const importMetaProd = this.get("PROD");
     if (importMetaProd === "true") {
       return true;
     }
-    
+
     // Check for DEV (explicit development flag)
     const importMetaDev = this.get("DEV");
     if (importMetaDev === "true") {
@@ -510,12 +381,20 @@ export class EnvManager {
     }
 
     // Check explicit production settings
-    if (nodeEnv === "production" || viteMode === "production" || denoEnv === "production") {
+    if (
+      nodeEnv === "production" ||
+      viteMode === "production" ||
+      denoEnv === "production"
+    ) {
       return true;
     }
 
     // Check explicit non-production settings
-    if (nodeEnv === "development" || viteMode === "development" || denoEnv === "development") {
+    if (
+      nodeEnv === "development" ||
+      viteMode === "development" ||
+      denoEnv === "development"
+    ) {
       return false;
     }
     if (nodeEnv === "test" || viteMode === "test" || denoEnv === "test") {
@@ -831,7 +710,7 @@ export class EnvManager {
    * const email = env.getValidated({
    *   key: 'ADMIN_EMAIL',
    *   required: true,
-   *   constraints: { validate: EnvManager.validators.email }
+   *   constraints: { validate: EnvVariableManager.validators.email }
    * });
    * ```
    */
@@ -1362,7 +1241,7 @@ export class EnvManager {
  * - ✅ Deno
  * - ✅ Bun
  */
-export const env: EnvManager = new EnvManager();
+export const env: EnvVariableManager = new EnvVariableManager();
 
 /**
  * # GetEnv

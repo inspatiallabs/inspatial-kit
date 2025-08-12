@@ -5,16 +5,8 @@ export type {
   RendererExtension,
   RendererExtensions,
   ComposedExtensions,
-} from "./extensions.ts";
-export { createExtension } from "./extensions.ts";
-
-// Legacy universal renderer (for backwards compatibility)
-export {
-  createUniversalRenderer,
-  createRenderer as createAutoRenderer,
-  detectEnvironment,
-  supportsFeature,
-} from "./universal.ts";
+} from "./create-extension.ts";
+export { createExtension } from "./create-extension.ts";
 
 // Base renderer factory (for advanced users)
 export { createRenderer as createBaseRenderer } from "./create-renderer.ts";

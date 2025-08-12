@@ -3,7 +3,10 @@ import { createRenderer } from "./create-renderer.ts";
 import { cachedStrKeyNoFalsy, splitFirst } from "../utils.ts";
 import { env } from "../env/index.ts";
 import { wrap } from "../runtime/jsx-runtime.ts";
-import { composeExtensions, type RendererExtensions } from "./extensions.ts";
+import {
+  composeExtensions,
+  type RendererExtensions,
+} from "./create-extension.ts";
 import { applyWebStyle, computeClassString } from "./helpers.ts";
 
 const defaultRendererID = "DOM";

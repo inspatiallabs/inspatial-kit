@@ -14,7 +14,7 @@ import {
 
 // ########################## (TRIGGER PROPS TEST SIGNALS) ##########################
 
-export function Counter() {
+export function CounterView() {
   // Test signals for trigger props
   const testSignals = {
     // Dynamic colors based on count

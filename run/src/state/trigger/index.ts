@@ -5,4 +5,4 @@ export {
   InDOMTriggerProps,
   InUniversalTriggerProps,
 } from "./trigger-props.ts";
-export { InTriggerProp } from "./trigger-prop-extension.ts";
+export { InTrigger } from "./trigger-prop-extension.ts";

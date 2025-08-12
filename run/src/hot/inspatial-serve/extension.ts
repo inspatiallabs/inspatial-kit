@@ -2,8 +2,8 @@
 // ------------------------------
 // Renderer Extension Integration
 // ------------------------------
-import { createExtension } from "../../renderer/extensions.ts";
-import { detectEnvironment } from "../../renderer/environment.ts";
+import { detectEnvironment } from "../../env/index.ts"
+import { createExtension } from "../../renderer/create-extension.ts";
 import { InSpatialServe } from "./core.ts";
 
 /**

@@ -2,8 +2,11 @@ import { AndroidXRRenderer } from "./android-xr.ts";
 import { VisionOSRenderer } from "./vision-os.ts";
 import { HorizonOSRenderer } from "./horizon-os.ts";
 import { GenericXRRenderer } from "./generic-xr.ts";
-import type { EnvironmentInfo } from "./environment.ts";
-import { type RendererExtensions, composeExtensions } from "./extensions.ts";
+import type { EnvironmentInfo } from "../env/index.ts";
+import {
+  type RendererExtensions,
+  composeExtensions,
+} from "./create-extension.ts";
 
 export interface XROptions {
   rendererID?: string;

@@ -1,5 +1,5 @@
 import { createRenderer } from "./create-renderer.ts";
-import { composeExtensions, type RendererExtensions } from "./extensions.ts";
+import { composeExtensions, type RendererExtensions } from "./create-extension.ts";
 
 export interface AndroidXROptions {
   rendererID?: string;

@@ -26,6 +26,7 @@
     "@inspatial/state": "../run/src/state/index.ts",
     "@inspatial/state/core": "../run/src/state/core/index.ts",
     "@inspatial/state/trigger": "../run/src/state/trigger/index.ts",
+    "@inspatial/route": "../run/src/route/index.ts",
     "@inspatial/env": "../run/src/env/index.ts",
     "@inspatial/hot": "../run/src/hot/index.ts",
     "@inspatial/debug": "../run/src/debug/index.ts",

@@ -23,7 +23,7 @@
     "./jsx-runtime": "./src/runtime/jsx-runtime.ts",
     "./jsx-dev-runtime": "./src/runtime/jsx-dev-runtime.ts",
     "./trigger": "./src/trigger/index.ts",
-    "./trigger/InTriggerProp": "./src/trigger/trigger-prop-extension.ts",
+    "./trigger/InTrigger": "./src/trigger/trigger-prop-extension.ts",
     "./env": "./src/env/index.ts",
     "./hot": "./src/hot/index.ts",
     "./debug": "./src/debug/index.ts"

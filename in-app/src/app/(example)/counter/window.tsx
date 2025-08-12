@@ -1,8 +1,8 @@
-import { Counter } from "@inspatial/app/(application)/(window)/counter.tsx";
-import { useTheme } from "./theme/state.ts";
+import { CounterView } from "./view.tsx";
+import { useTheme } from "../(extensions)/in-theme/index.ts";
 import { $ } from "@inspatial/state";
 
-export function App() {
+export function CounterAppWindow() {
   return (
     <>
       <div className="fixed top-4 right-4 flex items-center gap-2 z-50">
@@ -26,7 +26,7 @@ export function App() {
           )}
         </button>
       </div>
-      <Counter />
+      <CounterView />
     </>
   );
 }

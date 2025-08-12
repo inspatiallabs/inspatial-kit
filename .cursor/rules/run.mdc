@@ -44,14 +44,14 @@ InSpatial Run is the highest layer of abstraction for both InSpatial dev and clo
 
 - **Extensible Architecture:** Decouples component logic from rendering environment.
 - **`createRenderer(nodeOps, rendererID?)`:** Creates a custom renderer.
-- **`DOMRenderer(InTriggerProp)` (`@inspatial/run/renderer/dom`):** For interactive web applications.
+- **`DOMRenderer(InTrigger)` (`@inspatial/run/renderer/dom`):** For interactive web applications.
   _ **Triggers & Event Handling:** `on:eventName` (e.g., `on:click`). Supports modifiers like `on-once:`, `on-passive:`, `on-capture:`, `on-prevent:`, `on-stop:`.
   _ **Browser Preset Directives:** `class:className={signal}` for conditional classes, `style:property={value}` for individual styling (CSS) properties.
   \_ **Handling Dynamic HTML Content:** For inserting dynamic HTML (e.g., from APIs), prefer parsing the HTML into a `DocumentFragment` and rendering it directly within the component. This is more robust and integrates better with InSpatial's retained mode rendering than using `innerHTML` directly, which can have security implications and reconciliation challenges.
 
-- **`NativeRenderer(InTriggerProp)` (`@inspatial/run/renderer/native`):** For interactive iOS, Android and VisionOS applications. \* \*\*Soon...
+- **`NativeRenderer(InTrigger)` (`@inspatial/run/renderer/native`):** For interactive iOS, Android and VisionOS applications. \* \*\*Soon...
 
-- **`GPURenderer(InTriggerProp)` (`@inspatial/run/renderer/spatial`):** For interactive 3D & XR applications. \* \*\*Soon...
+- **`GPURenderer(InTrigger)` (`@inspatial/run/renderer/spatial`):** For interactive 3D & XR applications. \* \*\*Soon...
 
 **2. InSpatial Runtime (JSX):**
 Built on top the universal runtime
@@ -311,11 +311,11 @@ InSpatial Triggers are grouped into `Props` and `Actions`.
 
 **NOTE**
 
-- Trigger Props are disabled by default. Install the `InTriggerProp` extension to enable resolution of `on:*`, `style:*`, and `class:*`.
+- Trigger Props are disabled by default. Install the `InTrigger` extension to enable resolution of `on:*`, `style:*`, and `class:*`.
 - Use `createTriggerHandle()` to register new or override existing trigger props in the registry.
 - Import surface for trigger props is provided by `@inspatial/state`:
   ```ts
-  import { InTriggerProp, createTriggerHandle } from "@inspatial/trigger";
+  import { InTrigger, createTriggerHandle } from "@inspatial/trigger";
   ```
 
 #### Trigger (Actions)
@@ -325,12 +325,12 @@ Action triggers are part of State (see InSpatial State). Use `createAction()` fo
 #### Trigger (Props)
 
 - Triggers are decoupled and disabled by default. The trigger prop registry helps create and mix different platform trigger props e.g you can unify the click event from web/dom and android, ios etc... give it a simple name e.g `tap` then all of those platforms will respond to the tap.
-- Use `InTriggerProp` (or custom extensions) to enable triggers props.
+- Use `InTrigger` (or custom extensions) to enable triggers props.
 - Use `createTriggerHandle` to register a new trigger prop e.g `on:dooropen`
 
 #### Trigger Prop Extension
 
-Enable trigger props by installing `InTriggerProp` in your renderer. This extension:
+Enable trigger props by installing `InTrigger` in your renderer. This extension:
 
 - Registers standard DOM events (click, input, keydown, etc.)
 - Registers universal props (`tap`, `longpress`, `change`, `submit`, `focus`)
@@ -338,11 +338,11 @@ Enable trigger props by installing `InTriggerProp` in your renderer. This extens
 
 ```typescript
 import { createRenderer } from "@inspatial/renderer";
-import { InTriggerProp } from "@inspatial/trigger";
+import { InTrigger } from "@inspatial/trigger";
 
 createRenderer({
   mode: "auto",
-  extensions: [InTriggerProp],
+  extensions: [InTrigger],
 });
 ```
 
@@ -394,7 +394,7 @@ Different platforms can have different trigger implementations:
 - **Native**: Can use platform-specific gesture recognizers
   etc...
 
-The trigger bridge system handles these differences transparently. `InTriggerProp` auto-registers a universal bridge so `on:tap` maps to `click` on the web, and `longpress` is synthesized from pointer events.
+The trigger bridge system handles these differences transparently. `InTrigger` auto-registers a universal bridge so `on:tap` maps to `click` on the web, and `longpress` is synthesized from pointer events.
 
 **.4. InSpatial Motion:**
 InSpatial Motion is built on InSpatial's `@in/motion`. \* \*\*Soon...
@@ -448,8 +448,8 @@ Note: hasValue returns plain boolean. Returns true when the value of the signal 
 
 **Renderer Setup:**
 
-- `DOMRenderer(InTriggerProp)` from `@in/dom`
-- `InTriggerProp` from `@inspatial/run/trigger` to ship the default/core web props i.e `class:` and `style:`
+- `DOMRenderer(InTrigger)` from `@in/dom`
+- `InTrigger` from `@inspatial/run/trigger` to ship the default/core web props i.e `class:` and `style:`
 - Trigger system & Event handling: `on:event`, `on-once:event`, `on-passive:event`, `on-capture:event`
 
 **JSX Configuration**
@@ -558,7 +558,7 @@ import { App } from "../my/app/root.tsx";
 createRenderer({
   mode: "auto",
   debug: "verbose",
-  extensions: [InTriggerProp],
+  extensions: [InTrigger],
 }).then((InSpatial: any) => {
   InSpatial.render(document.getElementById("app"), App);
 });
@@ -815,7 +815,7 @@ const templateUrl = t`https://inspatial.store/template?id=${s.templateId}`;
 9. **Async**: Components can be `async` functions with `fallback` and `catch` props
 10. **Signal Operations**: Use `.eq()`, `.gt()`, `.and()`, etc. for comparisons
 11. **Render**: `InSpatial.render(container, component, props, ...children)`
-    `
+12. **Env**: Short for Environment `@inspatial/env` should be use to condition platform, runtime and render targets as well as environment variables.
 
 ### Naming Pattern
 

@@ -1,5 +1,5 @@
-import { detectEnvironment, type EnvironmentInfo } from "./environment.ts";
-import type { RendererExtensions } from "./extensions.ts";
+import { detectEnvironment, type EnvironmentInfo } from "../env/index.ts";
+import type { RendererExtensions } from "./create-extension.ts";
 import { createDebugContext, type DebugMode } from "../debug/index.ts";
 
 /**
@@ -257,6 +257,3 @@ async function createServerRenderer({
   debugCtx?.logRendererCreation("Server-SSR", renderer);
   return renderer;
 }
-
-// Re-export types for convenience
-export type { EnvironmentInfo } from "./environment.ts";

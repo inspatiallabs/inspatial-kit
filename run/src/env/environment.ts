@@ -3,6 +3,13 @@
  * Automatically detects the runtime environment and selects appropriate renderer
  */
 
+/**
+ * Interface for environment access across different runtimes
+ */
+export interface EnvironmentProvider {
+  get(key: string): string | undefined;
+}
+
 export interface EnvironmentInfo {
   type:
     | "dom"
@@ -19,6 +26,8 @@ export interface EnvironmentInfo {
     | "visionos"
     | "horizonos"
     | "unknown";
+  /** Browser engine when applicable */
+  browserEngine?: "chromium" | "webkit" | "gecko" | "unknown";
   features: {
     hasDOM: boolean;
     hasDocument: boolean;
@@ -60,6 +69,60 @@ function safeGlobalAccess<T = any>(key: string): T | undefined {
 }
 
 /**
+ * Detect browser engine (Chromium, WebKit, Gecko) using UA-CH (if available) and UA fallback
+ */
+export function detectBrowserEngine():
+  | "chromium"
+  | "webkit"
+  | "gecko"
+  | "unknown" {
+  try {
+    const hasWindow = typeof window !== "undefined";
+    const nav: any = hasWindow ? (globalThis as any).navigator : undefined;
+    const ua: string = nav?.userAgent || "";
+
+    // 1) Try UA-CH brands first (not widely supported in Firefox/Safari)
+    const brands: Array<{ brand: string; version: string }> | undefined =
+      nav?.userAgentData?.brands || nav?.userAgentData || undefined;
+    if (Array.isArray(brands)) {
+      const brandNames = brands.map((b) => (b?.brand || "").toLowerCase());
+      if (
+        brandNames.some(
+          (b) =>
+            b.includes("chromium") ||
+            b.includes("google chrome") ||
+            b.includes("microsoft edge") ||
+            b.includes("opera") ||
+            b.includes("chrome") ||
+            b.includes("edg")
+        )
+      ) {
+        return "chromium";
+      }
+      if (brandNames.some((b) => b.includes("firefox"))) return "gecko";
+      if (brandNames.some((b) => b.includes("safari"))) return "webkit";
+      // Fallthrough to UA parsing if inconclusive
+    }
+
+    // 2) UA fallback parsing
+    const isIOS = /iPhone|iPad|iPod/i.test(ua) || /Macintosh;.*Mobile/.test(ua);
+    if (/Firefox\/\d+/i.test(ua) || /Gecko\/\d+/i.test(ua)) return "gecko";
+
+    // AppleWebKit present in both Safari (WebKit) and Blink (Chromium).
+    // Differentiate: On iOS all browsers use WebKit.
+    if (/AppleWebKit\/\d+/i.test(ua)) {
+      if (isIOS) return "webkit";
+      if (/(Chrome|Chromium|Edg|OPR|Brave)\/\d+/i.test(ua)) return "chromium";
+      return "webkit";
+    }
+
+    return "unknown";
+  } catch {
+    return "unknown";
+  }
+}
+
+/**
  * Detect the current runtime environment
  */
 export function detectEnvironment(): EnvironmentInfo {
@@ -96,6 +159,9 @@ export function detectEnvironment(): EnvironmentInfo {
       safeGlobalAccess("MetaXR") !== undefined ||
       navigator.userAgent?.includes("HorizonOS") ||
       navigator.userAgent?.includes("Quest"));
+
+  // Determine browser engine where a window/DOM exists
+  const browserEngine = hasWindow ? detectBrowserEngine() : undefined;
 
   // AndroidXR Environment (Android Extended Reality)
   if (hasAndroidXR && !hasWindow) {
@@ -138,6 +204,7 @@ export function detectEnvironment(): EnvironmentInfo {
       runtime: "VisionOS",
       version,
       platform: "visionos",
+      browserEngine: browserEngine,
       features: {
         hasDOM: true,
         hasDocument: true,
@@ -173,6 +240,7 @@ export function detectEnvironment(): EnvironmentInfo {
       runtime: "HorizonOS",
       version,
       platform: "horizonos",
+      browserEngine: browserEngine,
       features: {
         hasDOM: true,
         hasDocument: true,
@@ -254,6 +322,7 @@ export function detectEnvironment(): EnvironmentInfo {
         type: "capacitor",
         runtime: "Capacitor",
         platform,
+        browserEngine: browserEngine,
         features: {
           hasDOM: true,
           hasDocument: true,
@@ -277,6 +346,7 @@ export function detectEnvironment(): EnvironmentInfo {
         type: "lynx",
         runtime: "Lynx WebView",
         platform: "web",
+        browserEngine: browserEngine,
         features: {
           hasDOM: true,
           hasDocument: true,
@@ -303,6 +373,7 @@ export function detectEnvironment(): EnvironmentInfo {
         runtime: "Electron",
         version: processVersions.electron,
         platform: "desktop",
+        browserEngine: "chromium",
         features: {
           hasDOM: true,
           hasDocument: true,
@@ -353,6 +424,7 @@ export function detectEnvironment(): EnvironmentInfo {
       type: "dom",
       runtime: "Browser",
       platform: "web",
+      browserEngine: browserEngine,
       features: {
         hasDOM: true,
         hasDocument: true,
@@ -511,7 +583,7 @@ export function getRendererType(
 /**
  * Check if the current environment supports a specific feature
  */
-export function supportsFeature(
+export function envSupportsFeature(
   feature: keyof EnvironmentInfo["features"],
   env?: EnvironmentInfo
 ): boolean {

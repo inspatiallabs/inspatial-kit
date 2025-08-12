@@ -1,5 +1,5 @@
 import type { ExtensionSignal } from "@inspatial/renderer";
-import { supportsFeature } from "@inspatial/run";
+import { envSupportsFeature } from "@inspatial/run";
 import { createExtension } from "@inspatial/renderer";
 
 /*################################(Types)################################*/
@@ -35,7 +35,7 @@ export const InTheme = createExtension({
         const { useTheme } = m;
         const apply = () => {
           const mode = useTheme.mode.peek?.() ?? useTheme.mode.get?.();
-          if (supportsFeature("hasDocument")) {
+          if (envSupportsFeature("hasDocument")) {
             if (mode) document.documentElement.setAttribute("data-theme", mode);
           }
         };

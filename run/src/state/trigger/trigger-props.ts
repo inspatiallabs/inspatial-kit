@@ -1,6 +1,6 @@
 import { nextTick, bind, isSignal } from "../../signal/index.ts";
 import type { Signal } from "../../signal/index.ts";
-import { detectEnvironment } from "../../renderer/environment.ts";
+import { detectEnvironment } from "../../env/index.ts";
 
 /*#################################(Types)
 #################################*/

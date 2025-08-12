@@ -3,19 +3,19 @@ import {
   InDOMTriggerProps,
   InUniversalTriggerProps,
 } from "./trigger-props.ts";
-import { createExtension } from "../../renderer/extensions.ts";
+import { createExtension } from "../../renderer/create-extension.ts";
 
 /**
  * InSpatial trigger prop extension
  * @description This extension is used to add trigger prop functionality to the InSpatial renderer. Without this extension, the trigger prop functionality will not be available so event listeners will not be triggered.
  * @example
  * ```tsx
- * import { InTriggerProp } from "@inspatial/state";
+ * import { InTrigger } from "@inspatial/state";
  * ```
  */
-export const InTriggerProp = createExtension({
+export const InTrigger = createExtension({
   meta: {
-    key: "intriggerprop",
+    key: "InTrigger",
     name: "trigger",
     description: "Universal trigger props and directive resolver",
     author: { name: "InSpatial" },
@@ -35,7 +35,6 @@ export const InTriggerProp = createExtension({
       namespaces: withTriggerProps.namespaces,
       tagNamespaceMap: withTriggerProps.tagNamespaceMap,
       tagAliases: withTriggerProps.tagAliases,
-      propAliases: withTriggerProps.propAliases,
     },
   },
   lifecycle: {

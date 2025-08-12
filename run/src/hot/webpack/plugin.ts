@@ -1,4 +1,4 @@
-import { env } from "../../env/get.ts";
+import { env } from "../../env/index.ts";
 import {
   createFilter,
   type FilterPattern,

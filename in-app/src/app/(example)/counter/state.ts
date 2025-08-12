@@ -149,7 +149,12 @@ export const handleTupleSetMultiplier = createAction(
 export const handleBatch = createAction(useCounter, {
   setMultiplyByFactor: {
     key: "count",
-    fn: (count: number) => count * useCounter.multiplier.peek(),
+    fn: (count: number) => {
+      const factor = useCounter.multiplier.peek();
+      // If count is 0, make the operation visible by setting to the factor
+      // Otherwise multiply as expected
+      return count === 0 ? factor : count * factor;
+    },
     options: { name: "multiply-by-factor" },
   },
   setAddBonusEntry: {

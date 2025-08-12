@@ -2,6 +2,7 @@ import type { Signal as _Signal } from "../../../signal/index.ts";
 import { createRenderer } from "../../../renderer/create-renderer.ts";
 import { normalizeHref } from "../../../route/sanitize.ts";
 import { createTriggerHandle } from "../../../state/trigger/trigger-props.ts";
+import { detectBrowserEngine } from "../../../env/index.ts";
 
 interface LinkProps {
   to: string;
@@ -57,15 +58,27 @@ export function Link(props: LinkProps, ...children: any[]): any {
         const res = await protect();
         if (res === false) return;
         if (typeof res === "string") {
-          (globalThis as any).history?.pushState({ path: res }, "", res);
-          // notify
-          if (
-            (globalThis as any).dispatchEvent &&
-            (globalThis as any).PopStateEvent
-          ) {
-            (globalThis as any).dispatchEvent(
-              new (globalThis as any).PopStateEvent("popstate")
-            );
+          const navApi = (globalThis as any).navigation;
+          const isChromium = detectBrowserEngine() === "chromium";
+          if (navApi && isChromium) {
+            try {
+              const result = navApi.navigate(res, {
+                history: "auto",
+              });
+              await result?.finished;
+            } catch {
+              // ignore navigation api errors
+            }
+          } else {
+            (globalThis as any).history?.pushState({ path: res }, "", res);
+            if (
+              (globalThis as any).dispatchEvent &&
+              (globalThis as any).PopStateEvent
+            ) {
+              (globalThis as any).dispatchEvent(
+                new (globalThis as any).PopStateEvent("popstate")
+              );
+            }
           }
           return;
         }
@@ -73,25 +86,38 @@ export function Link(props: LinkProps, ...children: any[]): any {
         return;
       }
     }
-    if (replace)
-      (globalThis as any).history?.replaceState(
-        { path: normalized },
-        "",
-        normalized
-      );
-    else
-      (globalThis as any).history?.pushState(
-        { path: normalized },
-        "",
-        normalized
-      );
-    if (
-      (globalThis as any).dispatchEvent &&
-      (globalThis as any).PopStateEvent
-    ) {
-      (globalThis as any).dispatchEvent(
-        new (globalThis as any).PopStateEvent("popstate")
-      );
+    const navApi = (globalThis as any).navigation;
+    const isChromium = detectBrowserEngine() === "chromium";
+    if (navApi && isChromium) {
+      try {
+        const result = navApi.navigate(normalized, {
+          history: replace ? "replace" : "auto",
+        });
+        await result?.finished;
+      } catch {
+        // ignore navigation api errors
+      }
+    } else {
+      if (replace)
+        (globalThis as any).history?.replaceState(
+          { path: normalized },
+          "",
+          normalized
+        );
+      else
+        (globalThis as any).history?.pushState(
+          { path: normalized },
+          "",
+          normalized
+        );
+      if (
+        (globalThis as any).dispatchEvent &&
+        (globalThis as any).PopStateEvent
+      ) {
+        (globalThis as any).dispatchEvent(
+          new (globalThis as any).PopStateEvent("popstate")
+        );
+      }
     }
   };
 
