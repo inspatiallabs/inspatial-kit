@@ -7,7 +7,7 @@ export type Platform =
   | "horizonos"
   | "universal";
 
-export type PageKind = "window" | "scene";
+export type ViewType = "window" | "scene";
 
 export interface FileDirectives {
   use?: Array<
@@ -18,7 +18,7 @@ export interface FileDirectives {
 export type PlatformFileMap = Record<Platform, string>;
 
 export interface RouteFiles {
-  page?: string | PlatformFileMap; // path to window.tsx or scene.tsx
+  view?: string | PlatformFileMap; // path to window.tsx or scene.tsx
   layout?: string | PlatformFileMap;
   loading?: string | PlatformFileMap;
   error?: {
@@ -38,7 +38,7 @@ export interface RouteFiles {
 
 export interface RouteNodeMeta {
   platform?: Platform;
-  pageKind?: PageKind;
+  viewType?: ViewType;
   directives?: FileDirectives;
   mode?: "spa" | "mpa" | "auto";
   zone?: string; // for multi-zone

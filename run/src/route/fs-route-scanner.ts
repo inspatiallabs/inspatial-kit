@@ -106,8 +106,8 @@
 //         }
 
 //         const meta: RouteNode["meta"] = {};
-//         if (windowFile) meta.pageKind = "window" as any;
-//         if (!windowFile && sceneFile) meta.pageKind = "scene" as any;
+//         if (windowFile) meta.viewType = "window" as any;
+//         if (!windowFile && sceneFile) meta.viewType = "scene" as any;
 
 //         const name = this.routeKeyFromPath(urlBase || "/");
 //         thisNode = {

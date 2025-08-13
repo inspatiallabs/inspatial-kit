@@ -9,6 +9,12 @@ export interface RouteOptions<T extends { path: string }> {
   routes?: T[] | Record<string, T>;
   prefix?: string;
   mode?: RouterMode;
+  /** Optional view mappings by route name */
+  views?: Record<string, any>;
+  /** Optional view mappings by absolute path (e.g., "/counter") */
+  viewsByPath?: Record<string, any>;
+  /** Optional default view when no mapping found */
+  defaultView?: any;
 }
 
 export interface CurrentRoute {
@@ -38,6 +44,12 @@ export interface RouteApi {
   canGoBack: Signal<boolean>;
   transition: Signal<"idle" | "navigating" | "error">;
   error?: Signal<any | null>;
+  // view mapping API (renderer-agnostic)
+  views: (map: Record<string, any>) => RouteApi;
+  viewsByPath: (map: Record<string, any>) => RouteApi;
+  default: (fallback: any) => RouteApi;
+  /** Computed selected view/component based on current route */
+  selected: Signal<any>;
   // chained API for fs integration
   fs?: (opts: {
     manifest: import("./types.ts").InRouteManifest;
@@ -60,6 +72,30 @@ export function createRoute<T extends { path: string }>(
   const canGoBack = createSignal<boolean>(false);
   const transition = createSignal<"idle" | "navigating" | "error">("idle");
   const error = createSignal<any | null>(null);
+
+  // =================== (View Mapping) ===================
+  const nameToView: Record<string, any> = Object.assign(
+    {},
+    options.views || {}
+  );
+  const pathToView: Record<string, any> = Object.assign(
+    {},
+    options.viewsByPath || {}
+  );
+  let defaultView: any = options.defaultView;
+
+  // Collect inline route views if provided as part of route records (best-effort)
+  try {
+    if (!Array.isArray(routes) && routes && typeof routes === "object") {
+      for (const [name, cfg] of Object.entries(routes as Record<string, any>)) {
+        if (cfg && typeof cfg === "object" && cfg.view) {
+          nameToView[name] = cfg.view;
+        }
+      }
+    }
+  } catch {
+    // ignore parse failures
+  }
 
   function updateCanGoBack(): void {
     try {
@@ -194,6 +230,23 @@ export function createRoute<T extends { path: string }>(
     canGoBack,
     transition,
     error,
+    views(map: Record<string, any>) {
+      Object.assign(nameToView, map || {});
+      // Touch selected update
+      selected.trigger();
+      return api;
+    },
+    viewsByPath(map: Record<string, any>) {
+      Object.assign(pathToView, map || {});
+      selected.trigger();
+      return api;
+    },
+    default(fallback: any) {
+      defaultView = fallback;
+      selected.trigger();
+      return api;
+    },
+    selected: undefined as any,
   };
 
   // Initialize current if in browser
@@ -244,6 +297,25 @@ export function createRoute<T extends { path: string }>(
       }
     });
   }
+
+  // Selected view signal (renderer-agnostic)
+  const selected = createSignal<any>(null as any);
+  // Recompute selected whenever current changes
+  current.connect(() => {
+    const cur = current.peek();
+    const path = (cur?.path || (globalThis as any).location?.pathname || "/")
+      .split("?")[0]
+      .split("#")[0];
+    const name = cur?.name;
+    let view: any = undefined;
+    if (name && nameToView[name]) view = nameToView[name];
+    else if (path && pathToView[path]) view = pathToView[path];
+    else view = defaultView;
+    selected.poke(view);
+    selected.trigger();
+  });
+  // Expose on API
+  (api as any).selected = selected as Signal<any>;
 
   return api;
 }

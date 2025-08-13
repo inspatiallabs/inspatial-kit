@@ -3,6 +3,8 @@ import { normalizeHref, isSafeHref } from "../../../route/sanitize.ts";
 import type { detectBrowserEngine as _detectBrowserEngine } from "../../../env/index.ts";
 import { getGlobalRenderer as _getGlobalRenderer } from "../../../runtime/jsx-runtime.ts";
 
+/*################################(Props)################################*/
+
 interface LinkProps {
   to: string;
   params?: Record<string, string>;
@@ -15,6 +17,7 @@ interface LinkProps {
   [prop: string]: any;
 }
 
+/*################################(Render)################################*/
 export function Link(props: LinkProps, ...children: any[]): any {
   // Resolve the active renderer set by DOMRenderer.wrap
   const R: any = _getGlobalRenderer?.() || (globalThis as any).R || null;

@@ -1,37 +1,25 @@
-import { createRoute, type RouteApi } from "@inspatial/route";
-import { $ } from "@inspatial/state";
+import { createRoute } from "@inspatial/route";
 import { Dynamic } from "@inspatial/kit";
 import { AppWindow } from "./window.tsx";
 import { CounterAppWindow } from "./(example)/counter/window.tsx";
 import { ProjectsWindow } from "./(dashboard)/projects/window.tsx";
+import { ErrorWindow } from "./error.tsx";
+import { RouteTestWindow } from "./(example)/route-test/window.tsx";
 
+/*################################(Route)################################*/
 // Programmatic routing
 export const route = createRoute({
   routes: {
-    home: { path: "/" },
-    counter: { path: "/counter" },
-    projects: { path: "/projects" },
+    home: { path: "/", view: AppWindow },
+    counter: { path: "/counter", view: CounterAppWindow },
+    projects: { path: "/projects", view: ProjectsWindow },
+    routeTest: { path: "/route-test", view: RouteTestWindow },
   },
+  defaultView: ErrorWindow,
 });
 
-// Expose for Link and programmatic navigation
-try {
-  (globalThis as unknown as { InRoute?: RouteApi }).InRoute = route;
-} catch {
-  // ignore if global object is not writable in this environment
-}
-
-// Simple view that renders a window based on current route
+/*################################(Render)################################*/
 export function AppRoutes() {
-  const Selected = $(() => {
-    const raw =
-      route.current.get()?.path ||
-      (typeof location !== "undefined" ? location.pathname : "/");
-    const path = raw.split("?")[0].split("#")[0];
-    if (path === "/counter") return CounterAppWindow;
-    if (path === "/projects") return ProjectsWindow;
-    return AppWindow;
-  });
-
+  const Selected = route.selected;
   return () => <Dynamic is={Selected} />;
 }

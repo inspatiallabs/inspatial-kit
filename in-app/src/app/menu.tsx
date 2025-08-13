@@ -1,6 +1,7 @@
 import { Link } from "@inspatial/kit";
 import { useTheme } from "./(extensions)/in-theme/index.ts";
 import { $ } from "@inspatial/state";
+import { route } from "./routes.tsx";
 
 export function AppMenu() {
   return (
@@ -9,40 +10,36 @@ export function AppMenu() {
         <a href="/">Home</a>
         <a href="/counter">Counter</a>
         <a href="/projects">Projects</a>
+        <a href="/route-test">Route API</a>
       </nav>
       <div className="flex gap-3 mt-6">
         <div
           role="button"
           className="px-3 py-1 border rounded cursor-pointer"
-          on:tap={async (e: any) => {
-            e?.preventDefault?.();
-            const rt: any = (globalThis as any).InRoute;
-            await rt?.navigate?.("/");
-          }}
+          on:tap={() => route.navigate("/")}
         >
           Home (tap)
         </div>
         <div
           role="button"
           className="px-3 py-1 border rounded cursor-pointer"
-          on:tap={async (e: any) => {
-            e?.preventDefault?.();
-            const rt: any = (globalThis as any).InRoute;
-            await rt?.navigate?.("/counter");
-          }}
+          on:tap={() => route.navigate("/counter")}
         >
           Counter (tap)
         </div>
         <div
           role="button"
           className="px-3 py-1 border rounded cursor-pointer"
-          on:tap={async (e: any) => {
-            e?.preventDefault?.();
-            const rt: any = (globalThis as any).InRoute;
-            await rt?.navigate?.("/projects");
-          }}
+          on:tap={() => route.navigate("/projects")}
         >
           Projects (tap)
+        </div>
+        <div
+          role="button"
+          className="px-3 py-1 border rounded cursor-pointer"
+          on:tap={() => route.navigate("/route-test")}
+        >
+          Route API (tap)
         </div>
       </div>
       <div className="flex gap-3 mt-6">
@@ -50,6 +47,7 @@ export function AppMenu() {
         <Link to="/">Home (Link)</Link>
         <Link to="/counter">Counter (Link)</Link>
         <Link to="/projects">Projects (Link)</Link>
+        <Link to="/route-test">Route API (Link)</Link>
       </div>
       <div className="fixed top-4 right-4 flex items-center gap-2 z-50">
         <button
