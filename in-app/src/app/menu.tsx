@@ -16,28 +16,28 @@ export function AppMenu() {
         <div
           role="button"
           className="px-3 py-1 border rounded cursor-pointer"
-          on:tap={() => route.navigate("/")}
+          on:tap={() => route.navigate("home")}
         >
           Home (tap)
         </div>
         <div
           role="button"
           className="px-3 py-1 border rounded cursor-pointer"
-          on:tap={() => route.navigate("/counter")}
+          on:tap={() => route.navigate("counter")}
         >
           Counter (tap)
         </div>
         <div
           role="button"
           className="px-3 py-1 border rounded cursor-pointer"
-          on:tap={() => route.navigate("/projects")}
+          on:tap={() => route.navigate("projects")}
         >
           Projects (tap)
         </div>
         <div
           role="button"
           className="px-3 py-1 border rounded cursor-pointer"
-          on:tap={() => route.navigate("/route-test")}
+          on:tap={() => route.navigate("routeTest")}
         >
           Route API (tap)
         </div>
@@ -48,6 +48,9 @@ export function AppMenu() {
         <Link to="/counter">Counter (Link)</Link>
         <Link to="/projects">Projects (Link)</Link>
         <Link to="/route-test">Route API (Link)</Link>
+        <Link to="https://www.google.com/" target="_blank" rel="external">
+          Google (Link)
+        </Link>
       </div>
       <div className="fixed top-4 right-4 flex items-center gap-2 z-50">
         <button

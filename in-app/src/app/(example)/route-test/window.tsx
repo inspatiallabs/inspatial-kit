@@ -14,52 +14,90 @@ export function RouteTestWindow() {
           <strong>Current path:</strong> {currentPath}
         </div>
         <div className="flex flex-wrap gap-2 mt-3">
+          {/* Named route navigation */}
           <button
+            type="button"
             className="px-2 py-1 border rounded"
-          on:tap={() => route.navigate("https://www.google.com/")}
+            on:tap={() => route.navigate("home")}
+          >
+            navigateTo("home")
+          </button>
+          <button
+            type="button"
+            className="px-2 py-1 border rounded"
+            on:tap={() => route.navigate("counter")}
+          >
+            navigateTo("counter")
+          </button>
+          <button
+            type="button"
+            className="px-2 py-1 border rounded"
+            on:tap={() => route.navigate("projects")}
+          >
+            navigateTo("projects")
+          </button>
+          <button
+            type="button"
+            className="px-2 py-1 border rounded"
+            on:tap={() => route.navigate("routeTest")}
+          >
+            navigateTo("routeTest")
+          </button>
+
+          <button
+            type="button"
+            className="px-2 py-1 border rounded"
+            on:tap={() => route.navigate("https://www.google.com/")}
           >
             navigate("google.com")
           </button>
           <button
+            type="button"
             className="px-2 py-1 border rounded"
-          on:tap={() => route.navigate("/counter")}
+            on:tap={() => route.navigate("/counter")}
           >
             navigate("/counter")
           </button>
           <button
+            type="button"
             className="px-2 py-1 border rounded"
-          on:tap={() => route.navigate("/projects")}
+            on:tap={() => route.navigate("/projects")}
           >
             navigate("/projects")
           </button>
 
           <button
+            type="button"
             className="px-2 py-1 border rounded"
-          on:tap={() => route.redirect("/")}
+            on:tap={() => route.redirect("/")}
           >
             redirect("/")
           </button>
           <button
+            type="button"
             className="px-2 py-1 border rounded"
-          on:tap={() => route.reload()}
+            on:tap={() => route.reload()}
           >
             reload()
           </button>
           <button
+            type="button"
             className="px-2 py-1 border rounded"
-          on:tap={() => route.resetScrollPosition()}
+            on:tap={() => route.resetScrollPosition()}
           >
             resetScrollPosition()
           </button>
           <button
+            type="button"
             className="px-2 py-1 border rounded"
-          on:tap={() => route.back()}
+            on:tap={() => route.back()}
           >
             back()
           </button>
           <button
+            type="button"
             className="px-2 py-1 border rounded"
-          on:tap={() => route.forward()}
+            on:tap={() => route.forward()}
           >
             forward()
           </button>
@@ -68,5 +106,3 @@ export function RouteTestWindow() {
     </>
   );
 }
-
-

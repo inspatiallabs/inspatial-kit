@@ -1,5 +1,9 @@
 import type { Signal as _Signal } from "../../../signal/index.ts";
-import { normalizeHref, isSafeHref } from "../../../route/sanitize.ts";
+import {
+  normalizeHref,
+  isSafeHref,
+  isLocalHref,
+} from "../../../route/sanitize.ts";
 import type { detectBrowserEngine as _detectBrowserEngine } from "../../../env/index.ts";
 import { getGlobalRenderer as _getGlobalRenderer } from "../../../runtime/jsx-runtime.ts";
 
@@ -15,6 +19,8 @@ interface LinkProps {
   protect?: () => boolean | string | Promise<boolean | string>;
   class?: any;
   [prop: string]: any;
+  target?: "_blank" | "_self" | "_parent" | "_top";
+  rel?: "external" | "noopener" | "noreferrer";
 }
 
 /*################################(Render)################################*/
@@ -49,12 +55,39 @@ export function Link(props: LinkProps, ...children: any[]): any {
       .join("&");
     href += (href.includes("?") ? "&" : "?") + qs;
   }
-  const normalized = normalizeHref(href);
+  const isLocal = isLocalHref(href);
+  // For external http(s) links, append ?ref=inspatial when missing
+  let externalHref = href;
+  if (!isLocal) {
+    try {
+      const url = new URL(
+        href,
+        (globalThis as any).location?.origin || "http://localhost"
+      );
+      if (url.protocol === "http:" || url.protocol === "https:") {
+        if (!url.searchParams.has("ref")) {
+          url.searchParams.set("ref", "inspatial");
+        }
+      }
+      externalHref = url.toString();
+    } catch {
+      // leave href as-is if URL parsing fails
+    }
+  }
+  const normalized = isLocal ? normalizeHref(href) : externalHref;
 
   // Navigation handler via trigger-props
   const clickHandler = async (event?: any) => {
     if (props.disabled) return;
     const rt: any = (globalThis as any).InRoute;
+    // Respect explicit external behaviors
+    if (
+      props.target === "_blank" ||
+      props.download ||
+      props.rel === "external"
+    ) {
+      return; // let browser handle
+    }
     if (protect) {
       try {
         const res = await protect();
@@ -70,7 +103,7 @@ export function Link(props: LinkProps, ...children: any[]): any {
         return;
       }
     }
-    const sameOriginSafe = isSafeHref(normalized);
+    const sameOriginSafe = isLocal && isSafeHref(normalized);
     if (rt?.navigate && sameOriginSafe) {
       event?.preventDefault?.();
       await rt.navigate(normalized, { replace: !!replace });
