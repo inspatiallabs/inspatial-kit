@@ -406,7 +406,63 @@ NOTE: Signals are the most low-level reactive primitives you should only ever us
 ## Routing & Navigation
 
 **.7. InSpatial Route:**
-InSpatial Route is built on InSpatial's `@in/route` module. \* \*\*Soon...
+InSpatial Route is a universal filesystem router built on InSPatial's `@in/route` module.
+
+### Programmatic routing - `createRoute()` API
+
+- Define routes with `createRoute({ routes })`.
+- Map views with `.views({...})` or `.viewsByPath({...})`, and set `.default(fallback)`.
+- Render with `<Dynamic is={route.selected} />`. Read `route.current`, navigate via `route.navigate(path)`, `route.redirect(path)`, `route.back()`; check `route.canGoBack`.
+- Minimal example:
+
+  ```ts
+  export const route = createRoute({
+    defaultView: ErrorWindow,
+    routes: {
+      home: { path: "/", view: AppWindow },
+      projects: { path: "/projects", view: ProjectsWindow },
+    },
+  });
+
+  export function AppRoutes() {
+    const Selected = route.selected;
+    return () => <Dynamic is={Selected} />;
+  }
+  ```
+
+  NOTE: Pass your `AppRoutes` as the entry point un your renderer
+
+  ```ts
+  createRenderer({...}).then((InSpatial: any) => {
+      InSpatial.render(document.getElementById("app"), AppRoutes); // Import you Approutes
+  });
+  ```
+
+### Navigation
+
+#### 1. With Link Component:
+
+- Use `<Link to="/path">` for SPA navigation; it uses InSpatial's universal `InTrigger` props (`on:tap`) under the hood and appends `?ref=inspatial` for external http(s) links.
+- Example:
+
+  ```tsx
+  <Link to="/projects">Projects</Link>
+  ```
+
+#### 2. With Trigger Props
+
+```ts
+import { route } from "@inspatial/route";
+
+const route = createRoute()
+
+//NOTE: route.navigate() handles both named and path/URL navigation so ("/home") or ("home") will both work
+<MyComponent on:tap={() => route.navigate("/home")}>Home</MyComponent>
+```
+
+### File Based Routing - `InRoute()` Extension
+
+\* \*\*Soon...
 
 ## Testing
 

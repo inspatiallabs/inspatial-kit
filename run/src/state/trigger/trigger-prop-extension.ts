@@ -13,34 +13,36 @@ import { createExtension } from "../../renderer/create-extension.ts";
  * import { InTrigger } from "@inspatial/state";
  * ```
  */
-export const InTrigger = createExtension({
-  meta: {
-    key: "InTrigger",
-    name: "trigger",
-    description: "Universal trigger props and directive resolver",
-    author: { name: "InSpatial" },
-    verified: true,
-    price: 0,
-    status: "installed",
-    type: "Universal",
-    version: "0.1.0",
-  },
-  scope: {
-    clientScope: "progressive",
-    editorScopes: ["Windows", "Scenes", "Cloud", "InDev"],
-  },
-  capabilities: {
-    rendererProps: {
-      onDirective: withTriggerProps.onTriggerProp,
-      namespaces: withTriggerProps.namespaces,
-      tagNamespaceMap: withTriggerProps.tagNamespaceMap,
-      tagAliases: withTriggerProps.tagAliases,
+export function InTrigger() {
+  return createExtension({
+    meta: {
+      key: "InTrigger",
+      name: "trigger",
+      description: "Universal trigger props and directive resolver",
+      author: { name: "InSpatial" },
+      verified: true,
+      price: 0,
+      status: "installed",
+      type: "Universal",
+      version: "0.1.0",
     },
-  },
-  lifecycle: {
-    setup: () => {
-      InDOMTriggerProps();
-      InUniversalTriggerProps();
+    scope: {
+      clientScope: "progressive",
+      editorScopes: ["Windows", "Scenes", "Cloud", "InDev"],
     },
-  },
-});
+    capabilities: {
+      rendererProps: {
+        onDirective: withTriggerProps.onTriggerProp,
+        namespaces: withTriggerProps.namespaces,
+        tagNamespaceMap: withTriggerProps.tagNamespaceMap,
+        tagAliases: withTriggerProps.tagAliases,
+      },
+    },
+    lifecycle: {
+      setup: () => {
+        InDOMTriggerProps();
+        InUniversalTriggerProps();
+      },
+    },
+  });
+}
