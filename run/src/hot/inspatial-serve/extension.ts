@@ -46,8 +46,8 @@ export const InServe = createExtension({
         (globalThis as any)[flagKey] = true;
 
         await new InSpatialServe().run();
-      } catch (_) {
-        // Silently ignore in environments where serving isn't possible
+      } catch (err) {
+        console.error("❌ InSpatial Dev failed to serve:", err);
       }
     },
   },

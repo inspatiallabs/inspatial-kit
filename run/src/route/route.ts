@@ -71,7 +71,7 @@ export class Route<T extends BaseRouteConfig, C = null> {
   ) {
     this.hooks = options.hooks || [];
     this.prefix = options.prefix || "";
-    this.eventName = options.eventName || "texivia";
+    this.eventName = options.eventName || "in-route";
     this.context = options.initialContext ?? null;
     this.interceptLinks = options.interceptLinks ?? true;
     this.ignoreUnknown = options.ignoreUnknown ?? false;
@@ -261,23 +261,18 @@ export class Route<T extends BaseRouteConfig, C = null> {
     const isChromium = detectBrowserEngine() === "chromium";
 
     if (navApi && isChromium) {
-      // Use the Web Navigation API
+      // Use the Web Navigation API (Chromium)
       navApi.addEventListener("navigate", this._onNavigateBound);
-      // No need to intercept clicks or listen to popstate in this mode
-      this.navigate(
-        globalThis.location.pathname + globalThis.location.search,
-        false
-      );
-    } else {
-      // Fallback to History API
-      globalThis.addEventListener("popstate", this._onPopStateBound);
-      this.interceptLinks &&
-        document.addEventListener("click", this._onClickBound);
-      this.navigate(
-        globalThis.location.pathname + globalThis.location.search,
-        false
-      );
     }
+    // Always attach History+click interception for broad compatibility
+    globalThis.addEventListener("popstate", this._onPopStateBound);
+    this.interceptLinks &&
+      document.addEventListener("click", this._onClickBound);
+    // Prime current route
+    this.navigate(
+      globalThis.location.pathname + globalThis.location.search,
+      false
+    );
     this.delegateUnknown &&
       document.addEventListener(
         `${this.eventName}-delegate`,
@@ -293,11 +288,10 @@ export class Route<T extends BaseRouteConfig, C = null> {
 
     if (navApi && isChromium) {
       navApi.removeEventListener?.("navigate", this._onNavigateBound);
-    } else {
-      globalThis.removeEventListener("popstate", this._onPopStateBound);
-      this.interceptLinks &&
-        document.removeEventListener("click", this._onClickBound);
     }
+    globalThis.removeEventListener("popstate", this._onPopStateBound);
+    this.interceptLinks &&
+      document.removeEventListener("click", this._onClickBound);
   }
 
   /**
@@ -374,26 +368,25 @@ export class Route<T extends BaseRouteConfig, C = null> {
   ): Promise<
     { route: CompiledRoute<T>; params: Record<string, string> } | false
   > {
-    if (redirectCount > 10) throw new Error("Texivia: redirect limit exceeded");
+    if (redirectCount > 10) throw new Error("in-route: redirect limit exceeded");
 
-    const navApi = (globalThis as any).navigation;
-    const isChromium = detectBrowserEngine() === "chromium";
+    // Run the route locally for broad browser support
+    const result = await this._runRouteForPath(path, redirectCount);
+    if (result === false) return false;
 
-    if (navApi && isChromium && !this._handlingNavigationEvent) {
-      // Use Web Navigation API; route execution will happen in the navigate handler
-      this._lastResult = undefined;
-      try {
-        const result = navApi.navigate(path, {
-          history: pushState ? "auto" : "replace",
-        });
-        await result?.finished;
-      } catch {
-        // fall through to attempt local routing
+    // Update history after successful match
+    try {
+      const hasHistory = typeof (globalThis as any).history !== "undefined";
+      if (hasHistory) {
+        if (pushState)
+          (globalThis as any).history.pushState({ path }, "", path);
+        else (globalThis as any).history.replaceState({ path }, "", path);
       }
-      return this._lastResult ?? false;
+    } catch {
+      // best-effort history update
     }
 
-    return this._runRouteForPath(path, redirectCount);
+    return result;
   }
 
   /**
@@ -443,14 +436,17 @@ export class Route<T extends BaseRouteConfig, C = null> {
    */
   private _dispatchEvent(
     route: CompiledRoute<T>,
-    params: Record<string, string>
+    params: Record<string, string>,
+    path?: string
   ): void {
+    const currentPath = path || (globalThis as any).location?.pathname || "";
+    const currentSearch = (globalThis as any).location?.search || "";
     const event = new CustomEvent(this.eventName, {
       detail: {
         route,
         params: params || {},
-        path: globalThis.location.pathname,
-        query: this._parseQuery(globalThis.location.search),
+        path: currentPath,
+        query: this._parseQuery(currentSearch),
       },
       bubbles: true,
     });
@@ -467,6 +463,8 @@ export class Route<T extends BaseRouteConfig, C = null> {
 
   /** Handles link clicks to enable SPA navigation. */
   private async _handleClick(event: MouseEvent): Promise<void> {
+    // If default has been prevented by a higher-priority handler (e.g., Link), respect it
+    if ((event as any).defaultPrevented) return;
     const link = (event.target as Element).closest("a");
     if (
       !link ||
@@ -532,7 +530,7 @@ export class Route<T extends BaseRouteConfig, C = null> {
   ): Promise<
     { route: CompiledRoute<T>; params: Record<string, string> } | false
   > {
-    if (redirectCount > 10) throw new Error("Texivia: redirect limit exceeded");
+    if (redirectCount > 10) throw new Error("in-route: redirect limit exceeded");
 
     const _match = this._matchRoute(path.split("?")[0]);
     if (_match === null) {
@@ -567,7 +565,7 @@ export class Route<T extends BaseRouteConfig, C = null> {
       }
     }
 
-    this._dispatchEvent(_match.route, _match.params);
+    this._dispatchEvent(_match.route, _match.params, path);
     this._lastResult = { route: _match.route, params: _match.params };
     return this._lastResult;
   }

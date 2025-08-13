@@ -254,6 +254,8 @@ export class InSpatialServe {
   private clients: Set<WebSocket> = new Set();
   private isRunning = false;
   private buildQueue = new BuildQueue();
+  private httpServer: any | null = null;
+  private wsServer: any | null = null;
 
   /**
    * Runs the InSpatial Development Server
@@ -327,7 +329,7 @@ export class InSpatialServe {
   }
 
   private runWebSocketServer() {
-    const _wsServer = InZero.serve({ port: 8888 }, (request: Request) => {
+    const handler = (request: Request) => {
       const upgrade = request.headers.get("upgrade");
       if (upgrade !== "websocket") {
         return new Response("Not a websocket request", { status: 400 });
@@ -354,9 +356,22 @@ export class InSpatialServe {
       };
 
       return response;
-    });
+    };
 
-    console.log("🔌 WebSocket server runed on port 8888");
+    const tryPorts = [8888, 8889, 8890];
+    for (const p of tryPorts) {
+      try {
+        this.wsServer = InZero.serve({ port: p }, handler);
+        console.log(`🔌 WebSocket server runed on port ${p}`);
+        return;
+      } catch (e) {
+        console.warn(
+          `⚠️ Failed to bind WS port ${p}:`,
+          (e as any)?.message || e
+        );
+      }
+    }
+    throw new Error("Unable to bind WebSocket server on ports 8888-8890");
   }
 
   private runSmartWatching() {
@@ -550,7 +565,7 @@ export class InSpatialServe {
   }
 
   private runFileServer() {
-    const _server = InZero.serve({ port: 6310 }, async (request: Request) => {
+    const handler = async (request: Request) => {
       const url = new URL(request.url);
       let pathname = url.pathname;
 
@@ -596,14 +611,60 @@ export class InSpatialServe {
           headers: { "Content-Type": contentType },
         });
       } catch (_error) {
+        // SPA fallback: if not a direct file (no extension), serve index.html
+        const hasExtension = pathname.includes(".");
+        if (!hasExtension) {
+          try {
+            const indexContent = await InZero.readFile("./dist/index.html");
+            const textContent = new TextDecoder().decode(indexContent);
+            const wsPort = (this.wsServer as any)?.addr?.port || 8888;
+            const modifiedContent = textContent.replace(
+              "</body>",
+              `
+              <script>
+                // InSpatial Hot Reload Client (SPA fallback)
+                const ws = new WebSocket('ws://localhost:${wsPort}');
+                ws.onmessage = (event) => {
+                  const data = JSON.parse(event.data);
+                  if (data.type === 'reload') {
+                    console.log('🔥 InSpatial: Reloading...');
+                    window.location.reload();
+                  }
+                };
+                ws.onopen = () => console.log('🔌 InSpatial: Connected to hot reload');
+                ws.onclose = () => console.log('❌ InSpatial: Disconnected from hot reload');
+              </script>
+              </body>`
+            );
+            return new Response(modifiedContent, {
+              headers: { "Content-Type": "text/html" },
+            });
+          } catch {
+            // fallthrough to 404 if index.html missing
+          }
+        }
         console.log(`❌ File not found: ${pathname}`);
         return new Response("404 - File Not Found", { status: 404 });
       }
-    });
+    };
 
-    console.log("🌐 InSpatial app running at http://localhost:6310");
-    console.log("🔥 Hot reload enabled via WebSocket on port 8888");
-    console.log("✨ Ready for development!");
+    const tryPorts = [6310, 6311, 6312];
+    for (const p of tryPorts) {
+      try {
+        this.httpServer = InZero.serve({ port: p }, handler);
+        console.log(`🌐 InSpatial app running at http://localhost:${p}`);
+        const wsPort = (this.wsServer as any)?.addr?.port || 8888;
+        console.log(`🔥 Hot reload enabled via WebSocket on port ${wsPort}`);
+        console.log("✨ Ready for development!");
+        return;
+      } catch (e) {
+        console.warn(
+          `⚠️ Failed to bind HTTP port ${p}:`,
+          (e as any)?.message || e
+        );
+      }
+    }
+    throw new Error("Unable to bind HTTP server on ports 6310-6312");
   }
 
   private getContentType(pathname: string): string {

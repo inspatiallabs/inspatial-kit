@@ -6,7 +6,7 @@
     "build": "deno task setup && deno bundle --platform=browser --output=dist/bundle.js --sourcemap --minify src/config/render.ts",
     "setup": "powershell -Command \"New-Item -ItemType Directory -Force -Path dist/asset; deno run -A npm:@tailwindcss/cli@latest -i src/config/app.css -o dist/kit.css --content 'src/**/*.{ts,tsx,js,jsx}'; Copy-Item src/asset/favicon.png dist/asset/favicon.png; Copy-Item index.html dist/index.html\"",
     "serve": "deno run --allow-net --allow-read --allow-write --allow-env --allow-run src/config/render.ts",
-    "clean": "rm -rf dist && rm -rf node_modules && rm -rf deno.lock"
+    "clean": "rm -rf dist && rm -rf node_modules && rm -rf deno.lock && rm -rf src/app/.inroute"
   },
   "compilerOptions": {
     "lib": ["ES2022", "DOM", "DOM.Iterable", "deno.ns"],

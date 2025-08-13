@@ -1,8 +1,7 @@
 import type { Signal as _Signal } from "../../../signal/index.ts";
-import { createRenderer } from "../../../renderer/create-renderer.ts";
-import { normalizeHref } from "../../../route/sanitize.ts";
-import { createTriggerHandle } from "../../../state/trigger/trigger-props.ts";
-import { detectBrowserEngine } from "../../../env/index.ts";
+import { normalizeHref, isSafeHref } from "../../../route/sanitize.ts";
+import type { detectBrowserEngine as _detectBrowserEngine } from "../../../env/index.ts";
+import { getGlobalRenderer as _getGlobalRenderer } from "../../../runtime/jsx-runtime.ts";
 
 interface LinkProps {
   to: string;
@@ -17,9 +16,8 @@ interface LinkProps {
 }
 
 export function Link(props: LinkProps, ...children: any[]): any {
-  const R: any =
-    (createRenderer as any) ||
-    (globalThis as any).jsxRuntime?.getGlobalRenderer?.();
+  // Resolve the active renderer set by DOMRenderer.wrap
+  const R: any = _getGlobalRenderer?.() || (globalThis as any).R || null;
   const {
     to,
     params,
@@ -50,35 +48,18 @@ export function Link(props: LinkProps, ...children: any[]): any {
   }
   const normalized = normalizeHref(href);
 
-  // Bridge trigger events using trigger-props
-  const clickHandler = async () => {
+  // Navigation handler via trigger-props
+  const clickHandler = async (event?: any) => {
     if (props.disabled) return;
+    const rt: any = (globalThis as any).InRoute;
     if (protect) {
       try {
         const res = await protect();
         if (res === false) return;
         if (typeof res === "string") {
-          const navApi = (globalThis as any).navigation;
-          const isChromium = detectBrowserEngine() === "chromium";
-          if (navApi && isChromium) {
-            try {
-              const result = navApi.navigate(res, {
-                history: "auto",
-              });
-              await result?.finished;
-            } catch {
-              // ignore navigation api errors
-            }
-          } else {
-            (globalThis as any).history?.pushState({ path: res }, "", res);
-            if (
-              (globalThis as any).dispatchEvent &&
-              (globalThis as any).PopStateEvent
-            ) {
-              (globalThis as any).dispatchEvent(
-                new (globalThis as any).PopStateEvent("popstate")
-              );
-            }
+          if (rt?.navigate) {
+            event?.preventDefault?.();
+            await rt.navigate(res, { replace: false });
           }
           return;
         }
@@ -86,18 +67,15 @@ export function Link(props: LinkProps, ...children: any[]): any {
         return;
       }
     }
-    const navApi = (globalThis as any).navigation;
-    const isChromium = detectBrowserEngine() === "chromium";
-    if (navApi && isChromium) {
-      try {
-        const result = navApi.navigate(normalized, {
-          history: replace ? "replace" : "auto",
-        });
-        await result?.finished;
-      } catch {
-        // ignore navigation api errors
-      }
-    } else {
+    const sameOriginSafe = isSafeHref(normalized);
+    if (rt?.navigate && sameOriginSafe) {
+      event?.preventDefault?.();
+      await rt.navigate(normalized, { replace: !!replace });
+      return;
+    }
+    // Fallback: mutate history for SPA feel even if no router is set up
+    if (sameOriginSafe) {
+      event?.preventDefault?.();
       if (replace)
         (globalThis as any).history?.replaceState(
           { path: normalized },
@@ -121,21 +99,28 @@ export function Link(props: LinkProps, ...children: any[]): any {
     }
   };
 
-  function onRef(node: Element) {
-    // Map universal triggers to platform-specific
-    createTriggerHandle("tap", (_node, cb: any) => {
-      _node.addEventListener("click", () => cb?.());
-    });
-    createTriggerHandle("pointerenter", (_node, cb: any) => {
-      _node.addEventListener("pointerenter", () => cb?.());
-    });
-    // Attach our handlers via bridge
-    const tap = clickHandler as any;
-    const enter = prefetch ? () => {} : undefined;
-    // Use trigger-props attributes through renderer; here we manually wire for now
-    if (tap) (node as any).onclick = tap;
-    if (enter) (node as any).onpointerenter = enter;
-  }
+  const rt: any = (globalThis as any).InRoute;
+  const prefetchHandler = prefetch
+    ? (_e?: any) => {
+        try {
+          rt?.prefetch?.(normalized);
+        } catch {
+          // best-effort prefetch
+        }
+      }
+    : undefined;
 
-  return R.c("a", { href: normalized, $ref: onRef, ...rest }, ...children);
+  if (R && typeof R.c === "function") {
+    return R.c(
+      "a",
+      {
+        href: normalized,
+        "on:tap": clickHandler,
+        "on:pointerenter": prefetchHandler,
+        ...rest,
+      },
+      ...children
+    );
+  }
+  return null;
 }

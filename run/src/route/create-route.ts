@@ -92,7 +92,20 @@ export function createRoute<T extends { path: string }>(
     transition.set("navigating");
     error.set(null);
     const res = await route.navigate(path, !(opts && opts.replace));
-    if (!res) return false;
+    if (!res) {
+      // Update current to reflect the attempted path for consumers (e.g., InRouteView)
+      current.set({
+        path,
+        params: {},
+        query: Object.fromEntries(
+          new URLSearchParams((globalThis as any).location?.search || "")
+        ),
+        name: undefined,
+      });
+      transition.set("error");
+      updateCanGoBack();
+      return false;
+    }
     current.set({
       path,
       params: res.params,
@@ -183,30 +196,36 @@ export function createRoute<T extends { path: string }>(
     error,
   };
 
-  // Chained fs() sugar to reduce cognitive load: createRoute(...).fs({ manifest, loaders })
-  (api as any).fs = (opts: {
-    manifest: import("./types.ts").InRouteManifest;
-    loaders?: {
-      pageFiles: Record<string, () => Promise<any>>;
-      layoutFiles?: Record<string, () => Promise<any>>;
-      loadingFiles?: Record<string, () => Promise<any>>;
-    };
-    mode?: RouterMode;
-  }) => {
-    // Dynamic import to avoid circular deps eagerly
-    const modPromise = import("./create-fs-route.ts");
-    return modPromise.then(({ createFsRoute }) =>
-      createFsRoute({
-        manifest: opts.manifest,
-        loaders: opts.loaders,
-        mode: opts.mode,
-      })
-    ) as unknown as RouteApi;
-  };
-
   // Initialize current if in browser
   if (typeof globalThis !== "undefined" && (globalThis as any).location) {
     route.start();
+    // Sync current signal when navigation happens via native anchor interception
+    try {
+      (globalThis as any).document?.addEventListener?.(
+        "in-route",
+        (ev: any) => {
+          try {
+            const detail = ev?.detail || {};
+            const path = String(detail.path || "");
+            const queryObj = detail.query || {};
+            const qs = new URLSearchParams(queryObj).toString();
+            const fullPath = qs ? `${path}?${qs}` : path;
+            current.set({
+              path: fullPath,
+              params: detail.params || {},
+              query: queryObj,
+              name: detail.route?.name,
+            });
+            updateCanGoBack();
+            transition.set("idle");
+          } catch {
+            // best-effort sync
+          }
+        }
+      );
+    } catch {
+      // ignore listener failures in non-DOM contexts
+    }
     // Prime current
     const path =
       (globalThis as any).location.pathname +

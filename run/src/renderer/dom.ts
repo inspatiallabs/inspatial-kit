@@ -83,7 +83,7 @@ export function DOMRenderer(options: DOMOptions = {}): any {
     ref.parentNode.insertBefore(node, ref);
   }
 
-  // Event listeners removed - now handled entirely by extensions
+  // NOTE: Event listeners are resolved by extensions via onDirective; ensure triggers are available
 
   function setAttr(node: any, attr: string, val: any): void {
     if (val === undefined || val === null || val === false) return;
