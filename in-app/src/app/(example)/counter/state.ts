@@ -1,4 +1,4 @@
-import { createState, createStorage, createAction } from "@inspatial/state";
+import { createState, createStorage, createAction } from "@inspatial/kit/state";
 // import { cloud } from "@inspatial/app/api/inspatial-cloud.api.ts";
 
 // ########################## (CLOUD) ##########################

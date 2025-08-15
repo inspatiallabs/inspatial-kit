@@ -12,7 +12,7 @@
     "forceConsistentCasingInFileNames": true,
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "jsx": "preserve",
-    "jsxImportSource": "@inspatial/run",
+    "jsxImportSource": "@inspatial/kit",
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]

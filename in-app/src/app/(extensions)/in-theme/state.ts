@@ -1,4 +1,4 @@
-import { createState } from "@inspatial/state";
+import { createState } from "@inspatial/kit/state";
 
 /*################################(Types)################################*/
 

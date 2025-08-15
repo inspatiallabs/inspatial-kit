@@ -1,0 +1,131 @@
+{
+  "name": "@inspatial/kit",
+  "license": "Apache-2.0",
+  "version": "1.0.0",
+  "exports": {
+    ".": "./src/index.ts",
+    "./signal": "./src/signal/src/index.ts",
+    "./kit": "./src/kit/src/index.ts",
+    "./kit/control-flow": "./src/kit/control-flow/index.ts",
+    "./kit/navigation": "./src/kit/navigation/index.ts",
+    "./kit/structure": "./src/kit/structure/index.ts",
+    "./extension": "./src/extension/src/index.ts",
+    "./renderer": "./src/renderer/src/index.ts",
+    "./renderer/create-renderer": "./src/renderer/src/create-renderer.ts",
+    "./renderer/dom": "./src/renderer/src/dom.ts",
+    "./renderer/ssr": "./src/renderer/src/ssr.ts",
+    "./renderer/xr": "./src/renderer/src/xr.ts",
+    "./renderer/android-xr": "./src/renderer/src/android-xr.ts",
+    "./renderer/vision-os": "./src/renderer/src/vision-os.ts",
+    "./renderer/horizon-os": "./src/renderer/src/horizon-os.ts",
+    "./renderer/generic-xr": "./src/renderer/src/generic-xr.ts",
+    "./renderer/nativescript": "./src/renderer/src/nativescript.ts",
+    "./runtime": "./src/runtime/src/index.ts",
+    "./jsx-runtime": "./src/runtime/src/jsx-runtime.ts",
+    "./jsx-dev-runtime": "./src/runtime/src/jsx-dev-runtime.ts",
+    "./state": "./src/state/src/index.ts",
+    "./state/core": "./src/state/src/core/index.ts",
+    "./state/trigger": "./src/state/src/trigger/index.ts",
+    "./env": "./src/env/src/index.ts",
+    "./serve": "./src/serve/src/index.ts",
+    "./debug": "./src/debug/src/index.ts"
+  },
+  "tasks": {
+    "test": "deno test --allow-env --allow-read --allow-write --allow-run --allow-net --allow-hrtime --allow-env --allow-all ./src/index.test.ts",
+    "lint": "deno lint",
+    "fmt": "deno fmt",
+    "check": "deno check **/*.ts",
+    "clean": "rm -rf node_modules && rm -rf deno.lock && rm -rf dist",
+    "publish": "deno publish --allow-slow-types --no-check --allow-dirty"
+  },
+  "publish": {
+    "exclude": [".github", ".vscode", "**/*.test.ts", "test_deps.ts"]
+  },
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "deno.ns",
+      "dom.asynciterable",
+      "deno.unstable",
+      "deno.worker",
+      "deno.window",
+      "esnext",
+      "webworker.asynciterable",
+      "webworker",
+      "webworker.importscripts",
+      "webworker.iterable",
+      "decorators",
+      "scripthost"
+    ]
+  },
+  "fmt": {
+    "semiColons": false,
+    "singleQuote": false,
+    "proseWrap": "preserve",
+    "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.mdx"]
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended", "jsx", "jsr"],
+      "include": [
+        "no-var",
+        "no-window",
+        "no-unused-vars",
+        "ban-untagged-todo",
+        "no-empty-interface",
+        "no-slow-types",
+        "no-deprecated-deno-api",
+        "no-duplicate-case",
+        "no-dupe-class-members",
+        "camelcase",
+        "no-dupe-args",
+        "no-sloppy-imports",
+        "no-class-assign",
+        "no-unsafe-finally"
+      ],
+      "exclude": ["no-explicit-any", "ban-ts-comment"]
+    }
+  },
+  "imports": {
+    "@in/kit/": "./src/",
+
+    "@in/test": "jsr:@inspatial/test@^0.1.1",
+
+    "@in/style/": "./src/style/src/",
+
+    "@in/kit/component/": "./src/kit/src/component/",
+    "@in/kit/control-flow/": "./src/kit/src/control-flow/",
+    "@in/kit/navigation/": "./src/kit/src/navigation/",
+    "@in/kit/structure/": "./src/kit/src/structure/",
+
+    "@in/renderer/": "./src/renderer/src/",
+    "@in/runtime/": "./src/runtime/src/",
+    "@in/jsx-runtime/": "./src/runtime/src/",
+    "@in/jsx-dev-runtime/": "./src/runtime/src/",
+    "@in/extension/": "./src/extension/src/",
+    "@in/dom/": "./src/renderer/src/",
+    "@in/ssr/": "./src/renderer/src/",
+    "@in/gpu/": "./src/renderer/src/",
+    "@in/xr/": "./src/renderer/src/",
+    "@in/android-xr/": "./src/renderer/src/",
+    "@in/vision-os/": "./src/renderer/src/",
+    "@in/horizon-os/": "./src/renderer/src/",
+    "@in/nativescript/": "./src/renderer/src/",
+
+    "@in/zero/": "./src/zero/src/",
+
+    "@in/teract/signal/": "./src/signal/src/",
+    "@in/teract/state/": "./src/state/src/core/",
+    "@in/teract/trigger/": "./src/state/src/trigger/",
+
+    "@in/route/": "./src/route/src/",
+
+    "@in/vader/env/": "./src/env/src/",
+    "@in/vader/debug/": "./src/debug/src/",
+    "@in/vader": "./src/utils.ts",
+
+    "@in/serve/": "./src/serve/src/"
+  }
+}

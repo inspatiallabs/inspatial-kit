@@ -1,4 +1,4 @@
-import { $ } from "@inspatial/state";
+import { $ } from "@inspatial/kit/state";
 import { route } from "../../routes.tsx";
 import { AppMenu } from "../../menu.tsx";
 

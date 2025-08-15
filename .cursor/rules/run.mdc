@@ -1,10 +1,10 @@
-InSpatial Run is based on InSpatial's own signal reactive primitives `@in/teract`. InSpatial sematically shares sytax with the likes of React, SolidJS and Preact.
+InSpatial Kit is based on InSpatial's own signal reactive primitives `@in/teract`. InSpatial sematically shares sytax with the likes of React, SolidJS and Preact.
 
-InSpatial Run is the Framework Runtime for InSpatial universal renderer `@in/renderer` which targets all platforms with support for multiple templating e.g JSX.
+InSpatial Kit is the Framework Runtime for InSpatial universal renderer `@in/renderer` which targets all platforms with support for multiple templating e.g JSX.
 
-**Important** InSpatial Run is its own independent self-contained framework powered by its own dev modules, concept, opinions and renderers and as such IT IS IS DIFFERENT FROM REACT, SOLIDJS, PREACT or any other framework.
+**Important** InSpatial Kit is its own independent self-contained framework powered by its own dev modules, concept, opinions and renderers and as such IT IS IS DIFFERENT FROM REACT, SOLIDJS, PREACT or any other framework.
 
-InSpatial Run is the highest layer of abstraction for both InSpatial dev and cloud UDE modules. All core utilities, actions and APIs are encapsulated into simpler functions and file routes essentially removing the need for any form of project initialization or configurations. InSpatial Run removes the need to install or use any of InSpatial's stand-alone dev and cloud modules as they come bundled with it by default.
+InSpatial Kit is the highest layer of abstraction for both InSpatial dev and cloud UDE modules. All core utilities, actions and APIs are encapsulated into simpler functions and file routes essentially removing the need for any form of project initialization or configurations. InSpatial Kit removes the need to install or use any of InSpatial's stand-alone dev and cloud modules as they come bundled with it by default.
 
 ### NOTE
 
@@ -32,36 +32,63 @@ InSpatial Run is the highest layer of abstraction for both InSpatial dev and clo
 - **Kit:** Use InSpatial Kit control-flow primitives like `List`, and `Show`
 - **InSpatial Cloud:** All datasource and backend functionality must ONLY use `@inspatial/cloud` and `@inspatial/cloud-client.
 - **No 3rd Party Dependecies or NPM Packages**: MUST not install third-party packages or NPM packages. All packages must be installed from JSR and only InSpatial Dev Modules which start with `@in` or `@inspatial` directives.
-- **InSpatial Serve:** All new projects MUST use InSpatial Serve and its `InServe` extension to bundle, mininify, serve, style/css transform, and hot-reload. Basically replaces the need for tools like Vite, RSPack or WebPack. Do not ever install or use those tools to Run an InSpatial App.
+- **InSpatial Serve:** All new projects MUST use InSpatial Serve and its `InServe` extension to bundle, mininify, serve, style/css transform, and hot-reload. Basically replaces the need for tools like Vite, RSPack or WebPack. Do not ever install or use those tools to Kit an InSpatial App.
 
 ---
 
-# InSpatial Run Concepts & Guide
+# InSpatial Kit Concepts & Guide
 
 ## Styling & UI
 
-**1. InSpatial Renderer:**
+### 1. InSpatial Renderer
 
 - **Extensible Architecture:** Decouples component logic from rendering environment.
 - **`createRenderer(nodeOps, rendererID?)`:** Creates a custom renderer.
-- **`DOMRenderer(InTrigger)` (`@inspatial/run/renderer/dom`):** For interactive web applications.
+- **`DOMRenderer(InTrigger)` (`@inspatial/kit/dom-renderer`):** For interactive web applications.
   _ **Triggers & Event Handling:** `on:eventName` (e.g., `on:click`). Supports modifiers like `on-once:`, `on-passive:`, `on-capture:`, `on-prevent:`, `on-stop:`.
   _ **Browser Preset Directives:** `class:className={signal}` for conditional classes, `style:property={value}` for individual styling (CSS) properties.
   \_ **Handling Dynamic HTML Content:** For inserting dynamic HTML (e.g., from APIs), prefer parsing the HTML into a `DocumentFragment` and rendering it directly within the component. This is more robust and integrates better with InSpatial's retained mode rendering than using `innerHTML` directly, which can have security implications and reconciliation challenges.
 
-- **`NativeRenderer(InTrigger)` (`@inspatial/run/renderer/native`):** For interactive iOS, Android and VisionOS applications. \* \*\*Soon...
+- **`GPURenderer(InTrigger)` (`@inspatial/kit/gpu-renderer`):** For interactive 3D & XR applications. \* \*\*Soon...
 
-- **`GPURenderer(InTrigger)` (`@inspatial/run/renderer/spatial`):** For interactive 3D & XR applications. \* \*\*Soon...
 
-**2. InSpatial Runtime (JSX):**
+#### Render targets - "Use Directives"
+InSpatial allows you to switch between renderers with directives, because all InSpatial Kit components and widgets are built for different platforms e.g `button.dom.tsx`, `button.gpu.tsx` etc... You can easily switch the render targets by declaring the following directive at the beginning of your `window.tsx` or `scene.tsx` files. 
+
+##### For `window.tsx` Views
+
+- **"use native":** universal defaults this is the default directive and is what is auto attached to every .tsx file if no directive is declared. This will auto use the appropraite renderer based on detected environment. 
+- **"use dom":**
+- **"use gpu":**
+- **"use ios:"**
+- **"use visionos:"**
+- **"use android:"**
+- **"use androidxr:"**
+- **"use horizonos:"**
+- **"use ssr:"**
+
+
+##### For `scene.tsx` Views
+- **"use volumentric":** for 3d scenes 
+- **"use ar":** for augmented reality scenes
+- **"use vr":** for virtual reality scenes
+- **"use mr":** for mixed reality scenes
+
+
+### 2. InSpatial Runtime
 Built on top the universal runtime
 
+
+#### JSX Runtime
 - **Retained Mode:** JSX templates are evaluated once to build the initial UI.
-- **Pragma Transform (Recommended)::** Provides maximum flexibility. Requires configuring `jsxFactory: 'R.c'` and `jsxFragment: 'R.f'` in build tools (Vite, Babel). Components receive `R` as an argument.
+- **Pragma Transform::** Provides maximum flexibility. Requires configuring `jsxFactory: 'R.c'` and `jsxFragment: 'R.f'` in build tools (Vite, Babel). Components receive `R` as an argument.
 - **Automatic Runtime:** Easier setup, but less flexible. Configures `jsx: 'automatic'` and `jsxImportSource: 'InSpatial'`.
 - **Hot Reload:** Use `InVite` extension for vite-rollup/rolldown and `InPack` for webpack/rspack client development.
 
-**3. InSpatial Kit:**
+
+#### Creating your own runtime?
+
+### 3. Widgets & Components
 
 - **Structure:** A component is a function `(props, ...children) => Node`. The inner function receives the renderer `R`.
 - **Structure & Control Flow Components:**
@@ -101,7 +128,7 @@ const my = {
  style={{
     web: {
       // ❌  DON'T DO THIS
-      color: my.textColor.get(),
+      color: my.textColor.get(), // this works too but auto-coercion already appends .get()
 
       // ✅ DO THIS
       color: my.textColor,
@@ -147,9 +174,10 @@ className={{
 
 #### Styling Alternative (Not-recommended)
 
-Subsequently styling can be done by calling multiple style props e.g
+Styling can also be done by calling multiple style props e.g
 
 ```typescript
+// ❌  DON'T DO THIS
 <Component
   style:color="black"
   style:background-color="yellow"
@@ -157,13 +185,15 @@ Subsequently styling can be done by calling multiple style props e.g
 />
 ```
 
+Even though this is an option it forgoes the unviversal mental model of InSpatial because it treats and assumes that you are only operating in the context of the web also it creates a new type of anti-pattern where you are parsing the same prop more than once within a sing component. 
+
 - **Styling Dynamic Elements:** For dynamically styled elements, leverage InSpatial's browser preset capabilities for conditional classes (`class:active={signal}`) and inline styles (`style:property={value}`) to ensure styles update correctly with state changes. \* \*\*Soon...
 
 ## Interactivity
 
-### 1. Signals (@in/teract/signal)
+### 4. Signals (@in/teract/signal)
 
-InSpatial Run is fundamentally reactive signal based system. The core signal primitives InSpatial State is that `@in/teract` is an signal based interactivity and state management system. It is subdivided into two types of reactive systems. There is Signal Core and Signal Lite each inspired by SolidJS and Preact respectively.
+InSpatial Kit is fundamentally reactive signal based system. The core signal primitives InSpatial State is that `@in/teract` is an signal based interactivity and state management system. It is subdivided into two types of reactive systems. There is Signal Core and Signal Lite each inspired by SolidJS and Preact respectively.
 
 - **Definition:** Reactive containers (`createSignal()`) that notify observers on value changes.
 - **Computed Signals:** Derive values from other signals (`computed()`, or `$(...)` alias) and update automatically.
@@ -204,9 +234,9 @@ Use the extensive signal operation methods (`.and()`, `.eq()`, `.gt()`, etc.) fo
 
 NOTE: hasValue returns plain boolean. Returns true when the value of the signal is not nullish.
 
-### 2. InSpatial State (@inspatial/state)
+### 5. InSpatial State (@inspatial/kit/state)
 
-InSpatial State is built-in state management system for InSpatial Run. InSpatial State provides a higher-level abstraction built on top of InSpatial's reactive signal module `@in/teract/signal`.
+InSpatial State is built-in state management system for InSpatial Kit. InSpatial State provides a higher-level abstraction built on top of InSpatial's reactive signal module `@in/teract/signal`.
 
 You can use InSpatial State in two ways:
 
@@ -302,7 +332,7 @@ Is this a game or xr?
 
 Both patterns have the same power... pick the ergonomics that fit the job.
 
-### 3. InSpatial Triggers (Props Registry)
+### 6. InSpatial Triggers (Props Registry)
 
 InSpatial Triggers are grouped into `Props` and `Actions`.
 
@@ -313,9 +343,9 @@ InSpatial Triggers are grouped into `Props` and `Actions`.
 
 - Trigger Props are disabled by default. Install the `InTrigger` extension to enable resolution of `on:*`, `style:*`, and `class:*`.
 - Use `createTriggerHandle()` to register new or override existing trigger props in the registry.
-- Import surface for trigger props is provided by `@inspatial/state`:
+- Import surface for trigger props is provided by `@inspatial/kit/state`:
   ```ts
-  import { InTrigger, createTriggerHandle } from "@inspatial/trigger";
+  import { InTrigger, createTriggerHandle } from "@inspatial/kit/trigger";
   ```
 
 #### Trigger (Actions)
@@ -337,8 +367,8 @@ Enable trigger props by installing `InTrigger` in your renderer. This extension:
 - Wires `style:*` and `class:*` for reactive styling
 
 ```typescript
-import { createRenderer } from "@inspatial/renderer";
-import { InTrigger } from "@inspatial/trigger";
+import { createRenderer } from "@inspatial/kit/renderer";
+import { InTrigger } from "@inspatial/kit/trigger";
 
 createRenderer({
   mode: "auto",
@@ -359,7 +389,7 @@ createRenderer({
 Register custom trigger props via the registry. Handlers receive the `node` and the prop `value` (function or signal):
 
 ```typescript
-import { createTriggerHandle } from "@inspatial/state";
+import { createTriggerHandle } from "@inspatial/kit/state";
 
 // Example: basic hover state callback
 createTriggerHandle("hover", (node, cb?: (e: Event) => void) => {
@@ -396,16 +426,131 @@ Different platforms can have different trigger implementations:
 
 The trigger bridge system handles these differences transparently. `InTrigger` auto-registers a universal bridge so `on:tap` maps to `click` on the web, and `longpress` is synthesized from pointer events.
 
-**.4. InSpatial Motion:**
+## Extension
+
+### Extending InSpatial Renderer/App
+
+InSpatial Kit exposes a lightweight extension API. An extension is a plain object created with `createExtension({ meta, capabilities, lifecycle, ... })` and consumed by renderers via `extensions: [/* your extensions */]`.
+
+- **Directive layer (renderer-agnostic)**: Provide `capabilities.rendererProps.onDirective(prefix, key, prop?)` to resolve namespaced props (e.g., `datax:title`, `svg:xlink:href`). Also provide `namespaces`, `tagNamespaceMap`, and `tagAliases` if needed.
+- **Lifecycle**: Use `lifecycle.setup(renderer)` for one-time registration (e.g., registering trigger props). Validation hooks are optional (`validate`).
+- **Events**: All event listeners must flow through the trigger prop system. Register new events with `createTriggerHandle()` and ensure `InTrigger` is present.
+
+### Demo: a tiny directive extension
+
+Add a `datax:*` directive that maps to `data-*` attributes across platforms.
+
+```ts
+// extensions/datax.ts
+import { createExtension } from "@inspatial/kit/extension";
+
+export function InDataX() {
+  return createExtension({
+    meta: {
+      key: "InDataX",
+      name: "datax",
+      description: "Adds datax:* → data-* attribute resolution",
+      verified: true,
+      type: "Universal",
+      version: "0.1.0",
+    },
+    capabilities: {
+      rendererProps: {
+        onDirective(prefix, key) {
+          if (prefix !== "datax") return undefined;
+          const attr = `data-${key}`;
+          return (node, value) => {
+            if (value == null || value === false)
+              (node as any).removeAttribute?.(attr);
+            else (node as any).setAttribute?.(attr, String(value));
+          };
+        },
+      },
+    },
+    scope: {}, // ...
+    permissions: {}, // ...
+    lifecycle: {
+      setup() {}, //...
+    },
+  });
+}
+```
+
+Usage:
+
+```ts
+import { createRenderer } from "@inspatial/kit/renderer";
+import { InTrigger } from "@inspatial/kit/trigger/InTrigger"; // enables on:* props
+import { InDataX } from "./extensions/datax";
+
+createRenderer({
+  mode: "auto",
+  extensions: [InTrigger(), InDataX()],
+}).then((InSpatial) => {
+  InSpatial.render(document.getElementById("app"), () => (
+    <button datax:variant="primary" on:tap={() => console.log("tap")}>
+      OK
+    </button>
+  ));
+});
+```
+
+Notes:
+
+- The demo shows a directive resolver (no raw listeners). For custom events, register via the trigger bridge and keep `InTrigger()` installed so `on:*` props resolve.
+
+### Extending InSpatial Cloud
+
+```ts
+import { CloudExtension } from "@inspatial/cloud";
+
+export const userAgentExtension = new CloudExtension("userAgent", {
+  label: "User Agent",
+  description: "This extension provides user-agent parsing",
+  config: {
+    userAgentDebug: {
+      type: "boolean",
+      description: "Enable user agent printing to console",
+      default: true,
+    },
+    userAgentEnabled: {
+      type: "boolean",
+      description: "Enable user agent parsing",
+      default: true,
+    },
+  },
+  requestLifecycle: {
+    setup: [
+      {
+        name: "parseUserAgent",
+        handler(inRequest, config) {
+          if (!config.userAgentEnabled) return;
+
+          const agent = parseUserAgent(inRequest.headers.get("user-agent"));
+          inRequest.context.register("userAgent", agent);
+
+          if (config.userAgentDebug) {
+            const userAgent = inRequest.context.get("userAgent");
+            console.log({ userAgent });
+          }
+        },
+      },
+    ],
+  },
+  install() {},
+}) as CloudExtension;
+```
+
+### 7. InSpatial Motion
 InSpatial Motion is built on InSpatial's `@in/motion`. \* \*\*Soon...
 
 #### NOTE On Interactivity
 
-NOTE: Signals are the most low-level reactive primitives you should only ever use `createSignal()` API from `@in/teract/signal` directly only when building frameworks. Otherwise application development MUST use `createState()` api from `@inspatial/state` which builds upon signals.
+NOTE: Signals are the most low-level reactive primitives you should only ever use `createSignal()` API from `@in/teract/signal` directly only when building frameworks. Otherwise application development MUST use `createState()` api from `@inspatial/kit/state` which builds upon signals.
 
 ## Routing & Navigation
 
-**.7. InSpatial Route:**
+### 8. InSpatial Route
 InSpatial Route is a universal filesystem router built on InSPatial's `@in/route` module.
 
 ### Programmatic routing - `createRoute()` API
@@ -417,11 +562,12 @@ InSpatial Route is a universal filesystem router built on InSPatial's `@in/route
 
   ```ts
   export const route = createRoute({
+    mode: "auto",
     defaultView: ErrorWindow,
-    routes: {
-      home: { path: "/", view: AppWindow },
-      projects: { path: "/projects", view: ProjectsWindow },
-    },
+    routes: [
+      { name: "home", to: "/", view: HomeWindow },
+      { name: "projects", to: "/projects", view: ProjectsWindow },
+    ],
   });
 
   export function AppRoutes() {
@@ -440,7 +586,7 @@ InSpatial Route is a universal filesystem router built on InSPatial's `@in/route
 
 ### Navigation
 
-#### 1. With Link Component:
+#### A. With Link Component:
 
 - Use `<Link to="/path">` for SPA navigation; it uses InSpatial's universal `InTrigger` props (`on:tap`) under the hood and appends `?ref=inspatial` for external http(s) links.
 - Example:
@@ -449,10 +595,10 @@ InSpatial Route is a universal filesystem router built on InSPatial's `@in/route
   <Link to="/projects">Projects</Link>
   ```
 
-#### 2. With Trigger Props
+#### B. With Trigger Props
 
 ```ts
-import { route } from "@inspatial/route";
+import { route } from "@inspatial/kit/route";
 
 const route = createRoute()
 
@@ -466,13 +612,119 @@ const route = createRoute()
 
 ## Testing
 
-**.8. InSpatial Test:**
+### 9. InSpatial Test
 InSpatial Test is built on InSpatial's `@in/test`. \* \*\*Soon...
 
-## Cloud & Backend
+## Server & Backend
 
-**.9. InSpatial Cloud:**
-InSpatial Cloud is built on `@inspatial/cloud` and exposes `@inspatial/cloud` APIs for comprehensive backend and data management across all platforms. \* \*\*Soon...
+### 10. InSpatial Cloud
+InSpatial Cloud is built on `@inspatial/cloud` and exposes `@inspatial/cloud` APIs for comprehensive backend and data management across all platforms. `@inspatial/cloud-client` is what you should always use on the cient app. `@inSpatial/cloud` is only for server.
+
+### Adding a New Cloud Collection/Table
+
+```ts
+import {
+  ChildEntryType as ChildCollection,
+  EntryType as Collection,
+} from "@inspatial/cloud";
+
+export const customerAccount = new Collection("customerAccount", {
+  label: "Customer Account",
+  idMode: "ulid",
+  titleField: "customerName",
+  fields: [
+    {
+      key: "customerName",
+      type: "DataField",
+      label: "Customer Name",
+      required: true,
+    },
+    {
+      key: "customerId",
+      type: "DataField",
+      label: "Customer ID",
+      required: true,
+    },
+  ],
+  children: [
+    new ChildCollection("users", {
+      description: "Users associated with this account",
+      label: "Users",
+      fields: [
+        {
+          key: "user",
+          label: "User",
+          type: "ConnectionField",
+          entryType: "user",
+        },
+        {
+          key: "isOwner",
+          label: "Is Owner",
+          type: "BooleanField",
+        },
+      ],
+    }),
+  ],
+});
+```
+
+With InSpatial Cloud, everything is an exension. You can create in one of two apis `new CloudExtension` and `createInCloud` which is the highest level abstraction.
+
+### Using - `new CloudExtension()`
+
+```ts
+import { CloudExtension } from "@inspatial/cloud";
+import { product } from "./collection/product.ts";
+import { customerAccount } from "./collection/customer-account.ts";
+
+const crmExtension = new CloudExtension("crm", {
+  label: "CRM",
+  description: "Customer Relationship Management",
+  version: "1.0.0",
+  entryTypes: [customerAccount, product],
+  roles: [
+    {
+      roleName: "customer",
+      description: "A customer",
+      label: "Customer",
+    },
+    {
+      roleName: "manager",
+      description: "A manager",
+      label: "Manager",
+    },
+  ],
+});
+
+export default crmExtension;
+```
+
+### Using - `createInCloud()`
+
+```ts
+import { createInCloud } from "@inspatial/cloud";
+import { product } from "./collection/product.ts";
+import { customerAccount } from "./collection/customer-account.ts";
+
+createInCloud({
+  name: "CRM",
+  description: "Customer Relationship Management",
+  version: "1.0.0",
+  entryTypes: [customerAccount, product],
+  roles: [
+    {
+      roleName: "customer",
+      description: "A customer",
+      label: "Customer",
+    },
+    {
+      roleName: "manager",
+      description: "A manager",
+      label: "Manager",
+    },
+  ],
+});
+```
 
 ---
 
@@ -505,7 +757,7 @@ Note: hasValue returns plain boolean. Returns true when the value of the signal 
 **Renderer Setup:**
 
 - `DOMRenderer(InTrigger)` from `@in/dom`
-- `InTrigger` from `@inspatial/run/trigger` to ship the default/core web props i.e `class:` and `style:`
+- `InTrigger` from `@inspatial/kit/trigger` to ship the default/core web props i.e `class:` and `style:`
 - Trigger system & Event handling: `on:event`, `on-once:event`, `on-passive:event`, `on-capture:event`
 
 **JSX Configuration**
@@ -514,15 +766,24 @@ Note: hasValue returns plain boolean. Returns true when the value of the signal 
 
 JSX runtime is essential when using InSpatial together with runtimes like [Deno](https://github.com/denoland/deno/issues/29584), compilers like [SWC](https://github.com/swc-project/swc/issues/10553) or generators like [MDX](https://mdxjs.com/), since they lack the ability to correctly transform JSX via parameters.
 
-### Setup with (@Inspatial/serve) Renderer Extensions
+### 10. Dev & Production (Serving, Bundling etc...) 
+You can build your app for dev and production using different tools like (InSpatial `Serve` extension, Vite, Rollup with Babel, Rspack or Webpack). InSpatial provides different plugins and extensions for different tools. 
+
+- InServe (Default)
+- InVite  
+- InPack 
+
+
+#### InServe (Founders Choice)
+When using `InServe()` extension there's no need to use or configure a build tool like Vite or RSPack. To use `InServe()`, create your render.ts file and add it as an extension. 
 
 ```typescript
 // render.ts
-import { createRenderer } from "@inspatial/run/renderer";
-import { InServe } from "@inspatial/serve";
+import { createRenderer } from "@inspatial/kit/renderer";
+import { InServe } from "@in/serve";
 
 createRenderer({
-  extensions: [InServe],
+  extensions: [InServe()],
 });
 ```
 
@@ -537,19 +798,14 @@ Then add your deno.json
 }
 ```
 
-### Setup with a build tool (Alternative)
-
-Your setup can be configured too build tool like (Vite, Rollup with Babel, Rspack or Webpack) to use InSpatial's JSX runtime.
-
-#### Vite (`vite.config.ts`)
+#### InVite 
+Use `InVite` plugin for Vite. Create a `vite.config.ts` file and add the following conifguration
 
 ##### Pragma Config (Default)
 
 ```typescript
 import { defineConfig } from "vite";
-import tailwindcss from "@tailwindcss/vite";
-import deno from "@deno/vite-plugin";
-import { InSpatial } from "@inspatial/run/hot";
+import { InVite } from "@in/vite";
 
 export default defineConfig({
   server: {
@@ -560,8 +816,6 @@ export default defineConfig({
     jsxFragment: "R.f",
   },
   plugins: [
-    deno(),
-    tailwindcss(), // Optional
     InVite(),
   ],
   build: {
@@ -578,7 +832,7 @@ import { defineConfig } from "vite";
 export default defineConfig({
   esbuild: {
     jsx: "automatic",
-    jsxImportSource: "@inspatial/run", // This tells Vite/esbuild where to find the runtime
+    jsxImportSource: "@inspatial/kit", // This tells Vite/esbuild where to find the runtime
   },
 });
 ```
@@ -592,12 +846,26 @@ export default defineConfig({
       "@babel/preset-react",
       {
         "runtime": "automatic",
-        "importSource": "@inspatial/run"
+        "importSource": "@inspatial/kit"
       }
     ]
   ]
 }
 ```
+
+#### InPack 
+Use the `InPack` plugin for Webpack and/or RSPack/RSBuild
+
+```javascript
+import { defineConfig } from "@rsbuild/core";
+import InPack from "@in/pack";
+
+export default defineConfig({
+  plugins: [InPack()],
+  // ... jsx config
+});
+```
+
 
 ### Initialization
 
@@ -607,7 +875,7 @@ Once your build tool is configured, you need to initialize the runtime with a re
 
 ```typescript
 import "./kit.css";
-import { createRenderer } from "@inspatial/run/renderer";
+import { createRenderer } from "@inspatial/kit/renderer";
 import { App } from "../my/app/root.tsx";
 
 // Create InSpatial renderer with Trigger Props
@@ -624,30 +892,6 @@ Now, any `.jsx` or `.tsx` file will be automatically transformed to use the init
 
 **Hot Reload:**
 
-#### Vite
-
-```javascript
-import { defineConfig } from "vite";
-import InSpatial from "@inspatial/run/hot";
-
-export default defineConfig({
-  plugins: [InVite()],
-  // ... jsx config
-});
-```
-
-#### Rspack (RsBuild) or Webpack
-
-```javascript
-import { defineConfig } from "@rsbuild/core";
-import InSpatialRun from "@inspatial/run/hot";
-
-export default defineConfig({
-  plugins: [InPack()],
-  // ... jsx config
-});
-```
-
 ---
 
 ## ⚠️ CRITICAL: THIS IS NOT REACT!
@@ -658,7 +902,7 @@ export default defineConfig({
 
 | React                                                       | InSpatial                                                        |
 | ----------------------------------------------------------- | ---------------------------------------------------------------- |
-| `useState(0)`                                               | `createSignal(0)`                                                |
+| `useState(0)`                                               | `createState({count: 0 })`                                                |
 | `createEffect(() => {}, [deps])`                            | `watch(() => {})` or `createEffect(() => {})`                    |
 | `{count}`                                                   | `{count}` (same for signals)                                     |
 | `{`Count: ${count}`}`                                       | `{$(() => \`Count: ${count.value}\`)}`or`{t\`Count: ${count}\`}` |
@@ -683,7 +927,7 @@ const Counter = () => {
 };
 
 // ✅ The InSpatial way - DO THIS (State)
-import { createState } from "@inspatial/state";
+import { createState } from "@inspatial/kit/state";
 
 const Counter = () => {
   const counter = createState({ count: 0 });
@@ -710,7 +954,7 @@ const App = () => {
 };
 
 // ✅ The InSpatial way - DO THIS (State)
-import { createState } from "@inspatial/state";
+import { createState } from "@inspatial/kit/state";
 
 const App = () => {
   const ui = createState({ isVisible: true });
@@ -741,7 +985,7 @@ const TodoList = () => {
 };
 
 // ✅ The InSpatial way - DO THIS (State)
-import { createState } from "@inspatial/state";
+import { createState } from "@inspatial/kit/state";
 
 const TodoList = () => {
   const state = createState({ todos: [{ id: 1, text: "Learn InSpatial" }] });
@@ -791,7 +1035,7 @@ createEffect(() => {
 const message = `Count is: ${count}`;
 
 // ✅ The InSpatial way - DO THIS (State)
-import { createState, $ } from "@inspatial/state";
+import { createState, $ } from "@inspatial/kit/state";
 
 const s = createState({ count: 0 });
 const message = $(() => `Count is: ${s.count.get()}`);
@@ -826,7 +1070,7 @@ const PostCard = async ({ id }: PostID) => {
 ### 8. State Signal Operations (Advanced)
 
 ```typescript
-import { createState, $ } from "@inspatial/state";
+import { createState, $ } from "@inspatial/kit/state";
 
 // State-backed signal comparisons and derived values
 const s = createState({ count: 5, status: "loading" });
@@ -852,7 +1096,7 @@ const label = $(() => `Status: ${s.status.get()}`);
 
 ```javascript
 // Template literals with reactive interpolation (State)
-import { createState } from "@inspatial/state";
+import { createState } from "@inspatial/kit/state";
 
 const s = createState({ templateId: 123 });
 const templateUrl = t`https://inspatial.store/template?id=${s.templateId}`;
@@ -871,7 +1115,7 @@ const templateUrl = t`https://inspatial.store/template?id=${s.templateId}`;
 9. **Async**: Components can be `async` functions with `fallback` and `catch` props
 10. **Signal Operations**: Use `.eq()`, `.gt()`, `.and()`, etc. for comparisons
 11. **Render**: `InSpatial.render(container, component, props, ...children)`
-12. **Env**: Short for Environment `@inspatial/env` should be use to condition platform, runtime and render targets as well as environment variables.
+12. **Env**: Short for Environment `@inspatial/kit/env` built on `@in/vader/env` should be use to condition platform, runtime and render targets as well as environment variables.
 
 ### Naming Pattern
 
@@ -904,3 +1148,13 @@ const templateUrl = t`https://inspatial.store/template?id=${s.templateId}`;
 - **Searchable** - easy to find all states (search `use`), triggers (search `handle`), actions (search `set`)
 - **Consistent** - same pattern across entire codebase
 - **Maintainable** - refactoring becomes predictable
+
+## Anti-Patterns & Conflicts
+
+Because InSpatial is a Universal Development Environment (UDE), there are many patterns developers are traditionally accustomed to that are now considered Anti-Patterns.
+
+- Styling
+- Triggers
+- Motion
+
+These are primary systems that are intentiaonally detached from InSpatial Renderer. Universal Apps are omni-platforms and as such we should never assume the environment the user is in.

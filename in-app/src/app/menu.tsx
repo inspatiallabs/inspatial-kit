@@ -1,6 +1,6 @@
-import { Link } from "@inspatial/kit";
+import { Link } from "@inspatial/kit/navigation";
 import { useTheme } from "./(extensions)/in-theme/index.ts";
-import { $ } from "@inspatial/state";
+import { $ } from "@inspatial/kit/state";
 import { route } from "./routes.tsx";
 
 export function AppMenu() {

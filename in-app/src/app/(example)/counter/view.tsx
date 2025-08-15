@@ -1,6 +1,6 @@
 // deno-lint-ignore-file
-import { $ } from "@inspatial/state";
-import { Show, List } from "@inspatial/kit";
+import { $ } from "@inspatial/kit/state";
+import { Show, List } from "@inspatial/kit/control-flow";
 import {
   useCounter,
   useCounterExplicit,

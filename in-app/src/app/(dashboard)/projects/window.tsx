@@ -1,4 +1,4 @@
-import { AppMenu } from "../../menu.tsx";
+import { AppMenu } from "@inspatial/app/app/menu.tsx";
 
 export function ProjectsWindow() {
   return (

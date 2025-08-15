@@ -10,27 +10,82 @@
   },
   "compilerOptions": {
     "lib": ["ES2022", "DOM", "DOM.Iterable", "deno.ns"],
-    "jsxImportSource": "@inspatial/run",
+    "jsxImportSource": "@inspatial/kit",
     "jsx": "react-jsx"
   },
   "imports": {
+    "@in/kit/": "../kit/src/",
+    "@in/kit": "../kit/src/index.ts",
+
+    "@in/kit/component": "../kit/src/kit/src/component/index.ts",
+    "@in/kit/control-flow": "../kit/src/kit/src/control-flow/index.ts",
+    "@in/kit/navigation": "../kit/src/kit/src/navigation/index.ts",
+    "@in/kit/structure": "../kit/src/kit/src/structure/index.ts",
+
+    "@in/renderer/": "../kit/src/renderer/src/",
+    "@in/runtime/": "../kit/src/runtime/src/",
+    "@in/extension/": "../kit/src/extension/src/",
+    "@in/route/": "../kit/src/route/src/",
+    "@in/zero/": "../kit/src/zero/src/",
+
+    "@in/runtime": "../kit/src/runtime/src/index.ts",
+    "@in/jsx-runtime": "../kit/src/runtime/src/jsx-runtime.ts",
+    "@in/jsx-dev-runtime": "../kit/src/runtime/src/jsx-dev-runtime.ts",
+
+    "@in/extension": "../kit/src/extension/src/index.ts",
+    "@in/route": "../kit/src/route/src/index.ts",
+    "@in/zero": "../kit/src/zero/src/index.ts",
+
+    "@in/dom": "../kit/src/renderer/src/dom.ts",
+    "@in/ssr": "../kit/src/renderer/src/ssr.ts",
+    "@in/android-xr": "../kit/src/renderer/src/android-xr.ts",
+    "@in/vision-os": "../kit/src/renderer/src/vision-os.ts",
+    "@in/horizon-os": "../kit/src/renderer/src/horizon-os.ts",
+    "@in/xr": "../kit/src/renderer/src/xr.ts",
+    "@in/gpu": "../kit/src/renderer/src/gpu.ts",
+    "@in/nativescript": "../kit/src/renderer/src/nativescript.ts",
+
+    "@in/teract/signal/": "../kit/src/signal/src/",
+    "@in/teract/signal": "../kit/src/signal/src/index.ts",
+    "@in/teract/state/": "../kit/src/state/src/core/",
+    "@in/teract/trigger/": "../kit/src/state/src/trigger/",
+    "@in/teract/trigger": "../kit/src/state/src/trigger/index.ts",
+    "@in/teract/env/": "../kit/src/env/src/",
+    "@in/teract/env": "../kit/src/env/src/index.ts",
+
+    "@in/serve/": "../kit/src/serve/src/",
+    "@in/serve": "../kit/src/serve/src/index.ts",
+
+    "@in/vader": "../kit/src/utils.ts",
+    "@in/vader/env/": "../kit/src/env/src/",
+    "@in/vader/env": "../kit/src/env/src/index.ts",
+    "@in/vader/debug/": "../kit/src/debug/src/",
+    "@in/vader/debug": "../kit/src/debug/src/index.ts",
+
     "@inspatial/app/": "./src/",
+
     "@inspatial/cloud-client": "jsr:@inspatial/cloud-client@^0.1.22",
-    "@inspatial/run": "../run/src/index.ts",
-    "@inspatial/runtime": "../run/src/runtime/index.ts",
-    "@inspatial/run/jsx-runtime": "../run/src/runtime/jsx-runtime.ts",
-    "@inspatial/run/jsx-dev-runtime": "../run/src/runtime/jsx-dev-runtime.ts",
-    "@inspatial/kit": "../run/src/kit/index.ts",
-    "@inspatial/renderer": "../run/src/renderer/index.ts",
-    "@inspatial/signal": "../run/src/signal/index.ts",
-    "@inspatial/state": "../run/src/state/index.ts",
-    "@inspatial/state/core": "../run/src/state/core/index.ts",
-    "@inspatial/state/trigger": "../run/src/state/trigger/index.ts",
-    "@inspatial/route": "../run/src/route/index.ts",
-    "@inspatial/env": "../run/src/env/index.ts",
-    "@inspatial/hot": "../run/src/hot/index.ts",
-    "@inspatial/debug": "../run/src/debug/index.ts",
-    "@inspatial/serve": "../run/src/hot/inspatial-serve/index.ts",
+
+    "@inspatial/kit": "../kit/src/index.ts",
+    "@inspatial/kit/control-flow": "../kit/src/kit/src/control-flow/index.ts",
+    "@inspatial/kit/navigation": "../kit/src/kit/src/navigation/index.ts",
+    "@inspatial/kit/structure": "../kit/src/kit/src/structure/index.ts",
+    "@inspatial/kit/component": "../kit/src/kit/src/component/index.ts",
+
+    "@inspatial/kit/extension": "../kit/src/extension/src/index.ts",
+
+    "@inspatial/kit/jsx-runtime": "../kit/src/runtime/src/jsx-runtime.ts",
+    "@inspatial/kit/jsx-dev-runtime": "../kit/src/runtime/src/jsx-dev-runtime.ts",
+
+    "@inspatial/kit/components": "../kit/src/kit/src/index.ts",
+    "@inspatial/kit/renderer": "../kit/src/renderer/src/index.ts",
+    "@inspatial/kit/signal": "../kit/src/signal/src/index.ts",
+    "@inspatial/kit/state": "../kit/src/state/src/core/index.ts",
+    "@inspatial/kit/trigger": "../kit/src/state/src/trigger/index.ts",
+    "@inspatial/kit/route": "../kit/src/route/src/index.ts",
+    "@inspatial/kit/env": "../kit/src/env/src/index.ts",
+    "@inspatial/kit/serve": "../kit/src/serve/src/index.ts",
+    "@inspatial/kit/debug": "../kit/src/debug/src/index.ts",
     "@tailwindcss/cli": "npm:@tailwindcss/cli@^4.1.11",
     "tailwindcss": "npm:tailwindcss@^4.1.11"
   }
