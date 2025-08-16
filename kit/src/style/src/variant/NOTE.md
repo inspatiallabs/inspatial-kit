@@ -1,27 +1,27 @@
-# Variant Composition: Common Gotchas
+# Style Composition: Common Gotchas
 
 ## 🚨 Key Things to Know
 
-Variant composition can be tricky when working with deeply nested and complex variant settings. Here's what you need to watch out for:
+Style composition can be tricky when working with deeply nested and complex style settings. Here's what you need to watch out for:
 
 ## API Methods
 
-### Using the `getVariant` Method
+### Using the `getStyle` Method
 
 <details>
-<summary>💡 <strong>Terminology:</strong> Variant API</summary>
+<summary>💡 <strong>Terminology:</strong> Style API</summary>
 
-The variant system provides the `getVariant` method for applying variant styles. This method takes your variant props and returns the generated class names.
+The style system provides the `getStyle` method for applying style styles. This method takes your style props and returns the generated class names.
 
 </details>
 
 #### Example Usage
 
 ```typescript
-import { createStyle, type StyleProps } from "@inspatial/theme/variant";
+import { createStyle, type StyleProps } from "@in/style/style";
 
-// Create a button variant
-const ButtonVariant = createStyle({
+// Create a button style
+const ButtonStyle = createStyle({
   base: "inline-flex items-center justify-center rounded transition-colors",
   settings: {
     size: {
@@ -41,15 +41,15 @@ const ButtonVariant = createStyle({
 });
 
 // Extract the props type
-export type ButtonVariantType = StyleProps<typeof ButtonVariant>;
+export type ButtonStyleType = StyleProps<typeof ButtonStyle>;
 
-// Use the variant
-const primaryButton = ButtonVariant.getVariant({
+// Use the style
+const primaryButton = ButtonStyle.getStyle({
   size: "lg",
 });
 
 // With className prop
-const customButton = ButtonVariant.getVariant({
+const customButton = ButtonStyle.getStyle({
   format: "secondary",
   className: "font-bold",
 });
@@ -60,9 +60,9 @@ const customButton = ButtonVariant.getVariant({
 ### Missing Properties in `createStyle` Settings
 
 <details>
-<summary>💡 <strong>Terminology:</strong> Empty Variant Properties</summary>
+<summary>💡 <strong>Terminology:</strong> Empty Style Properties</summary>
 
-When creating variants using `createStyle`, each property in the settings object must have at least one value defined, even if it's an empty string. Otherwise, TypeScript will raise type errors when using the variant methods.
+When creating styles using `createStyle`, each property in the settings object must have at least one value defined, even if it's an empty string. Otherwise, TypeScript will raise type errors when using the style methods.
 
 </details>
 
@@ -70,13 +70,13 @@ When creating variants using `createStyle`, each property in the settings object
 
 ```typescript
 // This will cause a type error
-export const HeaderWidgetVariant = createStyle({
+export const HeaderWidgetStyle = createStyle({
   base: "inline-flex cursor-auto",
   settings: {
     format: {
       // Empty object with no properties
     },
-    // other variants
+    // other styles
   },
   defaultSettings: {
     format: "full",
@@ -85,8 +85,8 @@ export const HeaderWidgetVariant = createStyle({
 });
 
 // Later usage will generate error:
-// Property 'getVariant' does not exist on type 'VariantSystemReturn'
-const variantClass = HeaderWidgetVariant.getVariant({
+// Property 'getStyle' does not exist on type 'StyleSystemReturn'
+const styleClass = HeaderWidgetStyle.getStyle({
   format: "full",
   ...settings,
 });
@@ -95,20 +95,20 @@ const variantClass = HeaderWidgetVariant.getVariant({
 #### ✅ Correct Implementation
 
 ```typescript
-import { createStyle, type StyleProps } from "@inspatial/theme/variant";
+import { createStyle, type StyleProps } from "@in/style/style";
 
-export const HeaderWidgetVariant = createStyle({
+export const HeaderWidgetStyle = createStyle({
   base: "inline-flex cursor-auto",
   settings: {
-    variant: {
+    style: {
       // Must have properties defined
       full: "absolute top-[80px] left-0 z-10 md:hidden overflow-hidden",
       segmented: "", // Even empty strings are acceptable
     },
-    // other variants
+    // other styles
   },
   defaultSettings: {
-    variant: "full",
+    style: "full",
     format: "base",
     size: "base",
     radius: "base",
@@ -119,53 +119,53 @@ export const HeaderWidgetVariant = createStyle({
 });
 
 // Usage
-const variantClass = HeaderWidgetVariant.getVariant({
-  variant: "full",
+const styleClass = HeaderWidgetStyle.getStyle({
+  style: "full",
   ...settings,
 });
 ```
 
 ## Best Practices
 
-1. **Always define at least one property** for each variant category
+1. **Always define at least one property** for each style category
 2. **Use empty strings** (`""`) when no classes are needed
-3. **Export typed props** using `StyleProps<typeof yourVariant.getVariant>`
+3. **Export typed props** using `StyleProps<typeof yourStyle.getStyle>`
 4. **Include all possible options** in your `defaultSettings`
 
 > [!NOTE]
-> Adding more variants later is easy, just ensure you update both the `settings` and `defaultSettings` objects.
+> Adding more styles later is easy, just ensure you update both the `settings` and `defaultSettings` objects.
 
-# More Things to Know About the Variant System
+# More Things to Know About the Style System
 
-### 1. Core API (Create Variant)
+### 1. Core API (Create Style)
 
 ```typescript
 // Consistent API shape regardless of how it's called:
-const system = createStyle(); // Returns {getVariant, iss, variant, composeVariant}
-const buttonVariant = createStyle({ ...config }); // Returns {getVariant, iss, variant, composeVariant, config}
+const system = createStyle(); // Returns {getStyle, iss, style, composeStyle}
+const buttonStyle = createStyle({ ...config }); // Returns {getStyle, iss, style, composeStyle, config}
 ```
 
 ### 2. Type Extraction
 
 ```typescript
-// Consistent type extraction from any variant pattern:
-type ButtonVariantType = StyleProps<typeof ButtonVariant>;
+// Consistent type extraction from any style pattern:
+type ButtonStyleType = StyleProps<typeof ButtonStyle>;
 ```
 
 ## Using Factory Functions
 
-If you're using the factory pattern (creating your own variant system):
+If you're using the factory pattern (creating your own style system):
 
 ```typescript
-// Create a custom variant system
-const myVariantSystem = createStyle({
+// Create a custom style system
+const myStyleSystem = createStyle({
   hooks: {
     onComplete: (className) => `my-prefix-${className}`,
   },
 });
 
-// Use the system to create variants
-const button = myVariantSystem.variant({
+// Use the system to create styles
+const button = myStyleSystem.style({
   base: "rounded",
   settings: {
     size: {
@@ -175,6 +175,6 @@ const button = myVariantSystem.variant({
   },
 });
 
-// Apply the variant
+// Apply the style
 const className = button({ size: "sm" });
 ```

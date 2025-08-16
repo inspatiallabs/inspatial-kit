@@ -7,7 +7,7 @@
  *
  * @since 0.1.2
  * @category InSpatial Theme
- * @module @inspatial/theme/font
+ * @module @in/style/font
  * @kind test
  * @access public
  */
@@ -18,7 +18,7 @@ import {
   assertEquals,
   assertExists,
   assertSpyCalls,
-} from "@inspatial/test";
+} from "@in/test";
 // @ts-ignore: Allow importing .ts files in Deno
 import { installGoogleFonts } from "../install.ts";
 // @ts-ignore: Allow importing .ts files in Deno

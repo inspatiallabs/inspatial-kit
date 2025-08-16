@@ -48,7 +48,7 @@ interface Code {
  *
  * @example Usage
  * ```ts no-assert
- * import { inspatialColors } from "@inspatial/theme/color";
+ * import { inspatialColors } from "@in/style/color";
  * ```
  * const blueColor = inspatialColors.blue;  // Returns "#009FE3"
  */
@@ -136,7 +136,7 @@ const HEX_PATTERN = (hex: string): RegExp =>
  *
  * @example Usage
  * ```ts no-assert
- * import { inspatialColorPatterns } from "@inspatial/theme/color";
+ * import { inspatialColorPatterns } from "@in/style/color";
  *
  * const hasBlue = inspatialColorPatterns.blue.test("#009FE3");  // Returns true
  * const replaced = someString.replace(inspatialColorPatterns.blue, 'blue');

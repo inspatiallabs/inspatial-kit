@@ -1,17 +1,17 @@
 {
   "nodeModulesDir": "auto",
   "tasks": {
-    "css:watch": "deno run -A npm:@tailwindcss/cli@latest -i src/config/app.css -o dist/kit.css --content 'src/**/*.{ts,tsx,js,jsx}' --watch",
+    "css:watch": "deno run -A npm:@tailwindcss/cli@latest -i src/config/app.css -o dist/kit.css --content src/**/*.{ts,tsx,js,jsx} ../kit/src/**/*.{ts,tsx,js,jsx} --watch",
+    "setup": "powershell -Command \"New-Item -ItemType Directory -Force -Path dist/asset; deno run -A npm:@tailwindcss/cli@latest -i src/config/app.css -o dist/kit.css --content 'src/**/*.{ts,tsx,js,jsx}' '../kit/src/**/*.{ts,tsx,js,jsx}'; Copy-Item src/asset/favicon.png dist/asset/favicon.png; Copy-Item index.html dist/index.html\"",
     "js:watch": "deno bundle --platform=browser --output=dist/bundle.js --sourcemap --watch src/config/render.ts",
     "build": "deno task setup && deno bundle --platform=browser --output=dist/bundle.js --sourcemap --minify src/config/render.ts",
-    "setup": "powershell -Command \"New-Item -ItemType Directory -Force -Path dist/asset; deno run -A npm:@tailwindcss/cli@latest -i src/config/app.css -o dist/kit.css --content 'src/**/*.{ts,tsx,js,jsx}'; Copy-Item src/asset/favicon.png dist/asset/favicon.png; Copy-Item index.html dist/index.html\"",
     "serve": "deno run --allow-net --allow-read --allow-write --allow-env --allow-run src/config/render.ts",
     "clean": "rm -rf dist && rm -rf node_modules && rm -rf deno.lock && rm -rf src/app/.inroute"
   },
   "compilerOptions": {
     "lib": ["ES2022", "DOM", "DOM.Iterable", "deno.ns"],
-    "jsxImportSource": "@inspatial/kit",
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "jsxImportSource": "@inspatial/kit"
   },
   "imports": {
     "@in/kit/": "../kit/src/",
@@ -21,9 +21,15 @@
     "@in/kit/control-flow": "../kit/src/kit/src/control-flow/index.ts",
     "@in/kit/navigation": "../kit/src/kit/src/navigation/index.ts",
     "@in/kit/structure": "../kit/src/kit/src/structure/index.ts",
+    "@in/kit/component/": "../kit/src/kit/src/component/",
+    "@in/kit/control-flow/": "../kit/src/kit/src/control-flow/",
+    "@in/kit/navigation/": "../kit/src/kit/src/navigation/",
+    "@in/kit/structure/": "../kit/src/kit/src/structure/",
 
     "@in/renderer/": "../kit/src/renderer/src/",
     "@in/runtime/": "../kit/src/runtime/src/",
+    "@in/jsx-runtime/": "../kit/src/runtime/src/",
+    "@in/jsx-dev-runtime/": "../kit/src/runtime/src/",
     "@in/extension/": "../kit/src/extension/src/",
     "@in/route/": "../kit/src/route/src/",
     "@in/zero/": "../kit/src/zero/src/",
@@ -44,10 +50,19 @@
     "@in/xr": "../kit/src/renderer/src/xr.ts",
     "@in/gpu": "../kit/src/renderer/src/gpu.ts",
     "@in/nativescript": "../kit/src/renderer/src/nativescript.ts",
+    "@in/dom/": "../kit/src/renderer/src/",
+    "@in/ssr/": "../kit/src/renderer/src/",
+    "@in/gpu/": "../kit/src/renderer/src/",
+    "@in/xr/": "../kit/src/renderer/src/",
+    "@in/android-xr/": "../kit/src/renderer/src/",
+    "@in/vision-os/": "../kit/src/renderer/src/",
+    "@in/horizon-os/": "../kit/src/renderer/src/",
+    "@in/nativescript/": "../kit/src/renderer/src/",
 
     "@in/teract/signal/": "../kit/src/signal/src/",
     "@in/teract/signal": "../kit/src/signal/src/index.ts",
     "@in/teract/state/": "../kit/src/state/src/core/",
+    "@in/teract/state": "../kit/src/state/src/core/index.ts",
     "@in/teract/trigger/": "../kit/src/state/src/trigger/",
     "@in/teract/trigger": "../kit/src/state/src/trigger/index.ts",
     "@in/teract/env/": "../kit/src/env/src/",
@@ -61,6 +76,9 @@
     "@in/vader/env": "../kit/src/env/src/index.ts",
     "@in/vader/debug/": "../kit/src/debug/src/",
     "@in/vader/debug": "../kit/src/debug/src/index.ts",
+
+    "@in/style/": "../kit/src/style/src/",
+    "@in/style": "../kit/src/style/src/index.ts",
 
     "@inspatial/app/": "./src/",
 

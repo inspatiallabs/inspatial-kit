@@ -4,7 +4,7 @@
  *
  * @since 0.1.2
  * @category InSpatial Theme
- * @module @inspatial/theme/font
+ * @module @in/style/font
  * @kind test
  * @access private
  */
@@ -31,7 +31,7 @@ export interface MockFunction<T extends (...args: any[]) => any> {
 }
 
 /**
- * Simplified MockFn alternative to @inspatial/test.mockFn 
+ * Simplified MockFn alternative to @in/test.mockFn 
  */
 export function createMockFunction<
   T extends (...args: any[]) => any

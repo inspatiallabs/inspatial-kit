@@ -9,7 +9,7 @@ import {
   assertExists,
   assertIsError,
   assertSpyCalls,
-} from "@inspatial/test";
+} from "@in/test";
 import { POPULAR_FONTS, generateGoogleFontStubs } from "../stub-generator.ts";
 import { InSpatialFontProp } from "../font-generator.ts";
 // @ts-ignore: Import mock adapter

@@ -21,12 +21,12 @@ type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
   : never;
 
 /**
- * Extract props type from a variant function or object
- * Works with direct variant functions and variant objects
+ * Extract props type from a style function or object
+ * Works with direct style functions and style objects
  */
 type StyleProps<T> = T extends (props?: infer P) => string
   ? OmitUndefined<P>
-  : T extends { getVariant: (props?: infer P) => string }
+  : T extends { getStyle: (props?: infer P) => string }
   ? OmitUndefined<P>
   : never;
 
@@ -183,15 +183,15 @@ const TW_PROPERTIES: Record<string, boolean> = {
 
 /*##############################################(SPLIT-TAILWIND-CLASS)##############################################*/
 
-function splitTailwindClass(className: string): [string, string, string] {
+function _splitTailwindClass(className: string): [string, string, string] {
   // Handle pseudo-classes and breakpoints
-  const [variants, ...rest] = className.split(":").reverse();
+  const [styles, ...rest] = className.split(":").reverse();
   const base = rest.length ? rest.reverse().join(":") : "";
 
   // Extract property and value
   // Tailwind class structure is either 'property' or 'property-value'
-  const matches = variants.match(/^([a-zA-Z0-9-]+)(?:-(.+))?$/);
-  if (!matches) return ["", "", variants];
+  const matches = styles.match(/^([a-zA-Z0-9-]+)(?:-(.+))?$/);
+  if (!matches) return ["", "", styles];
 
   const [, property, value = ""] = matches;
   return [base, property, value];
@@ -218,7 +218,7 @@ function mergeClasses(classes: string[]): string {
 
     // For Tailwind utility classes, check for conflicts
     if (isTailwindClass(className)) {
-      const { variant, utility, fullClass } = parseTailwindClass(className);
+      const { style, utility, fullClass } = parseTailwindClass(className);
 
       // Special handling for specific utility types that need more granular keys
       // For classes like text-sm, text-base, text-lg we want to keep all of them
@@ -230,11 +230,11 @@ function mergeClasses(classes: string[]): string {
         utility === "text" &&
         /text-(xs|sm|base|lg|xl|[0-9]+xl)/.test(fullClass)
       ) {
-        key = variant ? `${variant}:${fullClass}` : fullClass;
+        key = style ? `${style}:${fullClass}` : fullClass;
       }
       // For padding and margin, p-1, p-2, etc. should conflict
       else {
-        key = variant ? `${variant}:${utility}` : utility;
+        key = style ? `${style}:${utility}` : utility;
       }
 
       // If we haven't seen this utility type before, add it
@@ -257,7 +257,7 @@ function mergeClasses(classes: string[]): string {
  * Checks if a class name is a Tailwind utility class
  */
 function isTailwindClass(className: string): boolean {
-  // Get the base class without variants
+  // Get the base class without styles
   const baseName = className.split(":").pop() || "";
   // Extract the utility prefix
   const utilityPrefix = baseName.split("-")[0];
@@ -266,20 +266,20 @@ function isTailwindClass(className: string): boolean {
 }
 
 /**
- * Parses a Tailwind class into its variant and utility parts
+ * Parses a Tailwind class into its style and utility parts
  */
 function parseTailwindClass(className: string): {
-  variant: string;
+  style: string;
   utility: string;
   fullClass: string;
 } {
   const parts = className.split(":");
-  let variant = "";
+  let style = "";
   let baseClass = className;
 
-  // Handle variant prefixes
+  // Handle style prefixes
   if (parts.length > 1) {
-    variant = parts.slice(0, -1).join(":");
+    style = parts.slice(0, -1).join(":");
     baseClass = parts[parts.length - 1];
   }
 
@@ -287,7 +287,7 @@ function parseTailwindClass(className: string): {
   const utilityPrefix = baseClass.split("-")[0];
 
   return {
-    variant,
+    style,
     utility: utilityPrefix,
     fullClass: baseClass,
   };
@@ -342,35 +342,34 @@ function issUtil(...inputs: ClassValueProp[]): string {
 const falsyToString = <T extends unknown>(value: T) =>
   typeof value === "boolean" ? `${value}` : value === 0 ? "0" : value;
 
-/*##############################################(VARIANT-SYSTEM)##############################################*/
+/*##############################################(style-SYSTEM)##############################################*/
 
-type VariantShapeProp = Record<string, Record<string, ClassValueProp>>;
-type VariantSchemaProp<V extends VariantShapeProp> = {
-  [Variant in keyof V]?: StringToBoolean<keyof V[Variant]> | undefined;
+type StyleShapeProp = Record<string, Record<string, ClassValueProp>>;
+type StyleSchemaProp<V extends StyleShapeProp> = {
+  [Style in keyof V]?: StringToBoolean<keyof V[Style]> | undefined;
 };
 
 /**
- * Type definition for variant configuration objects
+ * Type definition for style configuration objects
  * For type inference and IDE autocompletion
  */
-export interface InSpatialVariantConfig<V extends VariantShapeProp> {
+export interface InSpatialStyleConfig<V extends StyleShapeProp> {
   /** Base classes applied to all instances */
   base?: ClassValueProp;
 
-  /** Variant settings mapping variant names to their possible values */
+  /** Style settings mapping style names to their possible values */
   settings?: V;
 
-  /** Compound variants for complex combinations */
+  /** Compound styles for complex combinations */
   composition?: Array<
-    VariantSchemaProp<V> & {
+    StyleSchemaProp<V> & {
       class?: ClassValueProp;
       className?: ClassValueProp;
-      css?: ClassValueProp;
     }
   >;
 
-  /** Default values for variants */
-  defaultSettings?: VariantSchemaProp<V>;
+  /** Default values for styles */
+  defaultSettings?: StyleSchemaProp<V>;
 
   /** Hooks for customizing the output class names */
   hooks?: {
@@ -379,10 +378,10 @@ export interface InSpatialVariantConfig<V extends VariantShapeProp> {
   };
 }
 
-type VariantConfigProp = InSpatialVariantConfig<any>;
+type StyleConfigProp = InSpatialStyleConfig<any>;
 
-interface ComposeVariantProp {
-  <T extends ReturnType<VariantProp>[]>(...components: [...T]): (
+interface ComposeStyleProp {
+  <T extends ReturnType<StyleProp>[]>(...components: [...T]): (
     props?: (
       | UnionToIntersection<
           {
@@ -393,55 +392,52 @@ interface ComposeVariantProp {
     ) & {
       class?: ClassValueProp;
       className?: ClassValueProp;
-      css?: ClassValueProp;
     }
   ) => string;
 }
 
-interface VariantProp {
-  <V extends VariantShapeProp>(config: InSpatialVariantConfig<V>): (
-    props?: VariantSchemaProp<V> & {
+interface StyleProp {
+  <V extends StyleShapeProp>(config: InSpatialStyleConfig<V>): (
+    props?: StyleSchemaProp<V> & {
       class?: ClassValueProp;
       className?: ClassValueProp;
-      css?: ClassValueProp;
     }
   ) => string;
 }
 
 /**
- * Standard interface for all variant system returns
+ * Standard interface for all style system returns
  * Ensures consistency across different creation methods
  */
-interface VariantSystemReturn<V extends VariantShapeProp = any> {
-  /** Core function to apply variants */
-  getVariant: (
-    props?: VariantSchemaProp<V> & {
+interface StyleSystemReturn<V extends StyleShapeProp = any> {
+  /** Core function to apply styles */
+  getStyle: (
+    props?: StyleSchemaProp<V> & {
       class?: ClassValueProp;
       className?: ClassValueProp;
-      css?: ClassValueProp;
     }
   ) => string;
 
   /** Utility for combining classes with intelligent conflict resolution */
   iss: (...inputs: ClassValueProp[]) => string;
 
-  /** Creates variant functions with configurable styles */
-  variant: VariantProp;
+  /** Creates style functions with configurable styles */
+  style: StyleProp;
 
-  /** Utility for combining multiple variant components */
-  composeVariant: ComposeVariantProp;
+  /** Utility for combining multiple style components */
+  composeStyle: ComposeStyleProp;
 
-  /** Configuration used to create this variant (only if direct config was provided) */
-  config?: InSpatialVariantConfig<V>;
+  /** Configuration used to create this style (only if direct config was provided) */
+  config?: InSpatialStyleConfig<V>;
 }
 
 /**
- * Core implementation of the variant system
+ * Core implementation of the style system
  * This is used internally by both the global exports and createStyle
  */
-function createStyleCore<V extends VariantShapeProp>(
-  options?: VariantConfigProp
-): VariantSystemReturn<V> {
+function createStyleCore<V extends StyleShapeProp>(
+  options?: StyleConfigProp
+): StyleSystemReturn<V> {
   const iss = (...inputs: ClassValueProp[]): string => {
     const className = issUtil(inputs);
     return (
@@ -450,30 +446,25 @@ function createStyleCore<V extends VariantShapeProp>(
     );
   };
 
-  const variant: VariantProp = (config) => (props) => {
+  const style: StyleProp = (config) => (props) => {
     if (!config.settings) {
-      return iss(config.base, props?.class, props?.className, props?.css);
+      return iss(config.base, props?.class, props?.className);
     }
 
     const { settings, defaultSettings } = config;
 
-    // Process variant classes
-    const variantClasses = Object.keys(settings).map((variant) => {
-      const prop = props?.[variant as keyof typeof props];
-      const defaultProp = defaultSettings?.[variant];
+    // Process style classes
+    const styleClasses = Object.keys(settings).map((style) => {
+      const prop = props?.[style as keyof typeof props];
+      const defaultProp = defaultSettings?.[style];
       const value = falsyToString(prop ?? defaultProp);
-      const variantObj = settings[variant];
-      return variantObj[value as keyof typeof variantObj];
+      const styleObj = settings[style];
+      return styleObj[value as keyof typeof styleObj];
     });
 
-    // Process compound variants
+    // Process compound styles
     const compoundClasses = config.composition?.reduce((acc, cv) => {
-      const {
-        class: cvClass,
-        className: cvClassName,
-        css: cvCss,
-        ...conditions
-      } = cv;
+      const { class: cvClass, className: cvClassName, ...conditions } = cv;
       const matches = Object.entries(conditions).every(([key, value]) => {
         const propValue =
           props?.[key as keyof typeof props] ??
@@ -483,17 +474,16 @@ function createStyleCore<V extends VariantShapeProp>(
           : propValue === value;
       });
 
-      return matches ? [...acc, cvClass, cvClassName, cvCss] : acc;
+      return matches ? [...acc, cvClass, cvClassName] : acc;
     }, [] as ClassValueProp[]);
 
     // Handle base classes first to ensure they appear in expected order
     const baseClasses = config.base ? `${config.base}` : "";
     const additionalClasses = iss(
-      variantClasses,
+      styleClasses,
       compoundClasses,
       props?.class,
-      props?.className,
-      props?.css
+      props?.className
     );
 
     // Combine base with additional classes
@@ -502,38 +492,37 @@ function createStyleCore<V extends VariantShapeProp>(
       : additionalClasses;
   };
 
-  const composeVariant: ComposeVariantProp =
+  const composeStyle: ComposeStyleProp =
     (...components) =>
     (props) => {
-      const { class: cls, className, css, ...variantProps } = props || {};
+      const { class: cls, className, ...styleProps } = props || {};
 
       // Get the raw classes from each component
       const componentResults = components.map((component) =>
-        component(variantProps as any)
+        component(styleProps as any)
       );
 
       // Combine with other provided classes
-      const allClasses = [...componentResults, cls, className, css];
+      const allClasses = [...componentResults, cls, className];
 
       // Use iss to apply intelligent conflict resolution
       return iss(...allClasses);
     };
 
-  // Define the placeholder getVariant function
-  const getVariant = ((props?: any) => "") as (
-    props?: VariantSchemaProp<V> & {
+  // Define the placeholder getStyle function
+  const getStyle = ((_props?: any) => "") as (
+    props?: StyleSchemaProp<V> & {
       class?: ClassValueProp;
       className?: ClassValueProp;
-      css?: ClassValueProp;
     }
   ) => string;
 
   // Return a minimal system with the properly typed methods
   return {
-    getVariant,
+    getStyle,
     iss,
-    variant,
-    composeVariant,
+    style,
+    composeStyle,
   };
 }
 
@@ -542,8 +531,8 @@ function createStyleCore<V extends VariantShapeProp>(
  * # iss
  * #### A utility for intelligent class name composition and conflict resolution
  *
- * iss combines CSS classes with intelligent conflict resolution, working like a smart
- * style manager that knows how to combine css classes without conflicts.
+ * iss combines classes with intelligent conflict resolution, working like a smart
+ * style manager that knows how to combine classes without conflicts.
  *
  * @since 0.1.1
  * @category InSpatial Theme
@@ -554,7 +543,7 @@ function createStyleCore<V extends VariantShapeProp>(
  * @example
  * ### Basic Usage
  * ```typescript
- * import { iss } from '@inspatial/theme/variant';
+ * import { iss } from '@in/style/style';
  *
  * // Combining simple classes
  * const className = iss('bg-pop-500 text-white', 'hover:bg-pop-600');
@@ -579,7 +568,7 @@ function createStyleCore<V extends VariantShapeProp>(
  * ```
  *
  * @param {...ClassValueProp[]} inputs - Accepts any number of class values to be combined
- * @returns {string} A merged string of CSS classes with conflicts resolved
+ * @returns {string} A merged string of InSpatial Style Sheet classes with conflicts resolved
  */
 
 // Create the base system for global exports
@@ -589,16 +578,16 @@ const baseSystem = createStyleCore();
 /** Utility for intelligent class name composition and conflict resolution */
 export const iss = baseSystem.iss;
 
-/** Creates variant functions with configurable styles */
-export const variant = baseSystem.variant;
+/** Creates style functions with configurable styles */
+export const style = baseSystem.style;
 
-/** Utility for combining multiple variant components */
-export const composeVariant = baseSystem.composeVariant;
+/** Utility for combining multiple style components */
+export const composeStyle = baseSystem.composeStyle;
 
 /*##############################################(CREATE-STYLE)##############################################*/
 /**
  * # createStyle
- * #### A factory function that creates a customizable variant styling system
+ * #### A factory function that creates a customizable style styling system
  *
  * The `createStyle` function is like a style system factory. Think of it as a custom
  * clothing designer that lets you create your own styling rules and combinations.
@@ -611,51 +600,51 @@ export const composeVariant = baseSystem.composeVariant;
  *
  * ### 💡 Core Concepts
 
- * - Custom variant system creation
+ * - Custom style system creation
  * - Configurable style hooks
  * - Tailwind-compatible class merging
  *
  * ### 📚 Terminology
- * > **Variant System**: A structured way to manage different style variations of a component
+ * > **Style System**: A structured way to manage different style variations of a component
  * > **Style Hooks**: Functions that can modify the final output of class names
- * > **getVariant**: Method to apply variant styles to components
+ * > **getStyle**: Method to apply style styles to components
  *
  * @example 
  * ### Basic Configuration
  * 
- * import { createStyle } from "@inspatial/theme/variant";
- * import type { StyleProps } from "@inspatial/theme/variant";
+ * import { createStyle } from "@in/style/style";
+ * import type { StyleProps } from "@in/style/style";
  * 
  * ```typescript
- * const ComponentVariant = createStyle({
+ * const ComponentStyle = createStyle({
  *   settings: {
  *     size: { sm: "text-sm px-2", lg: "text-lg px-4" },
  *     theme: { light: "bg-white text-black", dark: "bg-black text-white" }
  *   }
  * });
  * 
- * // type inference with getVariant
- * type ComponentStyleProps = StyleProps<typeof ComponentVariant.getVariant> & {
- *   // Add any additional props here that are not part of the variant system (optional)
+ * // type inference with getStyle
+ * type ComponentStyleProps = StyleProps<typeof ComponentStyle.getStyle> & {
+ *   // Add any additional props here that are not part of the style system (optional)
  * }
  *
- * // Apply styles with the variant
- * const className = ComponentVariant.getVariant({ size: "sm", theme: "dark" });
+ * // Apply styles with the style
+ * const className = ComponentStyle.getStyle({ size: "sm", theme: "dark" });
  * ```
  * 
  * ### Custom System
  * ```typescript
- * import { createStyle } from '@inspatial/theme/variant';
+ * import { createStyle } from '@in/style/style';
  *
- * // Create a custom variant system with a class name transformer
- * const { variant, iss } = createStyle({
+ * // Create a custom style system with a class name transformer
+ * const { style, iss } = createStyle({
  *   hooks: {
  *     onComplete: (className) => `my-prefix-${className}`
  *   }
  * });
  *
- * // Use the custom variant system
- * const button = variant({
+ * // Use the custom style system
+ * const button = style({
  *   base: "rounded-md",
  *   settings: {
  *     size: {
@@ -666,43 +655,40 @@ export const composeVariant = baseSystem.composeVariant;
  * });
  * ```
  *
- * @param {VariantConfigProp | InSpatialVariantConfig<V>} [configOrOptions] - 
- * Configuration options for the variant system, or a direct variant configuration
- * @returns {VariantSystemReturn<V>} Returns an object containing the core styling utilities 
- * and variant functions with a consistent API shape
+ * @param {StyleConfigProp | InSpatialStyleConfig<V>} [configOrOptions] - 
+ * Configuration options for the style system, or a direct style configuration
+ * @returns {StyleSystemReturn<V>} Returns an object containing the core styling utilities 
+ * and style functions with a consistent API shape
  */
 
 /**
  * Unified implementation of createStyle that handles both usage patterns
  */
-export function createStyle<V extends VariantShapeProp>(
-  configOrOptions?: VariantConfigProp | InSpatialVariantConfig<V>
-): VariantSystemReturn<V> {
+export function createStyle<V extends StyleShapeProp>(
+  configOrOptions?: StyleConfigProp | InSpatialStyleConfig<V>
+): StyleSystemReturn<V> {
   // Create the base system
   const system = createStyleCore<V>(
     configOrOptions && "hooks" in configOrOptions ? configOrOptions : undefined
   );
 
-  // If direct config was provided (with settings or base), create specific variant function
+  // If direct config was provided (with settings or base), create specific style function
   if (
     configOrOptions &&
     ("settings" in configOrOptions || "base" in configOrOptions)
   ) {
-    const variantFn = system.variant(
-      configOrOptions as InSpatialVariantConfig<V>
-    );
+    const styleFn = system.style(configOrOptions as InSpatialStyleConfig<V>);
 
-    // Return with strongly typed getVariant
+    // Return with strongly typed getStyle
     return {
       ...system,
-      getVariant: variantFn as (
-        props?: VariantSchemaProp<V> & {
+      getStyle: styleFn as (
+        props?: StyleSchemaProp<V> & {
           class?: ClassValueProp;
           className?: ClassValueProp;
-          css?: ClassValueProp;
         }
       ) => string,
-      config: configOrOptions as InSpatialVariantConfig<V>,
+      config: configOrOptions as InSpatialStyleConfig<V>,
     };
   }
 
@@ -714,36 +700,35 @@ export function createStyle<V extends VariantShapeProp>(
  * Return type for createStyle when used with a configuration
  * Used for documentation purposes
  */
-export type VariantReturnType<V extends VariantShapeProp> =
-  VariantSystemReturn<V>;
+export type StyleReturnType<V extends StyleShapeProp> = StyleSystemReturn<V>;
 
 export type {
-  /** Type for CSS class values that can be used in the variant system */
+  /** Type for InSpatial Style Sheet class values that can be used in the style system */
   ClassValueProp,
 
   /**
-   * Utility type for extracting props from a variant function or object
-   * Works with direct variant functions and objects with getVariant method
+   * Utility type for extracting props from a style function or object
+   * Works with direct style functions and objects with getStyle method
    *
    * @example
    * ```typescript
-   * // With direct variant function
-   * const button = variant({ ... });
+   * // With direct style function
+   * const button = style({ ... });
    * type ButtonProps = StyleProps<typeof button>;
    *
    * // With createStyle result
-   * const ButtonVariant = createStyle({ ... });
-   * type ButtonProps = StyleProps<typeof ButtonVariant.getVariant>;
+   * const ButtonStyle = createStyle({ ... });
+   * type ButtonProps = StyleProps<typeof ButtonStyle.getStyle>;
    * ```
    */
   StyleProps,
 
-  /** Type for defining the shape of variants in a component */
-  VariantShapeProp,
+  /** Type for defining the shape of styles in a component */
+  StyleShapeProp,
 
-  /** Type for the schema of variant props based on a variant shape */
-  VariantSchemaProp,
+  /** Type for the schema of style props based on a style shape */
+  StyleSchemaProp,
 
-  /** Configuration options for the variant system */
-  VariantConfigProp,
+  /** Configuration options for the style system */
+  StyleConfigProp,
 };

@@ -1,57 +1,17 @@
 import { Link } from "@inspatial/kit/navigation";
 import { useTheme } from "./(extensions)/in-theme/index.ts";
 import { $ } from "@inspatial/kit/state";
-import { route } from "./routes.tsx";
+import {Stack, XStack, YStack } from "@inspatial/kit/structure";
 
 export function AppMenu() {
   return (
     <>
-      <nav className="flex gap-3 mt-3">
-        <a href="/">Home</a>
-        <a href="/counter">Counter</a>
-        <a href="/projects">Projects</a>
-        <a href="/route-test">Route API</a>
-      </nav>
-      <div className="flex gap-3 mt-6">
-        <div
-          role="button"
-          className="px-3 py-1 border rounded cursor-pointer"
-          on:tap={() => route.navigate("home")}
-        >
-          Home (tap)
-        </div>
-        <div
-          role="button"
-          className="px-3 py-1 border rounded cursor-pointer"
-          on:tap={() => route.navigate("counter")}
-        >
-          Counter (tap)
-        </div>
-        <div
-          role="button"
-          className="px-3 py-1 border rounded cursor-pointer"
-          on:tap={() => route.navigate("projects")}
-        >
-          Projects (tap)
-        </div>
-        <div
-          role="button"
-          className="px-3 py-1 border rounded cursor-pointer"
-          on:tap={() => route.navigate("routeTest")}
-        >
-          Route API (tap)
-        </div>
-      </div>
-      <div className="flex gap-3 mt-6">
-        {/* Link-based navigation (3rd variant) */}
-        <Link to="/">Home (Link)</Link>
-        <Link to="/counter">Counter (Link)</Link>
-        <Link to="/projects">Projects (Link)</Link>
-        <Link to="/route-test">Route API (Link)</Link>
-        <Link to="https://www.google.com/" target="_blank" rel="external">
-          Google (Link)
-        </Link>
-      </div>
+      <YStack className="p-10 bg-yellow-300">
+        <Link className="bg-green-300" to="/">Kit</Link>
+        <Link to="/counter">Cloud</Link>
+        <Link to="/projects">App</Link>
+        <Link to="/route-test">Store</Link>
+      </YStack>
       <div className="fixed top-4 right-4 flex items-center gap-2 z-50">
         <button
           type="button"

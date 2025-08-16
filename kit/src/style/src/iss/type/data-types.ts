@@ -9,8 +9,8 @@ import * as ISSType from "./index.ts";
  * letting you create your own custom flavor combinations (CSS variables with -- prefix).
  *
  * @since 0.1.8
- * @category InSpatial Theme
- * @module @inspatial/theme/iss
+ * @category InSpatial Style
+ * @module @in/style
  * @kind interface
  * @access public
  *
@@ -34,7 +34,7 @@ import * as ISSType from "./index.ts";
  *
  * **Creating a button style:**
  * ```typescript
- * import type { ISSProps } from "@inspatial/theme/iss/type/data-types.ts";
+ * import type { ISSProps } from "@in/style/iss/type/data-types.ts";
  *
  * // Define a style object for buttons
  * const buttonStyle: ISSProps = {
@@ -47,7 +47,7 @@ import * as ISSType from "./index.ts";
  *
  * **Building a theme system:**
  * ```typescript
- * import type { ISSProps } from "@inspatial/theme/iss/type/data-types.ts";
+ * import type { ISSProps } from "@in/style/iss/type/data-types.ts";
  *
  * // Create theme objects with colors and typography
  * const lightTheme = {

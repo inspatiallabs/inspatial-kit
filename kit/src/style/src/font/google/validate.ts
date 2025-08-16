@@ -41,7 +41,7 @@ export function validateGoogleFont(
     subsets,
   } = fontFunctionArgument || ({} as any);
   if (functionName === "") {
-    inSpatialFontError(`@inspatial/theme has no default export`);
+    inSpatialFontError(`@in/style has no default export`);
   }
 
   const fontFamily = functionName.replace(/_/g, " ");

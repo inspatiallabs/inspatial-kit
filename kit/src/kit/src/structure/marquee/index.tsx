@@ -1,6 +1,6 @@
 // /* eslint-disable react-hooks/exhaustive-deps */
 // "use client";
-// import { kit } from "@inspatial/theme/variant";
+// import { kit } from "@in/style/variant";
 // import { SharedProps } from "@inspatial/type/util";
 
 // /*#########################################(Types)#########################################*/

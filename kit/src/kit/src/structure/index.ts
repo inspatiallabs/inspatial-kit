@@ -1,1 +1,1 @@
-export * from "./marquee/index.tsx";
+export * from "./stack/index.tsx";

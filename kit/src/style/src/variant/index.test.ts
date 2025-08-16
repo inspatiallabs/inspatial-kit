@@ -1,15 +1,15 @@
 import { test, expect } from "@in/test";
 import {
-  composeVariant,
+  composeStyle,
   createStyle,
   iss,
-  variant,
+  style,
   type StyleProps,
 } from "./index.ts";
 
 /**
- * Comprehensive test suite for the InSpatial Variant System
- * This covers all aspects and scenarios of the variant system functionality.
+ * Comprehensive test suite for the InSpatial Style System
+ * This covers all aspects and scenarios of the style system functionality.
  */
 
 /*##############################################(BASIC-FUNCTIONALITY)##############################################*/
@@ -42,12 +42,12 @@ test({
 });
 
 test({
-  name: "iss() should preserve variant classes correctly",
+  name: "iss() should preserve style classes correctly",
   fn: () => {
-    // When using variant classes
+    // When using style classes
     const result = iss("p-2", "hover:p-4", "dark:p-6", "sm:p-8");
 
-    // Then it should preserve all variants
+    // Then it should preserve all styles
     expect(result).toContain("p-2");
     expect(result).toContain("hover:p-4");
     expect(result).toContain("dark:p-6");
@@ -106,10 +106,10 @@ test({
 /*##############################################(VARIANT-BASIC)##############################################*/
 
 test({
-  name: "variant() should handle basic variant configurations",
+  name: "style() should handle basic style configurations",
   fn: () => {
-    // Given a basic button variant
-    const button = variant({
+    // Given a basic button style
+    const button = style({
       base: "px-4 py-2 rounded",
       settings: {
         intent: {
@@ -141,10 +141,10 @@ test({
 });
 
 test({
-  name: "variant() should handle multiple variant dimensions",
+  name: "style() should handle multiple style dimensions",
   fn: () => {
-    // Given a button with multiple variant dimensions
-    const button = variant({
+    // Given a button with multiple style dimensions
+    const button = style({
       base: "rounded",
       settings: {
         intent: {
@@ -192,10 +192,10 @@ test({
 /*##############################################(DEFAULT-SETTINGS)##############################################*/
 
 test({
-  name: "variant() should handle defaultSettings",
+  name: "style() should handle defaultSettings",
   fn: () => {
     // Given a button with defaultSettings
-    const button = variant({
+    const button = style({
       base: "rounded font-medium",
       settings: {
         intent: {
@@ -232,10 +232,10 @@ test({
 });
 
 test({
-  name: "variant() should handle boolean variants",
+  name: "style() should handle boolean styles",
   fn: () => {
-    // Given a button with boolean variants
-    const button = variant({
+    // Given a button with boolean styles
+    const button = style({
       base: "rounded",
       settings: {
         disabled: {
@@ -275,10 +275,10 @@ test({
 /*##############################################(COMPOUND-VARIANTS)##############################################*/
 
 test({
-  name: "variant() should handle compound variants with composition",
+  name: "style() should handle compound styles with composition",
   fn: () => {
-    // Given a button with compound variants
-    const button = variant({
+    // Given a button with compound styles
+    const button = style({
       base: "rounded",
       settings: {
         intent: {
@@ -307,7 +307,7 @@ test({
       ],
     });
 
-    // When using combinations that match compound variants
+    // When using combinations that match compound styles
     const smallPrimary = button({ intent: "primary", size: "sm" });
     const largeDanger = button({ intent: "danger", size: "lg" });
     const largeSecondary = button({ intent: "secondary", size: "lg" });
@@ -325,10 +325,10 @@ test({
 });
 
 test({
-  name: "variant() should handle compound variants with multiple matches",
+  name: "style() should handle compound styles with multiple matches",
   fn: () => {
     // Given a button with multiple potential compound matches
-    const button = variant({
+    const button = style({
       base: "rounded",
       settings: {
         intent: {
@@ -388,10 +388,10 @@ test({
 /*##############################################(CLASS-PROPS)##############################################*/
 
 test({
-  name: "variant() should handle class, className, and css props",
+  name: "style() should handle class and className",
   fn: () => {
     // Given a basic button
-    const button = variant({
+    const button = style({
       base: "rounded",
       settings: {
         intent: {
@@ -412,16 +412,11 @@ test({
       className: "px-8 py-3",
     });
 
-    const withCss = button({
-      intent: "primary",
-      css: "hover:scale-105",
-    });
 
     const withMultiple = button({
       intent: "secondary",
       class: "font-bold",
       className: "text-xl",
-      css: "hover:bg-gray-300",
     });
 
     // Then all classes should be included
@@ -444,13 +439,13 @@ test({
 /*##############################################(CREATE-STYLE)##############################################*/
 
 test({
-  name: "createStyle() should return a working variant system",
+  name: "createStyle() should return a working style system",
   fn: () => {
-    // Given a custom variant system
+    // Given a custom style system
     const mySystem = createStyle();
 
-    // When creating variants with it
-    const button = mySystem.variant({
+    // When creating styles with it
+    const button = mySystem.style({
       base: "rounded",
       settings: {
         color: {
@@ -460,7 +455,7 @@ test({
       },
     });
 
-    // Then the variants should work
+    // Then the styles should work
     const blueButton = button({ color: "blue" });
     expect(blueButton).toContain("bg-blue-500");
   },
@@ -469,7 +464,7 @@ test({
 test({
   name: "createStyle() should allow custom hooks",
   fn: () => {
-    // Given a custom variant system with hooks
+    // Given a custom style system with hooks
     const prefixedSystem = createStyle({
       hooks: {
         onComplete: (className) => `prefix-${className}`,
@@ -485,10 +480,10 @@ test({
 });
 
 test({
-  name: "createStyle() with config should provide getVariant API",
+  name: "createStyle() with config should provide getStyle API",
   fn: () => {
-    // Given a variant with the getVariant API
-    const buttonVariant = createStyle({
+    // Given a style with the getStyle API
+    const buttonStyle = createStyle({
       base: "rounded",
       settings: {
         intent: {
@@ -507,17 +502,17 @@ test({
     });
 
     // When using the API method with props
-    const button = buttonVariant.getVariant({
+    const button = buttonStyle.getStyle({
       intent: "secondary",
       size: "lg",
     });
 
-    // Then the variant should be applied correctly
+    // Then the style should be applied correctly
     expect(button).toContain("bg-gray-200");
     expect(button).toContain("text-lg");
 
     // Test with default values
-    const defaultButton = buttonVariant.getVariant();
+    const defaultButton = buttonStyle.getStyle();
 
     // Default values should be applied
     expect(defaultButton).toContain("bg-blue-500");
@@ -528,10 +523,10 @@ test({
 /*##############################################(COMPOSE-VARIANT)##############################################*/
 
 test({
-  name: "composeVariant() should combine multiple variants",
+  name: "composeStyle() should combine multiple styles",
   fn: () => {
-    // Given several independent variants
-    const sizeVariant = variant({
+    // Given several independent styles
+    const sizeStyle = style({
       settings: {
         size: {
           sm: "text-sm py-1 px-2",
@@ -541,7 +536,7 @@ test({
       },
     });
 
-    const colorVariant = variant({
+    const colorStyle = style({
       settings: {
         color: {
           blue: "bg-blue-500 text-white",
@@ -551,7 +546,7 @@ test({
       },
     });
 
-    const shapeVariant = variant({
+    const shapeStyle = style({
       settings: {
         rounded: {
           none: "rounded-none",
@@ -562,14 +557,14 @@ test({
     });
 
     // When composing them together
-    const buttonVariant = composeVariant(
-      sizeVariant,
-      colorVariant,
-      shapeVariant
+    const buttonStyle = composeStyle(
+      sizeStyle,
+      colorStyle,
+      shapeStyle
     );
 
     // Then it should handle all props
-    const button = buttonVariant({
+    const button = buttonStyle({
       size: "lg",
       color: "blue",
       rounded: "full",
@@ -587,10 +582,10 @@ test({
 });
 
 test({
-  name: "composeVariant() should handle defaults from individual variants",
+  name: "composeStyle() should handle defaults from individual styles",
   fn: () => {
-    // Given variants with defaults
-    const sizeVariant = variant({
+    // Given styles with defaults
+    const sizeStyle = style({
       settings: {
         size: {
           sm: "text-sm",
@@ -603,7 +598,7 @@ test({
       },
     });
 
-    const colorVariant = variant({
+    const colorStyle = style({
       settings: {
         color: {
           blue: "bg-blue-500",
@@ -616,15 +611,15 @@ test({
     });
 
     // When composing and using without all props
-    const buttonVariant = composeVariant(sizeVariant, colorVariant);
-    const button = buttonVariant();
+    const buttonStyle = composeStyle(sizeStyle, colorStyle);
+    const button = buttonStyle();
 
     // Then it should use the defaults
     expect(button).toContain("text-base"); // default md
     expect(button).toContain("bg-blue-500"); // default blue
 
     // And when specifying only some props
-    const redButton = buttonVariant({ color: "red" });
+    const redButton = buttonStyle({ color: "red" });
 
     // It should use provided + defaults
     expect(redButton).toContain("text-base"); // still default md
@@ -637,8 +632,8 @@ test({
 test({
   name: "StyleProps should correctly extract props type",
   fn: () => {
-    // Given a button variant
-    const button = variant({
+    // Given a button style
+    const button = style({
       settings: {
         size: {
           sm: "text-sm",
@@ -677,15 +672,15 @@ test({
 /*##############################################(EDGE-CASES)##############################################*/
 
 test({
-  name: "variant() should handle empty or missing settings",
+  name: "style() should handle empty or missing settings",
   fn: () => {
-    // Given a variant with no settings
-    const emptyVariant = variant({
+    // Given a style with no settings
+    const emptyStyle = style({
       base: "bg-blue-500 rounded",
     });
 
     // When used
-    const result = emptyVariant();
+    const result = emptyStyle();
 
     // Then it should just use the base class, preserving order but not applying conflict resolution
     expect(result).toBe("bg-blue-500 rounded");
@@ -693,10 +688,10 @@ test({
 });
 
 test({
-  name: "variant() should handle numeric values",
+  name: "style() should handle numeric values",
   fn: () => {
-    // Given a variant with numeric values
-    const gridVariant = variant({
+    // Given a style with numeric values
+    const gridStyle = style({
       settings: {
         cols: {
           1: "grid-cols-1",
@@ -708,8 +703,8 @@ test({
     });
 
     // When used with numeric keys
-    const grid2Col = gridVariant({ cols: 2 });
-    const grid4Col = gridVariant({ cols: 4 });
+    const grid2Col = gridStyle({ cols: 2 });
+    const grid4Col = gridStyle({ cols: 4 });
 
     // Then it should work correctly
     expect(grid2Col).toContain("grid-cols-2");
@@ -718,10 +713,10 @@ test({
 });
 
 test({
-  name: "variant() should handle falsy values",
+  name: "style() should handle falsy values",
   fn: () => {
     // Given a button with boolean and falsy options
-    const button = variant({
+    const button = style({
       base: "btn",
       settings: {
         disabled: {
@@ -750,10 +745,10 @@ test({
 });
 
 test({
-  name: "variant() should handle array values in composition",
+  name: "style() should handle array values in composition",
   fn: () => {
-    // Given a button with array match in compound variant
-    const button = variant({
+    // Given a button with array match in compound style
+    const button = style({
       base: "btn",
       settings: {
         size: {
@@ -783,7 +778,7 @@ test({
       ],
     });
 
-    // When variants match the conditions
+    // When styles match the conditions
     const smallPrimary = button({ size: "sm", intent: "primary" });
     const mediumPrimary = button({ size: "md", intent: "primary" });
     const largePrimary = button({ size: "lg", intent: "primary" });
@@ -801,10 +796,10 @@ test({
   name: "Example: creating a complete button system",
   fn: () => {
     // Given a comprehensive button system
-    const button = variant({
+    const button = style({
       base: "inline-flex items-center justify-center font-medium transition-colors",
       settings: {
-        variant: {
+        style: {
           primary: "bg-blue-500 text-white hover:bg-blue-600",
           secondary: "bg-gray-200 text-gray-800 hover:bg-gray-300",
           outline:
@@ -829,7 +824,7 @@ test({
         },
       },
       defaultSettings: {
-        variant: "primary",
+        style: "primary",
         size: "md",
         fullWidth: false,
         disabled: false,
@@ -837,24 +832,24 @@ test({
       composition: [
         // Special case for outline + disabled
         {
-          variant: "outline",
+          style: "outline",
           disabled: true,
           class: "border-gray-300 text-gray-300",
         },
         // Special case for ghost + disabled
         {
-          variant: "ghost",
+          style: "ghost",
           disabled: true,
           class: "text-gray-300",
         },
         // Large primary buttons get extra shadow - separate rules for each size
         {
-          variant: "primary",
+          style: "primary",
           size: "lg",
           class: "shadow-lg",
         },
         {
-          variant: "primary",
+          style: "primary",
           size: "xl",
           class: "shadow-lg",
         },
@@ -863,12 +858,12 @@ test({
 
     // When creating different button styles
     const defaultBtn = button();
-    const secondaryBtn = button({ variant: "secondary" });
-    const smallOutlineBtn = button({ variant: "outline", size: "sm" });
-    const largeGhostBtn = button({ variant: "ghost", size: "lg" });
-    const disabledDangerBtn = button({ variant: "danger", disabled: true });
-    const largePrimaryBtn = button({ variant: "primary", size: "lg" });
-    const disabledOutlineBtn = button({ variant: "outline", disabled: true });
+    const secondaryBtn = button({ style: "secondary" });
+    const smallOutlineBtn = button({ style: "outline", size: "sm" });
+    const largeGhostBtn = button({ style: "ghost", size: "lg" });
+    const disabledDangerBtn = button({ style: "danger", disabled: true });
+    const largePrimaryBtn = button({ style: "primary", size: "lg" });
+    const disabledOutlineBtn = button({ style: "outline", disabled: true });
 
     // Then they should all have the expected classes - check individual components
     // to avoid order-dependent test failures
@@ -886,9 +881,9 @@ test({
     expect(disabledDangerBtn).toContain("opacity-50");
     expect(disabledDangerBtn).toContain("cursor-not-allowed");
 
-    expect(largePrimaryBtn).toContain("shadow-lg"); // from compound variant
+    expect(largePrimaryBtn).toContain("shadow-lg"); // from compound style
 
-    // Compound variants should work as expected
+    // Compound styles should work as expected
     expect(disabledOutlineBtn).toContain("border-gray-300"); // from compound
     expect(disabledOutlineBtn).toContain("text-gray-300"); // from compound
   },

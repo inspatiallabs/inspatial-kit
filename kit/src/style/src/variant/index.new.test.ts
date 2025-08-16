@@ -1,14 +1,14 @@
-import { test, expect } from "@inspatial/test";
+import { test, expect } from "@in/test";
 import { 
   createStyle, 
   iss, 
-  variant, 
-  composeVariant, 
+  style, 
+  composeStyle, 
   type StyleProps 
 } from "./index.ts";
 
 /**
- * Test suite for the streamlined InSpatial Variant System API
+ * Test suite for the streamlined InSpatial Style System API
  */
 
 /*##############################################(API-CONSISTENCY)##############################################*/
@@ -16,7 +16,7 @@ import {
 test({
   name: "createStyle() with options returns a consistent API shape",
   fn: () => {
-    // When creating a variant system with options
+    // When creating a style system with options
     const system = createStyle({
       hooks: {
         onComplete: (className) => className
@@ -24,9 +24,9 @@ test({
     });
     
     // Then it should have a consistent API shape
-    expect(typeof system.getVariant).toBe("function");
-    expect(typeof system.variant).toBe("function");
-    expect(typeof system.composeVariant).toBe("function");
+    expect(typeof system.getStyle).toBe("function");
+    expect(typeof system.style).toBe("function");
+    expect(typeof system.composeStyle).toBe("function");
     expect(typeof system.iss).toBe("function");
   }
 });
@@ -34,8 +34,8 @@ test({
 test({
   name: "createStyle() with direct config returns a consistent API shape",
   fn: () => {
-    // When creating a variant with direct config
-    const buttonVariant = createStyle({
+    // When creating a style with direct config
+    const buttonStyle = createStyle({
       base: "rounded",
       settings: {
         intent: {
@@ -46,24 +46,24 @@ test({
     });
     
     // Then it should have a consistent API shape
-    expect(typeof buttonVariant.getVariant).toBe("function");
-    expect(typeof buttonVariant.variant).toBe("function");
-    expect(typeof buttonVariant.composeVariant).toBe("function");
-    expect(typeof buttonVariant.iss).toBe("function");
+    expect(typeof buttonStyle.getStyle).toBe("function");
+    expect(typeof buttonStyle.style).toBe("function");
+    expect(typeof buttonStyle.composeStyle).toBe("function");
+    expect(typeof buttonStyle.iss).toBe("function");
     
     // And should have the config
-    expect(buttonVariant.config).toBeDefined();
-    expect(buttonVariant.config?.base).toBe("rounded");
+    expect(buttonStyle.config).toBeDefined();
+    expect(buttonStyle.config?.base).toBe("rounded");
   }
 });
 
 /*##############################################(API-FUNCTIONALITY)##############################################*/
 
 test({
-  name: "getVariant() handles all variant features",
+  name: "getStyle() handles all style features",
   fn: () => {
-    // Given a complex variant
-    const buttonVariant = createStyle({
+    // Given a complex style
+    const buttonStyle = createStyle({
       base: "rounded",
       settings: {
         size: {
@@ -95,15 +95,15 @@ test({
     });
     
     // When applying with different props
-    const defaultButton = buttonVariant.getVariant();
-    const primarySmall = buttonVariant.getVariant({ intent: "primary", size: "sm" });
-    const secondaryDisabled = buttonVariant.getVariant({
+    const defaultButton = buttonStyle.getStyle();
+    const primarySmall = buttonStyle.getStyle({ intent: "primary", size: "sm" });
+    const secondaryDisabled = buttonStyle.getStyle({
       intent: "secondary", 
       disabled: true,
       className: "custom-class"
     });
     
-    // Then it should correctly apply all variant features
+    // Then it should correctly apply all style features
     
     // Default settings
     expect(defaultButton).toContain("rounded");
@@ -111,7 +111,7 @@ test({
     expect(defaultButton).toContain("text-base");
     expect(defaultButton).toContain("cursor-pointer");
     
-    // Explicit settings with compound variant
+    // Explicit settings with compound style
     expect(primarySmall).toContain("text-sm");
     expect(primarySmall).toContain("bg-blue-500");
     expect(primarySmall).toContain("font-bold"); // From composition
@@ -126,10 +126,10 @@ test({
 /*##############################################(TYPE-EXTRACTION)##############################################*/
 
 test({
-  name: "StyleProps works with getVariant",
+  name: "StyleProps works with getStyle",
   fn: () => {
-    // Given a button variant
-    const buttonVariant = createStyle({
+    // Given a button style
+    const buttonStyle = createStyle({
       settings: {
         size: {
           sm: "text-sm",
@@ -143,7 +143,7 @@ test({
     });
     
     // TypeScript type extraction (compile-time check)
-    // type ButtonProps = StyleProps<typeof buttonVariant.getVariant>;
+    // type ButtonProps = StyleProps<typeof buttonStyle.getStyle>;
     
     // Runtime verification with record
     const props: Record<string, unknown> = {
@@ -152,7 +152,7 @@ test({
     };
     
     // Method should work with the props
-    const result = buttonVariant.getVariant(props as any);
+    const result = buttonStyle.getStyle(props as any);
     
     expect(result).toContain("text-sm");
     expect(result).toContain("bg-blue-500");
@@ -160,10 +160,10 @@ test({
 });
 
 test({
-  name: "StyleProps works with direct variant functions",
+  name: "StyleProps works with direct style functions",
   fn: () => {
-    // Given a direct variant function
-    const button = variant({
+    // Given a direct style function
+    const button = style({
       settings: {
         size: {
           sm: "text-sm",
@@ -186,17 +186,17 @@ test({
 /*##############################################(FACTORY-PATTERN)##############################################*/
 
 test({
-  name: "createStyle() can be used as a factory for creating consistent variants",
+  name: "createStyle() can be used as a factory for creating consistent styles",
   fn: () => {
-    // Given a custom variant system
+    // Given a custom style system
     const mySystem = createStyle({
       hooks: {
         onComplete: (className) => `prefix-${className}`
       }
     });
     
-    // When creating variants with it
-    const button = mySystem.variant({
+    // When creating styles with it
+    const button = mySystem.style({
       base: "rounded",
       settings: {
         color: {
@@ -206,7 +206,7 @@ test({
       }
     });
     
-    // Then the variants should work with the hooks applied
+    // Then the styles should work with the hooks applied
     const blueButton = button({ color: "blue" });
     expect(blueButton).toBe("rounded prefix-bg-blue-500");
   }
@@ -215,7 +215,7 @@ test({
 /*##############################################(GLOBAL-EXPORTS)##############################################*/
 
 test({
-  name: "Global exports (iss, variant, composeVariant) work as expected",
+  name: "Global exports (iss, style, composeStyle) work as expected",
   fn: () => {
     // Given direct usage of iss
     const issResult = iss("text-red-500", "bg-blue-200");
@@ -224,8 +224,8 @@ test({
     expect(issResult).toContain("text-red-500");
     expect(issResult).toContain("bg-blue-200");
     
-    // Given direct usage of variant
-    const button = variant({
+    // Given direct usage of style
+    const button = style({
       base: "rounded",
       settings: {
         intent: {
@@ -240,8 +240,8 @@ test({
     expect(primaryButton).toContain("rounded");
     expect(primaryButton).toContain("bg-blue-500");
     
-    // Given direct usage of composeVariant
-    const sizeVariant = variant({
+    // Given direct usage of composeStyle
+    const sizeStyle = style({
       settings: {
         size: {
           sm: "text-sm",
@@ -250,7 +250,7 @@ test({
       }
     });
     
-    const colorVariant = variant({
+    const colorStyle = style({
       settings: {
         color: {
           blue: "bg-blue-500",
@@ -259,7 +259,7 @@ test({
       }
     });
     
-    const composed = composeVariant(sizeVariant, colorVariant);
+    const composed = composeStyle(sizeStyle, colorStyle);
     
     // Then it should work as expected
     const result = composed({ size: "lg" as const, color: "red" as const });

@@ -3,7 +3,7 @@
  * @summary Test for Google Font installation functionality
  */
 
-import { test, assertEquals } from "@inspatial/test";
+import { test, assertEquals } from "@in/test";
 // @ts-ignore: Allow importing .ts files in Deno
 import { installGoogleFonts } from "../install.ts";
 // @ts-ignore: Allow importing .ts files in Deno

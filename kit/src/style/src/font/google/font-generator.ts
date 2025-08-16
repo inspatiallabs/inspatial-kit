@@ -193,7 +193,7 @@ function generateFontDeclaration(name: string, font: FontDefinition): string {
  * 
  * @since 0.1.8
  * @category InSpatial Theme
- * @module @inspatial/theme/font
+ * @module @in/style/font
  * @kind function
  * @access public
  * 
@@ -208,7 +208,7 @@ function generateFontDeclaration(name: string, font: FontDefinition): string {
  * @example
  * ### Basic Font Configuration
  * \`\`\`typescript
- * import { ${safeFunctionName} } from '@inspatial/theme/font';
+ * import { ${safeFunctionName} } from '@in/style/font';
  * 
  * // Create a font configuration
  * const myFont = ${safeFunctionName}({
@@ -231,7 +231,7 @@ function generateFontDeclaration(name: string, font: FontDefinition): string {
  * @example
  * ### Using Multiple Weights and Custom CSS Variable
  * \`\`\`typescript
- * import { ${safeFunctionName} } from '@inspatial/theme/font';
+ * import { ${safeFunctionName} } from '@in/style/font';
  * 
  * const myFont = ${safeFunctionName}({
  *   weight: [${font.weights.map((w) => `'${w}'`).join(", ")}],

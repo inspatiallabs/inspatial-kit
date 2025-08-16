@@ -28,7 +28,8 @@
     "./state/trigger": "./src/state/src/trigger/index.ts",
     "./env": "./src/env/src/index.ts",
     "./serve": "./src/serve/src/index.ts",
-    "./debug": "./src/debug/src/index.ts"
+    "./debug": "./src/debug/src/index.ts",
+    "./style": "./src/style/src/index.ts"
   },
   "tasks": {
     "test": "deno test --allow-env --allow-read --allow-write --allow-run --allow-net --allow-hrtime --allow-env --allow-all ./src/index.test.ts",
@@ -42,6 +43,8 @@
     "exclude": [".github", ".vscode", "**/*.test.ts", "test_deps.ts"]
   },
   "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "@inspatial/kit",
     "allowImportingTsExtensions": true,
     "lib": [
       "dom",
@@ -91,9 +94,10 @@
   "imports": {
     "@in/kit/": "./src/",
 
-    "@in/test": "jsr:@inspatial/test@^0.1.1",
+    "@in/test": "jsr:@in/test@^0.1.1",
 
     "@in/style/": "./src/style/src/",
+    "@in/style": "./src/style/src/index.ts",
 
     "@in/kit/component/": "./src/kit/src/component/",
     "@in/kit/control-flow/": "./src/kit/src/control-flow/",
@@ -102,8 +106,10 @@
 
     "@in/renderer/": "./src/renderer/src/",
     "@in/runtime/": "./src/runtime/src/",
-    "@in/jsx-runtime/": "./src/runtime/src/",
-    "@in/jsx-dev-runtime/": "./src/runtime/src/",
+
+    "@inspatial/kit/jsx-runtime": "./src/runtime/src/",
+    "@inspatial/kit/jsx-dev-runtime": "./src/runtime/src/",
+
     "@in/extension/": "./src/extension/src/",
     "@in/dom/": "./src/renderer/src/",
     "@in/ssr/": "./src/renderer/src/",

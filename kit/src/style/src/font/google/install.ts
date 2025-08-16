@@ -146,7 +146,7 @@ async function installGoogleFonts(options: InstallOptions = { all: true }) {
     console.log(`✅ Successfully installed ${fontCount} Google Font families!`);
     console.log("You can now use Google Fonts in your application:");
     console.log("");
-    console.log("import { Roboto, Open_Sans } from '@inspatial/theme/font';");
+    console.log("import { Roboto, Open_Sans } from '@in/style/font';");
     console.log("");
     console.log("const robotoFont = Roboto({");
     console.log("  weight: ['400', '700'],");

@@ -1,7 +1,7 @@
 #!/usr/bin/env deno
 
 /**
- * Initialization script for @inspatial/theme
+ * Initialization script for @in/style
  *
  * This script provides a guided setup for the theme package.
  * It helps users initialize their environment with either stubs (lightweight)

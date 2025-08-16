@@ -7,7 +7,7 @@
  *
  * @since 0.1.2
  * @category InSpatial Theme
- * @module @inspatial/theme/font
+ * @module @in/style/font
  * @kind test
  * @access private
  */

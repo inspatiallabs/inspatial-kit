@@ -1,7 +1,7 @@
 #!/usr/bin/env deno
 
 /**
- * Post-install script for @inspatial/theme
+ * Post-install script for @in/style
  *
  * This script runs after the package is installed and ensures the Google Font stubs are generated.
  * It keeps the package lightweight by default, while still offering the ability to use all Google Fonts.

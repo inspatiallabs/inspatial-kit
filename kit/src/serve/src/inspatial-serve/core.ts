@@ -183,6 +183,26 @@ class BuildQueue {
   private async buildCSS(): Promise<void> {
     console.log("🎨 Building CSS...");
 
+    // Base content globs always include the app sources
+    const contentGlobs = ["src/**/*.{ts,tsx,js,jsx}"] as string[];
+
+    // Conditionally include monorepo framework sources (../kit/src) when present
+    try {
+      const stat = await InZero.stat("../kit/src");
+      // deno-lint-ignore no-explicit-any
+      if ((stat as any)?.isDirectory) {
+        contentGlobs.push("../kit/src/**/*.{ts,tsx,js,jsx}");
+        console.log("📦 Including ../kit/src in Tailwind content globs");
+      }
+    } catch {
+      // Not a monorepo; skip
+    }
+
+    // Repeat --content per glob (Tailwind CLI expects individual flags)
+    const contentArgs = ([] as string[]).concat(
+      ...contentGlobs.map((g) => ["--content", g])
+    );
+
     const buildProcess = new InZero.Command("deno", {
       args: [
         "run",
@@ -192,8 +212,7 @@ class BuildQueue {
         "src/config/app.css",
         "-o",
         "dist/kit.css",
-        "--content",
-        "src/**/*.{ts,tsx,js,jsx}",
+        ...contentArgs,
       ],
       cwd: InZero.cwd(),
     });
@@ -278,6 +297,7 @@ export class InSpatialServe {
    * ```
    */
   async run() {
+    const t0 = (globalThis as any).performance?.now?.() ?? Date.now();
     console.log("🔥 runing InSpatial development server...");
 
     // Ensure dist directory exists and is set up
@@ -294,6 +314,9 @@ export class InSpatialServe {
 
     this.isRunning = true;
     console.log("✅ InSpatial development server runed");
+    const t1 = (globalThis as any).performance?.now?.() ?? Date.now();
+    const readyMs = Math.round(t1 - t0);
+    console.log(`🕒 Ready in ${readyMs}ms`);
   }
 
   private async initialSetup() {
@@ -380,7 +403,7 @@ export class InSpatialServe {
       const srcWatcher = InZero.watchFs("./src", { recursive: true });
       this.watchers.push(srcWatcher);
 
-      // Also watch local framework/runtime sources when used via import maps (monorepo)
+      // Watch local framework/runtime sources when linked as a package (import map path)
       try {
         const runWatcher = InZero.watchFs("@inspatial/kit", {
           recursive: true,
@@ -393,8 +416,30 @@ export class InSpatialServe {
         })();
         console.log("👁️ Watching @inspatial/kit for framework changes");
       } catch {
-        // optional monorepo watch; ignore if path not present
+        // optional; ignore if package path not present
       }
+
+      // Conditionally also watch monorepo source (../kit/src) when present
+      (async () => {
+        try {
+          const stat = await InZero.stat("../kit/src");
+          // deno-lint-ignore no-explicit-any
+          if ((stat as any)?.isDirectory) {
+            const kitWatcher = InZero.watchFs("../kit/src", {
+              recursive: true,
+            });
+            this.watchers.push(kitWatcher);
+            (async () => {
+              for await (const event of kitWatcher) {
+                await this.handleSourceChange(event);
+              }
+            })();
+            console.log("👁️ Watching ../kit/src for framework changes");
+          }
+        } catch {
+          // not monorepo; skip
+        }
+      })();
 
       // Watch root files (index.html, etc.)
       const rootWatcher = InZero.watchFs("./", { recursive: false });
