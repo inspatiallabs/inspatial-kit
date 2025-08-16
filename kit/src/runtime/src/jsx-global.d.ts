@@ -98,7 +98,7 @@ declare global {
      *   // Additional widget or component-specific props can be defined here
      * }
      *
-     * function MyComponent({ children, className, asChild, disabled }: MyComponentProps) {
+     * function MyComponent({ children, className, disabled }: MyComponentProps) {
      *   // Component implementation
      * }
      * ```
@@ -130,9 +130,6 @@ declare global {
 
       /** InSpatial style sheet properties for the widget or component. */
       style?: UniversalStyleProps;
-
-      /** If true, renders the widget or component as a child element. */
-      asChild?: boolean;
 
       /** If true, sets the widget or component to a disabled state. */
       disabled?: boolean;

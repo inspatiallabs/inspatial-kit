@@ -471,7 +471,7 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@inspatial/cloud-client@~0.1.22",
+      "jsr:@inspatial/cloud-client@~0.1.28",
       "npm:@tailwindcss/cli@^4.1.11",
       "npm:tailwindcss@^4.1.11"
     ],

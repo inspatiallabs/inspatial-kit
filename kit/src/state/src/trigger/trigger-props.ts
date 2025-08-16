@@ -1,4 +1,9 @@
-import { nextTick, bind, isSignal, type Signal } from "@in/teract/signal/index.ts";
+import {
+  nextTick,
+  bind,
+  isSignal,
+  type Signal,
+} from "@in/teract/signal/index.ts";
 import { detectEnvironment } from "@in/vader/env/index.ts";
 
 /*#################################(Types)
@@ -403,6 +408,10 @@ export function InDOMTriggerProps(): void {
 export type InUniversalTriggerPropsType =
   | "tap"
   | "longpress"
+  | "mount"
+  | "route"
+  | "beforeMount"
+  | "frameChange"
   | "change"
   | "submit"
   | "focus"
@@ -440,12 +449,185 @@ function DOMLongPressHandler(durationMs = 500): TriggerPropHandler {
   };
 }
 
+function DOMMountHandler(): TriggerPropHandler<
+  AnyEventHandler | Signal<AnyEventHandler>
+> {
+  const mounted = new WeakSet<Element>();
+  return function (node: Element, val: any): void {
+    if (!node || mounted.has(node)) return;
+    mounted.add(node);
+    const cb = isSignal(val) ? val.peek() : val;
+    if (typeof cb === "function") {
+      nextTick(function () {
+        // Fire after current tick to ensure node is connected
+        try {
+          cb({ type: "mount" });
+        } catch {
+          // ignore errors from user callback
+        }
+      });
+    }
+  };
+}
+
+function DOMBeforeMountHandler(): TriggerPropHandler<MaybeSignalHandler> {
+  const fired = new WeakSet<Element>();
+  return function (node: Element, val: MaybeSignalHandler): void {
+    if (!node || !val || fired.has(node)) return;
+    fired.add(node);
+    const cb = isSignal(val) ? (val.peek() as any) : (val as any);
+    if (typeof cb === "function") {
+      try {
+        cb({ type: "beforeMount" });
+      } catch {
+        // ignore user callback errors
+      }
+    }
+  };
+}
+
+let __ROUTE_EVENT_NAME: string | null = null;
+let __routeDocListener: ((ev: Event) => void) | null = null;
+const __routeCallbacks = new Map<Element, AnyEventHandler>();
+
+function DOMRouteHandler(): TriggerPropHandler<MaybeSignalHandler> {
+  return function (node: Element, val: MaybeSignalHandler): void {
+    if (!node || !val) return;
+    __ROUTE_EVENT_NAME =
+      (globalThis as any).__IN_ROUTE_EVENT_NAME ||
+      __ROUTE_EVENT_NAME ||
+      "in-route";
+
+    let currentHandler: AnyEventHandler | null = null;
+    if (isSignal(val)) {
+      val.connect(function () {
+        const cb = val.peek();
+        currentHandler =
+          typeof cb === "function"
+            ? (detail: any) => (cb as AnyEventHandler)(detail)
+            : null;
+        if (currentHandler) __routeCallbacks.set(node, currentHandler);
+        else __routeCallbacks.delete(node);
+      });
+    } else if (typeof val === "function") {
+      currentHandler = val as AnyEventHandler;
+      __routeCallbacks.set(node, currentHandler);
+    }
+
+    if (!__routeDocListener) {
+      __routeDocListener = function (ev: Event): void {
+        const detail = (ev as any).detail || ev;
+        // Iterate stable snapshot to allow mutation during iteration
+        for (const [el, cb] of Array.from(__routeCallbacks.entries())) {
+          if (!(el as any).isConnected) {
+            __routeCallbacks.delete(el);
+            continue;
+          }
+          try {
+            cb(detail);
+          } catch {
+            // ignore user handler errors
+          }
+        }
+      };
+      document.addEventListener(
+        __ROUTE_EVENT_NAME || "in-route",
+        __routeDocListener as AnyEventHandler
+      );
+    }
+  };
+}
+
+// ========================= (FrameChange Global Loop) =========================
+let __rafId: number | null = null;
+let __lastTs: number | null = null;
+let __frameStart: number = 0;
+let __frameCount: number = 0;
+let __frameLoopActive = false;
+const __frameCallbacks = new Map<Element, AnyEventHandler>();
+
+function __startFrameLoop(): void {
+  if (__frameLoopActive) return;
+  __frameLoopActive = true;
+  const w: any = typeof window !== "undefined" ? window : globalThis;
+  const rAF: any = w?.requestAnimationFrame?.bind(w);
+  const cAF: any = w?.cancelAnimationFrame?.bind(w);
+
+  const step = (ts: number): void => {
+    if (!__frameStart) __frameStart = ts;
+    const delta = __lastTs == null ? 0 : ts - __lastTs;
+    __lastTs = ts;
+    __frameCount++;
+    const elapsed = ts - __frameStart;
+
+    // Snapshot to allow mutation during iteration
+    for (const [el, cb] of Array.from(__frameCallbacks.entries())) {
+      if (!(el as any).isConnected) {
+        __frameCallbacks.delete(el);
+        continue;
+      }
+      try {
+        cb({ type: "frameChange", time: ts, delta, elapsed, frame: __frameCount });
+      } catch {
+        // ignore user callback errors
+      }
+    }
+
+    if (__frameCallbacks.size === 0) {
+      __frameLoopActive = false;
+      __lastTs = null;
+      __frameStart = 0;
+      __frameCount = 0;
+      if (cAF && __rafId != null) cAF(__rafId);
+      __rafId = null;
+      return;
+    }
+
+    if (rAF) __rafId = rAF(step);
+    else __rafId = setTimeout(() => step((w?.performance || performance).now()), 16) as any;
+  };
+
+  if (rAF) __rafId = rAF(step);
+  else __rafId = setTimeout(() => step((w?.performance || performance).now()), 16) as any;
+}
+
+function DOMFrameChangeHandler(): TriggerPropHandler<MaybeSignalHandler> {
+  return function (node: Element, val: MaybeSignalHandler): void {
+    if (!node || !val) return;
+    let cb: AnyEventHandler | null = null;
+    if (isSignal(val)) {
+      val.connect(function () {
+        const v = val.peek();
+        if (typeof v === "function") {
+          cb = v as AnyEventHandler;
+          __frameCallbacks.set(node, cb);
+          __startFrameLoop();
+        } else {
+          __frameCallbacks.delete(node);
+        }
+      });
+    } else if (typeof val === "function") {
+      cb = val as AnyEventHandler;
+      __frameCallbacks.set(node, cb);
+      __startFrameLoop();
+    }
+  };
+}
+
 /** Register platform-bridged universal triggers */
 export function InUniversalTriggerProps(): void {
   const env = detectEnvironment();
 
   // DOM/Web bridge
   if (env.type === "dom" || env.type === "electron" || env.type === "lynx") {
+    // mount → fire once after mount
+    createTriggerHandle("mount", DOMMountHandler());
+    // beforeMount → fire synchronously during directive setup
+    createTriggerHandle("beforeMount", DOMBeforeMountHandler());
+    // route → global route event
+    createTriggerHandle("route", DOMRouteHandler());
+    // frameChange → requestAnimationFrame loop
+    createTriggerHandle("frameChange", DOMFrameChangeHandler());
     // tap → click
     createTriggerHandle("tap", DOMEventHandler("click"));
     // longpress → synth from pointer events
@@ -461,6 +643,10 @@ export function InUniversalTriggerProps(): void {
   // Capacitor (WebView + native App bridge)
   if (env.type === "capacitor") {
     // Base DOM mappings still apply
+    createTriggerHandle("mount", DOMMountHandler());
+    createTriggerHandle("beforeMount", DOMBeforeMountHandler());
+    createTriggerHandle("route", DOMRouteHandler());
+    createTriggerHandle("frameChange", DOMFrameChangeHandler());
     createTriggerHandle("tap", DOMEventHandler("click"));
     createTriggerHandle("longpress", DOMLongPressHandler());
     createTriggerHandle("change", DOMEventHandler("change"));

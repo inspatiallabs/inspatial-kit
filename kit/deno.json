@@ -107,8 +107,9 @@
     "@in/renderer/": "./src/renderer/src/",
     "@in/runtime/": "./src/runtime/src/",
 
-    "@inspatial/kit/jsx-runtime": "./src/runtime/src/",
-    "@inspatial/kit/jsx-dev-runtime": "./src/runtime/src/",
+    "@inspatial/kit/runtime": "./src/runtime/src/index.ts",
+    "@inspatial/kit/jsx-runtime": "./src/runtime/src/jsx-runtime.ts",
+    "@inspatial/kit/jsx-dev-runtime": "./src/runtime/src/jsx-dev-runtime.ts",
 
     "@in/extension/": "./src/extension/src/",
     "@in/dom/": "./src/renderer/src/",

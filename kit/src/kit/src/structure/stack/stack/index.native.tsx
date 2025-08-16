@@ -1,14 +1,19 @@
 import { iss } from "@in/style";
 import { StackStyle, type StackProps } from "./style.ts";
+import { Slot } from "../../slot/index.tsx";
 
-/*#####################################(Render)#####################################*/
+/*#####################################(COMPONENT)#####################################*/
 
 export function Stack(props: StackProps) {
+  /***********************************(Props)*******************************************/
+
   const { children, className, $ref, variant, disabled, gap, ...rest } = props;
+
+  /***********************************(Render)*******************************************/
 
   return (
     <>
-      <div
+      <Slot
         className={iss(
           `${StackStyle.getStyle({
             variant,
@@ -36,7 +41,7 @@ export function Stack(props: StackProps) {
         {...rest}
       >
         {children}
-      </div>
+      </Slot>
     </>
   );
 }

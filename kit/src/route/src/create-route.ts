@@ -41,6 +41,7 @@ export interface RouteApi {
   reload(): void;
   back(): void;
   forward(): void;
+  /** Get the current route url (including query params and hash) */
   get(): string;
   resetScrollPosition(): void;
   dispose?: () => void;
@@ -202,6 +203,12 @@ export function createRoute<T extends { to: string }>(
       routeName,
     } as any
   );
+  // Expose the event name globally for trigger bridge consumers
+  try {
+    (globalThis as any).__IN_ROUTE_EVENT_NAME = eventName || "in-route";
+  } catch {
+    // ignore non-DOM contexts
+  }
   const current = createSignal<CurrentRoute | null>(null);
   const canGoBack = createSignal<boolean>(false);
   const transition = createSignal<"idle" | "navigating" | "error">("idle");

@@ -51,13 +51,13 @@ InSpatial Kit is the highest layer of abstraction for both InSpatial dev and clo
 
 - **`GPURenderer(InTrigger)` (`@inspatial/kit/gpu-renderer`):** For interactive 3D & XR applications. \* \*\*Soon...
 
-
 #### Render targets - "Use Directives"
-InSpatial allows you to switch between renderers with directives, because all InSpatial Kit components and widgets are built for different platforms e.g `button.dom.tsx`, `button.gpu.tsx` etc... You can easily switch the render targets by declaring the following directive at the beginning of your `window.tsx` or `scene.tsx` files. 
+
+InSpatial allows you to switch between renderers with directives, because all InSpatial Kit components and widgets are built for different platforms e.g `button.dom.tsx`, `button.gpu.tsx` etc... You can easily switch the render targets by declaring the following directive at the beginning of your `window.tsx` or `scene.tsx` files.
 
 ##### For `window.tsx` Views
 
-- **"use native":** universal defaults this is the default directive and is what is auto attached to every .tsx file if no directive is declared. This will auto use the appropraite renderer based on detected environment. 
+- **"use native":** universal defaults this is the default directive and is what is auto attached to every .tsx file if no directive is declared. This will auto use the appropraite renderer based on detected environment.
 - **"use dom":**
 - **"use gpu":**
 - **"use ios:"**
@@ -67,24 +67,23 @@ InSpatial allows you to switch between renderers with directives, because all In
 - **"use horizonos:"**
 - **"use ssr:"**
 
-
 ##### For `scene.tsx` Views
-- **"use volumentric":** for 3d scenes 
+
+- **"use volumentric":** for 3d scenes
 - **"use ar":** for augmented reality scenes
 - **"use vr":** for virtual reality scenes
 - **"use mr":** for mixed reality scenes
 
-
 ### 2. InSpatial Runtime
+
 Built on top the universal runtime
 
-
 #### JSX Runtime
+
 - **Retained Mode:** JSX templates are evaluated once to build the initial UI.
 - **Pragma Transform::** Provides maximum flexibility. Requires configuring `jsxFactory: 'R.c'` and `jsxFragment: 'R.f'` in build tools (Vite, Babel). Components receive `R` as an argument.
 - **Automatic Runtime:** Easier setup, but less flexible. Configures `jsx: 'automatic'` and `jsxImportSource: 'InSpatial'`.
 - **Hot Reload:** Use `InVite` extension for vite-rollup/rolldown and `InPack` for webpack/rspack client development.
-
 
 #### Creating your own runtime?
 
@@ -185,7 +184,7 @@ Styling can also be done by calling multiple style props e.g
 />
 ```
 
-Even though this is an option it forgoes the unviversal mental model of InSpatial because it treats and assumes that you are only operating in the context of the web also it creates a new type of anti-pattern where you are parsing the same prop more than once within a sing component. 
+Even though this is an option it forgoes the unviversal mental model of InSpatial because it treats and assumes that you are only operating in the context of the web also it creates a new type of anti-pattern where you are parsing the same prop more than once within a sing component.
 
 - **Styling Dynamic Elements:** For dynamically styled elements, leverage InSpatial's browser preset capabilities for conditional classes (`class:active={signal}`) and inline styles (`style:property={value}`) to ensure styles update correctly with state changes. \* \*\*Soon...
 
@@ -266,15 +265,15 @@ counterState.count.get();
 ```ts
 const gameState = createState({ x: 0, y: 0, hp: 100, score: 0 });
 
-// Direct signal trigger
+// Direct Signal Action
 const addScore = createAction(gameState.score, (s, n = 1) => s + n);
 
-// Tuple trigger
+// Tuple Actions
 const damage = createAction([gameState, "hp"], (hp, amt = 10) =>
   Math.max(0, hp - amt)
 );
 
-// Batch triggers
+// Batch Actions
 const move = createAction(gameState, {
   moveX: { key: "x", fn: (x, dx: number) => x + dx },
   moveY: { key: "y", fn: (y, dy: number) => y + dy },
@@ -311,7 +310,7 @@ createStorage(gameState, {
   ```ts
   const score2x = $(() => gameState.score.get() * 2);
   ```
-- Trigger options
+- Action Trigger options
   ```ts
   const inc = createAction(s.a, (v) => v + 1, { throttle: 50, once: false });
   ```
@@ -354,9 +353,95 @@ Action triggers are part of State (see InSpatial State). Use `createAction()` fo
 
 #### Trigger (Props)
 
+Trigger Props solves a who slew of problems:
+
 - Triggers are decoupled and disabled by default. The trigger prop registry helps create and mix different platform trigger props e.g you can unify the click event from web/dom and android, ios etc... give it a simple name e.g `tap` then all of those platforms will respond to the tap.
 - Use `InTrigger` (or custom extensions) to enable triggers props.
 - Use `createTriggerHandle` to register a new trigger prop e.g `on:dooropen`
+- Triggers are view driven not actions i.e you call the trigger prop you want at the component level, this removes the need for historic footguns like effects.
+
+While you can create your own custom trigger using `createTriggerHandle()` InSpatial provides a standard list of Universal Trigger Props out of the box. They include:
+
+##### A. LifeCycle Triggers
+
+**on:frameChange**
+Use `on:frameChange` to trigger an action every frame per second. This is especially useful for graphics application e.g XR and Games.
+
+One requestAnimationFrame (RAF) for the whole app, not per node.
+
+- Each subscriber gets a per-frame callback with:
+- time: high-resolution timestamp
+- delta: ms since last frame
+- elapsed: ms since the loop started
+- frame: monotonically increasing frame index
+- Auto-cleans disconnected nodes and stops the loop when the registry is empty.
+
+```ts
+const ui = createState({ fps: 0 });
+
+// Use Frame Change
+<Template on:frameChange={({ delta, frame }: { delta: number; frame: number }) => {
+    if (frame % 10 === 0) {
+      const d = delta || 16;
+      const next = Math.max(1, Math.round(1000 / d));
+      ui.fps.value = next;
+    }
+  }}
+/>
+
+// Display
+   <FPS />
+```
+
+**on:beforeMount** & **on:mount** 
+Use `on:beforeMount` to trigger actions you want before an app starts or renders.
+Use `on:mount` to trigger actions you want when/after  an app starts or renders.
+
+```typescript
+<Template
+  on:beforeMount={() => {
+    // safe for state setup, timers, subscriptions
+    // avoid reading DOM layout here; node may not be connected yet
+  }}
+  on:mount={() => {
+    // node is now connected; do DOM reads/writes here if needed
+  }}
+/>
+```
+
+
+**on:route**
+Use `on:route` to trigger an action on navigation.
+
+```ts
+<Link to="https://inspatial.app" on:route={() => alert("routing")}>
+  App
+</Link>
+```
+
+##### B. Input Triggers
+
+**on:tap**
+...
+
+**on:longpress**
+...
+
+**on:change**
+...
+
+**on:focus**
+...
+
+**on:submit**
+...
+
+
+##### C. Area Triggers
+
+##### D. Gesture Triggers
+
+##### E. Physics Triggers
 
 #### Trigger Prop Extension
 
@@ -542,6 +627,7 @@ export const userAgentExtension = new CloudExtension("userAgent", {
 ```
 
 ### 7. InSpatial Motion
+
 InSpatial Motion is built on InSpatial's `@in/motion`. \* \*\*Soon...
 
 #### NOTE On Interactivity
@@ -551,6 +637,7 @@ NOTE: Signals are the most low-level reactive primitives you should only ever us
 ## Routing & Navigation
 
 ### 8. InSpatial Route
+
 InSpatial Route is a universal filesystem router built on InSPatial's `@in/route` module.
 
 ### Programmatic routing - `createRoute()` API
@@ -613,11 +700,13 @@ const route = createRoute()
 ## Testing
 
 ### 9. InSpatial Test
+
 InSpatial Test is built on InSpatial's `@in/test`. \* \*\*Soon...
 
 ## Server & Backend
 
 ### 10. InSpatial Cloud
+
 InSpatial Cloud is built on `@inspatial/cloud` and exposes `@inspatial/cloud` APIs for comprehensive backend and data management across all platforms. `@inspatial/cloud-client` is what you should always use on the cient app. `@inSpatial/cloud` is only for server.
 
 ### Adding a New Cloud Collection/Table
@@ -766,16 +855,17 @@ Note: hasValue returns plain boolean. Returns true when the value of the signal 
 
 JSX runtime is essential when using InSpatial together with runtimes like [Deno](https://github.com/denoland/deno/issues/29584), compilers like [SWC](https://github.com/swc-project/swc/issues/10553) or generators like [MDX](https://mdxjs.com/), since they lack the ability to correctly transform JSX via parameters.
 
-### 10. Dev & Production (Serving, Bundling etc...) 
-You can build your app for dev and production using different tools like (InSpatial `Serve` extension, Vite, Rollup with Babel, Rspack or Webpack). InSpatial provides different plugins and extensions for different tools. 
+### 10. Dev & Production (Serving, Bundling etc...)
+
+You can build your app for dev and production using different tools like (InSpatial `Serve` extension, Vite, Rollup with Babel, Rspack or Webpack). InSpatial provides different plugins and extensions for different tools.
 
 - InServe (Default)
-- InVite  
-- InPack 
-
+- InVite
+- InPack
 
 #### InServe (Founders Choice)
-When using `InServe()` extension there's no need to use or configure a build tool like Vite or RSPack. To use `InServe()`, create your render.ts file and add it as an extension. 
+
+When using `InServe()` extension there's no need to use or configure a build tool like Vite or RSPack. To use `InServe()`, create your render.ts file and add it as an extension.
 
 ```typescript
 // render.ts
@@ -798,7 +888,8 @@ Then add your deno.json
 }
 ```
 
-#### InVite 
+#### InVite
+
 Use `InVite` plugin for Vite. Create a `vite.config.ts` file and add the following conifguration
 
 ##### Pragma Config (Default)
@@ -815,9 +906,7 @@ export default defineConfig({
     jsxFactory: "R.c",
     jsxFragment: "R.f",
   },
-  plugins: [
-    InVite(),
-  ],
+  plugins: [InVite()],
   build: {
     target: "esnext",
   },
@@ -853,7 +942,8 @@ export default defineConfig({
 }
 ```
 
-#### InPack 
+#### InPack
+
 Use the `InPack` plugin for Webpack and/or RSPack/RSBuild
 
 ```javascript
@@ -865,7 +955,6 @@ export default defineConfig({
   // ... jsx config
 });
 ```
-
 
 ### Initialization
 
@@ -902,7 +991,7 @@ Now, any `.jsx` or `.tsx` file will be automatically transformed to use the init
 
 | React                                                       | InSpatial                                                        |
 | ----------------------------------------------------------- | ---------------------------------------------------------------- |
-| `useState(0)`                                               | `createState({count: 0 })`                                                |
+| `useState(0)`                                               | `createState({count: 0 })`                                       |
 | `createEffect(() => {}, [deps])`                            | `watch(() => {})` or `createEffect(() => {})`                    |
 | `{count}`                                                   | `{count}` (same for signals)                                     |
 | `{`Count: ${count}`}`                                       | `{$(() => \`Count: ${count.value}\`)}`or`{t\`Count: ${count}\`}` |

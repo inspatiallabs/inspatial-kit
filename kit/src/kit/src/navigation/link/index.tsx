@@ -5,7 +5,7 @@ import { getGlobalRenderer as _getGlobalRenderer } from "@in/runtime";
 
 /*################################(Props)################################*/
 
-interface LinkProps {
+interface LinkProps extends JSX.SharedProps {
   to: string;
   params?: Record<string, string>;
   query?: Record<string, string>;
@@ -13,8 +13,6 @@ interface LinkProps {
   prefetch?: boolean;
   modeOverride?: "spa" | "mpa";
   protect?: () => boolean | string | Promise<boolean | string>;
-  class?: any;
-  [prop: string]: any;
   target?: "_blank" | "_self" | "_parent" | "_top";
   rel?: "external" | "noopener" | "noreferrer";
 }

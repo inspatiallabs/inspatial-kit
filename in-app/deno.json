@@ -82,7 +82,7 @@
 
     "@inspatial/app/": "./src/",
 
-    "@inspatial/cloud-client": "jsr:@inspatial/cloud-client@^0.1.22",
+    "@inspatial/cloud-client": "jsr:@inspatial/cloud-client@^0.1.28",
 
     "@inspatial/kit": "../kit/src/index.ts",
     "@inspatial/kit/control-flow": "../kit/src/kit/src/control-flow/index.ts",

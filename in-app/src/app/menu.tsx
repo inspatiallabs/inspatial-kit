@@ -1,18 +1,33 @@
 import { Link } from "@inspatial/kit/navigation";
-import { useTheme } from "./(extensions)/in-theme/index.ts";
-import { $ } from "@inspatial/kit/state";
-import {Stack, XStack, YStack } from "@inspatial/kit/structure";
+import { $, createState } from "@inspatial/kit/state";
+import { XStack } from "@inspatial/kit/structure";
+import { FPS } from "./fps.tsx";
+import { route } from "./routes.tsx";
 
 export function AppMenu() {
   return (
     <>
-      <YStack className="p-10 bg-yellow-300">
-        <Link className="bg-green-300" to="/">Kit</Link>
-        <Link to="/counter">Cloud</Link>
-        <Link to="/projects">App</Link>
-        <Link to="/route-test">Store</Link>
-      </YStack>
-      <div className="fixed top-4 right-4 flex items-center gap-2 z-50">
+      <XStack className="justify-center items-center space-x-10 p-4 w-full">
+        <Link
+          to="/"
+          className={`rounded-full py-[10px] px-[18px] ${
+            route.get() === "/" && "bg-purple-500"
+          }`}
+        >
+          Kit
+        </Link>
+        <Link to="/counter" className="rounded-full py-[10px] px-[18px]">
+          Cloud
+        </Link>
+        <Link to="/projects" className="rounded-full py-[10px] px-[18px]">
+          App
+        </Link>
+        <Link to="/route-test" className="rounded-full py-[10px] px-[18px]">
+          Store
+        </Link>
+      </XStack>
+      <FPS />
+      {/* <div className="fixed top-4 right-4 flex items-center gap-2 z-50">
         <button
           type="button"
           style={{
@@ -32,7 +47,7 @@ export function AppMenu() {
               : "Switch to Dark"
           )}
         </button>
-      </div>
+      </div> */}
     </>
   );
 }

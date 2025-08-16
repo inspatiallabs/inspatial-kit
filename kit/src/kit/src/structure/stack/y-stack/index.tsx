@@ -11,6 +11,7 @@ export function YStack(props: StackProps) {
         web: {
           display: "flex",
           flexDirection: "column",
+          ...props.style,
         },
       }}
       {...props}
