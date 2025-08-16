@@ -1,5 +1,5 @@
-import { isSignal, type Signal } from "@in/teract/signal";
-import { type Component, createComponent, Fn, render } from "@in/kit";
+import { isSignal, type Signal } from "@in/teract/signal/index.ts";
+import { type Component, createComponent, Fn, render } from "@in/kit/index.ts";
 import { removeFromArr } from "@in/vader";
 import { env } from "@in/vader/env";
 import type { DebugContext } from "@in/vader/debug";

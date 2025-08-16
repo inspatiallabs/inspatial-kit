@@ -1,6 +1,6 @@
 import { wrap as wrapDev } from "./jsx-dev-runtime.ts";
 import { nop } from "@in/vader";
-import { env } from "@in/vader/env";
+import { env } from "@in/vader/env/index.ts";
 
 /*################################(JSX Props Type Declaration)################################*/
 import "./jsx-global.d.ts";

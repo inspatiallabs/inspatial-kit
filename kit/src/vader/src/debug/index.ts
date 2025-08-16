@@ -2,7 +2,7 @@
  * InSpatial Universal Debugger
  */
 
-import { env } from "@in/vader/env";
+import { env } from "../env/variables.ts";
 
 export type DebugLevel = "error" | "warn" | "info" | "debug" | "trace";
 export type DebugCategory =

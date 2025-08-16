@@ -1,5 +1,5 @@
 import { createRenderer } from "@inspatial/kit/renderer";
-import { envSupportsFeature } from "@inspatial/kit/env";
+import { envSupportsFeature } from "@inspatial/kit/vader/env";
 import { InTrigger } from "@inspatial/kit/trigger";
 import { InTheme } from "@inspatial/app/app/(extensions)/in-theme/index.ts";
 import { InServe } from "@inspatial/kit/serve";

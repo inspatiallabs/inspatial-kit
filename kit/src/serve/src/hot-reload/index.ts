@@ -1,6 +1,6 @@
 import { createSignal } from "@in/teract/signal";
 import { isPrimitive } from "@in/vader";
-import { env } from "@in/vader/env";
+import { env } from "@in/vader/env/variables.ts";
 
 /*################################(Hot Module Replacement Interfaces)################################*/
 interface HotModuleReplacement {

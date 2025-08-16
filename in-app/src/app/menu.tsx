@@ -1,28 +1,33 @@
 import { Link } from "@inspatial/kit/navigation";
-import { $, createState } from "@inspatial/kit/state";
+import { $ } from "@inspatial/kit/state";
 import { XStack } from "@inspatial/kit/structure";
+import { Text } from "@inspatial/kit/typography";
 import { FPS } from "./fps.tsx";
 import { route } from "./routes.tsx";
+import { InSpatialIcon } from "@inspatial/kit/icon";
 
 export function AppMenu() {
   return (
     <>
       <XStack className="justify-center items-center space-x-10 p-4 w-full">
+        <Link to="https://www.inspatial.dev/kit" className="rounded-full py-[10px] px-[18px]">
+          Kit
+        </Link>
+        <Link to="https://www.inspatial.cloud" className="rounded-full py-[10px] px-[18px]">
+          Cloud
+        </Link>
+        {/* <Link to="https://www.inspatial.store" className="rounded-full py-[10px] px-[18px]">
+         <InSpatialIcon format="fill" className="text-purple-500" />
+        </Link> */}
         <Link
           to="/"
           className={`rounded-full py-[10px] px-[18px] ${
             route.get() === "/" && "bg-purple-500"
           }`}
         >
-          Kit
-        </Link>
-        <Link to="/counter" className="rounded-full py-[10px] px-[18px]">
-          Cloud
-        </Link>
-        <Link to="/projects" className="rounded-full py-[10px] px-[18px]">
           App
         </Link>
-        <Link to="/route-test" className="rounded-full py-[10px] px-[18px]">
+        <Link to="https://www.inspatial.store" className="rounded-full py-[10px] px-[18px]">
           Store
         </Link>
       </XStack>

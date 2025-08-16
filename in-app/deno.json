@@ -1,8 +1,8 @@
 {
   "nodeModulesDir": "auto",
   "tasks": {
-    "css:watch": "deno run -A npm:@tailwindcss/cli@latest -i src/config/app.css -o dist/kit.css --content src/**/*.{ts,tsx,js,jsx} ../kit/src/**/*.{ts,tsx,js,jsx} --watch",
-    "setup": "powershell -Command \"New-Item -ItemType Directory -Force -Path dist/asset; deno run -A npm:@tailwindcss/cli@latest -i src/config/app.css -o dist/kit.css --content 'src/**/*.{ts,tsx,js,jsx}' '../kit/src/**/*.{ts,tsx,js,jsx}'; Copy-Item src/asset/favicon.png dist/asset/favicon.png; Copy-Item index.html dist/index.html\"",
+    "css:watch": "deno run -A npm:@tailwindcss/cli@latest -i src/config/app.css -o dist/kit.css --content src/**/*.{ts,tsx,js,jsx} --content ../kit/src/**/*.{ts,tsx,js,jsx} --watch",
+    "setup": "powershell -Command \"New-Item -ItemType Directory -Force -Path dist/asset; deno run -A npm:@tailwindcss/cli@latest -i src/config/app.css -o dist/kit.css --content 'src/**/*.{ts,tsx,js,jsx}' --content '../kit/src/**/*.{ts,tsx,js,jsx}'; Copy-Item src/asset/favicon.png dist/asset/favicon.png; Copy-Item index.html dist/index.html\"",
     "js:watch": "deno bundle --platform=browser --output=dist/bundle.js --sourcemap --watch src/config/render.ts",
     "build": "deno task setup && deno bundle --platform=browser --output=dist/bundle.js --sourcemap --minify src/config/render.ts",
     "serve": "deno run --allow-net --allow-read --allow-write --allow-env --allow-run src/config/render.ts",
@@ -25,6 +25,7 @@
     "@in/kit/control-flow/": "../kit/src/kit/src/control-flow/",
     "@in/kit/navigation/": "../kit/src/kit/src/navigation/",
     "@in/kit/structure/": "../kit/src/kit/src/structure/",
+    "@in/kit/typography/": "../kit/src/kit/src/typography/",
 
     "@in/renderer/": "../kit/src/renderer/src/",
     "@in/runtime/": "../kit/src/runtime/src/",
@@ -65,20 +66,22 @@
     "@in/teract/state": "../kit/src/state/src/core/index.ts",
     "@in/teract/trigger/": "../kit/src/state/src/trigger/",
     "@in/teract/trigger": "../kit/src/state/src/trigger/index.ts",
-    "@in/teract/env/": "../kit/src/env/src/",
-    "@in/teract/env": "../kit/src/env/src/index.ts",
 
     "@in/serve/": "../kit/src/serve/src/",
     "@in/serve": "../kit/src/serve/src/index.ts",
 
-    "@in/vader": "../kit/src/utils.ts",
-    "@in/vader/env/": "../kit/src/env/src/",
-    "@in/vader/env": "../kit/src/env/src/index.ts",
-    "@in/vader/debug/": "../kit/src/debug/src/",
-    "@in/vader/debug": "../kit/src/debug/src/index.ts",
+    "@in/vader": "../kit/src/vader/src/index.ts",
+    "@in/vader/": "../kit/src/vader/src/",
+    "@in/vader/env/": "../kit/src/vader/src/env/",
+    "@in/vader/env": "../kit/src/vader/src/env/index.ts",
+    "@in/vader/debug/": "../kit/src/vader/src/debug/",
+    "@in/vader/debug": "../kit/src/vader/src/debug/index.ts",
 
     "@in/style/": "../kit/src/style/src/",
     "@in/style": "../kit/src/style/src/index.ts",
+
+    "@in/motion/": "../kit/src/motion/src/",
+    "@in/motion": "../kit/src/motion/src/index.ts",
 
     "@inspatial/app/": "./src/",
 
@@ -86,9 +89,11 @@
 
     "@inspatial/kit": "../kit/src/index.ts",
     "@inspatial/kit/control-flow": "../kit/src/kit/src/control-flow/index.ts",
+    "@inspatial/kit/component": "../kit/src/kit/src/component/index.ts",
     "@inspatial/kit/navigation": "../kit/src/kit/src/navigation/index.ts",
     "@inspatial/kit/structure": "../kit/src/kit/src/structure/index.ts",
-    "@inspatial/kit/component": "../kit/src/kit/src/component/index.ts",
+    "@inspatial/kit/typography": "../kit/src/kit/src/typography/index.ts",
+    "@inspatial/kit/icon": "../kit/src/kit/src/icon/index.ts",
 
     "@inspatial/kit/extension": "../kit/src/extension/src/index.ts",
 
@@ -100,10 +105,12 @@
     "@inspatial/kit/signal": "../kit/src/signal/src/index.ts",
     "@inspatial/kit/state": "../kit/src/state/src/core/index.ts",
     "@inspatial/kit/trigger": "../kit/src/state/src/trigger/index.ts",
+    "@inspatial/kit/motion": "../kit/src/motion/src/index.ts",
     "@inspatial/kit/route": "../kit/src/route/src/index.ts",
-    "@inspatial/kit/env": "../kit/src/env/src/index.ts",
     "@inspatial/kit/serve": "../kit/src/serve/src/index.ts",
-    "@inspatial/kit/debug": "../kit/src/debug/src/index.ts",
+    "@inspatial/kit/vader": "../kit/src/vader/src/index.ts",
+    "@inspatial/kit/vader/env": "../kit/src/vader/src/env/index.ts",
+
     "@tailwindcss/cli": "npm:@tailwindcss/cli@^4.1.11",
     "tailwindcss": "npm:tailwindcss@^4.1.11"
   }

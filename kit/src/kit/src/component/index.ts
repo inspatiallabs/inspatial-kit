@@ -10,7 +10,7 @@ import {
   enableHotReload,
 } from "@in/serve";
 import { removeFromArr, isThenable, isPrimitive } from "@in/vader";
-import { env } from "@in/teract/env";
+import { env } from "@in/vader/env";
 import type { DebugContext } from "@in/vader/debug";
 import { List, Show, Fn } from "../control-flow/index.ts";
 import { _asyncContainer, Async } from "../control-flow/async/index.ts";

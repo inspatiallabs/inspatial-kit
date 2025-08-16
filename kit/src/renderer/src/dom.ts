@@ -1,7 +1,7 @@
 import { isSignal, peek, bind } from "@in/teract/signal";
 import { createRenderer } from "./create-renderer.ts";
 import { cachedStrKeyNoFalsy, splitFirst } from "@in/vader";
-import { env } from "@in/vader/env";
+import { env } from "@in/vader/env/index.ts";
 import { wrap } from "@in/jsx-runtime";
 import {
   composeExtensions,

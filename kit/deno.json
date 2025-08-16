@@ -29,7 +29,9 @@
     "./env": "./src/env/src/index.ts",
     "./serve": "./src/serve/src/index.ts",
     "./debug": "./src/debug/src/index.ts",
-    "./style": "./src/style/src/index.ts"
+    "./style": "./src/style/src/index.ts",
+    "./motion": "./src/motion/src/index.ts",
+    "./vader": "./src/vader/src/index.ts"
   },
   "tasks": {
     "test": "deno test --allow-env --allow-read --allow-write --allow-run --allow-net --allow-hrtime --allow-env --allow-all ./src/index.test.ts",
@@ -129,10 +131,15 @@
 
     "@in/route/": "./src/route/src/",
 
-    "@in/vader/env/": "./src/env/src/",
-    "@in/vader/debug/": "./src/debug/src/",
-    "@in/vader": "./src/utils.ts",
+    "@in/motion/": "./src/motion/src/",
+    "@in/motion": "./src/motion/src/index.ts",
 
-    "@in/serve/": "./src/serve/src/"
+    "@in/vader/env/": "./src/vader/src/env/",
+    "@in/vader/debug/": "./src/vader/debug/",
+    "@in/vader/remove-from-arr/": "./src/vader/remove-from-arr/",
+    "@in/vader": "./src/vader/src/index.ts",
+
+    "@in/serve/": "./src/serve/src/",
+    "@inspatial/util": "jsr:@inspatial/util@^0.2.0"
   }
 }
