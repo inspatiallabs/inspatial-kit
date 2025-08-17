@@ -2,7 +2,7 @@
   "nodeModulesDir": "auto",
   "tasks": {
     "css:watch": "deno run -A npm:@tailwindcss/cli@latest -i src/config/app.css -o dist/kit.css --content src/**/*.{ts,tsx,js,jsx} --content ../kit/src/**/*.{ts,tsx,js,jsx} --watch",
-    "setup": "powershell -Command \"New-Item -ItemType Directory -Force -Path dist/asset; deno run -A npm:@tailwindcss/cli@latest -i src/config/app.css -o dist/kit.css --content 'src/**/*.{ts,tsx,js,jsx}' --content '../kit/src/**/*.{ts,tsx,js,jsx}'; Copy-Item src/asset/favicon.png dist/asset/favicon.png; Copy-Item index.html dist/index.html\"",
+    "setup": "powershell -Command \"New-Item -ItemType Directory -Force -Path dist/asset; deno run -A npm:@tailwindcss/cli@latest -i src/config/app.css -o dist/kit.css --content 'src/**/*.{ts,tsx,js,jsx}' --content '../kit/src/**/*.{ts,tsx,js,jsx}'; Copy-Item -Recurse -Force src/asset/* dist/asset/; Copy-Item index.html dist/index.html\"",
     "js:watch": "deno bundle --platform=browser --output=dist/bundle.js --sourcemap --watch src/config/render.ts",
     "build": "deno task setup && deno bundle --platform=browser --output=dist/bundle.js --sourcemap --minify src/config/render.ts",
     "serve": "deno run --allow-net --allow-read --allow-write --allow-env --allow-run src/config/render.ts",
@@ -27,6 +27,7 @@
     "@in/kit/structure/": "../kit/src/kit/src/structure/",
     "@in/kit/typography/": "../kit/src/kit/src/typography/",
     "@in/kit/ornament/": "../kit/src/kit/src/ornament/",
+    "@in/kit/media/": "../kit/src/kit/src/media/",
 
     "@in/renderer/": "../kit/src/renderer/src/",
     "@in/runtime/": "../kit/src/runtime/src/",
@@ -97,6 +98,7 @@
     "@inspatial/kit/typography": "../kit/src/kit/src/typography/index.ts",
     "@inspatial/kit/icon": "../kit/src/kit/src/icon/index.ts",
     "@inspatial/kit/ornament": "../kit/src/kit/src/ornament/index.ts",
+    "@inspatial/kit/media": "../kit/src/kit/src/media/index.ts",
 
     "@inspatial/kit/extension": "../kit/src/extension/src/index.ts",
 

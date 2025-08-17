@@ -9,6 +9,7 @@
     "./kit/control-flow": "./src/kit/control-flow/index.ts",
     "./kit/navigation": "./src/kit/navigation/index.ts",
     "./kit/structure": "./src/kit/structure/index.ts",
+    "./kit/media": "./src/kit/src/media/index.ts",
     "./extension": "./src/extension/src/index.ts",
     "./renderer": "./src/renderer/src/index.ts",
     "./renderer/create-renderer": "./src/renderer/src/create-renderer.ts",
@@ -105,6 +106,7 @@
     "@in/kit/control-flow/": "./src/kit/src/control-flow/",
     "@in/kit/navigation/": "./src/kit/src/navigation/",
     "@in/kit/structure/": "./src/kit/src/structure/",
+    "@in/kit/media/": "./src/kit/src/media/",
 
     "@in/renderer/": "./src/renderer/src/",
     "@in/runtime/": "./src/runtime/src/",
