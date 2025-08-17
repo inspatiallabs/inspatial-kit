@@ -16,15 +16,15 @@ export type AllFontVariants = typeof FontVariants;
 //##############################################(VARIANTS)##############################################//
 
 export const TypographyStyle = createStyle({
-  base: ["inline-flex"],
+  base: ["inline-flex", { web: { display: "inline-flex" } }],
   settings: {
     variant: {
-      text: "",
-      quote: "",
-      code: "",
+      text: [""],
+      quote: [""],
+      code: [""],
     },
     format: {
-      base: "",
+      base: [""],
     },
   },
   defaultSettings: {

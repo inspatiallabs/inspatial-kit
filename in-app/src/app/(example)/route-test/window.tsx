@@ -18,28 +18,28 @@ export function RouteTestWindow() {
           <button
             type="button"
             className="px-2 py-1 border rounded"
-            on:tap={() => route.navigate("home")}
+            on:tap={() => route.to("home")}
           >
             navigateTo("home")
           </button>
           <button
             type="button"
             className="px-2 py-1 border rounded"
-            on:tap={() => route.navigate("counter")}
+            on:tap={() => route.to("counter")}
           >
             navigateTo("counter")
           </button>
           <button
             type="button"
             className="px-2 py-1 border rounded"
-            on:tap={() => route.navigate("projects")}
+            on:tap={() => route.to("projects")}
           >
             navigateTo("projects")
           </button>
           <button
             type="button"
             className="px-2 py-1 border rounded"
-            on:tap={() => route.navigate("routeTest")}
+            on:tap={() => route.to("routeTest")}
           >
             navigateTo("routeTest")
           </button>
@@ -47,21 +47,21 @@ export function RouteTestWindow() {
           <button
             type="button"
             className="px-2 py-1 border rounded"
-            on:tap={() => route.navigate("https://www.google.com/")}
+            on:tap={() => route.to("https://www.google.com/")}
           >
             navigate("google.com")
           </button>
           <button
             type="button"
             className="px-2 py-1 border rounded"
-            on:tap={() => route.navigate("/counter")}
+            on:tap={() => route.to("/counter")}
           >
             navigate("/counter")
           </button>
           <button
             type="button"
             className="px-2 py-1 border rounded"
-            on:tap={() => route.navigate("/projects")}
+            on:tap={() => route.to("/projects")}
           >
             navigate("/projects")
           </button>

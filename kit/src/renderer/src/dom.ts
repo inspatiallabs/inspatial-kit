@@ -54,13 +54,75 @@ export function DOMRenderer(options: DOMOptions = {}): any {
   }
   function createTextNode(text: any): any {
     if (isSignal(text)) {
-      const node = doc.createTextNode("");
-      text.connect(function () {
-        const newData = peek(text);
-        if (newData === undefined) node.data = "";
-        else node.data = newData;
-      });
-      return node;
+      // Dynamic region with start/end anchors to safely manage fragment children
+      const start = doc.createComment("dyn-start");
+      const end = doc.createComment("dyn-end");
+      const frag = doc.createDocumentFragment();
+      frag.appendChild(start);
+      frag.appendChild(end);
+
+      let currentNodes: Node[] = [];
+
+      const clear = (parent: Node): void => {
+        if (!currentNodes.length) return;
+        for (const n of currentNodes) {
+          try {
+            if ((n as any).parentNode) (n as any).parentNode.removeChild(n);
+          } catch {}
+        }
+        currentNodes = [];
+      };
+
+      const insert = (parent: Node, val: any): void => {
+        if (val && (val as any).cloneNode) {
+          const node = val as Node;
+          if ((node as any).nodeType === 11) {
+            // DocumentFragment → move its children
+            while ((node as any).firstChild) {
+              const child = (node as any).firstChild as Node;
+              (parent as any).insertBefore(child, end);
+              currentNodes.push(child);
+            }
+          } else {
+            (parent as any).insertBefore(node, end);
+            currentNodes.push(node);
+          }
+        } else {
+          const tn = doc.createTextNode(String(val));
+          (parent as any).insertBefore(tn, end);
+          currentNodes.push(tn);
+        }
+      };
+
+      const mount = (val: any): void => {
+        const parent = (end as any).parentNode;
+        if (!parent) return;
+        // Clear existing content
+        clear(parent);
+        if (val === undefined || val === null || val === false) return;
+        insert(parent, val);
+      };
+
+      let latest: any = undefined;
+      bind(function (next: any) {
+        latest = next;
+        queueMicrotask(() => mount(latest));
+      }, text);
+      // Initial: wait until anchors are attached to a parent before mounting
+      (function tryInit(attempts = 0) {
+        const parent = (end as any).parentNode;
+        if (!parent) {
+          if (attempts < 5) {
+            requestAnimationFrame(() => tryInit(attempts + 1));
+          } else {
+            // Final attempt even if parent is still null
+            queueMicrotask(() => mount(latest));
+          }
+          return;
+        }
+        mount(latest);
+      })();
+      return frag;
     }
 
     return doc.createTextNode(text);

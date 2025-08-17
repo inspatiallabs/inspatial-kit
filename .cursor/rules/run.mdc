@@ -190,7 +190,54 @@ Even though this is an option it forgoes the unviversal mental model of InSpatia
 
 #### Style Composition: (Variant Authority)
 
-NOTE: `@in/style/variant` supports object/web style injection, where all keys are compiled to a generated CSS class (e.g., .in-abc123) and injected once into a <style data-in-variant> tag. This allows you to write both css and tailwind like styling inside `createStyle()` api.
+NOTE: `@in/style/variant` enables object/web style injection, compiling all style keys into unique CSS classes (e.g., .in-abc123) that are injected once into a `<style data-in-variant>` tag. With the `createStyle()` API, you can write both CSS and Tailwind-like styles directly in TypeScript, not in `.css` files. InSpatial Kit Widgets & Components use these utilities, but they are not traditional CSS or Tailwind—they are compiled and applied at runtime based on your platform and render target. If TailwindCSS is installed, InSpatial will use its utilities; otherwise, it falls back to standard CSS. The styles you write look like Tailwind or CSS, but are managed by the InSpatial Style Sheet (ISS) system, which handles platform-specific transpilation for you.
+
+```typescript
+import { createStyle } from "@in/style/variant";
+
+export const IconStyle = createStyle({
+  base: [
+    "inline-block items-center",
+    { web: { display: "inline-block", alignItems: "center" } },
+  ],
+  settings: {
+    format: {
+      regular: ["", {}],
+      fill: ["fill-current", { web: { fill: "currentColor" } }],
+    },
+
+    size: {
+      xs: ["w-[16px] h-[16px]", { web: { width: "16px", height: "16px" } }],
+      sm: ["w-[24px] h-[24px]", { web: { width: "24px", height: "24px" } }],
+      md: ["w-[32px] h-[32px]", { web: { width: "32px", height: "32px" } }],
+      lg: ["w-[40px] h-[40px]", { web: { width: "40px", height: "40px" } }],
+      xl: ["w-[48px] h-[48px]", { web: { width: "48px", height: "48px" } }],
+    },
+
+    disabled: {
+      true: [
+        "opacity-disabled opacity-50 pointer-events-none cursor-not-allowed",
+        {
+          web: {
+            opacity: 0.5,
+            pointerEvents: "none",
+            cursor: "not-allowed",
+            color: "var(--muted)",
+          },
+        },
+      ],
+      false: [{}],
+    },
+  },
+  defaultSettings: {
+    format: "regular",
+    size: "md",
+    disabled: false,
+  },
+});
+```
+
+The example above demonstrates how InSpatial Kit and Widgets support both CSS and Tailwind utility styles for maximum flexibility and platform agnosticism at a low level. However, when building higher-level InSpatial applications, it's recommended to consistently use either CSS or Tailwind utilities, rather than mixing both, to keep your styles clear and maintainable. Use Tailwind utilities if installed, otherwise use CSS utilities.
 
 **🚨 Key Things to Know**
 
@@ -520,10 +567,10 @@ InSpatial Triggers are grouped into `Props` and `Actions`.
 **NOTE**
 
 - Trigger Props are disabled by default. Install the `InTrigger` extension to enable resolution of `on:*`, `style:*`, and `class:*`.
-- Use `createTriggerHandle()` to register new or override existing trigger props in the registry.
+- Use `createTrigger()` to register new or override existing trigger props in the registry.
 - Import surface for trigger props is provided by `@inspatial/kit/state`:
   ```ts
-  import { InTrigger, createTriggerHandle } from "@inspatial/kit/trigger";
+  import { InTrigger, createTrigger } from "@inspatial/kit/trigger";
   ```
 
 #### Trigger (Actions)
@@ -536,10 +583,10 @@ Trigger Props solves a who slew of problems:
 
 - Triggers are decoupled and disabled by default. The trigger prop registry helps create and mix different platform trigger props e.g you can unify the click event from web/dom and android, ios etc... give it a simple name e.g `tap` then all of those platforms will respond to the tap.
 - Use `InTrigger` (or custom extensions) to enable triggers props.
-- Use `createTriggerHandle` to register a new trigger prop e.g `on:dooropen`
+- Use `createTrigger` to register a new trigger prop e.g `on:dooropen`
 - Triggers are view driven not actions i.e you call the trigger prop you want at the component level, this removes the need for historic footguns like effects.
 
-While you can create your own custom trigger using `createTriggerHandle()` InSpatial provides a standard list of Universal Trigger Props out of the box. They include:
+While you can create your own custom trigger using `createTrigger()` InSpatial provides a standard list of Universal Trigger Props out of the box. They include:
 
 ##### A. LifeCycle Triggers
 
@@ -651,10 +698,10 @@ createRenderer({
 Register custom trigger props via the registry. Handlers receive the `node` and the prop `value` (function or signal):
 
 ```typescript
-import { createTriggerHandle } from "@inspatial/kit/state";
+import { createTrigger } from "@inspatial/kit/state";
 
 // Example: basic hover state callback
-createTriggerHandle("hover", (node, cb?: (e: Event) => void) => {
+createTrigger("hover", (node, cb?: (e: Event) => void) => {
   if (!cb) return;
   const enter = (e: Event) => cb({ ...(e as any), type: "hoverenter" });
   const leave = (e: Event) => cb({ ...(e as any), type: "hoverleave" });
@@ -663,7 +710,7 @@ createTriggerHandle("hover", (node, cb?: (e: Event) => void) => {
 });
 
 // Example: swipe with pointer events
-createTriggerHandle(
+createTrigger(
   "swipe",
   (node, cb?: (e: { type: string; dx: number }) => void) => {
     if (!cb) return;
@@ -696,7 +743,7 @@ InSpatial Kit exposes a lightweight extension API. An extension is a plain objec
 
 - **Directive layer (renderer-agnostic)**: Provide `capabilities.rendererProps.onDirective(prefix, key, prop?)` to resolve namespaced props (e.g., `datax:title`, `svg:xlink:href`). Also provide `namespaces`, `tagNamespaceMap`, and `tagAliases` if needed.
 - **Lifecycle**: Use `lifecycle.setup(renderer)` for one-time registration (e.g., registering trigger props). Validation hooks are optional (`validate`).
-- **Events**: All event listeners must flow through the trigger prop system. Register new events with `createTriggerHandle()` and ensure `InTrigger` is present.
+- **Events**: All event listeners must flow through the trigger prop system. Register new events with `createTrigger()` and ensure `InTrigger` is present.
 
 ### Demo: a tiny directive extension
 
@@ -821,7 +868,7 @@ InSpatial Route is a universal filesystem router built on InSPatial's `@in/route
 
 - Define routes with `createRoute({ routes })`.
 - Map views with `.views({...})` or `.viewsByPath({...})`, and set `.default(fallback)`.
-- Render with `<Dynamic is={route.selected} />`. Read `route.current`, navigate via `route.navigate(path)`, `route.redirect(path)`, `route.back()`; check `route.canGoBack`.
+- Render with `<Dynamic is={route.selected} />`. Read `route.current`, navigate via `route.to(path)`, `route.redirect(path)`, `route.back()`; check `route.canGoBack`.
 - Minimal example:
 
   ```ts
@@ -866,9 +913,11 @@ import { route } from "@inspatial/kit/route";
 
 const route = createRoute()
 
-//NOTE: route.navigate() handles both named and path/URL navigation so ("/home") or ("home") will both work
-<MyComponent on:tap={() => route.navigate("/home")}>Home</MyComponent>
+//NOTE: route.to() handles both named and path/URL navigation so ("/home") or ("home") will both work
+<MyComponent on:tap={() => route.to("/home")}>Home</MyComponent>
 ```
+
+NOTE: `route.to()` is an alias of `route.navigate()` however .to is preffered since its reads fluently and aligns with `<Link to...>`
 
 ### File Based Routing - `InRoute()` Extension
 
@@ -1277,7 +1326,7 @@ useEffect(() => {
 
 // ✅ The InSpatial way - DO THIS
 createEffect(() => {
-  createTriggerHandle("swipe", createResizeHandler(), {
+  createTrigger("swipe", createResizeHandler(), {
     platforms: ["dom", "native:ios", "native:android"],
     fallback: "resize",
   });
@@ -1292,6 +1341,29 @@ createEffect(() => {
 
  // ✅ The InSpatial way - DO THIS
 <Button className="btn" class:active={isActive}>
+```
+
+**Conditionally Rendering Computed Values**
+
+```typescript
+// ❌  DON'T DO THIS
+<Button on:tap={() => useTheme.action.setToggle()}>
+  {$(() =>
+    String(useTheme.mode) === "dark" ? <LightModeIcon /> : <DarkModeIcon />
+  )}
+</Button>
+
+// ✅ DO THIS
+<Button
+    on:tap={() => useTheme.action.setToggle()}
+  >
+    <Show
+      when={$(() => String(useTheme.mode) === "dark")}
+      otherwise={<DarkModeIcon />}
+    >
+      <LightModeIcon />
+    </Show>
+  </Button>
 ```
 
 ### 6. Complex Reactive Expressions
@@ -1417,10 +1489,10 @@ const templateUrl = t`https://inspatial.store/template?id=${s.templateId}`;
 
 ## Anti-Patterns & Conflicts
 
-Because InSpatial is a Universal Development Environment (UDE), there are many patterns developers are traditionally accustomed to that are now considered Anti-Patterns.
+Because InSpatial is a Universal Development Environment (UDE), there are many patterns developers are traditionally accustomed to that are now considered Anti-Patterns. These Anti-patterns sually stem from three core concept that are historically baked into frameworks. They include:
 
 - Styling
 - Triggers
 - Motion
 
-These are primary systems that are intentiaonally detached from InSpatial Renderer. Universal Apps are omni-platforms and as such we should never assume the environment the user is in.
+These are primary systems that are intentionally detached from InSpatial Renderer. Universal Apps are omni-platforms and as such we should never assume the environment the user is in. Detaching these concepts create a conflict-free system one that allows for a universal platform.

@@ -10,10 +10,20 @@ export const StackStyle = createStyle({
   settings: {
     //##############################################(VARIANT PROP)##############################################//
     variant: {
-      xStack: "inline-flex flex-row",
-      yStack: "inline-flex flex-col",
-      zStack:
+      xStack: [
+        "inline-flex flex-row",
+        { web: { display: "inline-flex", flexDirection: "row" } },
+      ],
+      yStack: [
+        "inline-flex flex-col",
+        { web: { display: "inline-flex", flexDirection: "column" } },
+      ],
+      zStack: [
         "inline-flex flex-row-reverse perspective-[-3000px] transform-3d skew-x-12",
+        {
+          web: { display: "inline-flex", flexDirection: "row-reverse", transform: "skewX(12deg)" },
+        },
+      ],
     },
 
     //##############################################(DISABLED PROP)##############################################//

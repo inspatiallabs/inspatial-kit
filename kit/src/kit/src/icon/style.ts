@@ -14,9 +14,11 @@ export const IconStyle = createStyle({
     },
 
     size: {
-      sm: ["w-4 h-4", { web: { width: "16px", height: "16px" } }],
-      md: ["w-6 h-6", { web: { width: "24px", height: "24px" } }],
-      lg: ["w-8 h-8", { web: { width: "320px", height: "320px" } }],
+      xs: ["w-[16px] h-[16px]", { web: { width: "16px", height: "16px" } }],
+      sm: ["w-[24px] h-[24px]", { web: { width: "24px", height: "24px" } }],
+      md: ["w-[32px] h-[32px]", { web: { width: "32px", height: "32px" } }],
+      lg: ["w-[40px] h-[40px]", { web: { width: "40px", height: "40px" } }],
+      xl: ["w-[48px] h-[48px]", { web: { width: "48px", height: "48px" } }],
     },
 
     disabled: {
@@ -36,7 +38,7 @@ export const IconStyle = createStyle({
   },
   defaultSettings: {
     format: "regular",
-    size: "lg",
+    size: "md",
     disabled: false,
   },
 });

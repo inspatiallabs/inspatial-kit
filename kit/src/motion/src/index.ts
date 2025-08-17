@@ -40,6 +40,6 @@ export * as inMotion from "./utils/index.ts";
 export { svg as createMotionSVG } from "./svg.ts";
 export { inSequence } from "./sequence.ts";
 export { eases } from "./eases.ts";
-
 // Re-export types
 export * as InMotionType from "./types.ts";
+

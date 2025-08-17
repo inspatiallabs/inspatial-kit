@@ -26,6 +26,7 @@
     "@in/kit/navigation/": "../kit/src/kit/src/navigation/",
     "@in/kit/structure/": "../kit/src/kit/src/structure/",
     "@in/kit/typography/": "../kit/src/kit/src/typography/",
+    "@in/kit/ornament/": "../kit/src/kit/src/ornament/",
 
     "@in/renderer/": "../kit/src/renderer/src/",
     "@in/runtime/": "../kit/src/runtime/src/",
@@ -94,6 +95,7 @@
     "@inspatial/kit/structure": "../kit/src/kit/src/structure/index.ts",
     "@inspatial/kit/typography": "../kit/src/kit/src/typography/index.ts",
     "@inspatial/kit/icon": "../kit/src/kit/src/icon/index.ts",
+    "@inspatial/kit/ornament": "../kit/src/kit/src/ornament/index.ts",
 
     "@inspatial/kit/extension": "../kit/src/extension/src/index.ts",
 

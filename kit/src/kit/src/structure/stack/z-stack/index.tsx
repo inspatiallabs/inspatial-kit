@@ -4,5 +4,9 @@ import type { StackProps } from "../stack/style.ts";
 /*#####################################(Render)#####################################*/
 
 export function ZStack(props: StackProps) {
-  return <Stack variant="zStack" {...props} />;
+  return (
+    <>
+      <Stack variant="zStack" {...props} />
+    </>
+  );
 }

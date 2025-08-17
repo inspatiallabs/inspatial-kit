@@ -1,7 +1,7 @@
 // #####################(Trigger Props)#####################
 export {
   withTriggerProps,
-  createTriggerHandle,
+  createTrigger,
   InDOMTriggerProps,
   InUniversalTriggerProps,
   type InUniversalTriggerPropsType,

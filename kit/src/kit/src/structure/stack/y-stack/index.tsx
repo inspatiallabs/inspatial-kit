@@ -5,16 +5,8 @@ import type { StackProps } from "../stack/style.ts";
 
 export function YStack(props: StackProps) {
   return (
-    <Stack
-      variant="yStack"
-      style={{
-        web: {
-          display: "flex",
-          flexDirection: "column",
-          ...props.style,
-        },
-      }}
-      {...props}
-    />
+    <>
+      <Stack variant="yStack" {...props} />
+    </>
   );
 }

@@ -6,52 +6,34 @@ import { iss } from "@in/style";
 export function InSpatialIcon({
   size,
   format,
+  disabled,
   className,
   ...props
 }: IconProps) {
-  // Use a utility function or a simple template literal to compose classes
-  const renderClassName = `stroke-secondary ${IconStyle.getStyle({
-    size,
-  })} ${className}`;
   return (
     <>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox={`0 0 19 21`}
         fill={format === "fill" ? "currentColor" : "none"}
-        stroke="currentColor"
-        className={iss(IconStyle.getStyle({ size, format }), renderClassName)}
+        className={iss(
+          IconStyle.getStyle({ size, format, disabled }),
+          className
+        )}
         {...props}
       >
         <path
-          d="M17.1906 4.50476L15.9276 3.76935L13.3377 5.28813L11.1634 6.53512L10.6518 6.82289L0.5 12.6902V14.145C0.5 15.1042 1.01159 15.9835 1.84292 16.4631L3.1059 17.1985L13.3377 11.2993V12.6902L4.32093 17.902L8.18981 20.1402C9.02114 20.6198 10.0443 20.6198 10.8757 20.1402L13.3377 18.7173L17.2066 16.4791C18.0379 15.9995 18.5495 15.1202 18.5495 14.161V6.83888C18.5335 5.87965 18.0219 4.98437 17.1906 4.50476Z"
+          d="M16.6906 4.00479L15.4276 3.26938L12.8377 4.78816L10.6634 6.03515L10.1518 6.32292L0 12.1902V13.645C0 14.6043 0.511588 15.4836 1.34292 15.9632L2.6059 16.6986L12.8377 10.7993V12.1902L3.82093 17.402L7.68981 19.6402C8.52114 20.1198 9.54432 20.1198 10.3757 19.6402L12.8377 18.2174L16.7066 15.9792C17.5379 15.4995 18.0495 14.6202 18.0495 13.661V6.33891C18.0335 5.37968 17.5219 4.4844 16.6906 4.00479Z"
           fill="currentColor"
         />
         <path
-          d="M4.24099 3.1297L1.84292 4.52058C1.01159 4.98421 0.5 5.87949 0.5 6.83872V11.2991L9.4528 6.13528L4.24099 3.1297Z"
+          d="M3.74099 2.62973L1.34292 4.02061C0.511588 4.48424 0 5.37952 0 6.33875V10.7992L8.9528 5.63531L3.74099 2.62973Z"
           fill="currentColor"
         />
         <path
-          d="M13.3377 3.88125L14.7286 3.08189L13.3377 2.28254L10.8597 0.85968C10.0284 0.380066 9.0052 0.380066 8.17387 0.85968L5.45605 2.42642L10.6679 5.432L13.3377 3.88125Z"
-          fill={
-            format === "fill"
-              ? "currentColor"
-              : "url(#paint0_linear_17999_41146)"
-          }
+          d="M12.8377 3.38128L14.2286 2.58192L12.8377 1.78257L10.3597 0.359711C9.52838 -0.119904 8.5052 -0.119904 7.67387 0.359711L4.95605 1.92645L10.1679 4.93203L12.8377 3.38128Z"
+          fill="#9000FF"
         />
-        <defs>
-          <linearGradient
-            id="paint0_linear_17999_41146"
-            x1="16.1566"
-            y1="-4.65624"
-            x2="5.07274"
-            y2="-1.65441"
-            gradientUnits="userSpaceOnUse"
-          >
-            <stop stop-color="#761FEC" />
-            <stop offset="1" stop-color="#CE17D6" />
-          </linearGradient>
-        </defs>
       </svg>
     </>
   );

@@ -128,12 +128,7 @@ export const Text = ({
   });
 
   // Run letter animations when applicable
-  createEffect(() => {
-    if (animate === "fadeUp" || animate === "fadeIn" || animate === "reveal") {
-      const root = document.getElementById(state.domId.peek());
-      animateLetters(root as HTMLElement, animate, 600, delay || 0);
-    }
-  });
+  // Letter animations are triggered via trigger props on mount (see on:mount below)
 
   // (Removed ticker/generate/flip/rotate etc. for initial InSpatial port)
 
@@ -177,27 +172,39 @@ export const Text = ({
   /*##############################################(RETURN)##############################################*/
 
   return (
-    <p
-      id={state.domId.get()}
-      className={
-        typeof iss === "function"
-          ? iss(
-              typographyClasses.get(),
-              "overflow-hidden flex w-full",
-              className
-            )
-          : `${typographyClasses.get()} overflow-hidden flex w-full ${
-              className || ""
-            }`
-      }
-      style={{
-        lineHeight: lineHeight,
-        ...(font?.heading && { fontFamily: font.heading }),
-        ...(font?.body && { fontFamily: font.body }),
-      }}
-      {...props}
-    >
-      {animate !== "none" ? renderContent() : children}
-    </p>
+    <>
+      <p
+        id={state.domId.get()}
+        on:mount={() => {
+          if (
+            animate === "fadeUp" ||
+            animate === "fadeIn" ||
+            animate === "reveal"
+          ) {
+            const root = document.getElementById(state.domId.peek());
+            animateLetters(root as HTMLElement, animate, 600, delay || 0);
+          }
+        }}
+        className={
+          typeof iss === "function"
+            ? iss(
+                typographyClasses.get(),
+                "overflow-hidden flex w-full",
+                className
+              )
+            : `${typographyClasses.get()} overflow-hidden flex w-full ${
+                className || ""
+              }`
+        }
+        style={{
+          lineHeight: lineHeight,
+          ...(font?.heading && { fontFamily: font.heading }),
+          ...(font?.body && { fontFamily: font.body }),
+        }}
+        {...props}
+      >
+        {animate !== "none" ? renderContent() : children}
+      </p>
+    </>
   );
 };

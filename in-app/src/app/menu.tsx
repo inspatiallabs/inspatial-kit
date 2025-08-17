@@ -2,71 +2,62 @@ import { Link } from "@inspatial/kit/navigation";
 import { $ } from "@inspatial/kit/state";
 import { XStack } from "@inspatial/kit/structure";
 import { Text } from "@inspatial/kit/typography";
+import { Button } from "@inspatial/kit/ornament";
 import { FPS } from "./fps.tsx";
 import { route } from "./routes.tsx";
-import { InSpatialIcon } from "@inspatial/kit/icon";
+import {
+  InSpatialIcon,
+  LightModeIcon,
+  DarkModeIcon,
+} from "@inspatial/kit/icon";
+import { useTheme } from "./(extensions)/in-theme/state.ts";
+// @ts-types="@inspatial/kit"
+import { Show } from "@inspatial/kit";
 
 export function AppMenu() {
   return (
     <>
-      <XStack className="justify-center items-center space-x-10 p-4 w-full">
-        <Link
-          to="https://www.inspatial.dev/kit"
-          className="rounded-full py-[10px] px-[18px]"
-        >
+      <XStack className="justify-center items-center space-x-10 w-full">
+        <Link to="https://www.inspatial.dev/kit" className="min-w-[48px]">
           Kit
         </Link>
-        <Link
-          to="https://www.inspatial.cloud"
-          className="rounded-full py-[10px] px-[18px]"
-        >
+        <Link to="https://www.inspatial.cloud" className="min-w-[48px]">
           Cloud
         </Link>
 
         <InSpatialIcon
-          on:tap={() => route.navigate("/")}
+          on:tap={() => route.to("/")}
           format="regular"
-          size="sm"
           className="cursor-pointer"
         />
 
         <Link
           to="/"
-          className={`rounded-full py-[10px] px-[18px] ${
-            route.get().startsWith("/") && "bg-purple-500/20 text-purple-500"
+          className={`rounded-full py-[4px] px-[14px] min-w-[48px] ${
+            route.get().startsWith("/") && "bg-(--brand)/20 text-(--brand)"
           }`}
         >
           App
         </Link>
-        <Link
-          to="https://www.inspatial.store"
-          className="rounded-full py-[10px] px-[18px]"
-        >
+        <Link to="https://www.inspatial.store" className="min-w-[48px]">
           Store
         </Link>
       </XStack>
       <FPS />
-      {/* <div className="fixed top-4 right-4 flex items-center gap-2 z-50">
-        <button
-          type="button"
-          style={{
-            web: {
-              backgroundColor: "yellow",
-              color: "black",
-              fontSize: "16px",
-              fontWeight: "900",
-              padding: "10px",
-            },
-          }}
+      <div className="fixed top-4 right-4 flex items-center gap-2 z-50">
+        <Button
+          format="outlineSurface"
+          iconOnly={true}
           on:tap={() => useTheme.action.setToggle()}
         >
-          {$(() =>
-            String(useTheme.mode) === "dark"
-              ? "Switch to Light"
-              : "Switch to Dark"
-          )}
-        </button>
-      </div> */}
+          <Show
+            when={$(() => String(useTheme.mode) === "dark")}
+            otherwise={<DarkModeIcon />}
+          >
+            <LightModeIcon />
+          </Show>
+        </Button>
+      </div>
     </>
   );
 }

@@ -37,6 +37,18 @@ export interface CurrentRoute {
 export interface RouteApi {
   // navigation
   navigate(to: string, opts?: { replace?: boolean }): Promise<boolean>;
+  /** Preferred alias for navigate */
+  to(
+    to:
+      | string
+      | {
+          name: string;
+          params?: Record<string, string>;
+          query?: Record<string, string>;
+          replace?: boolean;
+        },
+    opts?: { replace?: boolean; params?: Record<string, string>; query?: Record<string, string> }
+  ): Promise<boolean>;
   redirect(to: string): Promise<boolean>;
   reload(): void;
   back(): void;
@@ -317,6 +329,21 @@ export function createRoute<T extends { to: string }>(
     return navigate(to, { replace: true });
   }
 
+  // Preferred alias for navigate()
+  function to(
+    target:
+      | string
+      | {
+          name: string;
+          params?: Record<string, string>;
+          query?: Record<string, string>;
+          replace?: boolean;
+        },
+    opts?: { replace?: boolean; params?: Record<string, string>; query?: Record<string, string> }
+  ): Promise<boolean> {
+    return navigate(target as any, opts);
+  }
+
   function reload(): void {
     const navApi: any = (globalThis as any).navigation;
     if (navApi && detectBrowserEngine() === "chromium") {
@@ -372,6 +399,7 @@ export function createRoute<T extends { to: string }>(
 
   const api: RouteApi = {
     navigate,
+    to,
     redirect,
     reload,
     back,

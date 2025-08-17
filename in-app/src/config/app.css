@@ -28,37 +28,28 @@
 /*###################################################( THEME )###################################################*/
 
 @theme {
-  --window: hsla(0, 0%, 100%, 1);
-  --surface: hsla(21, 35%, 92%, 1);
-  --background: hsla(0, 0%, 100%, 1);
-
-  /*** Brand Colors ***/
-  --brand: hsla(334, 83%, 54%, 1);
-
-  /*** Primary & Secondary Colors ***/
-  --primary: hsla(240, 27%, 18%, 1); /*** for text and icons ***/
-  --secondary: hsla(240, 27%, 18%, 1) / 0.5; /*** for borders, text, and icons ***/
-
-  /*** Fonts ***/
-  --font-editors-note-lightitalic: "editors-note-lightitalic", sans-serif; /*** Added here only because InSpatial Does not seperate fonts by weight ***/
+  --window: hsla(0, 0%, 100%, 0.3);
+  --surface: hsla(0, 0%, 100%, 0.7);
+  --background: hsla(228, 52%, 96%, 1);
+  --brand: hsla(274, 100%, 50%, 1);
+  --primary: hsla(231, 42%, 15%, 1);
+  --secondary: hsla(224, 46%, 89%, 1);
+  --muted: hsla(228, 52%, 96%, 1);
 }
-
-/* Dark theme overrides */
 [data-theme="dark"] {
-  /* base surfaces */
-  --window: hsla(220, 15%, 10%, 1);
-  --surface: hsla(220, 15%, 15%, 1);
-  --background: hsla(220, 15%, 10%, 1);
-  /* text */
-  --primary: hsla(0, 0%, 98%, 1);
-  --secondary: hsla(0, 0%, 98%, 1) / 0.6;
+  --window: hsla(229, 41%, 18%, 0.3);
+  --surface: hsla(229, 41%, 18%, 0.6);
+  --background: hsla(233, 44%, 12%, 1);
+  --primary: hsla(0, 0%, 100%, 1);
+  --secondary: hsla(232, 31%, 29%, 1);
+  --muted: hsla(233, 44%, 12%, 0.25);
 }
 
 /*###################################################( BASE )###################################################*/
 
 @layer base {
   body {
-    font-family: var(--font-inter);
+    font-family: var(--font-inder);
     background-color: var(--background);
     color: var(--primary);
   }

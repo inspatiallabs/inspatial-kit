@@ -621,37 +621,37 @@ export function InUniversalTriggerProps(): void {
   // DOM/Web bridge
   if (env.type === "dom" || env.type === "electron" || env.type === "lynx") {
     // mount → fire once after mount
-    createTriggerHandle("mount", DOMMountHandler());
+    createTrigger("mount", DOMMountHandler());
     // beforeMount → fire synchronously during directive setup
-    createTriggerHandle("beforeMount", DOMBeforeMountHandler());
+    createTrigger("beforeMount", DOMBeforeMountHandler());
     // route → global route event
-    createTriggerHandle("route", DOMRouteHandler());
+    createTrigger("route", DOMRouteHandler());
     // frameChange → requestAnimationFrame loop
-    createTriggerHandle("frameChange", DOMFrameChangeHandler());
+    createTrigger("frameChange", DOMFrameChangeHandler());
     // tap → click
-    createTriggerHandle("tap", DOMEventHandler("click"));
+    createTrigger("tap", DOMEventHandler("click"));
     // longpress → synth from pointer events
-    createTriggerHandle("longpress", DOMLongPressHandler());
+    createTrigger("longpress", DOMLongPressHandler());
     // change → change
-    createTriggerHandle("change", DOMEventHandler("change"));
+    createTrigger("change", DOMEventHandler("change"));
     // submit → submit
-    createTriggerHandle("submit", DOMEventHandler("submit"));
+    createTrigger("submit", DOMEventHandler("submit"));
     // focus → focus
-    createTriggerHandle("focus", DOMEventHandler("focus"));
+    createTrigger("focus", DOMEventHandler("focus"));
     return;
   }
   // Capacitor (WebView + native App bridge)
   if (env.type === "capacitor") {
     // Base DOM mappings still apply
-    createTriggerHandle("mount", DOMMountHandler());
-    createTriggerHandle("beforeMount", DOMBeforeMountHandler());
-    createTriggerHandle("route", DOMRouteHandler());
-    createTriggerHandle("frameChange", DOMFrameChangeHandler());
-    createTriggerHandle("tap", DOMEventHandler("click"));
-    createTriggerHandle("longpress", DOMLongPressHandler());
-    createTriggerHandle("change", DOMEventHandler("change"));
-    createTriggerHandle("submit", DOMEventHandler("submit"));
-    createTriggerHandle("focus", DOMEventHandler("focus"));
+    createTrigger("mount", DOMMountHandler());
+    createTrigger("beforeMount", DOMBeforeMountHandler());
+    createTrigger("route", DOMRouteHandler());
+    createTrigger("frameChange", DOMFrameChangeHandler());
+    createTrigger("tap", DOMEventHandler("click"));
+    createTrigger("longpress", DOMLongPressHandler());
+    createTrigger("change", DOMEventHandler("change"));
+    createTrigger("submit", DOMEventHandler("submit"));
+    createTrigger("focus", DOMEventHandler("focus"));
 
     // Dynamically attach Capacitor App event trigger props
     try {
@@ -661,40 +661,40 @@ export function InUniversalTriggerProps(): void {
         try {
           const { App } = await dynamicImport("@capacitor/app");
           // Android back button
-          createTriggerHandle("back", (_node, cb: any) => {
+          createTrigger("back", (_node, cb: any) => {
             if (!cb || !App?.addListener) return;
             App.addListener("backButton", (ev: any) =>
               cb(ev ?? { type: "back" })
             );
           });
           // App resume
-          createTriggerHandle("resume", (_node, cb: any) => {
+          createTrigger("resume", (_node, cb: any) => {
             if (!cb || !App?.addListener) return;
             App.addListener("resume", (ev: any) =>
               cb(ev ?? { type: "resume" })
             );
           });
           // App pause
-          createTriggerHandle("pause", (_node, cb: any) => {
+          createTrigger("pause", (_node, cb: any) => {
             if (!cb || !App?.addListener) return;
             App.addListener("pause", (ev: any) => cb(ev ?? { type: "pause" }));
           });
           // Deep links
-          createTriggerHandle("urlopen", (_node, cb: any) => {
+          createTrigger("urlopen", (_node, cb: any) => {
             if (!cb || !App?.addListener) return;
             App.addListener("appUrlOpen", (ev: any) =>
               cb({ type: "urlopen", ...ev })
             );
           });
           // App active/inactive
-          createTriggerHandle("statechange", (_node, cb: any) => {
+          createTrigger("statechange", (_node, cb: any) => {
             if (!cb || !App?.addListener) return;
             App.addListener("appStateChange", (ev: any) =>
               cb({ type: "statechange", ...ev })
             );
           });
           // Restored result
-          createTriggerHandle("restored", (_node, cb: any) => {
+          createTrigger("restored", (_node, cb: any) => {
             if (!cb || !App?.addListener) return;
             App.addListener("restoredResult", (ev: any) =>
               cb({ type: "restored", ...ev })
@@ -715,7 +715,7 @@ export function InUniversalTriggerProps(): void {
 /**
  * Register custom platform-specific trigger handlers
  */
-export function createTriggerHandle<Name extends string, V = any>(
+export function createTrigger<Name extends string, V = any>(
   name: Name,
   handler: TriggerPropHandler<V>,
   options?: {
