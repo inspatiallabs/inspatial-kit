@@ -9,17 +9,10 @@ export function InSpatialIcon({
   className,
   ...props
 }: IconProps) {
-  // Default to 'lg' size if no size is provided
-  const sizeClass = size
-    ? size === "sm"
-      ? "w-4 h-4"
-      : size === "lg"
-      ? "w-8 h-8"
-      : "w-6 h-6"
-    : "w-8 h-8";
-
   // Use a utility function or a simple template literal to compose classes
-  const renderClassName = `stroke-secondary ${sizeClass} ${className}`;
+  const renderClassName = `stroke-secondary ${IconStyle.getStyle({
+    size,
+  })} ${className}`;
   return (
     <>
       <svg
@@ -27,10 +20,7 @@ export function InSpatialIcon({
         viewBox={`0 0 19 21`}
         fill={format === "fill" ? "currentColor" : "none"}
         stroke="currentColor"
-        className={iss(
-          `${IconStyle.getStyle({ size, format })}`,
-          renderClassName
-        )}
+        className={iss(IconStyle.getStyle({ size, format }), renderClassName)}
         {...props}
       >
         <path
@@ -43,7 +33,11 @@ export function InSpatialIcon({
         />
         <path
           d="M13.3377 3.88125L14.7286 3.08189L13.3377 2.28254L10.8597 0.85968C10.0284 0.380066 9.0052 0.380066 8.17387 0.85968L5.45605 2.42642L10.6679 5.432L13.3377 3.88125Z"
-          fill={format === "fill" ? "currentColor" : "url(#paint0_linear_17999_41146)"}
+          fill={
+            format === "fill"
+              ? "currentColor"
+              : "url(#paint0_linear_17999_41146)"
+          }
         />
         <defs>
           <linearGradient

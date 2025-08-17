@@ -10,24 +10,38 @@ export function AppMenu() {
   return (
     <>
       <XStack className="justify-center items-center space-x-10 p-4 w-full">
-        <Link to="https://www.inspatial.dev/kit" className="rounded-full py-[10px] px-[18px]">
+        <Link
+          to="https://www.inspatial.dev/kit"
+          className="rounded-full py-[10px] px-[18px]"
+        >
           Kit
         </Link>
-        <Link to="https://www.inspatial.cloud" className="rounded-full py-[10px] px-[18px]">
+        <Link
+          to="https://www.inspatial.cloud"
+          className="rounded-full py-[10px] px-[18px]"
+        >
           Cloud
         </Link>
-        {/* <Link to="https://www.inspatial.store" className="rounded-full py-[10px] px-[18px]">
-         <InSpatialIcon format="fill" className="text-purple-500" />
-        </Link> */}
+
+        <InSpatialIcon
+          on:tap={() => route.navigate("/")}
+          format="regular"
+          size="sm"
+          className="cursor-pointer"
+        />
+
         <Link
           to="/"
           className={`rounded-full py-[10px] px-[18px] ${
-            route.get() === "/" && "bg-purple-500"
+            route.get().startsWith("/") && "bg-purple-500/20 text-purple-500"
           }`}
         >
           App
         </Link>
-        <Link to="https://www.inspatial.store" className="rounded-full py-[10px] px-[18px]">
+        <Link
+          to="https://www.inspatial.store"
+          className="rounded-full py-[10px] px-[18px]"
+        >
           Store
         </Link>
       </XStack>

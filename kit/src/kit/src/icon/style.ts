@@ -3,31 +3,35 @@ import { createStyle, type StyleProps } from "@in/style";
 //##############################################(CREATE STYLE)##############################################//
 
 export const IconStyle = createStyle({
-  base: "inline-flex items-center",
+  base: [
+    "inline-block items-center",
+    { web: { display: "inline-block", alignItems: "center" } },
+  ],
   settings: {
     format: {
-      regular: "",
-      // thin: "",
-      // light: "",
-      // bold: "",
-      fill: "fill-current",
-      // duotone: "",
-      // glass: "",
+      regular: ["", {}],
+      fill: ["fill-current", { web: { fill: "currentColor" } }],
     },
 
     size: {
-      sm: "w-4 h-4",
-      md: "w-6 h-6",
-      lg: "w-8 h-8",
+      sm: ["w-4 h-4", { web: { width: "16px", height: "16px" } }],
+      md: ["w-6 h-6", { web: { width: "24px", height: "24px" } }],
+      lg: ["w-8 h-8", { web: { width: "320px", height: "320px" } }],
     },
-    // theme: {
-    //   light: "text-black",
-    //   dark: "text-white",
-    // },
 
     disabled: {
-      true: "opacity-disabled opacity-50 text-(--muted) pointer-events-none cursor-disabled",
-      false: "",
+      true: [
+        "opacity-disabled opacity-50 pointer-events-none cursor-not-allowed",
+        {
+          web: {
+            opacity: 0.5,
+            pointerEvents: "none",
+            cursor: "not-allowed",
+            color: "var(--muted)",
+          },
+        },
+      ],
+      false: [{}],
     },
   },
   defaultSettings: {

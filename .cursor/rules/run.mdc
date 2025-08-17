@@ -190,6 +190,8 @@ Even though this is an option it forgoes the unviversal mental model of InSpatia
 
 #### Style Composition: (Variant Authority)
 
+NOTE: `@in/style/variant` supports object/web style injection, where all keys are compiled to a generated CSS class (e.g., .in-abc123) and injected once into a <style data-in-variant> tag. This allows you to write both css and tailwind like styling inside `createStyle()` api.
+
 **🚨 Key Things to Know**
 
 Style composition can be tricky when working with deeply nested and complex style settings. Here's what you need to watch out for:

@@ -446,50 +446,157 @@ function createStyleCore<V extends StyleShapeProp>(
     );
   };
 
-  const style: StyleProp = (config) => (props) => {
-    if (!config.settings) {
-      return iss(config.base, props?.class, props?.className);
+  function isPlatformStyleObject(obj: any): boolean {
+    if (!obj || typeof obj !== "object") return false;
+    const platformKeys = [
+      "web",
+      "ios",
+      "android",
+      "visionOS",
+      "androidXR",
+      "horizonOS",
+    ];
+    if (platformKeys.some((k) => k in obj)) return true;
+    // Heuristic: treat object as class dict only if all values are boolean
+    const vals = Object.values(obj);
+    if (!vals.length) return false;
+    return !vals.every((v) => typeof v === "boolean");
+  }
+
+  function mergeStyle(target: any, source: any): any {
+    if (!source) return target;
+    if (!target) target = {};
+    for (const [k, v] of Object.entries(source)) {
+      if (v && typeof v === "object" && !Array.isArray(v)) {
+        target[k] = mergeStyle(target[k] || {}, v);
+      } else {
+        target[k] = v;
+      }
+    }
+    return target;
+  }
+
+  // -------------------------- Web Style injection -------------------------- //
+  let __inVariantStyleEl: any = null;
+  const __injectedStyleHashes = new Set<string>();
+
+  function __ensureStyleEl(): any {
+    try {
+      if (typeof document === "undefined") return null;
+      if (__inVariantStyleEl && __inVariantStyleEl.parentNode) return __inVariantStyleEl;
+      const el = document.createElement("style");
+      el.setAttribute("data-in-variant", "");
+      document.head.appendChild(el);
+      __inVariantStyleEl = el;
+      return el;
+    } catch {
+      return null;
+    }
+  }
+
+  function __toKebabCase(key: string): string {
+    return key
+      .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
+      .replace(/_/g, "-")
+      .toLowerCase();
+  }
+
+  function __hashString(input: string): string {
+    let h = 5381;
+    for (let i = 0; i < input.length; i++) h = (h * 33) ^ input.charCodeAt(i);
+    return (h >>> 0).toString(36);
+  }
+
+  function __serializeWebStyle(styleObj: Record<string, any>): string {
+    const parts: string[] = [];
+    for (const [k, v] of Object.entries(styleObj || {})) {
+      if (v === undefined || v === null || v === false) continue;
+      const cssKey = __toKebabCase(k);
+      parts.push(`${cssKey}: ${String(v)}`);
+    }
+    return parts.join("; ");
+  }
+
+  function __ensureClassForWebStyle(styleObj: Record<string, any>): string | null {
+    if (!styleObj) return null;
+    const cssBody = __serializeWebStyle(styleObj);
+    if (!cssBody) return null;
+    const hash = __hashString(cssBody);
+    const className = `in-${hash}`;
+    if (__injectedStyleHashes.has(hash)) return className;
+    const el = __ensureStyleEl();
+    if (!el) return className; // SSR/non-DOM: return stable class name without injection
+    try {
+      el.appendChild(document.createTextNode(`.${className} { ${cssBody} }`));
+      __injectedStyleHashes.add(hash);
+    } catch {
+      // ignore injection errors
+    }
+    return className;
+  }
+
+  function computeProps(config: InSpatialStyleConfig<V>, props?: any) {
+    const { settings, defaultSettings } = config;
+    const classParts: any[] = [];
+    let styleOut: any = {};
+
+    // Base can be string/array/object; collect classes and style
+    const base = config.base as any;
+    const baseArr = Array.isArray(base) ? base : base ? [base] : [];
+    for (const item of baseArr) {
+      if (typeof item === "string") classParts.push(item);
+      else if (Array.isArray(item)) classParts.push(item);
+      else if (item && typeof item === "object") styleOut = mergeStyle(styleOut, item);
     }
 
-    const { settings, defaultSettings } = config;
+    if (settings) {
+      for (const styleKey of Object.keys(settings)) {
+        const prop = props?.[styleKey];
+        const def = defaultSettings?.[styleKey as keyof typeof defaultSettings];
+        const value = falsyToString(prop ?? def);
+        const map = (settings as any)[styleKey];
+        const selected = map?.[value as any];
+        const arr = Array.isArray(selected) ? selected : selected ? [selected] : [];
+        for (const it of arr) {
+          if (typeof it === "string") classParts.push(it);
+          else if (Array.isArray(it)) classParts.push(...it);
+          else if (it && typeof it === "object") {
+            if (isPlatformStyleObject(it)) styleOut = mergeStyle(styleOut, it);
+            else classParts.push(it);
+          }
+        }
+      }
+    }
 
-    // Process style classes
-    const styleClasses = Object.keys(settings).map((style) => {
-      const prop = props?.[style as keyof typeof props];
-      const defaultProp = defaultSettings?.[style];
-      const value = falsyToString(prop ?? defaultProp);
-      const styleObj = settings[style];
-      return styleObj[value as keyof typeof styleObj];
-    });
+    // Composition
+    if (config.composition && config.composition.length) {
+      for (const rule of config.composition as any[]) {
+        const { class: cvClass, className: cvClassName, style: cvStyle, ...conds } = rule || {};
+        const matches = Object.entries(conds).every(([key, value]) => {
+          const pv = props?.[key] ?? defaultSettings?.[key as any];
+          return Array.isArray(value) ? value.includes(pv) : pv === value;
+        });
+        if (matches) {
+          if (cvClass) classParts.push(cvClass);
+          if (cvClassName) classParts.push(cvClassName);
+          if (cvStyle) styleOut = mergeStyle(styleOut, cvStyle);
+        }
+      }
+    }
 
-    // Process compound styles
-    const compoundClasses = config.composition?.reduce((acc, cv) => {
-      const { class: cvClass, className: cvClassName, ...conditions } = cv;
-      const matches = Object.entries(conditions).every(([key, value]) => {
-        const propValue =
-          props?.[key as keyof typeof props] ??
-          defaultSettings?.[key as keyof typeof defaultSettings];
-        return Array.isArray(value)
-          ? value.includes(propValue)
-          : propValue === value;
-      });
+    // Append external classes and compile web style to a generated class
+    const webStyle = (styleOut && (styleOut as any).web) || null;
+    if (webStyle) {
+      const webClass = __ensureClassForWebStyle(webStyle);
+      if (webClass) classParts.push(webClass);
+    }
+    const className = iss(classParts, props?.class, props?.className);
+    return { className, style: styleOut };
+  }
 
-      return matches ? [...acc, cvClass, cvClassName] : acc;
-    }, [] as ClassValueProp[]);
-
-    // Handle base classes first to ensure they appear in expected order
-    const baseClasses = config.base ? `${config.base}` : "";
-    const additionalClasses = iss(
-      styleClasses,
-      compoundClasses,
-      props?.class,
-      props?.className
-    );
-
-    // Combine base with additional classes
-    return baseClasses
-      ? `${baseClasses} ${additionalClasses}`.trim()
-      : additionalClasses;
+  const style: StyleProp = (config) => (props) => {
+    const { className } = computeProps(config as any, props);
+    return className;
   };
 
   const composeStyle: ComposeStyleProp =

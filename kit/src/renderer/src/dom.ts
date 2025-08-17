@@ -3,10 +3,7 @@ import { createRenderer } from "./create-renderer.ts";
 import { cachedStrKeyNoFalsy, splitFirst } from "@in/vader";
 import { env } from "@in/vader/env/index.ts";
 import { wrap } from "@in/jsx-runtime";
-import {
-  composeExtensions,
-  type RendererExtensions,
-} from "@in/extension";
+import { composeExtensions, type RendererExtensions } from "@in/extension";
 import { applyWebStyle, computeClassString } from "./helpers.ts";
 
 const defaultRendererID = "DOM";
@@ -45,13 +42,15 @@ export function DOMRenderer(options: DOMOptions = {}): any {
   });
 
   function createNode(tagName: string): any {
+    // Ensure SVG root defaults to the correct namespace
+    if (tagName === "svg") {
+      return doc.createElementNS(namespaces.svg, "svg");
+    }
     return getNodeCreator(tagName)();
   }
   function createAnchor(anchorName?: string): any {
-    if (!env.isProduction() && anchorName) {
-      return doc.createComment(anchorName);
-    }
-    return doc.createTextNode("");
+    // Always use a Comment as fragment anchor to avoid text-node layout side-effects inside SVG or HTML
+    return doc.createComment(env.isProduction() ? "" : anchorName || "");
   }
   function createTextNode(text: any): any {
     if (isSignal(text)) {
@@ -80,7 +79,8 @@ export function DOMRenderer(options: DOMOptions = {}): any {
     }
   }
   function insertBefore(node: any, ref: any): void {
-    ref.parentNode.insertBefore(node, ref);
+    // Defensive: if ref is a document fragment end marker (Text/Comment), use parent
+    if (ref && ref.parentNode) ref.parentNode.insertBefore(node, ref);
   }
 
   // NOTE: Event listeners are resolved by extensions via onDirective; ensure triggers are available
@@ -112,7 +112,11 @@ export function DOMRenderer(options: DOMOptions = {}): any {
   }
 
   function applyClass(node: HTMLElement, value: any): void {
-    node.className = computeClassString(value);
+    const cls = computeClassString(value);
+    // SVG elements need attribute-based class assignment for compatibility
+    const isSVG = (node as any).namespaceURI === namespaces.svg;
+    if (isSVG) (node as Element).setAttribute("class", cls || "");
+    else (node as HTMLElement).className = cls;
   }
 
   const getPropSetter = cachedStrKeyNoFalsy(function (_prop: string) {
@@ -191,10 +195,11 @@ export function DOMRenderer(options: DOMOptions = {}): any {
       };
     }
 
-    // Default: prefer property assignment when available; otherwise attribute
+    // Default: SVG prefers attribute assignment; HTML prefers property when available
     return function (node: any, val: any) {
       if (val === undefined || val === null) return;
-      const useProperty = prop in node;
+      const isSVG = (node as any).namespaceURI === namespaces.svg;
+      const useProperty = !isSVG && prop in node;
       if (isSignal(val)) {
         val.connect(function () {
           const next = peek(val);
