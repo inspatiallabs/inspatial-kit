@@ -1,5 +1,6 @@
 import { $, createState } from "@inspatial/kit/state";
 import { Slot } from "@inspatial/kit";
+import { iss } from "@inspatial/kit/style";
 
 /*###################################(PROPS)###################################*/
 interface FPSProps {
@@ -29,10 +30,10 @@ export function FPS({ className, sample = 10 }: FPSProps) {
             ui.fps.value = Math.max(1, Math.round(1000 / d));
           }
         }}
-        className={
-          className ||
-          "fixed top-2 right-3 z-50 rounded-sm px-2 py-1 text-xs bg-(--surface) text-(--primary)"
-        }
+        className={iss(
+          "fixed max-h-[24px] bottom-2 right-2 z-50 rounded-sm px-2 py-1 text-xs bg-(--surface) text-(--primary)",
+          className
+        )}
       >
         {$(() => `${ui.fps} FPS`)}
       </Slot>

@@ -83,6 +83,7 @@
 
     "@in/motion/": "../kit/src/motion/src/",
     "@in/motion": "../kit/src/motion/src/index.ts",
+    
 
     "@inspatial/app/": "./src/",
 
@@ -108,6 +109,7 @@
     "@inspatial/kit/state": "../kit/src/state/src/core/index.ts",
     "@inspatial/kit/trigger": "../kit/src/state/src/trigger/index.ts",
     "@inspatial/kit/motion": "../kit/src/motion/src/index.ts",
+    "@inspatial/kit/style": "../kit/src/style/src/index.ts",
     "@inspatial/kit/route": "../kit/src/route/src/index.ts",
     "@inspatial/kit/serve": "../kit/src/serve/src/index.ts",
     "@inspatial/kit/vader": "../kit/src/vader/src/index.ts",

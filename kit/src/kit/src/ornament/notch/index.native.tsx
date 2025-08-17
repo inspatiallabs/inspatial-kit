@@ -158,12 +158,11 @@ export function Notch(props: NotchProps) {
           </svg>
         ) : null}
 
-        {/* Children/Content  - replace with inspatial slot*/}
-        <section className="flex absolute flex-col h-full w-auto max-w-[50px] items-center justify-center">
-          <div className="flex flex-col w-full h-full max-h-[475px] justify-center items-center gap-[25px]">
+        <Slot className="flex absolute flex-col h-full w-auto max-w-[50px] items-center justify-center">
+          <Slot className="flex flex-col w-full h-full max-h-[475px] justify-center items-center gap-[25px]">
             {children}
-          </div>
-        </section>
+          </Slot>
+        </Slot>
       </Slot>
     </>
   );
