@@ -88,6 +88,7 @@ export function DOMRenderer(options: DOMOptions = {}): any {
             currentNodes.push(node);
           }
         } else {
+          if (val === true || val === false) return; // don't render raw booleans
           const tn = doc.createTextNode(String(val));
           (parent as any).insertBefore(tn, end);
           currentNodes.push(tn);
