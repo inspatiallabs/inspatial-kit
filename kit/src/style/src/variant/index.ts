@@ -483,7 +483,8 @@ function createStyleCore<V extends StyleShapeProp>(
   function __ensureStyleEl(): any {
     try {
       if (typeof document === "undefined") return null;
-      if (__inVariantStyleEl && __inVariantStyleEl.parentNode) return __inVariantStyleEl;
+      if (__inVariantStyleEl && __inVariantStyleEl.parentNode)
+        return __inVariantStyleEl;
       const el = document.createElement("style");
       el.setAttribute("data-in-variant", "");
       document.head.appendChild(el);
@@ -517,17 +518,22 @@ function createStyleCore<V extends StyleShapeProp>(
     return parts.join("; ");
   }
 
-  function __ensureClassForWebStyle(styleObj: Record<string, any>): string | null {
+  function __ensureClassForWebStyle(
+    styleObj: Record<string, any>,
+    specificity: "normal" | "low" = "normal"
+  ): string | null {
     if (!styleObj) return null;
     const cssBody = __serializeWebStyle(styleObj);
     if (!cssBody) return null;
-    const hash = __hashString(cssBody);
+    const hash = __hashString(cssBody + `|${specificity}`);
     const className = `in-${hash}`;
     if (__injectedStyleHashes.has(hash)) return className;
     const el = __ensureStyleEl();
     if (!el) return className; // SSR/non-DOM: return stable class name without injection
     try {
-      el.appendChild(document.createTextNode(`.${className} { ${cssBody} }`));
+      const selector =
+        specificity === "low" ? `:where(.${className})` : `.${className}`;
+      el.appendChild(document.createTextNode(`${selector} { ${cssBody} }`));
       __injectedStyleHashes.add(hash);
     } catch {
       // ignore injection errors
@@ -546,7 +552,8 @@ function createStyleCore<V extends StyleShapeProp>(
     for (const item of baseArr) {
       if (typeof item === "string") classParts.push(item);
       else if (Array.isArray(item)) classParts.push(item);
-      else if (item && typeof item === "object") styleOut = mergeStyle(styleOut, item);
+      else if (item && typeof item === "object")
+        styleOut = mergeStyle(styleOut, item);
     }
 
     if (settings) {
@@ -556,7 +563,11 @@ function createStyleCore<V extends StyleShapeProp>(
         const value = falsyToString(prop ?? def);
         const map = (settings as any)[styleKey];
         const selected = map?.[value as any];
-        const arr = Array.isArray(selected) ? selected : selected ? [selected] : [];
+        const arr = Array.isArray(selected)
+          ? selected
+          : selected
+          ? [selected]
+          : [];
         for (const it of arr) {
           if (typeof it === "string") classParts.push(it);
           else if (Array.isArray(it)) classParts.push(...it);
@@ -571,7 +582,12 @@ function createStyleCore<V extends StyleShapeProp>(
     // Composition
     if (config.composition && config.composition.length) {
       for (const rule of config.composition as any[]) {
-        const { class: cvClass, className: cvClassName, style: cvStyle, ...conds } = rule || {};
+        const {
+          class: cvClass,
+          className: cvClassName,
+          style: cvStyle,
+          ...conds
+        } = rule || {};
         const matches = Object.entries(conds).every(([key, value]) => {
           const pv = props?.[key] ?? defaultSettings?.[key as any];
           return Array.isArray(value) ? value.includes(pv) : pv === value;
@@ -587,10 +603,94 @@ function createStyleCore<V extends StyleShapeProp>(
     // Append external classes and compile web style to a generated class
     const webStyle = (styleOut && (styleOut as any).web) || null;
     if (webStyle) {
-      const webClass = __ensureClassForWebStyle(webStyle);
-      if (webClass) classParts.push(webClass);
+      // Split color-related properties to low specificity so user utilities/styles win
+      const colorKeys = new Set([
+        "backgroundColor",
+        "background",
+        "color",
+        "borderColor",
+        "outlineColor",
+        "fill",
+        "stroke",
+        "textDecorationColor",
+      ]);
+      const lowSpec: Record<string, any> = {};
+      const normalSpec: Record<string, any> = {};
+      for (const [k, v] of Object.entries(webStyle)) {
+        if (colorKeys.has(k)) lowSpec[k] = v;
+        else normalSpec[k] = v;
+      }
+      // Detect user-provided color utilities in props.class / props.className
+      const userCls = issUtil(props?.class, props?.className);
+      const hasUserColorUtil = /(?:\b|:)(bg-|text-|border-|outline-)/.test(
+        userCls
+      );
+      if (Object.keys(normalSpec).length) {
+        const c1 = __ensureClassForWebStyle(normalSpec, "normal");
+        if (c1) classParts.push(c1);
+      }
+      if (Object.keys(lowSpec).length && !hasUserColorUtil) {
+        const c2 = __ensureClassForWebStyle(lowSpec, "low");
+        if (c2) classParts.push(c2);
+      }
     }
-    const className = iss(classParts, props?.class, props?.className);
+
+    // Convert CSS-variable utilities like bg-(--brand), text-(--primary), border-(--surface)/80
+    // into generated CSS classes so they work across browsers and avoid relying on Tailwind parsing
+    const varUtilRegex =
+      /^(bg|text|border|outline|fill|stroke|decoration)-\((--[a-zA-Z0-9_-]+)\)(?:\/(\d{1,3}))?$/;
+    const utilToCssProp: Record<string, string> = {
+      bg: "backgroundColor",
+      text: "color",
+      border: "borderColor",
+      outline: "outlineColor",
+      fill: "fill",
+      stroke: "stroke",
+      decoration: "textDecorationColor",
+    };
+
+    const expandedClassParts: string[] = [];
+    const pushToken = (t: string) => {
+      if (!t) return;
+      const m = t.match(varUtilRegex);
+      if (!m) {
+        expandedClassParts.push(t);
+        return;
+      }
+      const [, util, cssVar, opacity] = m;
+      const cssProp = utilToCssProp[util] || "";
+      if (!cssProp) {
+        expandedClassParts.push(t);
+        return;
+      }
+      // Build CSS value using color-mix for opacity if provided
+      let value = `var(${cssVar})`;
+      const pct = opacity
+        ? Math.max(0, Math.min(100, parseInt(opacity, 10)))
+        : null;
+      if (pct !== null && !Number.isNaN(pct)) {
+        value = `color-mix(in oklab, var(${cssVar}) ${pct}%, transparent)`;
+      }
+      const cls = __ensureClassForWebStyle({ [cssProp]: value }, "low");
+      if (cls) expandedClassParts.push(cls);
+    };
+
+    // Flatten classParts into tokens, convert, and rebuild
+    const flatTokens: string[] = [];
+    for (const cp of classParts) {
+      if (!cp) continue;
+      if (typeof cp === "string")
+        flatTokens.push(...cp.split(/\s+/).filter(Boolean));
+      else if (Array.isArray(cp))
+        flatTokens.push(...(cp as any).flat().filter(Boolean));
+      else flatTokens.push(String(cp));
+    }
+    if (flatTokens.length) {
+      for (const token of flatTokens) pushToken(token);
+    }
+
+    // Use iss to finalize classes including props.class / props.className
+    const className = iss(expandedClassParts, props?.class, props?.className);
     return { className, style: styleOut };
   }
 

@@ -58,13 +58,13 @@ export function AppMenu() {
         format="outlineSurface"
         iconOnly={true}
         on:tap={() => useTheme.action.setToggle()}
-        className="fixed bottom-4 left-4 flex items-center gap-2 z-50 bg-(--surface) hover:bg-(--surface)/80"
+        className="fixed bottom-4 left-4 flex items-center gap-2 z-50"
       >
         <Show
           when={$(() => String(useTheme.mode) === "dark")}
-          otherwise={<DarkModeIcon />}
+          otherwise={<DarkModeIcon className="p-[2px]" />}
         >
-          <LightModeIcon />
+          <LightModeIcon className="p-[2px]" />
         </Show>
       </Button>
     </>

@@ -89,7 +89,10 @@ Built on top the universal runtime
 
 ### 3. Widgets & Components
 
-- **Structure:** A component is a function `(props, ...children) => Node`. The inner function receives the renderer `R`.
+#### Structure
+
+A Strcuture component is a function `(props, ...children) => Node`. The inner function receives the renderer `R`.
+
 - **Structure & Control Flow Components:**
   _ `<Show when={signal}>`: Conditional rendering. Supports `true` and `else` props. For one-off static conditions, you can use inline typescript to return the desired branch directly just like in React(but will not have reactivity).
   _ `<List each={signalOfArray} track="key" indexed={true}>`: Efficiently renders lists with reconciliation by handling all list rendering scenarios. Automatically handles static arrays and signals, eliminates need for `derivedExtract`, provides direct item access in templates. Use `track` for stable keys when data changes completely. Exposes `getItem()`, `remove()`, `clear()` methods. Template functions receive raw item data directly for clean, readable syntax.
@@ -97,6 +100,43 @@ Built on top the universal runtime
   _ **Error Handling in Asynchronous Components:** Implement robust error handling within `async` components. Utilize the `catch` prop of `<Async>` components or direct `fallback`/`catch` props on async components, and `try...catch` blocks for network requests to gracefully manage and display errors to the user.
   _ `<Dynamic is={componentOrTag}>`: Renders a component or HTML tag that can change dynamically.
   _ `<Fn ctx={value} catch={errorHandler}>`: Executes a function that returns a render function, useful for complex logic with error boundaries. \* **List Management:** Use `List` component's exposed methods (`getItem()`, `remove()`, `clear()`) for imperative list manipulation when needed.
+
+##### `<ScrollView>`
+
+By default, InSpatial apps display content at the maximum width and height of the viewport, so scrolling and scrollbars are not enabled automatically. The `ScrollView` structure component provides scrolling functionality when needed. It offers properties to show or hide the scrollbar, select different scrollbar variants, and supports animating its children with various `InMotion` effects and animations.
+
+**Example Usage**
+
+```typescript
+<ScrollView>
+  <Stack variant="yStack" className="space-y-2 p-2 bg-(--brand) w-full">
+    {Array.from({ length: 30 }).map((_, i) => (
+      <YStack key={i} className="p-3 rounded bg-(--surface) text-(--primary)">
+        Item {i + 1}
+      </YStack>
+    ))}
+  </Stack>
+</ScrollView>
+```
+
+**ScrollView `Bar`Themes & Properties**
+
+```typescript
+// Thin (default)
+<ScrollView scrollbar scrollbarTheme="thin">...</ScrollView>
+
+// Minimal (thumb appears on hover)
+<ScrollView scrollbar scrollbarTheme="minimal">...</ScrollView>
+
+// Rounded
+<ScrollView scrollbar scrollbarTheme="rounded">...</ScrollView>
+
+// Pill
+<ScrollView scrollbar scrollbarTheme="pill">...</ScrollView>
+
+// Gradient
+<ScrollView scrollbar scrollbarTheme="gradient">...</ScrollView>
+```
 
 - **`$ref`:** Special prop to get a reference to a DOM element or component instance (as a signal or function). **Critical for hot reload in dev mode:** always use `$ref` for component references, not `createComponent()` return values.
 - **`expose()`:** Allows child components to expose properties/methods to their parent via `$ref`.
@@ -413,6 +453,78 @@ const button = myStyleSystem.style({
 // Apply the style
 const className = button({ size: "sm" });
 ```
+
+**FAQ - Variant Authority**
+When both `style` and `class`/`className` are used to compose the same style properties, the `style` prop takes precedence otherwise known as `Variant Authority` and will override the corresponding styles set in `class`/`className`. For example:
+
+```typescript
+<Slot
+className="bg-purple-500"
+style={{
+  web: {
+    backgroundColor: "green",
+  },
+}}
+>
+```
+
+##### Authority Pattern - (CVA vs FVA)
+
+- Avoid hard-coding variables in styles or class-utilities.
+- using class/style variables creates a `fixed variant authority (FVA)` you cannot override in your component - unless this is what you actually want which may be the case then ignore this rule. Otherwise do not use variables when composing styles inside `createStyle()` if you want to a `class variant authority (CVA)`.
+
+```typescript
+// style.ts
+import { createStyle, type StyleProps } from "@inspatial/kit/style";
+
+export const ButtonStyle = createStyle({
+settings: {
+ variant: {
+// 👉🏾 Do this if you want (FVA)
+// will always be brand color even when changed at the component level
+base: [
+  "bg-(--brand)",
+  {
+    web: {
+      backgroundColor: "var-(--brand)",
+    },
+  },
+],
+
+// 👉🏾 Do this if you want (CVA)
+// will start as purple but can be changed at the component level
+base: [
+  "bg-purple-500",
+  {
+    web: {
+      backgroundColor: "var-purple-500",
+    },
+  }],
+ }
+}
+
+```
+
+###### Decision Tree
+
+- Do you want consumers to override colors at usage?
+
+  - ✅ Yes (CVA):
+    - ✅ Prefer utility colors in variants (e.g., `bg-purple-500`) and keep `style.web` for non-color (layout/shape/effects)
+    - ✅ If using variables, prefer static CSS utilities (e.g., `.bg-brand { background-color: var(--brand) }`)
+    - ❌ Avoid `style.web.backgroundColor = "var(--brand)"`
+  - ✅ No (FVA):
+    - ✅ Use `bg-(--brand)` + `style.web.backgroundColor = "var(--brand)"`
+    - ✅ Expect consumer utilities not to override
+    - ❌ Don’t rely on user `className` to change colors
+
+- Are you mixing utilities and style.web colors?
+  - If overrides are desired:
+    - ✅ Keep color in utilities; shape in `style.web`
+    - ✅ If injecting colors in `style.web`, ensure low specificity or accept consumer override strategy
+  - If overrides are not desired:
+    - ✅ Use variables in both utilities and `style.web`
+    - ❌ Don’t expect overrides to work
 
 ## Interactivity
 
@@ -1081,7 +1193,7 @@ Note: hasValue returns plain boolean. Returns true when the value of the signal 
 
 JSX runtime is essential when using InSpatial together with runtimes like [Deno](https://github.com/denoland/deno/issues/29584), compilers like [SWC](https://github.com/swc-project/swc/issues/10553) or generators like [MDX](https://mdxjs.com/), since they lack the ability to correctly transform JSX via parameters.
 
-### 10. Dev & Production (Serving, Bundling etc...)
+### 10. Building for Dev & Production
 
 You can build your app for dev and production using different tools like (InSpatial `Serve` extension, Vite, Rollup with Babel, Rspack or Webpack). InSpatial provides different plugins and extensions for different tools.
 
@@ -1496,3 +1608,7 @@ Because InSpatial is a Universal Development Environment (UDE), there are many p
 - Motion
 
 These are primary systems that are intentionally detached from InSpatial Renderer. Universal Apps are omni-platforms and as such we should never assume the environment the user is in. Detaching these concepts create a conflict-free system one that allows for a universal platform.
+
+```
+
+```

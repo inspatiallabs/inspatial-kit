@@ -55,6 +55,15 @@
     background-color: var(--background);
     color: var(--primary);
   }
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
+  #app {
+    height: 100vh;
+    overflow: hidden;
+  }
 }
 
 /*###################################################( COMPONENTS )###################################################*/

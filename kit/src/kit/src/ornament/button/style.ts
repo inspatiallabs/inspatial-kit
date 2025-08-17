@@ -30,39 +30,49 @@ export const ButtonStyle = createStyle({
     //##############################################(FORMAT PROP)##############################################//
     format: {
       base: [
-        "bg-(--brand) text-white shadow-effect hover:shadow-base",
-        { web: { backgroundColor: "var(--brand)", color: "white" } },
+        // NOTE: use bg-purple-500 instead of bg-(--brand) or any variable to allow variant authority
+        // Avoid hard-coding variables in styles or class-utilities.
+        "bg-purple-500 text-white shadow-effect hover:shadow-base",
+        {
+          web: {
+            boxShadow: "var(--in-shadow-effect, 0 0 0 0 transparent)",
+            backgroundColor: "var-purple-500",
+          },
+        },
       ],
       outline: [
-        "outline-2 outline-(--brand) bg-inherit hover:bg-(--brand) text-primary hover:text-white",
+        "outline outline-2 outline-purple-500 bg-inherit hover:bg-purple-500 text-primary hover:text-white",
         {
           web: {
             outlineStyle: "solid",
             outlineWidth: "2px",
-            outlineColor: "var(--brand)",
+            // outlineColor intentionally left to classes for override
           },
         },
       ],
       outlineSurface: [
-        "border-x-2 border-t-2 dark:border-b-2 border-(--surface) shadow-line text-primary",
+        "border-2 border-(--surface) shadow-muted text-primary bg-(--surface)",
         {
           web: {
-            borderColor: "var(--surface)",
             borderWidth: "2px",
+            // borderColor/backgroundColor via classes for override
+            boxShadow: "var(--in-shadow-muted, 0 0 0 0 transparent)",
+            borderColor: "var(--surface)",
           },
         },
       ],
       ghost: [
-        "bg-none shadow-none bg-transparent text-primary",
+        "bg-transparent shadow-none text-primary",
         { web: { backgroundColor: "transparent", boxShadow: "none" } },
       ],
       underline: [
-        "bg-inherit text-primary shadow-none underline-offset-[4px] underline decoration-4 decoration-(--brand)",
+        "bg-inherit text-primary shadow-none underline-offset-[4px] underline decoration-4 decoration-purple-500",
         {
           web: {
             textDecorationThickness: "4px",
-            textDecorationColor: "var(--brand)",
+            textDecorationColor: "var-purple-500",
             textUnderlineOffset: "4px",
+            // decoration color via class
           },
         },
       ],
@@ -72,13 +82,12 @@ export const ButtonStyle = createStyle({
     // Always set max and min values this restrains the size of the button especially when using InSpatial Widgets to keep them from mirroring the parent container sizing
     size: {
       base: [
-        "h-[40px] min-w-[40px] min-h-[40px] w-fit max-h-[40px] max-w-full px-4 ",
+        "h-[40px] min-w-[40px] min-h-[40px] max-h-[40px] max-w-full px-4 ",
         {
           web: {
             height: "40px",
             minWidth: "40px",
             minHeight: "40px",
-            width: "fit-content",
             maxHeight: "40px",
             maxWidth: "100%",
             paddingLeft: "1rem",
@@ -87,13 +96,12 @@ export const ButtonStyle = createStyle({
         },
       ],
       sm: [
-        "h-[36px] min-w-[36px] min-h-[36px] w-fit max-h-[36px] max-w-full px-4",
+        "h-[36px] min-w-[36px] min-h-[36px] max-h-[36px] max-w-full px-4",
         {
           web: {
             height: "36px",
             minWidth: "36px",
             minHeight: "36px",
-            width: "fit-content",
             maxHeight: "36px",
             maxWidth: "100%",
             paddingLeft: "1rem",
@@ -102,13 +110,12 @@ export const ButtonStyle = createStyle({
         },
       ],
       md: [
-        "h-[40px] min-w-[40px] min-h-[40px] w-fit max-h-[40px] max-w-full px-4",
+        "h-[40px] min-w-[40px] min-h-[40px] max-h-[40px] max-w-full px-4",
         {
           web: {
             height: "40px",
             minWidth: "40px",
             minHeight: "40px",
-            width: "fit-content",
             maxHeight: "40px",
             maxWidth: "100%",
             paddingLeft: "1rem",
@@ -117,13 +124,12 @@ export const ButtonStyle = createStyle({
         },
       ],
       lg: [
-        "h-[48px] min-w-[48px] min-h-[48px] w-fit max-h-[48px] max-w-full px-4",
+        "h-[48px] min-w-[48px] min-h-[48px] max-h-[48px] max-w-full px-4",
         {
           web: {
             height: "48px",
             minWidth: "48px",
             minHeight: "48px",
-            width: "fit-content",
             maxHeight: "48px",
             maxWidth: "100%",
             paddingLeft: "1rem",
@@ -132,13 +138,12 @@ export const ButtonStyle = createStyle({
         },
       ],
       xl: [
-        "h-[52px] min-w-[52px] min-h-[52px] w-fit max-h-[52px] max-w-full px-4",
+        "h-[52px] min-w-[52px] min-h-[52px] max-h-[52px] max-w-full px-4",
         {
           web: {
             height: "52px",
             minWidth: "52px",
             minHeight: "52px",
-            width: "fit-content",
             maxHeight: "52px",
             maxWidth: "100%",
             paddingLeft: "1rem",

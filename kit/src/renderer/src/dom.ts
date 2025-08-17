@@ -19,6 +19,23 @@ export function DOMRenderer(options: DOMOptions = {}): any {
   const { onDirective, namespaces, tagNamespaceMap, tagAliases, setups } =
     composeExtensions(options.extensions);
 
+  // Inject global CSS to hide scrollbars without disabling scrolling
+  (function injectScrollbarHide() {
+    try {
+      if (!doc) return;
+      const id = "in-scrollbar-hide";
+      if (doc.getElementById(id)) return;
+      const el = doc.createElement("style");
+      el.id = id;
+      el.setAttribute("data-in", "scrollbar-hide");
+      el.textContent = `
+        html, body { -ms-overflow-style: none; scrollbar-width: none; }
+        html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
+      `;
+      doc.head.appendChild(el);
+    } catch {}
+  })();
+
   function isNode(node: any): boolean {
     return !!(node && node.cloneNode);
   }
