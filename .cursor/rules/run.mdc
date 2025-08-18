@@ -400,6 +400,21 @@ const styleClass = HeaderWidgetStyle.getStyle({
 });
 ```
 
+**Extraction Patterns**
+
+````typescript
+// ✅ (Founders Choice)
+className={ButtonStyle.getStyle({ format, size, ...rest, className })}
+
+// or
+
+// ✅ (Works Too)
+className={iss(
+  ButtonStyle.getStyle({ format, size, ...rest }),
+  className
+)}
+```
+
 ##### Best Practices
 
 1. **Always define at least one property** for each style category
@@ -418,7 +433,7 @@ const styleClass = HeaderWidgetStyle.getStyle({
 // Consistent API shape regardless of how it's called:
 const system = createStyle(); // Returns {getStyle, iss, style, composeStyle}
 const buttonStyle = createStyle({ ...config }); // Returns {getStyle, iss, style, composeStyle, config}
-```
+````
 
 ##### 2. Type Extraction
 
@@ -467,64 +482,6 @@ style={{
 }}
 >
 ```
-
-##### Authority Pattern - (CVA vs FVA)
-
-- Avoid hard-coding variables in styles or class-utilities.
-- using class/style variables creates a `fixed variant authority (FVA)` you cannot override in your component - unless this is what you actually want which may be the case then ignore this rule. Otherwise do not use variables when composing styles inside `createStyle()` if you want to a `class variant authority (CVA)`.
-
-```typescript
-// style.ts
-import { createStyle, type StyleProps } from "@inspatial/kit/style";
-
-export const ButtonStyle = createStyle({
-settings: {
- variant: {
-// 👉🏾 Do this if you want (FVA)
-// will always be brand color even when changed at the component level
-base: [
-  "bg-(--brand)",
-  {
-    web: {
-      backgroundColor: "var-(--brand)",
-    },
-  },
-],
-
-// 👉🏾 Do this if you want (CVA)
-// will start as purple but can be changed at the component level
-base: [
-  "bg-purple-500",
-  {
-    web: {
-      backgroundColor: "var-purple-500",
-    },
-  }],
- }
-}
-
-```
-
-###### Decision Tree
-
-- Do you want consumers to override colors at usage?
-
-  - ✅ Yes (CVA):
-    - ✅ Prefer utility colors in variants (e.g., `bg-purple-500`) and keep `style.web` for non-color (layout/shape/effects)
-    - ✅ If using variables, prefer static CSS utilities (e.g., `.bg-brand { background-color: var(--brand) }`)
-    - ❌ Avoid `style.web.backgroundColor = "var(--brand)"`
-  - ✅ No (FVA):
-    - ✅ Use `bg-(--brand)` + `style.web.backgroundColor = "var(--brand)"`
-    - ✅ Expect consumer utilities not to override
-    - ❌ Don’t rely on user `className` to change colors
-
-- Are you mixing utilities and style.web colors?
-  - If overrides are desired:
-    - ✅ Keep color in utilities; shape in `style.web`
-    - ✅ If injecting colors in `style.web`, ensure low specificity or accept consumer override strategy
-  - If overrides are not desired:
-    - ✅ Use variables in both utilities and `style.web`
-    - ❌ Don’t expect overrides to work
 
 ## Interactivity
 

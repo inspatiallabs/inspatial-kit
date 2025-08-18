@@ -131,8 +131,8 @@ export function ScrollView(props: ScrollViewProps) {
       scrollable,
       scrollbar,
       scrollbarTheme: (props as any).scrollbarTheme ?? "thin",
-    }),
-    className
+      className,
+    })
   );
 
   /*********************************(Render)*********************************/

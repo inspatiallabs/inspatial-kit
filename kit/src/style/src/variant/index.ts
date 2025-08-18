@@ -545,6 +545,23 @@ function createStyleCore<V extends StyleShapeProp>(
     const { settings, defaultSettings } = config;
     const classParts: any[] = [];
     let styleOut: any = {};
+    // Detect user-provided class utilities to set family overrides
+    const userCls = issUtil(props?.class, props?.className);
+    const userTokens = userCls.split(/\s+/).filter(Boolean);
+    const userFamily: Record<string, boolean> = {
+      bg: false,
+      text: false,
+      border: false,
+      outline: false,
+      fill: false,
+      stroke: false,
+      decoration: false,
+    };
+    for (const t of userTokens) {
+      const fam = t.split(":").pop()?.split("-")?.[0] || "";
+      if ((userFamily as any)[fam] !== undefined)
+        (userFamily as any)[fam] = true;
+    }
 
     // Base can be string/array/object; collect classes and style
     const base = config.base as any;
@@ -620,18 +637,32 @@ function createStyleCore<V extends StyleShapeProp>(
         if (colorKeys.has(k)) lowSpec[k] = v;
         else normalSpec[k] = v;
       }
-      // Detect user-provided color utilities in props.class / props.className
-      const userCls = issUtil(props?.class, props?.className);
-      const hasUserColorUtil = /(?:\b|:)(bg-|text-|border-|outline-)/.test(
-        userCls
-      );
       if (Object.keys(normalSpec).length) {
         const c1 = __ensureClassForWebStyle(normalSpec, "normal");
         if (c1) classParts.push(c1);
       }
-      if (Object.keys(lowSpec).length && !hasUserColorUtil) {
-        const c2 = __ensureClassForWebStyle(lowSpec, "low");
-        if (c2) classParts.push(c2);
+      if (Object.keys(lowSpec).length) {
+        // Filter out color families when user has provided class utilities for them
+        const mapKeyToFamily: Record<string, string> = {
+          backgroundColor: "bg",
+          background: "bg",
+          color: "text",
+          borderColor: "border",
+          outlineColor: "outline",
+          fill: "fill",
+          stroke: "stroke",
+          textDecorationColor: "decoration",
+        };
+        const filtered: Record<string, any> = {};
+        for (const [k, v] of Object.entries(lowSpec)) {
+          const fam = mapKeyToFamily[k] || "";
+          if (fam && userFamily[fam]) continue;
+          filtered[k] = v;
+        }
+        if (Object.keys(filtered).length) {
+          const c2 = __ensureClassForWebStyle(filtered, "low");
+          if (c2) classParts.push(c2);
+        }
       }
     }
 
@@ -663,6 +694,8 @@ function createStyleCore<V extends StyleShapeProp>(
         expandedClassParts.push(t);
         return;
       }
+      // Skip variant variable token generation if user provided same family classes
+      if (userFamily[util]) return;
       // Build CSS value using color-mix for opacity if provided
       let value = `var(${cssVar})`;
       const pct = opacity
@@ -689,7 +722,7 @@ function createStyleCore<V extends StyleShapeProp>(
       for (const token of flatTokens) pushToken(token);
     }
 
-    // Use iss to finalize classes including props.class / props.className
+    // Use iss to finalize classes including props.class / props.className (user classes last)
     const className = iss(expandedClassParts, props?.class, props?.className);
     return { className, style: styleOut };
   }

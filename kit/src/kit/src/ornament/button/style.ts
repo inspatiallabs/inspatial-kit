@@ -30,18 +30,16 @@ export const ButtonStyle = createStyle({
     //##############################################(FORMAT PROP)##############################################//
     format: {
       base: [
-        // NOTE: use bg-purple-500 instead of bg-(--brand) or any variable to allow variant authority
-        // Avoid hard-coding variables in styles or class-utilities.
-        "bg-purple-500 text-white shadow-effect hover:shadow-base",
+        "bg-(--brand) text-white shadow-effect hover:shadow-base",
         {
           web: {
             boxShadow: "var(--in-shadow-effect, 0 0 0 0 transparent)",
-            backgroundColor: "var-purple-500",
+            backgroundColor: "var-(--brand)",
           },
         },
       ],
       outline: [
-        "outline outline-2 outline-purple-500 bg-inherit hover:bg-purple-500 text-primary hover:text-white",
+        "outline outline-2 outline-(--brand) bg-inherit hover:bg-(--brand) text-primary hover:text-white",
         {
           web: {
             outlineStyle: "solid",
@@ -66,11 +64,11 @@ export const ButtonStyle = createStyle({
         { web: { backgroundColor: "transparent", boxShadow: "none" } },
       ],
       underline: [
-        "bg-inherit text-primary shadow-none underline-offset-[4px] underline decoration-4 decoration-purple-500",
+        "bg-inherit text-primary shadow-none underline-offset-[4px] underline decoration-4 decoration-(--brand)",
         {
           web: {
             textDecorationThickness: "4px",
-            textDecorationColor: "var-purple-500",
+            textDecorationColor: "var-(--brand)",
             textUnderlineOffset: "4px",
             // decoration color via class
           },

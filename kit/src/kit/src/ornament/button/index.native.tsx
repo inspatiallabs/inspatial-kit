@@ -53,12 +53,10 @@ export function Button(props: ButtonProps) {
 
   //*************************************(RETURN)*************************************//
 
-
-
   return (
     <>
       <Component
-        className={ButtonStyle.getStyle({ format, size, ...rest, className })}
+        className={ButtonStyle.getStyle({ format, size, className, ...rest })}
         disabled={rest.disabled || rest.isLoading}
         $ref={$ref}
         {...rest}
