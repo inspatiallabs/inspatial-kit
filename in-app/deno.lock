@@ -1,7 +1,6 @@
 {
   "version": "5",
   "specifiers": {
-    "jsr:@std/bytes@^1.0.6": "1.0.6",
     "jsr:@std/collections@1.0.9": "1.0.9",
     "jsr:@std/collections@^1.1.1": "1.1.2",
     "jsr:@std/csv@1.0.4": "1.0.4",
@@ -18,9 +17,6 @@
     "npm:tailwindcss@^4.1.11": "4.1.11"
   },
   "jsr": {
-    "@std/bytes@1.0.6": {
-      "integrity": "f6ac6adbd8ccd99314045f5703e23af0a68d7f7e58364b47d2c7f408aeb5820a"
-    },
     "@std/collections@1.0.9": {
       "integrity": "4f58104ead08a04a2199374247f07befe50ba01d9cca8cbb23ab9a0419921e71"
     },
@@ -47,10 +43,7 @@
       ]
     },
     "@std/streams@1.0.10": {
-      "integrity": "75c0b1431873cd0d8b3d679015220204d36d3c7420d93b60acfc379eb0dc30af",
-      "dependencies": [
-        "jsr:@std/bytes"
-      ]
+      "integrity": "75c0b1431873cd0d8b3d679015220204d36d3c7420d93b60acfc379eb0dc30af"
     },
     "@std/text@1.0.9": {
       "integrity": "b2db4abc3e6ab93eb0280a0d5e126fd3fca80955bcc297ccaaf555e995eab747"

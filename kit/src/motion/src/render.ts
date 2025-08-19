@@ -16,7 +16,6 @@
  * @see https://inspatial.dev/motion
  ****************************************************/
 
-
 import { globals } from "./globals.ts";
 
 import {
@@ -34,7 +33,7 @@ import {
 import type { IRenderTickable as Tickable } from "./types.ts"; // Alias to reuse variable name
 
 // Define helper functions directly instead of importing from helpers.ts
-const now = (): number => performance.now();
+// Use engine-provided time from parent tick; avoid local time source to prevent drift
 
 const clamp = (value: number, min: number, max: number): number => {
   return Math.max(min, Math.min(max, value));
@@ -427,7 +426,8 @@ export const render = (
 
         // NOTE: Possible improvement: Use translate(x,y) / translate3d(x,y,z) syntax
         // to reduce memory usage on string composition
-        if (tweenTransformsNeedUpdate && tween._renderTransforms) {
+        // Render transforms whenever any transform tween updated for this target
+        if (tweenTransformsNeedUpdate) {
           let str = emptyString;
           for (const key in tweenTargetTransformsProperties) {
             const transformFragmentString =
@@ -522,7 +522,7 @@ export const tick = (
     const tl = tickable;
     const tlIsRunningBackwards = tl.backwards;
     const tlChildrenTime = internalRender ? time : tl._iterationTime;
-    const tlCildrenTickTime = now();
+    const tlCildrenTickTime = time; // inherit parent time to keep clocks consistent
 
     let tlChildrenHasRendered = 0;
     let tlChildrenHaveCompleted = true;

@@ -1,7 +1,7 @@
 import { createRenderer } from "@inspatial/kit/renderer";
 import { envSupportsFeature } from "@inspatial/kit/vader/env";
 import { InTrigger } from "@inspatial/kit/trigger";
-import { InTheme } from "@inspatial/app/app/(extensions)/in-theme/index.ts";
+import { InTheme } from "@inspatial/kit/theme";
 import { InServe } from "@inspatial/kit/serve";
 import { AppRoutes } from "../app/routes.tsx";
 

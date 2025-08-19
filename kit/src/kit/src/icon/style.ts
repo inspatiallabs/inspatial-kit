@@ -1,4 +1,4 @@
-import { createStyle, type StyleProps } from "@in/style";
+import { createStyle } from "@in/style";
 
 //##############################################(CREATE STYLE)##############################################//
 
@@ -42,6 +42,3 @@ export const IconStyle = createStyle({
     disabled: false,
   },
 });
-
-//##############################################(TYPES)##############################################//
-export type IconProps = StyleProps<typeof IconStyle> & JSX.SharedProps & {};

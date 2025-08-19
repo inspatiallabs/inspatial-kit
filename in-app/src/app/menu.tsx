@@ -1,16 +1,10 @@
 import { Link } from "@inspatial/kit/navigation";
-import { $ } from "@inspatial/kit/state";
 import { XStack, Slot } from "@inspatial/kit/structure";
-import { Button, Notch } from "@inspatial/kit/ornament";
+import { Notch } from "@inspatial/kit/ornament";
 import { FPS } from "./fps.tsx";
 import { route } from "./routes.tsx";
-import {
-  InSpatialIcon,
-  LightModeIcon,
-  DarkModeIcon,
-} from "@inspatial/kit/icon";
-import { useTheme } from "./(extensions)/in-theme/state.ts";
-import { Show } from "@inspatial/kit";
+import { InSpatialIcon } from "@inspatial/kit/icon";
+import { ThemeController } from "@inspatial/kit/theme";
 
 export function AppMenu() {
   return (
@@ -54,19 +48,7 @@ export function AppMenu() {
         </Link>
       </XStack>
       <FPS />
-      <Button
-        format="outlineSurface"
-        iconOnly={true}
-        on:tap={() => useTheme.action.setToggle()}
-        className="fixed bottom-4 left-4 flex items-center gap-2 z-50"
-      >
-        <Show
-          when={$(() => String(useTheme.mode) === "dark")}
-          otherwise={<DarkModeIcon className="p-[2px]" />}
-        >
-          <LightModeIcon className="p-[2px]" />
-        </Show>
-      </Button>
+      <ThemeController className="absolute bottom-4 left-4 z-100" />
     </>
   );
 }

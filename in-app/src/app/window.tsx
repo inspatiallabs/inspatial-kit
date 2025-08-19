@@ -1,9 +1,9 @@
-import { YStack, XStack, Stack, ScrollView } from "@inspatial/kit/structure";
+import { YStack } from "@inspatial/kit/structure";
 import { AuthLayout } from "./(auth)/layout.tsx";
 import { AppMenu } from "./menu.tsx";
-import { Text } from "@inspatial/kit/typography";
 import { Button } from "@inspatial/kit/ornament";
 import { GoogleIcon } from "@inspatial/kit/icon";
+import { InputField } from "@inspatial/kit/input";
 
 export function AppWindow() {
   return (
@@ -11,7 +11,7 @@ export function AppWindow() {
       <YStack className="overflow-hidden h-screen w-screen">
         <AppMenu />
         <AuthLayout>
-          <YStack className="w-full h-full items-center justify-center px-24">
+          <YStack className="w-full h-full items-center justify-center px-24 gap-y-4">
             {/**Button**/}
             <Button
               format="outlineSurface"
@@ -25,6 +25,14 @@ export function AppWindow() {
             {/**Divider**/}
 
             {/**Input**/}
+            <InputField
+              variant="emailfield"
+              className="shadow-(--shadow-hollow)"
+            />
+            <InputField
+              variant="passwordfield"
+              className="shadow-(--shadow-hollow) "
+            />
 
             {/**Button**/}
             <Button size="xl" className="w-full">

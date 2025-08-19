@@ -1,6 +1,5 @@
-import type { ExtensionSignal } from "@inspatial/kit/extension";
-import { envSupportsFeature } from "@inspatial/kit/vader/env";
-import { createExtension } from "@inspatial/kit/extension";
+import { envSupportsFeature } from "@in/vader/env";
+import { createExtension, type ExtensionSignal } from "@in/extension";
 
 /*################################(Types)################################*/
 

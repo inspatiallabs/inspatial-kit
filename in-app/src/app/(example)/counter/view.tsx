@@ -13,6 +13,7 @@ import {
   handleBatch,
   type EntryProps,
 } from "./state.ts";
+import { Text } from "@inspatial/kit/typography";
 
 // ########################## (TRIGGER PROPS TEST SIGNALS) ##########################
 
@@ -75,7 +76,7 @@ export function CounterView() {
 
           {/* Current Count Display */}
           <div className="bg-gray-800 p-6 rounded-lg text-center">
-            <h2 className="text-white text-2xl mb-2">Current </h2>
+            <Text className="text-white text-2xl mb-2">Current </Text>
             <div className="text-6xl font-bold text-yellow-400">
               {useCounter.count}
             </div>

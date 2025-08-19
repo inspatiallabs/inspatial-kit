@@ -29,6 +29,7 @@
     "./state/trigger": "./src/state/src/trigger/index.ts",
     "./env": "./src/env/src/index.ts",
     "./serve": "./src/serve/src/index.ts",
+    "./cloud": "./src/cloud/src/index.ts",
     "./debug": "./src/debug/src/index.ts",
     "./style": "./src/style/src/index.ts",
     "./motion": "./src/motion/src/index.ts",
@@ -107,6 +108,8 @@
     "@in/kit/navigation/": "./src/kit/src/navigation/",
     "@in/kit/structure/": "./src/kit/src/structure/",
     "@in/kit/media/": "./src/kit/src/media/",
+    "@in/kit/input/": "./src/kit/src/input/",
+    "@in/kit/theme/": "./src/kit/src/theme/",
 
     "@in/renderer/": "./src/renderer/src/",
     "@in/runtime/": "./src/runtime/src/",
@@ -142,6 +145,10 @@
     "@in/vader": "./src/vader/src/index.ts",
 
     "@in/serve/": "./src/serve/src/",
-    "@inspatial/util": "jsr:@inspatial/util@^0.2.0"
+
+    "@in/cloud/": "./src/cloud/src/",
+    "@in/cloud": "./src/cloud/src/index.ts",
+
+    "@inspatial/cloud-client": "jsr:@inspatial/cloud-client@^0.1.28"
   }
 }

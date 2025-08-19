@@ -51,24 +51,19 @@ export const sanitizePropertyName = (
   if (tweenType === tweenTypes.TRANSFORM) {
     const t = shortTransforms.get(propertyName);
     return t ? t : propertyName;
-  } else if (
-    tweenType === tweenTypes.CSS ||
-    // Handle special cases where properties like "strokeDashoffset" needs to be set as "stroke-dashoffset"
-    // but properties like "baseFrequency" should stay in lowerCamelCase
-    (tweenType === tweenTypes.ATTRIBUTE &&
-      isSvg(target) &&
-      propertyName in target.style)
-  ) {
+  } else if (tweenType === tweenTypes.CSS) {
     const cachedPropertyName = propertyNamesCache[propertyName];
-    if (cachedPropertyName) {
-      return cachedPropertyName;
-    } else {
-      const lowerCaseName = propertyName
-        ? toLowerCase(propertyName)
-        : propertyName;
-      propertyNamesCache[propertyName] = lowerCaseName;
-      return lowerCaseName;
-    }
+    if (cachedPropertyName) return cachedPropertyName;
+    const lowerCaseName = propertyName ? toLowerCase(propertyName) : propertyName;
+    propertyNamesCache[propertyName] = lowerCaseName;
+    return lowerCaseName;
+  } else if (tweenType === tweenTypes.ATTRIBUTE && isSvg(target)) {
+    // For SVG attributes, prefer kebab-case by default (e.g., strokeDashoffset -> stroke-dashoffset)
+    const cachedPropertyName = propertyNamesCache[propertyName];
+    if (cachedPropertyName) return cachedPropertyName;
+    const kebab = propertyName.replace(/[A-Z]/g, (m) => "-" + m.toLowerCase());
+    propertyNamesCache[propertyName] = kebab;
+    return kebab;
   } else {
     return propertyName;
   }

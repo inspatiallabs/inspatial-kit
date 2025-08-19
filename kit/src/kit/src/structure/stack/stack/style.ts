@@ -1,4 +1,4 @@
-import { createStyle, type StyleProps } from "@in/style";
+import { createStyle } from "@in/style";
 
 /*#####################################(CREATE STYLE)#####################################*/
 
@@ -21,7 +21,11 @@ export const StackStyle = createStyle({
       zStack: [
         "inline-flex flex-row-reverse perspective-[-3000px] transform-3d skew-x-12",
         {
-          web: { display: "inline-flex", flexDirection: "row-reverse", transform: "skewX(12deg)" },
+          web: {
+            display: "inline-flex",
+            flexDirection: "row-reverse",
+            transform: "skewX(12deg)",
+          },
         },
       ],
     },
@@ -39,19 +43,4 @@ export const StackStyle = createStyle({
     variant: "xStack",
     disabled: false,
   },
-});
-
-//##############################################(TYPES)##############################################//
-
-export type StackProps = StyleProps<typeof StackStyle> &
-  JSX.SharedProps & {
-    wrap?: JSX.ISSProps["flexWrap"];
-    justify?: JSX.ISSProps["justifyContent"];
-    align?: JSX.ISSProps["alignItems"];
-    gap?: JSX.ISSProps["gap"];
-  };
-
-export const StackPropsClass = StackStyle.getStyle({
-  variant: "xStack",
-  disabled: false,
 });

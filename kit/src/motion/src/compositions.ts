@@ -26,7 +26,23 @@ import {
   forEachChildren,
 } from "./helpers.ts";
 
-import { SafeLookupMap } from "@in/vader";
+// Local SafeLookupMap shim to avoid external dependency in this layer
+class SafeLookupMap<K extends object, V> {
+  private _wm: WeakMap<K, V>;
+  constructor() {
+    this._wm = new WeakMap();
+  }
+  get(key: K): V | undefined {
+    return this._wm.get(key);
+  }
+  set(key: K, value: V): this {
+    this._wm.set(key, value);
+    return this;
+  }
+  delete(key: K): boolean {
+    return this._wm.delete(key);
+  }
+}
 
 import type {
   Target,
@@ -120,7 +136,6 @@ export const composeTween = async (
   tween: Tween,
   siblings: TweenPropertySiblings
 ): Promise<Tween> => {
-  // Made async for dynamic import
   const tweenCompositionType = tween._composition;
 
   // Handle replaced tweens
@@ -193,13 +208,13 @@ export const composeTween = async (
       }
     }
   } else if (tweenCompositionType === compositionTypes.blend) {
-    const { addAdditiveAnimation } = await import("./additive.ts"); // Dynamic import
+    const { addAdditiveAnimation } = await import("./additive.ts");
     const additiveTweenSiblings = getTweenSiblings(
       tween.target,
       tween.property,
       "_add"
     );
-    const additiveAnimation = addAdditiveAnimation(lookups._add as any); // lookups._add might need adjustment if additive.ts also defines/manages it
+    const additiveAnimation = addAdditiveAnimation(lookups._add as any);
 
     let lookupTween = additiveTweenSiblings._head;
 
@@ -249,7 +264,6 @@ export const composeTween = async (
  * @return {Promise<Tween>} The removed tween
  */
 export const removeTweenSliblings = async (tween: Tween): Promise<Tween> => {
-  // Made async if it might call composeTween or similar async logic due to dynamic imports elsewhere
   const tweenComposition = tween._composition;
   if (tweenComposition !== compositionTypes.none) {
     const tweenTarget = tween.target;
@@ -263,7 +277,7 @@ export const removeTweenSliblings = async (tween: Tween): Promise<Tween> => {
       }
     }
     if (tweenComposition === compositionTypes.blend) {
-      const { additive } = await import("./additive.ts"); // Dynamically import `additive` for its `animation` property
+      const { additive } = await import("./additive.ts");
       const addTweensLookup = lookups._add;
       const addTargetProps = addTweensLookup.get(tweenTarget);
       if (!addTargetProps) return tween; // Return tween if addTargetProps is undefined

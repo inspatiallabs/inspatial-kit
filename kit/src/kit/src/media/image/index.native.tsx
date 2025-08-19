@@ -2,6 +2,7 @@ import { $ } from "@in/teract/state";
 import { iss } from "@in/style";
 import { ImageStyle, type ImageProps } from "../image/style.ts";
 
+//NOTE: WIP*** Not ready for production
 export function Image(props: ImageProps) {
   const {
     src,
@@ -25,6 +26,7 @@ export function Image(props: ImageProps) {
     placeholder = "none",
     blurDataURL,
     placeholderColor = "rgba(0,0,0,0.05)",
+    asBackground = false,
     className,
     $ref,
     ...rest
@@ -33,6 +35,7 @@ export function Image(props: ImageProps) {
   // Signals for lazy/in-view and load state
   const inView = $(false);
   const loaded = $(false);
+  let rootEl: any = null;
 
   // Derive srcset
   const srcSet = $(() => {
@@ -44,8 +47,7 @@ export function Image(props: ImageProps) {
   // View observer on mount; only set real src/srcset when visible
   function handleMount() {
     try {
-      const node = (globalThis.document?.getElementById?.(rest.id as any) ??
-        null) as HTMLElement | null;
+      const node = rootEl as any | null;
       if (!node || !("IntersectionObserver" in globalThis)) {
         inView.set(true);
         return;
@@ -74,7 +76,10 @@ export function Image(props: ImageProps) {
     <>
       <figure
         className={wrapperClass}
-        $ref={$ref}
+        $ref={(el: any) => {
+          rootEl = el;
+          if (typeof $ref === "function") ($ref as any)(el);
+        }}
         on:mount={() => handleMount()}
         {...rest}
       >
@@ -99,21 +104,35 @@ export function Image(props: ImageProps) {
           />
         ) : null}
 
-        {/* Real img */}
-        <img
-          alt={alt}
-          decoding={decoding}
-          loading={loading}
-          fetchPriority={fetchPriority as any}
-          crossOrigin={crossOrigin as any}
-          referrerPolicy={referrerPolicy as any}
-          width={width as any}
-          height={height as any}
-          sizes={sizes as any}
-          on:load={() => loaded.set(true)}
-          style={{ web: { display: "block", width: "100%", height: "100%" } }}
-          {...(inView ? { src, srcset: srcSet } : {})}
-        />
+        {asBackground ? (
+          <div
+            className="absolute inset-0"
+            style={{
+              web: {
+                backgroundImage: `url(${src})`,
+                backgroundSize: fit === "contain" ? "contain" : "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+              },
+            }}
+          />
+        ) : (
+          <img
+            alt={alt as any}
+            decoding={decoding as any}
+            loading={loading as any}
+            fetchPriority={fetchPriority as any}
+            crossOrigin={crossOrigin as any}
+            referrerPolicy={referrerPolicy as any}
+            width={width as any}
+            height={height as any}
+            sizes={sizes as any}
+            on:load={() => loaded.set(true)}
+            style={{ web: { display: "block", width: "100%", height: "100%" } }}
+            src={src as any}
+            srcset={srcSet as any}
+          />
+        )}
       </figure>
     </>
   );

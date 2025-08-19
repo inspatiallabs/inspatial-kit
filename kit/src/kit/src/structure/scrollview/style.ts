@@ -1,4 +1,4 @@
-import { createStyle, type StyleProps } from "@in/style";
+import { createStyle } from "@in/style";
 
 /*###################################(STYLE)###################################*/
 export const ScrollViewStyle = createStyle({
@@ -40,14 +40,3 @@ export const ScrollViewStyle = createStyle({
     scrollbarTheme: "thin",
   },
 });
-
-/*###################################(TYPES)###################################*/
-type ScrollAnimation = "none" | "fade" | "fadeUp" | "scale";
-
-export type ScrollViewProps = StyleProps<typeof ScrollViewStyle> & JSX.SharedProps & {
-  animate?: ScrollAnimation;
-  duration?: number;
-  delay?: number;
-  preserveChildren?: boolean;
-  axis?: "x" | "y" | "both";
-};

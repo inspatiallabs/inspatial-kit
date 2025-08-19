@@ -13,7 +13,7 @@ export function AuthLayout({
 
   return (
     <>
-      <XStack className="relative overflow-hidden h-screen w-full xl:p-5 md:px-1 md:py-1">
+      <XStack className="relative bg-(--surface) overflow-hidden h-screen w-full xl:p-5 md:px-1 md:py-1">
         {/**Layout Component**/}
         <Slot className="w-6/12 h-screen lg:hidden bg-brand md:w-auto flex items-center justify-center">
           <img

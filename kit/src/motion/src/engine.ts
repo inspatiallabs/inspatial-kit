@@ -37,9 +37,10 @@ const denoImmediate = (callback: () => void): number =>
 const denoClearImmediate = (id: number): void => clearTimeout(id);
 
 // Use constants instead of exported variables to avoid conflicts
-const browserTickMethod: ((callback: () => void) => number) | undefined = isBrowser
-  ? globalThis.requestAnimationFrame?.bind(globalThis)
-  : denoImmediate;
+const browserTickMethod: ((callback: () => void) => number) | undefined =
+  isBrowser
+    ? globalThis.requestAnimationFrame?.bind(globalThis)
+    : denoImmediate;
 
 const browserCancelMethod: ((id: number) => void) | undefined = isBrowser
   ? globalThis.cancelAnimationFrame?.bind(globalThis)
@@ -124,22 +125,25 @@ export class InMotionEngine extends InMotionClock {
     const time = (this._currentTime = now());
     if (this.requestTick(time) === tickModes.AUTO) {
       this.computeDeltaTime(time);
-      const InMotionSpeed = this._speed;
-      const InMotionFps = this._fps;
       let activeTickable = this._head as Tickable;
 
       while (activeTickable) {
         const nextTickable = (activeTickable as any)._next as Tickable;
 
         if (!activeTickable.paused) {
-          // Ensure we only pass the expected number of arguments to tick
-          tick(
-            activeTickable as any, // Type assertion to handle interface mismatch
-            activeTickable.deltaTime,
-            this._elapsedTime,
-            InMotionSpeed,
-            InMotionFps
-          );
+          // Respect per-tickable fps scheduling and pass absolute time through
+          const tickMode = (activeTickable as any).requestTick
+            ? (activeTickable as any).requestTick(time)
+            : tickModes.AUTO;
+          if (tickMode !== tickModes.NONE) {
+            tick(
+              activeTickable as any,
+              time,
+              0, // muteCallbacks
+              0, // internalRender
+              tickMode
+            );
+          }
         } else {
           removeChild(this as any, activeTickable); // Type assertion for protected property access
           this._hasChildren = !!this._tail;

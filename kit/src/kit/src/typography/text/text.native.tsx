@@ -10,7 +10,7 @@ import {
   transformClassMap,
   letterSpacingMap,
 } from "./helpers.ts";
-import type { TypographyProps } from "./style.ts";
+import type { TypographyProps } from "./type.ts";
 
 /*##############################################(ANIMATION HELPERS)##############################################*/
 const animateLetters = (
@@ -23,19 +23,29 @@ const animateLetters = (
   const letters = root.querySelectorAll('[data-letter="true"]');
   if (!letters.length) return;
 
-  if (style === "fadeUp") {
+  // Ensure starting state is hidden before we hand to Motion
+  letters.forEach((n) => ((n as HTMLElement).style.opacity = "0"));
+
+  if (style === "fadeUp" || style === "fadeUpContainer") {
     createMotion(letters, {
       opacity: { from: 0, to: 1, duration: durationMs },
       translateY: { from: 10, to: 0, duration: durationMs },
       delay: (_t: any, i: number, l: number) =>
         delayMs + (i / Math.max(1, l)) * 250,
       ease: eases.inOutQuad,
+      onComplete: () => {
+        // Cleanup inline opacity in case anything stuck
+        letters.forEach((n) => ((n as HTMLElement).style.opacity = ""));
+      },
     });
   } else if (style === "fadeIn") {
     createMotion(letters, {
       opacity: { from: 0, to: 1, duration: durationMs },
       delay: (_t: any, i: number) => delayMs + i * 25,
       ease: eases.inOutQuad,
+      onComplete: () => {
+        letters.forEach((n) => ((n as HTMLElement).style.opacity = ""));
+      },
     });
   } else if (style === "reveal") {
     createMotion(letters, {
@@ -43,8 +53,20 @@ const animateLetters = (
       translateY: { from: 8, to: 0, duration: durationMs },
       delay: (_t: any, i: number) => delayMs + i * 40,
       ease: eases.outQuad,
+      onComplete: () => {
+        letters.forEach((n) => ((n as HTMLElement).style.opacity = ""));
+      },
     });
   }
+
+  // Fallback safety: force show after total time
+  const total = delayMs + durationMs + 50;
+  setTimeout(() => {
+    letters.forEach((n) => {
+      const el = n as HTMLElement;
+      if (getComputedStyle(el).opacity === "0") el.style.opacity = "1";
+    });
+  }, total);
 };
 
 /*##############################################(TEXT COMPONENT)##############################################*/
@@ -176,12 +198,31 @@ export const Text = ({
       <p
         id={state.domId.get()}
         on:mount={() => {
-          if (
+          const root = document.getElementById(state.domId.peek());
+          if (!root) return;
+          if (animate === "fadeInContainer") {
+            // Animate the whole container for a visible test of Motion
+            try { root.style.opacity = "0"; } catch {}
+            createMotion(root, {
+              opacity: { from: 0, to: 1, duration: 700 },
+              ease: eases.inOutQuad,
+              onComplete: () => { try { root.style.opacity = ""; } catch {} },
+            } as any);
+            setTimeout(() => { try { if (getComputedStyle(root).opacity === "0") root.style.opacity = "1"; } catch {} }, 750);
+          } else if (animate === "fadeUpContainer") {
+            try { root.style.opacity = "0"; } catch {}
+            createMotion(root, {
+              opacity: { from: 0, to: 1, duration: 700 },
+              translateY: { from: 12, to: 0, duration: 700 },
+              ease: eases.inOutQuad,
+              onComplete: () => { try { root.style.opacity = ""; } catch {} },
+            } as any);
+            setTimeout(() => { try { if (getComputedStyle(root).opacity === "0") root.style.opacity = "1"; } catch {} }, 750);
+          } else if (
             animate === "fadeUp" ||
             animate === "fadeIn" ||
             animate === "reveal"
           ) {
-            const root = document.getElementById(state.domId.peek());
             animateLetters(root as HTMLElement, animate, 600, delay || 0);
           }
         }}

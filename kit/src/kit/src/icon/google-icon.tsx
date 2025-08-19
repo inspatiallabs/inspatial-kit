@@ -1,4 +1,5 @@
-import { IconStyle, type IconProps } from "./style.ts";
+import { IconStyle } from "./style.ts";
+import type { IconProps } from "./type.ts";
 import { iss } from "@in/style";
 
 //##############################################(COMPONENT)##############################################//

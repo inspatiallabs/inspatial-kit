@@ -1,7 +1,8 @@
 import { iss } from "@in/style";
 import { createState } from "@in/teract/state";
 import { createMotion } from "@in/motion";
-import { ScrollViewStyle, type ScrollViewProps } from "./style.ts";
+import { ScrollViewStyle } from "./style.ts";
+import type { ScrollViewProps } from "./type.ts";
 import { Slot } from "../slot/index.tsx";
 
 /*################################ (HELPERS) ###############################*/
@@ -65,16 +66,70 @@ function animateIn(
   if (type === "none") return;
   const keyframes: Record<string, any> = {};
   if (type === "fade")
-    keyframes.opacity = { from: 0, to: 1, duration: d, delay: de };
+    keyframes.opacity = {
+      from: 0,
+      to: 1,
+      duration: d,
+      delay: de,
+      composition: "replace",
+    };
   if (type === "fadeUp") {
-    keyframes.opacity = { from: 0, to: 1, duration: d, delay: de };
-    keyframes.translateY = { from: 12, to: 0, duration: d, delay: de };
+    keyframes.opacity = {
+      from: 0,
+      to: 1,
+      duration: d,
+      delay: de,
+      composition: "replace",
+    };
+    keyframes.translateY = {
+      from: 12,
+      to: 0,
+      duration: d,
+      delay: de,
+      composition: "replace",
+    };
   }
   if (type === "scale") {
-    keyframes.opacity = { from: 0, to: 1, duration: d, delay: de };
-    keyframes.scale = { from: 0.95, to: 1, duration: d, delay: de };
+    keyframes.opacity = {
+      from: 0,
+      to: 1,
+      duration: d,
+      delay: de,
+      composition: "replace",
+    };
+    // prefer translateZ(0) for GPU and use transform scale via short-hand x/y to ensure transforms apply visibly
+    keyframes.scale = {
+      from: 0.95,
+      to: 1,
+      duration: d,
+      delay: de,
+      composition: "replace",
+    } as any;
+    // kick a transform layer
+    try {
+      node.style.transform = (node.style.transform || "") + " translateZ(0)";
+    } catch {}
   }
-  createMotion(node, keyframes);
+  try {
+    createMotion(node, {
+      ...keyframes,
+      autoplay: true,
+      // Safety: ensure we end in a visible state even if ticking fails
+      onComplete: () => {
+        try {
+          node.style.opacity = "";
+          node.style.transform = node.style.transform || "";
+        } catch {}
+      },
+    } as any);
+    // Fallback: force visible after duration+delay (in case animation is interrupted)
+    const total = Math.max(0, (de || 0) + (d || 0) + 50);
+    setTimeout(() => {
+      try {
+        if (getComputedStyle(node).opacity === "0") node.style.opacity = "1";
+      } catch {}
+    }, total);
+  } catch {}
 }
 
 /*################################ (COMPONENT) ###############################*/
@@ -84,7 +139,7 @@ export function ScrollView(props: ScrollViewProps) {
     children,
     className,
     $ref,
-    animate = "none", //NOTE: InMotion has a bug so all InMotion animations may cause unexpected behaviour in widgets and components @TODO(benemma): Fix InMotion module
+    animate = "scale", //NOTE: InMotion has a bug so all InMotion animations may cause unexpected behaviour in widgets and components @TODO(benemma): Fix InMotion module
     duration = 400,
     delay = 0,
     preserveChildren,
@@ -95,7 +150,7 @@ export function ScrollView(props: ScrollViewProps) {
   } = props as any;
 
   /*********************************(State)*********************************/
-  const state = (createState as any).in({
+  const state = createState.in({
     initialState: {
       mounted: false,
       domId: "in-scroll-" + Math.random().toString(36).slice(2),

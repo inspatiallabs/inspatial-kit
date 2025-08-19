@@ -1,1 +1,1 @@
-export * from "./image/index.native.tsx";
+export * from "./image/index.ts";

@@ -524,9 +524,10 @@ export class Timer extends InMotionClock {
   resume(): this {
     if (!this.paused) return this;
     this.paused = false;
-    // We can safely imediatly render a timer that has no duration and no children
+    // We can safely immediately render a timer that has no duration and no children
     if (this.duration <= minValue && !this._hasChildren) {
-      tick(this as any, minValue, 0, 0, tickModes.FORCE);
+      // Include delay so the setter renders at its final state even when delayed
+      tick(this as any, this._delay + minValue, 0, 0, tickModes.FORCE);
     } else {
       if (!this._running) {
         // Use type assertion for Engine properties

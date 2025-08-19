@@ -1,4 +1,4 @@
-import { createState } from "@inspatial/kit/state";
+import { createState } from "@in/teract/state";
 
 /*################################(Types)################################*/
 
@@ -14,8 +14,7 @@ export const useTheme = createState.in({
     setDark: { key: "mode", fn: () => "dark" as ThemeModeProps },
     setToggle: {
       key: "mode",
-      fn: (current: ThemeModeProps) =>
-        current === "dark" ? "light" : "dark",
+      fn: (current: ThemeModeProps) => (current === "dark" ? "light" : "dark"),
     },
   },
   storage: {

@@ -1,12 +1,11 @@
-import { GoogleFontProps, PrimitiveFontProps } from "@in/style/font";
-import { createStyle } from "@in/style/variant";
-import type { StyleProps, ITypographyProps } from "@in/style";
+// import { GoogleFontProps, PrimitiveFontProps } from "@in/style/font";
+import { createStyle } from "@in/style";
 
 //##############################################(FONT)##############################################//
 
 const FontVariants = {
-  ...Object.fromEntries(GoogleFontProps.map((font) => [font.name, ""])),
-  ...Object.fromEntries(PrimitiveFontProps.map((font) => [font.name, ""])),
+  // ...Object.fromEntries(GoogleFontProps.map((font) => [font.name, ""])),
+  // ...Object.fromEntries(PrimitiveFontProps.map((font) => [font.name, ""])),
   // Add any additional custom fonts here if needed
 };
 
@@ -32,16 +31,3 @@ export const TypographyStyle = createStyle({
     format: "base",
   },
 });
-
-//##############################################(TYPES)##############################################//
-
-type AnimationStyleType = "none" | "fadeUp" | "fadeIn" | "reveal" | "typing";
-
-export type TypographyProps = StyleProps<typeof TypographyStyle.variant> &
-  JSX.SharedProps &
-  ITypographyProps & {
-    words?: string | string[];
-    duration?: number;
-    delay?: number;
-    animate?: AnimationStyleType;
-  };

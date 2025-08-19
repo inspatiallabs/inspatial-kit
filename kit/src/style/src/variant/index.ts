@@ -556,6 +556,7 @@ function createStyleCore<V extends StyleShapeProp>(
       fill: false,
       stroke: false,
       decoration: false,
+      shadow: false,
     };
     for (const t of userTokens) {
       const fam = t.split(":").pop()?.split("-")?.[0] || "";
@@ -669,7 +670,7 @@ function createStyleCore<V extends StyleShapeProp>(
     // Convert CSS-variable utilities like bg-(--brand), text-(--primary), border-(--surface)/80
     // into generated CSS classes so they work across browsers and avoid relying on Tailwind parsing
     const varUtilRegex =
-      /^(bg|text|border|outline|fill|stroke|decoration)-\((--[a-zA-Z0-9_-]+)\)(?:\/(\d{1,3}))?$/;
+      /^(bg|text|border|outline|fill|stroke|decoration|shadow)-\((--[a-zA-Z0-9_-]+)\)(?:\/(\d{1,3}))?$/;
     const utilToCssProp: Record<string, string> = {
       bg: "backgroundColor",
       text: "color",
@@ -678,13 +679,42 @@ function createStyleCore<V extends StyleShapeProp>(
       fill: "fill",
       stroke: "stroke",
       decoration: "textDecorationColor",
+      shadow: "boxShadow",
     };
 
     const expandedClassParts: string[] = [];
-    const pushToken = (t: string) => {
+    const pushToken = (t: string, fromUser: boolean = false) => {
       if (!t) return;
-      const m = t.match(varUtilRegex);
+      // Support two syntaxes: util-(--var) and util-[var(--var)]
+      const bracketVarUtilRegex =
+        /^(bg|text|border|outline|fill|stroke|decoration|shadow)-\[var\((--[a-zA-Z0-9_-]+)\)\](?:\/(\d{1,3}))?$/;
+      const m1 = t.match(varUtilRegex);
+      const m2 = t.match(bracketVarUtilRegex);
+      const m = m1 || m2;
       if (!m) {
+        // Fallback: allow theme shadow tokens like shadow-hollow, shadow-base, etc.
+        const shadowToken = t.match(/^shadow-([a-zA-Z0-9_-]+)$/);
+        const variableShadowNames = new Set([
+          "base",
+          "effect",
+          "subtle",
+          "hollow",
+          "input",
+          "active",
+          "line",
+          "inn",
+          "prime",
+          "cool",
+        ]);
+        if (shadowToken && variableShadowNames.has(shadowToken[1])) {
+          // Map to var(--shadow-<name>)
+          const cls = __ensureClassForWebStyle(
+            { boxShadow: `var(--shadow-${shadowToken[1]})` },
+            "low"
+          );
+          if (cls) expandedClassParts.push(cls);
+          return;
+        }
         expandedClassParts.push(t);
         return;
       }
@@ -694,17 +724,27 @@ function createStyleCore<V extends StyleShapeProp>(
         expandedClassParts.push(t);
         return;
       }
-      // Skip variant variable token generation if user provided same family classes
-      if (userFamily[util]) return;
-      // Build CSS value using color-mix for opacity if provided
+      // For system-generated tokens, avoid overriding explicit user-provided family utilities
+      if (!fromUser && userFamily[util]) return;
+      // Build CSS value; only color families support opacity mix
+      const colorFamilies = new Set([
+        "bg",
+        "text",
+        "border",
+        "outline",
+        "fill",
+        "stroke",
+        "decoration",
+      ]);
       let value = `var(${cssVar})`;
       const pct = opacity
         ? Math.max(0, Math.min(100, parseInt(opacity, 10)))
         : null;
-      if (pct !== null && !Number.isNaN(pct)) {
+      if (pct !== null && !Number.isNaN(pct) && colorFamilies.has(util)) {
         value = `color-mix(in oklab, var(${cssVar}) ${pct}%, transparent)`;
       }
-      const cls = __ensureClassForWebStyle({ [cssProp]: value }, "low");
+      const spec: "normal" | "low" = colorFamilies.has(util) ? "low" : "normal";
+      const cls = __ensureClassForWebStyle({ [cssProp]: value }, spec);
       if (cls) expandedClassParts.push(cls);
     };
 
@@ -722,8 +762,20 @@ function createStyleCore<V extends StyleShapeProp>(
       for (const token of flatTokens) pushToken(token);
     }
 
-    // Use iss to finalize classes including props.class / props.className (user classes last)
-    const className = iss(expandedClassParts, props?.class, props?.className);
+    // Convert user-provided variable utilities and filter them out of raw classes
+    const filteredUserTokens: string[] = [];
+    for (const token of userTokens) {
+      const beforeLen = expandedClassParts.length;
+      pushToken(token, true);
+      // If token was recognized and converted, skip keeping the raw token
+      if (expandedClassParts.length === beforeLen) {
+        filteredUserTokens.push(token);
+      }
+    }
+    const filteredUserStr = filteredUserTokens.join(" ");
+
+    // Use iss to finalize classes including processed user classes (user classes last)
+    const className = iss(expandedClassParts, filteredUserStr);
     return { className, style: styleOut };
   }
 
