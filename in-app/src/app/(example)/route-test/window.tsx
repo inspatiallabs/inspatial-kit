@@ -1,13 +1,11 @@
 import { $ } from "@inspatial/kit/state";
 import { route } from "../../routes.tsx";
-import { AppMenu } from "../../menu.tsx";
 
 export function RouteTestWindow() {
   const currentPath = $(() => route.get());
 
   return (
     <>
-      <AppMenu />
       <h1>Route API Test</h1>
       <div className="mt-3 p-3 border rounded">
         <div>

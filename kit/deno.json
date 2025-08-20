@@ -128,6 +128,7 @@
     "@in/horizon-os/": "./src/renderer/src/",
     "@in/nativescript/": "./src/renderer/src/",
 
+    "@in/zero": "./src/zero/src/index.ts",
     "@in/zero/": "./src/zero/src/",
 
     "@in/teract/signal/": "./src/signal/src/",

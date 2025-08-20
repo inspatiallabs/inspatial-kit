@@ -53,6 +53,7 @@ export type InputFieldProps = StyleProps<typeof InputFieldStyle> &
       | "pinfield"
       | "urlfield"
       | "locationfield"
+      | "multifield" // multi select
       | "datefield"
       | "timefield"
       | "filefield"
@@ -62,7 +63,6 @@ export type InputFieldProps = StyleProps<typeof InputFieldStyle> &
       | "tag"
       | "joystick"
       | "intelligence"
-      | "multiselect"
       | "counter"
       | "alignbox"
       | "togglegroup"

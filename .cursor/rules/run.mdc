@@ -1449,6 +1449,80 @@ createEffect(() => {
 });
 ```
 
+#### You Might Not Need Effect
+
+Most “do something when the view appears/changes” use‑cases don’t need `createEffect`. Prefer lifecycle trigger props and reactive control‑flow.
+
+- **Probability**: You're most likely to gravitate towards lifecycle trigger props (on:beforeMount/on:mount) in alongside a Control Flow component i.e <Show> on ~85% of your use cases, and most likely less than ~15% `createEffect` (subscriptions, timers, explicit side‑effects).
+
+- What to reach for first
+
+  - Use `on:beforeMount` or `on:mount` on a host element to run lifecycle work.
+  - Use `$(() => ...)` + `Show` to reactively render based on signals/computed state.
+  - Keep all listeners inside the InSpatial trigger system.
+
+- When to use which lifecycle
+
+  - `on:beforeMount`: synchronous during setup. Great when the initial render should already reflect a state flip.
+  - `on:mount`: next tick after first paint. Use when you want post‑paint work.
+  - Nuance: whether the first paint includes a `beforeMount` change depends on renderer timing; it runs during directive setup (synchronously), not deferred.
+
+- When you actually want `createEffect`
+
+  - Subscriptions to signals (e.g., logging, analytics, cross‑state reactions)
+  - Timers/intervals tied to state, with cleanup via `onDispose`
+  - Deriving non‑UI side effects from signals
+
+- Anti‑pattern to avoid
+
+  - Using `createEffect` as a surrogate for lifecycle: it runs immediately on setup and on subsequent signal changes, but it isn’t lifecycle‑bound and may run before mount. Prefer trigger props for mount timing.
+
+- Recipes
+  - Show content after lifecycle without effects
+
+```tsx
+import { createState, $ } from "@inspatial/kit/state";
+import { Stack } from "@inspatial/kit/structure";
+import { Show } from "@inspatial/kit/control-flow";
+
+const ui = createState({ render: false });
+
+<Stack on:beforeMount={() => ui.render.set(true)}>
+  <Show when={$(() => ui.render.get())}>
+    {() => <Text>This is most likely what you should be doing</Text>}
+  </Show>
+</Stack>;
+```
+
+- Reactive branching without effects
+
+```tsx
+import { Show } from "@inspatial/kit/control-flow";
+import { $ } from "@inspatial/kit/state";
+import { useTheme } from "@inspatial/kit/theme";
+
+<Show
+  when={$(() => useTheme.mode.get() === "dark")}
+  otherwise={() => <LightUI />}
+>
+  {() => <DarkUI />}
+</Show>;
+```
+
+- Side‑effect from data (this is where `createEffect` shines)
+
+```tsx
+import { createEffect } from "@inspatial/kit/state";
+
+createEffect(() => {
+  const mode = useTheme.mode.get();
+  console.log("theme:", mode);
+  // Return optional cleanup with onDispose inside, if needed
+});
+```
+
+Bottom line: lifecycle → trigger props; reactivity → `$`/`Show`; subscriptions/side‑effects → `createEffect`.
+
 ### 5. Conditional Classes
 
 ```javascript
@@ -1459,10 +1533,12 @@ createEffect(() => {
 <Button className="btn" class:active={isActive}>
 ```
 
-**Conditionally Rendering Computed Values**
+#### Conditionally Rendering Computed/Reactive Values
+
+##### `Show`
 
 ```typescript
-// ❌  DON'T DO THIS
+// ❌  DON'T DO THIS: It wont react
 <Button on:tap={() => useTheme.action.setToggle()}>
   {$(() =>
     String(useTheme.mode) === "dark" ? <LightModeIcon /> : <DarkModeIcon />
@@ -1482,9 +1558,10 @@ createEffect(() => {
   </Button>
 ```
 
-**Programmatic Switch Statement**
+##### `Choose` - The InSpatial Switch Statement
 
-```javascript
+```typescript
+// ❌  DON'T DO THIS: It wont react
 export function InputField() {
   return (
     <>
@@ -1501,7 +1578,29 @@ export function InputField() {
     </>
   );
 }
+
+// ✅ DO THIS
+import { Choose } from "@inspatial/kit/control-flow"
+export function InputField({ variant }) {
+  return (
+    <>
+    Choose({
+    cases: [
+      { when: $(() => variant.value === "emailfield"), children: EmailField },
+      { when: $(() => variant.value === "searchfield"), children: SearchField },
+    ],
+    otherwise: TextField,
+  });
+   </>
+  )
+}
 ```
+
+#### Difference Between Show & Choose
+
+- Show and Choose are both use to react to conditional values
+- Use `<Show>` where you want to display a binary value e.g [this or that]
+- Use `Choose` where multi-branch logic is desired, [this, this, this and more of those]
 
 ### 6. Complex Reactive Expressions
 
@@ -1634,6 +1733,44 @@ Because InSpatial is a Universal Development Environment (UDE), there are many p
 
 These are primary systems that are intentionally detached from InSpatial Renderer. Universal Apps are omni-platforms and as such we should never assume the environment the user is in. Detaching these concepts create a conflict-free system one that allows for a universal platform.
 
-```
+## First principles: keep it simple, make it reactive
 
-```
+- **If I make everything reactive or computed, do I need to worry about performance?**
+
+  - **Answer**: No.
+  - **Why?**: InSpatial Kit is built for interactivity, so using reactive patterns by default is generally safe and won’t cause noticeable slowdowns.
+
+- **What “reactive” really means**
+
+  - Values remember who cares about them. When a value changes, only the things that depend on it update.
+  - If nothing changes, nothing runs. Idle cost is basically zero.
+
+- **Signals and `$`**
+
+  - Signals are just values you can watch. `$` makes a value that follows other values.
+  - Don’t wrap hard-coded constants in `$`. Use `$` for anything that’s derived from changing state.
+
+- **State**
+
+  - Each field in your state is its own signal. Update one field without waking the whole app.
+  - Batch multiple updates together when you can.
+
+- **UI flow**
+
+  - `Show`: with a plain boolean, it’s just an if/else. With a signal, it updates when that signal changes.
+  - `Choose`: checks cases in order and updates when their conditions change.
+  - `List`: give items a key when lists get big or reorder often.
+
+- **Good defaults**
+
+  - Make things reactive by default.
+  - Hoist reused computeds and handlers out of tight loops.
+  - Use keys for large lists; group multiple updates.
+
+- **When to think twice**
+
+  - Huge lists that constantly reorder → use keys, paginate, or virtualize.
+  - Creating thousands of new computeds per frame → reuse instead of recreating. In other words - avoid unintended tracking and avoid creating lots of new watchers in tight loops.
+
+- **Bottom line**
+  - Reactive-by-default is safe. Work scales with what actually changes, not with app size.

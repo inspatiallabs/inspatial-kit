@@ -1035,14 +1035,27 @@
   * Breakpoints & Containers: Previously `SCREENS` in Tailwind V3 
   * InSpatial Uses Desktop/Window Viewport First Breakpoints (Largest to Smallest) 
   * This replaces Tailwind's Mobile First Breakpoints (Smallest to Largest)
+  * Note: You should only use one of these at a time, not both. We recommend using Mobile-first.
+  * Comment out the one you are not using.
   *===============================================================================*/
-@custom-variant sm (@media (max-width: 640px));
+  
+/* Desktop-first (largest → smallest) */
+/* @custom-variant sm (@media (max-width: 640px));
 @custom-variant md (@media (max-width: 768px));
 @custom-variant lg (@media (max-width: 1024px));
 @custom-variant xl (@media (max-width: 1280px));
 @custom-variant 2xl (@media (max-width: 1535px));
 @custom-variant 3xl (@media (max-width: 1920px));
-@custom-variant 4xl (@media (max-width: 3840px));
+@custom-variant 4xl (@media (max-width: 3840px)); */
+
+/* Mobile-first (smallest → largest) */
+@custom-variant sm (@media (min-width: 640px));
+@custom-variant md (@media (min-width: 768px));
+@custom-variant lg (@media (min-width: 1024px));
+@custom-variant xl (@media (min-width: 1280px));
+@custom-variant 2xl (@media (min-width: 1536px));
+@custom-variant 3xl (@media (min-width: 1920px));
+@custom-variant 4xl (@media (min-width: 3840px));
 
 /*###################################################( BASE )###################################################*/
 
@@ -1069,11 +1082,4 @@
 
 /*###################################################( UTILITIES )###################################################*/
 @layer utilities {
-  .scrollbar-hide {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
-  }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none; /* Chrome, Safari and Opera */
-  }
 }

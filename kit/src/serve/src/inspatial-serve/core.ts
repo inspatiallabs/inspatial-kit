@@ -476,10 +476,18 @@ export class InSpatialServe {
         !path.includes("dist")
     );
 
-    if (relevantFiles.length === 0) return;
+    // Detect asset file changes (images, etc.) under src
+    const assetFiles = event.paths.filter(
+      (path: string) =>
+        /\.(png|jpe?g|gif|svg|webp|avif)$/i.test(path) &&
+        path.includes("/src/") &&
+        !path.includes("dist")
+    );
+
+    if (relevantFiles.length === 0 && assetFiles.length === 0) return;
 
     console.log(
-      `📝 Source files changed: ${relevantFiles
+      `📝 Source files changed: ${[...relevantFiles, ...assetFiles]
         .map((p: string) =>
           p.replace((globalThis as any).Deno?.cwd?.() ?? "", ".")
         )
@@ -499,6 +507,12 @@ export class InSpatialServe {
     const needsCSSForTailwind = relevantFiles.some((file: string) =>
       /\.(ts|tsx|js|jsx)$/.test(file)
     );
+
+    // If only assets changed, notify clients without triggering builds
+    if (!needsJS && !needsCSS && assetFiles.length > 0) {
+      await this.notifyClients();
+      return;
+    }
 
     if (needsJS) {
       this.buildQueue.add("js");
@@ -635,6 +649,36 @@ export class InSpatialServe {
         pathname = "/index.html";
       }
 
+      // Dev asset handler: serve /asset/* from dist first, then src as fallback
+      if (pathname.startsWith("/asset/")) {
+        const safeRel = pathname.replace(/^\/asset\//, "");
+        // Disallow path traversal
+        if (safeRel.includes("..")) {
+          return new Response("400 - Bad Request", { status: 400 });
+        }
+        const tryServe = async (base: string) => {
+          try {
+            const filePath = `${base}/${safeRel}`;
+            const content = await InZero.readFile(filePath);
+            const contentType = this.getContentType(pathname);
+            const headers = new Headers({ "Content-Type": contentType });
+            // Dev cache policy: avoid stale assets during development
+            headers.set("Cache-Control", "no-store");
+            return new Response(content, { headers });
+          } catch {
+            return null;
+          }
+        };
+        // Prefer built assets (parity with production)
+        const fromDist = await tryServe("./dist/asset");
+        if (fromDist) return fromDist;
+        // Fallback to source assets during dev
+        const fromSrc = await tryServe("./src/asset");
+        if (fromSrc) return fromSrc;
+        console.log(`❌ Asset not found: ${pathname}`);
+        return new Response("404 - Asset Not Found", { status: 404 });
+      }
+
       try {
         // Serve from dist directory
         const filePath = `./dist${pathname}`;
@@ -748,6 +792,10 @@ export class InSpatialServe {
         return "image/gif";
       case "svg":
         return "image/svg+xml";
+      case "webp":
+        return "image/webp";
+      case "avif":
+        return "image/avif";
       default:
         return "text/plain";
     }
