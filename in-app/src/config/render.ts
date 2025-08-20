@@ -3,6 +3,7 @@ import { envSupportsFeature } from "@inspatial/kit/vader/env";
 import { InTrigger } from "@inspatial/kit/trigger";
 import { InTheme } from "@inspatial/kit/theme";
 import { InServe } from "@inspatial/kit/serve";
+import { InPresentation } from "@inspatial/kit/presentation";
 import { AppRoutes } from "../app/routes.tsx";
 
 /*################################(Create InSpatial Renderer)################################*/
@@ -10,7 +11,7 @@ import { AppRoutes } from "../app/routes.tsx";
 createRenderer({
   mode: "auto",
   debug: "minimal",
-  extensions: [InServe(), InTrigger(), InTheme()],
+  extensions: [InServe(), InTrigger(), InTheme(), InPresentation()],
 }).then((InSpatial: any) => {
   // Only attempt DOM mount when running in a browser/DOM environment
   if (envSupportsFeature("hasDocument")) {

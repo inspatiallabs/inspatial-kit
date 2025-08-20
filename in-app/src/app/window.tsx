@@ -1,4 +1,5 @@
 import { Stack } from "@inspatial/kit/structure";
+import { PresentationOutlet } from "@inspatial/kit/presentation";
 import { AppMenu } from "./menu.tsx";
 import { Show } from "@inspatial/kit/control-flow";
 import { $ } from "@inspatial/kit/state";
@@ -24,6 +25,7 @@ export function AppWindow() {
           <AuthWindow />
         </Show>
       </Stack>
+      <PresentationOutlet />
     </>
   );
 }

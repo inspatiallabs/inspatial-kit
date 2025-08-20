@@ -3,23 +3,25 @@ import { Button } from "@in/kit/ornament/button/index.native.tsx";
 import { useAuth } from "./state.ts";
 import { InputField } from "@inspatial/kit/input";
 import { GoogleIcon } from "@inspatial/kit/icon";
+import { AppMenu } from "../menu.tsx";
 
 export function AuthWindow() {
   //##############################################(RENDER)##############################################//
 
   return (
     <>
-      <XStack className="relative bg-(--surface) overflow-hidden h-screen w-full xl:p-5 md:px-1 md:py-1">
+    <AppMenu />
+      <XStack className="relative bg-(--surface) shadow-(--shadow-effect) overflow-hidden h-screen w-full">
         {/**Media View**/}
-        <Slot className="w-6/12 h-screen lg:hidden bg-brand md:w-auto flex items-center justify-center">
+        <Slot className="xl:flex w-6/12 h-screen hidden bg-brand items-center justify-center">
           <img
             src="/asset/media.png"
             className="flex justify-center items-center w-full h-screen"
           />
         </Slot>
         {/**Form Widget (Auth)**/}
-        <Slot className="relative flex bg-(--surface) h-full w-6/12 justify-center items-center lg:w-full">
-          <YStack className="w-full h-full items-center justify-center px-24 gap-y-4">
+        <Slot className="relative flex bg-(--surface) h-full w-full justify-center items-center lg:w-6/12 border-b-[8px] border-(--background)">
+          <YStack className="w-full h-full items-center justify-center px-24 gap-y-4 ">
             <Button
               format="outlineSurface"
               size="xl"

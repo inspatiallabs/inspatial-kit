@@ -1033,9 +1033,9 @@
 /*###################################################( BREAKPOINTS )###################################################*/
 /*===============================================================================
   * Breakpoints & Containers: Previously `SCREENS` in Tailwind V3 
-  * InSpatial Uses Desktop/Window Viewport First Breakpoints (Largest to Smallest) 
+  * InSpatial Uses Smallest to Largest `Mobile First` Breakpoints 
   * This replaces Tailwind's Mobile First Breakpoints (Smallest to Largest)
-  * Note: You should only use one of these at a time, not both. We recommend using Mobile-first.
+  * Note: You should only use one of these at a time, not both.
   * Comment out the one you are not using.
   *===============================================================================*/
   

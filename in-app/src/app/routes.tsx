@@ -5,6 +5,7 @@ import { CounterAppWindow } from "./(example)/counter/window.tsx";
 import { ProjectsWindow } from "./(dashboard)/projects/window.tsx";
 import { ErrorWindow } from "./error.tsx";
 import { RouteTestWindow } from "./(example)/route-test/window.tsx";
+import { AuthWindow } from "./(auth)/window.tsx";
 
 /*################################(Route)################################*/
 // Programmatic routing
@@ -12,6 +13,7 @@ export const route = createRoute({
   mode: "auto",
   routes: [
     { name: "home", to: "/", view: AppWindow },
+    { name: "auth", to: "/auth", view: AuthWindow },
     {
       name: "projects",
       to: "/projects",

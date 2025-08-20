@@ -6,5 +6,4 @@ export { Show } from "./show/index.ts";
 export { Choose } from "./choose/index.ts";
 export { lazy } from "./lazy/index.ts";
 export { Parse } from "./parse/index.ts";
-export { createPortal } from "./portal/index.ts";
 export { Render, render } from "./render/index.ts";

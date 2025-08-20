@@ -3,6 +3,7 @@ import { $ } from "@inspatial/kit/state";
 import { Show, List } from "@inspatial/kit/control-flow";
 import { ScrollView } from "@inspatial/kit/structure";
 import { Button } from "@inspatial/kit/ornament";
+import { Modal } from "@inspatial/kit/presentation";
 import {
   useCounter,
   useCounterExplicit,
@@ -155,6 +156,13 @@ export function CounterView() {
           </Show>
           {/* Action Buttons */}
           <div className="flex gap-4 flex-wrap justify-center">
+            {/* Modal demo trigger */}
+            <Button
+              className="bg-zinc-700 p-4 rounded-full text-white font-bold text-lg hover:bg-zinc-800 transition-colors"
+              on:presentation={{ id: "counter-help", action: "toggle" }}
+            >
+              ℹ️ Help
+            </Button>
             <Button
               className="bg-purple-600 p-4 rounded-full text-white font-bold text-lg shadow-lg hover:bg-purple-700 transition-colors"
               on:tap={() => handleTupleDouble()}
@@ -430,6 +438,21 @@ export function CounterView() {
             </div>
           </div>
         </div>
+
+        {/* Modal instance rendered once (global portal handles actual placement) */}
+        <Modal id="counter-help" closeOnEsc closeOnScrim className="z-10000">
+          <div className="p-6 flex flex-col gap-3">
+            <h3 className="text-xl font-semibold">Counter Help</h3>
+            <p className="text-sm opacity-80">
+              Use the buttons to adjust the counter and explore trigger props. This modal is controlled via on:presentation.
+            </p>
+            <div className="flex justify-end">
+              <Button format="outline" on:presentation={{ id: "counter-help", action: "close" }}>
+                Close
+              </Button>
+            </div>
+          </div>
+        </Modal>
       </ScrollView>
     </>
   );

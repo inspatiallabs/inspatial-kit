@@ -22,12 +22,12 @@ export function AppMenu() {
       <Notch className="pointer-events-none absolute w-full top-0 z-50 max-h-[56px] m-auto pr-8" />
 
       <XStack className="pointer-events-auto absolute inset-x-0 top-0 h-[56px] z-[51] flex justify-center items-center space-x-10">
-        <Link to="https://www.inspatial.dev/kit" className="min-w-[48px]">
+        {/* <Link to="https://www.inspatial.dev/kit" className="min-w-[48px]">
           Kit
         </Link>
         <Link to="https://www.inspatial.cloud" className="min-w-[48px]">
           Cloud
-        </Link>
+        </Link> */}
 
         <InSpatialIcon
           on:tap={() => route.to("/")}
@@ -35,7 +35,7 @@ export function AppMenu() {
           className="cursor-pointer"
         />
 
-        <Link
+        {/* <Link
           to="/"
           className={`rounded-full py-[4px] px-[14px] min-w-[48px] ${
             route.get().startsWith("/") && "bg-(--brand)/20 text-(--brand)"
@@ -45,7 +45,7 @@ export function AppMenu() {
         </Link>
         <Link to="https://www.inspatial.store" className="min-w-[48px]">
           Store
-        </Link>
+        </Link> */}
       </XStack>
       <FPS />
       <ThemeController className="absolute bottom-4 left-4 z-100" />
