@@ -5,13 +5,20 @@ import { InTheme } from "@inspatial/kit/theme";
 import { InServe } from "@inspatial/kit/serve";
 import { InPresentation } from "@inspatial/kit/presentation";
 import { AppRoutes } from "../app/routes.tsx";
+import { InCloud } from "@inspatial/kit/cloud";
 
 /*################################(Create InSpatial Renderer)################################*/
 
 createRenderer({
   mode: "auto",
   debug: "minimal",
-  extensions: [InServe(), InTrigger(), InTheme(), InPresentation()],
+  extensions: [
+    InServe(),
+    InTrigger(), // exposes universal and standard trigger
+    InTheme(),
+    InPresentation(), // exposes triggers like on:presentation
+    InCloud({ reconnect: "reload" }), // exposes triggers like on:cloudStatus / on:cloudReconnected
+  ],
 }).then((InSpatial: any) => {
   // Only attempt DOM mount when running in a browser/DOM environment
   if (envSupportsFeature("hasDocument")) {

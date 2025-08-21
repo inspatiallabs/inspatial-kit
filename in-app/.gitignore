@@ -29,3 +29,10 @@ bundle.js.map
 *.njsproj
 *.sln
 *.sw?
+
+# env
+.env
+
+# config
+/src/config
+

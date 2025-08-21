@@ -43,10 +43,10 @@ export interface AppStateProps {
 */
 
 // CREATOR PORTAL MENU PROPERTIES
-export type CreatorPortalModeProps = "Spec" | "Window" | "Scene" | "Cloud";
+export type EditorModeProps = "Spec" | "Window" | "Scene" | "Cloud";
 
-export interface CreatorPortalProps {
+export interface EditorProps {
   // user?: User | null;
-  creatorPortalMode?: CreatorPortalModeProps;
-  setCreatorPortalMode?: (value: CreatorPortalModeProps) => void;
+  editorMode?: EditorModeProps;
+  setEditorMode?: (value: EditorModeProps) => void;
 }

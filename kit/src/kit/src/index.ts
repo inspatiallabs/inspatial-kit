@@ -6,4 +6,5 @@ export * from "./typography/index.ts";
 export * from "./icon/index.ts";
 export * from "./ornament/index.ts";
 export * from "./media/index.ts";
+export * from "./avatar/index.ts";
 // export * from "./widget/index.ts";

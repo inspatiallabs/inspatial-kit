@@ -1,6 +1,4 @@
 import { Stack } from "@inspatial/kit/structure";
-import { PresentationOutlet } from "@inspatial/kit/presentation";
-import { AppMenu } from "./menu.tsx";
 import { Show } from "@inspatial/kit/control-flow";
 import { $ } from "@inspatial/kit/state";
 import { useAuth } from "./(auth)/state.ts";
@@ -10,22 +8,23 @@ import { AuthWindow } from "./(auth)/window.tsx";
 export function AppWindow() {
   return (
     <>
-      <AppMenu />
       <Stack
-        on:beforeMount={() => {
-          const existing = useAuth.user.peek();
-          useAuth.view.value = existing ? "dashboard" : "auth";
-        }}
+        // on:beforeMount={() => {
+        //   const existing = useAuth.user.peek();
+        //     useAuth.view.value = existing ? "dashboard" : "auth";
+        // }}
         className="overflow-hidden h-screen w-screen"
       >
         <Show
-          when={$(() => useAuth.view.peek() === "auth")}
+          when={
+            {}
+            // $(() => useAuth.view.peek() === "auth")
+          }
           otherwise={() => <ProjectsWindow />}
         >
           <AuthWindow />
         </Show>
       </Stack>
-      <PresentationOutlet />
     </>
   );
 }

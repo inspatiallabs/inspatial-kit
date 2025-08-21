@@ -1,4 +1,4 @@
-import { isSignal } from "@in/teract/signal";
+import { isSignal } from "@in/teract/signal/index.ts";
 import { nop } from "@in/vader";
 
 interface DebugInfo {

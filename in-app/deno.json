@@ -73,12 +73,16 @@
     "@in/serve/": "../kit/src/serve/src/",
     "@in/serve": "../kit/src/serve/src/index.ts",
 
+    "@in/cloud/": "../kit/src/cloud/src/",
+    "@in/cloud": "../kit/src/cloud/src/index.ts",
+
     "@in/vader": "../kit/src/vader/src/index.ts",
     "@in/vader/": "../kit/src/vader/src/",
     "@in/vader/env/": "../kit/src/vader/src/env/",
     "@in/vader/env": "../kit/src/vader/src/env/index.ts",
     "@in/vader/debug/": "../kit/src/vader/src/debug/",
     "@in/vader/debug": "../kit/src/vader/src/debug/index.ts",
+    
 
     "@in/style/": "../kit/src/style/src/",
     "@in/style": "../kit/src/style/src/index.ts",
@@ -89,8 +93,6 @@
 
     "@inspatial/app/": "./src/",
 
-    "@inspatial/cloud-client": "jsr:@inspatial/cloud-client@^0.1.28",
-
     "@inspatial/kit": "../kit/src/index.ts",
     "@inspatial/kit/control-flow": "../kit/src/kit/src/control-flow/index.ts",
     "@inspatial/kit/component": "../kit/src/kit/src/component/index.ts",
@@ -100,6 +102,7 @@
     "@inspatial/kit/icon": "../kit/src/kit/src/icon/index.ts",
     "@inspatial/kit/ornament": "../kit/src/kit/src/ornament/index.ts",
     "@inspatial/kit/media": "../kit/src/kit/src/media/index.ts",
+    "@inspatial/kit/avatar": "../kit/src/kit/src/avatar/index.ts",
     "@inspatial/kit/input": "../kit/src/kit/src/input/index.ts",
     "@inspatial/kit/theme": "../kit/src/kit/src/theme/index.ts",
     "@inspatial/kit/presentation": "../kit/src/kit/src/presentation/index.ts",
@@ -120,6 +123,9 @@
     "@inspatial/kit/serve": "../kit/src/serve/src/index.ts",
     "@inspatial/kit/vader": "../kit/src/vader/src/index.ts",
     "@inspatial/kit/vader/env": "../kit/src/vader/src/env/index.ts",
+
+    "@inspatial/kit/cloud": "../kit/src/cloud/src/index.ts",
+    "@inspatial/kit/cloud/": "../kit/src/cloud/src/",
 
     "@tailwindcss/cli": "npm:@tailwindcss/cli@^4.1.11",
     "tailwindcss": "npm:tailwindcss@^4.1.11"

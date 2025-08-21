@@ -1,6 +1,6 @@
+import { env } from "@in/vader/env/index.ts";
+import type { DebugContext } from "@in/vader/debug/index.ts";
 import { removeFromArr } from "@in/vader";
-import { env } from "@in/vader/env";
-import type { DebugContext } from "@in/vader/debug";
 
 // Type definitions
 export type SignalEffectType<T = any> = () => T;

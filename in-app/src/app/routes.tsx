@@ -6,6 +6,7 @@ import { ProjectsWindow } from "./(dashboard)/projects/window.tsx";
 import { ErrorWindow } from "./error.tsx";
 import { RouteTestWindow } from "./(example)/route-test/window.tsx";
 import { AuthWindow } from "./(auth)/window.tsx";
+import { AppMenu } from "./menu.tsx";
 
 /*################################(Route)################################*/
 // Programmatic routing
@@ -31,5 +32,10 @@ export const route = createRoute({
 /*################################(Render)################################*/
 export function AppRoutes() {
   const Selected = route.selected;
-  return () => <Dynamic is={Selected} />;
+  return () => (
+    <>
+      <AppMenu />
+      <Dynamic is={Selected} />
+    </>
+  );
 }

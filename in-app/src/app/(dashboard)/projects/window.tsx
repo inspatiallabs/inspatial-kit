@@ -1,4 +1,4 @@
-import { $ } from "@inspatial/kit/state";
+import { $, createState } from "@inspatial/kit/state";
 import { Carousel } from "@inspatial/kit/navigation";
 import { useTheme } from "@inspatial/kit/theme";
 import { Show } from "@inspatial/kit/control-flow";
@@ -8,6 +8,11 @@ import { Button } from "@inspatial/kit/ornament";
 //##############################################(WINDOW)##############################################//
 
 export function ProjectsWindow() {
+  //*************************(STATE)*************************//
+
+  const useProject = createState({});
+
+  //#########################(RENDER)#########################
   return (
     <>
       <YStack className="w-full items-center">
