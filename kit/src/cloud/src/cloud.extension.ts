@@ -9,7 +9,8 @@ export function InCloud(options?: { reconnect?: ReconnectPolicy }) {
     meta: {
       key: "InCloud",
       name: "InCloud",
-      description: "Cloud API and Live setup with trigger-prop integration",
+      description:
+        "InSpatial Cloud API & InLive setup with trigger-prop integration",
       author: { name: "InSpatial" },
       verified: true,
       price: 0,
@@ -19,8 +20,6 @@ export function InCloud(options?: { reconnect?: ReconnectPolicy }) {
     },
     lifecycle: {
       setup() {
-        // Ensure incloud is initialized by global.ts import side-effects.
-        // Optionally install reconnect policy
         if (options?.reconnect) {
           const policy = options.reconnect;
           incloud.live.onConnectionStatus((status: SocketStatus) => {

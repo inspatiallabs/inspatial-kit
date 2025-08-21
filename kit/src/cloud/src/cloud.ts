@@ -16,7 +16,6 @@ import type {
   SocketStatus,
 } from "jsr:@inspatial/cloud-client/types";
 
-
 /*######################################(INIT)######################################*/
 
 declare global {
@@ -193,10 +192,10 @@ const api = new InCloudClient(`${cloudHost}/api`, {
       console.log(`InCloud: ${options.type}: ${options.message ?? ""}`);
     }
     // Broadcast to UI via cloudNotify trigger
-    const entries = Array.from(__cloudNotifyCallbacks.entries());
+    const entries = Array.from(cloudNotifyCallbacks.entries());
     for (const [el, cb] of entries) {
       if (!(el as any).isConnected) {
-        __cloudNotifyCallbacks.delete(el);
+        cloudNotifyCallbacks.delete(el);
         continue;
       }
       try {
@@ -229,18 +228,18 @@ try {
 /*######################################(Cloud Triggers)######################################*/
 // Register trigger-prop handlers so UI can subscribe via on:cloudStatus / on:cloudReconnected
 type StatusCb = (info: { type: "cloudStatus"; status: string }) => void;
-const __cloudStatusCallbacks = new Map<Element, StatusCb>();
-const __cloudReconnectedCallbacks = new Map<Element, () => void>();
-let __cloudStatusListenerId: string | null = null;
+const cloudStatusCallbacks = new Map<Element, StatusCb>();
+const cloudReconnectedCallbacks = new Map<Element, () => void>();
+let cloudStatusListenerId: string | null = null;
 
-function __ensureCloudStatusSubscription(): void {
-  if (__cloudStatusListenerId) return;
-  __cloudStatusListenerId = incloud.live.onConnectionStatus(
+function ensureCloudStatusSubscription(): void {
+  if (cloudStatusListenerId) return;
+  cloudStatusListenerId = incloud.live.onConnectionStatus(
     (status: SocketStatus) => {
-      const entries = Array.from(__cloudStatusCallbacks.entries());
+      const entries = Array.from(cloudStatusCallbacks.entries());
       for (const [el, cb] of entries) {
         if (!(el as any).isConnected) {
-          __cloudStatusCallbacks.delete(el);
+          cloudStatusCallbacks.delete(el);
           continue;
         }
         try {
@@ -250,10 +249,10 @@ function __ensureCloudStatusSubscription(): void {
         }
       }
       if (status === "reconnected") {
-        const rEntries = Array.from(__cloudReconnectedCallbacks.entries());
+        const rEntries = Array.from(cloudReconnectedCallbacks.entries());
         for (const [el, rcb] of rEntries) {
           if (!(el as any).isConnected) {
-            __cloudReconnectedCallbacks.delete(el);
+            cloudReconnectedCallbacks.delete(el);
             continue;
           }
           try {
@@ -264,12 +263,12 @@ function __ensureCloudStatusSubscription(): void {
         }
       }
       if (
-        __cloudStatusCallbacks.size === 0 &&
-        __cloudReconnectedCallbacks.size === 0 &&
-        __cloudStatusListenerId
+        cloudStatusCallbacks.size === 0 &&
+        cloudReconnectedCallbacks.size === 0 &&
+        cloudStatusListenerId
       ) {
-        incloud.live.removeConnectionStatusListener(__cloudStatusListenerId);
-        __cloudStatusListenerId = null;
+        incloud.live.removeConnectionStatusListener(cloudStatusListenerId);
+        cloudStatusListenerId = null;
       }
     }
   );
@@ -277,10 +276,10 @@ function __ensureCloudStatusSubscription(): void {
 
 createTrigger("cloudStatus", (node: Element, val: any) => {
   if (!val) return;
-  __ensureCloudStatusSubscription();
+  ensureCloudStatusSubscription();
   const cb = isSignal(val) ? val.peek() : val;
   if (typeof cb === "function") {
-    __cloudStatusCallbacks.set(node, cb as StatusCb);
+    cloudStatusCallbacks.set(node, cb as StatusCb);
     // Immediately emit current status so UIs don't get stuck at initial value
     try {
       const current = (incloud.live as any)?.status as string | undefined;
@@ -295,25 +294,29 @@ createTrigger("cloudStatus", (node: Element, val: any) => {
 
 createTrigger("cloudReconnected", (node: Element, val: any) => {
   if (!val) return;
-  __ensureCloudStatusSubscription();
+  ensureCloudStatusSubscription();
   const original = isSignal(val) ? val.peek() : val;
   if (typeof original === "function") {
-    __cloudReconnectedCallbacks.set(node, original as () => void);
+    cloudReconnectedCallbacks.set(node, original as () => void);
   }
 });
 
 // Notification trigger
-type NotifyCb = (info: { type: string; title?: string; message: string }) => void;
-const __cloudNotifyCallbacks = new Map<Element, NotifyCb>();
+type NotifyCb = (info: {
+  type: string;
+  title?: string;
+  message: string;
+}) => void;
+const cloudNotifyCallbacks = new Map<Element, NotifyCb>();
 createTrigger("cloudNotify", (node: Element, val: any) => {
   if (!val) return;
   const cb = isSignal(val) ? val.peek() : val;
   if (typeof cb === "function") {
-    __cloudNotifyCallbacks.set(node, cb as NotifyCb);
+    cloudNotifyCallbacks.set(node, cb as NotifyCb);
   }
 });
 
-/*######################################(EXPORT)######################################*/
+/*######################################(RE-EXPORT)######################################*/
 export { Currencies, MimeTypes };
 /**
  * Synthetic alias for incloud

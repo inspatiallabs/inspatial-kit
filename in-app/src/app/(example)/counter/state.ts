@@ -1,14 +1,4 @@
 import { createState, createStorage, createAction } from "@inspatial/kit/state";
-// import { cloud } from "@inspatial/app/api/inspatial-cloud.api.ts";
-
-// ########################## (CLOUD) ##########################
-
-// const systemAdmins = cloud.auth.login("admin@user.com", "password").then(
-//   (user: unknown) => {
-//     console.log(user);
-//     return cloud.entry.getEntryList("user")
-//   }
-// );
 
 // ########################## (STATE & TRIGGERS) ##########################
 export interface EntryProps {

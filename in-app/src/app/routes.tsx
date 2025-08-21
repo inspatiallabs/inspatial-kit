@@ -7,14 +7,16 @@ import { ErrorWindow } from "./error.tsx";
 import { RouteTestWindow } from "./(example)/route-test/window.tsx";
 import { AuthWindow } from "./(auth)/window.tsx";
 import { AppMenu } from "./menu.tsx";
+import { AccountView } from "./(auth)/account.tsx";
 
 /*################################(Route)################################*/
 // Programmatic routing
 export const route = createRoute({
-  mode: "auto",
+  mode: "spa",
   routes: [
     { name: "home", to: "/", view: AppWindow },
     { name: "auth", to: "/auth", view: AuthWindow },
+    { name: "account", to: "/account", view: AccountView },
     {
       name: "projects",
       to: "/projects",

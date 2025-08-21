@@ -4,6 +4,7 @@ import { useAuth } from "./state.ts";
 import { InputField } from "@inspatial/kit/input";
 import { GoogleIcon } from "@inspatial/kit/icon";
 import { AppMenu } from "../menu.tsx";
+import { Image } from "@inspatial/kit/media";
 
 export function AuthWindow() {
   //##############################################(RENDER)##############################################//
@@ -14,7 +15,7 @@ export function AuthWindow() {
       <XStack className="relative bg-(--surface) shadow-(--shadow-effect) overflow-hidden h-screen w-full">
         {/**Media View**/}
         <Slot className="xl:flex w-6/12 h-screen hidden bg-brand items-center justify-center">
-          <img
+          <Image
             src="/asset/media.png"
             className="flex justify-center items-center w-full h-screen"
           />
