@@ -1,5 +1,5 @@
-import { iss } from "@in/style";
-import { ButtonStyle, type ButtonProps } from "./style.ts";
+import { ButtonStyle } from "./style.ts";
+import type { ButtonProps } from "./type.ts";
 import { Slot } from "../../structure/slot/index.tsx";
 import { LoadingIcon } from "../../icon/loading-icon.tsx";
 

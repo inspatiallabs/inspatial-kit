@@ -1,5 +1,6 @@
 import { createStyle } from "@in/style";
 
+/*###################################(CREATE STYLE)###################################*/
 export const AvatarStyle = createStyle({
   base: [
     "rounded-full overflow-hidden bg-(--surface) text-(--primary)",
@@ -25,5 +26,3 @@ export const AvatarStyle = createStyle({
     status: "offline",
   },
 });
-
-

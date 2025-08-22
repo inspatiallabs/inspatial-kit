@@ -1,7 +1,7 @@
 import { Slot } from "../../structure/slot/index.tsx";
-import { $ } from "@in/teract/signal/signal.ts";
+import { $, createEffect } from "@in/teract/state";
 import { PresentationRegistry } from "../registry.ts";
-import { iss } from "@in/style/index.ts";
+import { presentationStyle } from "../style.ts";
 
 export interface ModalProps extends JSX.SharedProps {
   id: string;
@@ -23,21 +23,7 @@ export function Modal(props: ModalProps) {
     children,
     ...rest
   } = props as any;
-  console.log(
-    "[Modal] Rendering with id:",
-    id,
-    "open:",
-    open,
-    "defaultOpen:",
-    defaultOpen
-  );
   const sig = PresentationRegistry.getSignal(id);
-  console.log(
-    "[Modal] Got signal:",
-    sig,
-    "is it a Signal?",
-    sig && typeof sig.get === "function"
-  );
 
   // Only set initial value if explicitly provided
   if (open !== undefined) {
@@ -51,41 +37,75 @@ export function Modal(props: ModalProps) {
     sig.value = true;
   }
 
+  let modalRef: HTMLElement | null = null;
+
   function onKeydown(e: any) {
-    if (closeOnEsc && e?.key === "Escape")
+    if (closeOnEsc && e?.key === "Escape") {
+      e.preventDefault();
+      e.stopPropagation();
       PresentationRegistry.setOpen(id, false);
+    }
   }
 
-  const classes = iss(
-    "fixed inset-0 m-auto max-w-[min(90vw,640px)] max-h-[80vh] rounded-lg bg-red-500 text-(--primary) shadow-(--shadow-effect)",
-    className
-  );
+  // Focus modal when it opens and add global escape listener
+  createEffect(() => {
+    const isOpen = sig.get();
+    if (isOpen) {
+      // Focus the modal
+      if (modalRef) {
+        // Small delay to ensure DOM is ready
+        setTimeout(() => {
+          modalRef?.focus();
+        }, 10);
+      }
+
+      // Add global escape listener as fallback
+      const handleGlobalKeydown = (e: KeyboardEvent) => {
+        if (closeOnEsc && e.key === "Escape") {
+          e.preventDefault();
+          PresentationRegistry.setOpen(id, false);
+        }
+      };
+
+      document.addEventListener("keydown", handleGlobalKeydown);
+
+      return () => {
+        document.removeEventListener("keydown", handleGlobalKeydown);
+      };
+    }
+  });
 
   // Create a computed that returns the modal content or null
   const modalContent = $(() => {
     const isOpen = sig.get();
-    console.log("[Modal] Computing modal content, isOpen:", isOpen);
-
     if (!isOpen) return null;
 
     return (
       <>
-        {/* Scrim */}
         <Slot
-          className="fixed inset-0 bg-black/40 z-[9999]"
+          className="fixed inset-0 bg-black/40 pointer-events-auto"
+          style:z-index="2147483646"
           on:tap={() => closeOnScrim && PresentationRegistry.setOpen(id, false)}
-          style={{ web: { pointerEvents: "auto" } }}
         />
-        {/* Modal content */}
+        {/* Centering wrapper */}
         <Slot
-          role="dialog"
-          aria-modal
-          className={iss(classes, "z-[10000]")}
-          on:keydown={onKeydown}
-          style={{ web: { pointerEvents: "auto" } }}
-          {...rest}
+          className="fixed inset-0 flex items-center justify-center pointer-events-none"
+          style:z-index="2147483647"
         >
-          {children}
+          {/* Modal panel */}
+          <Slot
+            role="dialog"
+            aria-modal
+            className={`${presentationStyle.getStyle({
+              className,
+            })} pointer-events-auto`}
+            $ref={(el: any) => (modalRef = el)}
+            on:keydown={onKeydown}
+            tabIndex={0}
+            {...rest}
+          >
+            {children}
+          </Slot>
         </Slot>
       </>
     );

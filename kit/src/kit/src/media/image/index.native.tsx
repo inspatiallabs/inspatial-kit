@@ -17,7 +17,6 @@ export function Image(props: ImageProps) {
     fetchPriority,
     crossOrigin,
     referrerPolicy,
-    // Keep style knobs for class generation
     fit,
     radius,
     aspect,

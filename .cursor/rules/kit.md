@@ -1,4 +1,5 @@
 # InSpatial Kit
+
 InSpatial Kit is based on InSpatial's own signal reactive primitives `@in/teract`. InSpatial sematically shares sytax with the likes of React, SolidJS and Preact.
 
 InSpatial Kit is the Framework Runtime for InSpatial universal renderer `@in/renderer` which targets all platforms with support for multiple templating e.g JSX.
@@ -90,15 +91,13 @@ Built on top the universal runtime
 
 ### 3. Widgets & Components
 
-#### Widgets/High Level Primitives (HLP)
-
 A Widget is a high-level primitive. It simple terms a widget contains multiple components. e.g an <InputField> has different variants of components i.e <TextField>, <NumberField> etc...
 
 NOTE: Only high-level primitives (such as Input, Ornament, Presentation, etc.) support `variants`. Each variant/children can have multiple `formats`, which act as sub-variants.
 
-##### Structure
+### Control Flow
 
-A Strcuture component is a function `(props, ...children) => Node`. The inner function receives the renderer `R`.
+Control flows allow you to...
 
 - **Structure & Control Flow Components:**
   _ `<Show when={signal}>`: Conditional rendering. Supports `true` and `else` props. For one-off static conditions, you can use inline typescript to return the desired branch directly just like in React(but will not have reactivity).
@@ -108,7 +107,22 @@ A Strcuture component is a function `(props, ...children) => Node`. The inner fu
   _ `<Dynamic is={componentOrTag}>`: Renders a component or HTML tag that can change dynamically.
   _ `<Fn ctx={value} catch={errorHandler}>`: Executes a function that returns a render function, useful for complex logic with error boundaries. \* **List Management:** Use `List` component's exposed methods (`getItem()`, `remove()`, `clear()`) for imperative list manipulation when needed.
 
-###### `<ScrollView>`
+- **`$ref`:** Special prop to get a reference to a DOM element or component instance (as a signal or function). **Critical for hot reload in dev mode:** always use `$ref` for component references, not `createComponent()` return values.
+- **`expose()`:** Allows child components to expose properties/methods to their parent via `$ref`.
+- **`capture()`:** Captures the current rendering context, useful for running functions (e.g., `expose()`) after `await` calls in async components.
+- **Importing:** All built-in components can be imported directly from package `InSpatial`
+- **`createComponent(template, props?, ...children)`:** Creates component instances
+  **`renderer.render(container, component, props, ...children)`:** Renders a component into a container, with optional props and children.
+  **`dispose(instance)`:** Cleans up component resources
+  **`getCurrentSelf()`:** Gets current component instance
+  **`snapshot()`:** Creates context snapshots for async operations
+- **JSX Children in Control Flow Components:** When using components like `<Show>` and `<List>`, ensure their render function children return either a _single root element_ or a `Fragment` (`<>...</>`) if rendering multiple sibling elements. This prevents unexpected rendering issues.
+
+### Structure
+
+A Structure is for...
+
+#### `<ScrollView>`
 
 By default, InSpatial apps display content at the maximum width and height of the viewport, so scrolling and scrollbars are not enabled automatically. The `ScrollView` structure component provides scrolling functionality when needed. It offers properties to show or hide the scrollbar, select different scrollbar variants, and supports animating its children with various `InMotion` effects and animations.
 
@@ -145,16 +159,61 @@ By default, InSpatial apps display content at the maximum width and height of th
 <ScrollView scrollbar scrollbarTheme="gradient">...</ScrollView>
 ```
 
-- **`$ref`:** Special prop to get a reference to a DOM element or component instance (as a signal or function). **Critical for hot reload in dev mode:** always use `$ref` for component references, not `createComponent()` return values.
-- **`expose()`:** Allows child components to expose properties/methods to their parent via `$ref`.
-- **`capture()`:** Captures the current rendering context, useful for running functions (e.g., `expose()`) after `await` calls in async components.
-- **Importing:** All built-in components can be imported directly from package `InSpatial`
-- **`createComponent(template, props?, ...children)`:** Creates component instances
-  **`renderer.render(container, component, props, ...children)`:** Renders a component into a container, with optional props and children.
-  **`dispose(instance)`:** Cleans up component resources
-  **`getCurrentSelf()`:** Gets current component instance
-  **`snapshot()`:** Creates context snapshots for async operations
-- **JSX Children in Control Flow Components:** When using components like `<Show>` and `<List>`, ensure their render function children return either a _single root element_ or a `Fragment` (`<>...</>`) if rendering multiple sibling elements. This prevents unexpected rendering issues.
+### Presentation
+
+#### Modal
+
+```typescript
+import { Modal } from "@inspatial/kit/presentation";
+import { YStack } from "@inspatial/kit/structure";
+import { Text } from "@inspatial/kit/typography";
+import { Button } from "@inspatial/kit/ornament";
+
+<Modal
+  id="counter-modal"
+  closeOnEsc
+  closeOnScrim
+  className="flex justify-center items-center h-screen w-screen m-auto"
+>
+  <YStack className="p-6 gap-3 w-[500px] h-[500px] bg-(--brand) rounded-3xl shadow-effect">
+    <Text className="text-xl font-semibold">Title</Text>
+    <Text>
+      Use the buttons to adjust the counter and explore trigger props. This
+      modal is controlled via on:presentation.
+    </Text>
+    <Button
+      format="outline"
+      on:presentation={{ id: "counter-modal", action: "close" }}
+    >
+      Close
+    </Button>
+  </YStack>
+</Modal>;
+```
+
+#### Portals
+
+Uses the Presentation Portals `Inlet/Outlet` to render components outside their original DOM hierarchy.
+
+```typescript
+import {
+  PresentationInlet,
+  PresentationOutlet,
+  Modal
+} from "@inspatial/kit/presentation";
+
+<Modal>
+  {/* The Presentation Outlet displays content provided by the Inlet */}
+  <PresentationOutlet fallback={() => <Text>Hello World</Text>} />
+</Modal>;
+
+{
+  /* The Presentation Inlet sends its children to be rendered by the Outlet */
+}
+<PresentationInlet>
+  <Text>Render on the modal</Text>
+</PresentationInlet>;
+```
 
 **6. InSpatial Styling:**
 InSpatial Style Sheet (ISS) or `@inspatial/style` is built on InSpatial's `@in/style`module a variant based styling engine largely inspired by Stiches.
@@ -218,20 +277,27 @@ className={{
 />
 ```
 
-#### Styling Alternative (Not-recommended)
+#### Lazy Styling (Alternative)
 
-Styling can also be done by calling multiple style props e.g
+Lazy styling allows you to pass multiple style prop in a single component
+Styling can also be done by calling multiple direct style props e.g
 
 ```typescript
-// ❌  DON'T DO THIS
+// ❌  DON'T DO THIS: Anti-Pattern but works
 <Component
   style:color="black"
   style:background-color="yellow"
   style:font-size="20px"
+  style:z-index="2147483646"
 />
 ```
 
-Even though this is an option it forgoes the unviversal mental model of InSpatial because it treats and assumes that you are only operating in the context of the web also it creates a new type of anti-pattern where you are parsing the same prop more than once within a sing component.
+While this approach is available, it should mainly be used as an "escape hatch" for special cases. Using multiple direct style props assumes you are only targeting the web, lacks types-safety and can lead to anti-patterns such as parsing the same prop multiple times within a single component. Prefer the standard reactive style and className patterns for most use cases. If you choose to use this pattern only use it for one style prop e.g
+
+```typescript
+// ✅ DO THIS
+<Componen style:z-index="2147483646" />
+```
 
 - **Styling Dynamic Elements:** For dynamically styled elements, leverage InSpatial's browser preset capabilities for conditional classes (`class:active={signal}`) and inline styles (`style:property={value}`) to ensure styles update correctly with state changes. \* \*\*Soon...
 
@@ -575,6 +641,48 @@ Use the extensive signal operation methods (`.and()`, `.eq()`, `.gt()`, etc.) fo
   While `.get()` is the default appended value you can opt out because `.get()` assumes your function is reactive by default and that may not always be the case, if this is not the case and you want to avoid tracking or create dependencies in imperative `.set()` calls, then use `.peek()`. Also don't be a stranger and utilize all the other available interactive signal operators at your disposal for their appropriate use case.
 
 NOTE: hasValue returns plain boolean. Returns true when the value of the signal is not nullish.
+
+#### First principles: keep it simple, make it reactive
+
+- **If I make everything reactive or computed, do I need to worry about performance?**
+
+  - **Answer**: No.
+  - **Why?**: InSpatial Kit is built for interactivity, so using reactive patterns by default is generally safe and won’t cause noticeable slowdowns.
+
+- **What “reactive” really means**
+
+  - Values remember who cares about them. When a value changes, only the things that depend on it update.
+  - If nothing changes, nothing runs. Idle cost is basically zero.
+
+- **Signals and `$`**
+
+  - Signals are just values you can watch. `$` makes a value that follows other values.
+  - Don’t wrap hard-coded constants in `$`. Use `$` for anything that’s derived from changing state.
+
+- **State**
+
+  - Each field in your state is its own signal. Update one field without waking the whole app.
+  - Batch multiple updates together when you can.
+
+- **UI flow**
+
+  - `Show`: with a plain boolean, it’s just an if/else. With a signal, it updates when that signal changes.
+  - `Choose`: checks cases in order and updates when their conditions change.
+  - `List`: give items a key when lists get big or reorder often.
+
+- **Good defaults**
+
+  - Make things reactive by default.
+  - Hoist reused computeds and handlers out of tight loops.
+  - Use keys for large lists; group multiple updates.
+
+- **When to think twice**
+
+  - Huge lists that constantly reorder → use keys, paginate, or virtualize.
+  - Creating thousands of new computeds per frame → reuse instead of recreating. In other words - avoid unintended tracking and avoid creating lots of new watchers in tight loops.
+
+- **Bottom line**
+  - Reactive-by-default is safe. Work scales with what actually changes, not with app size.
 
 ### 5. InSpatial State (@inspatial/kit/state)
 
@@ -1726,52 +1834,28 @@ const templateUrl = t`https://inspatial.store/template?id=${s.templateId}`;
 
 ## Footguns, Anti-Patterns & Conflicts
 
-Because InSpatial is a Universal Development Environment (UDE), there are many patterns developers are traditionally accustomed to that are now considered Anti-Patterns. These Anti-patterns sually stem from three core concept that are historically baked into frameworks. They include:
+### Anti-Patterns
+
+These are practices that work, but they bend or break the expected mental model of the framework. They don’t necessarily cause harm, and in some cases they can serve as “escape hatches.” The problem is that they disrupt the natural flow and conventions of the system, making things harder to reason about in the long run.
+
+### Footguns
+
+These are not just bad habits they’re dangerous. A footgun is something that will blow your leg off if you try to use it. They are inherently unsafe, unpredictable, and should never be considered—even as escape hatches. In other words: don’t do it, ever.
+
+### Conflicts
+
+Conflicts happen when two otherwise valid approaches or features clash with one another inside the framework. They may both be correct in isolation, but together they break assumptions, introduce ambiguity, or cause unexpected behavior. Understanding and resolving these conflicts is part of learning the “grammar” of the system.
+
+Because InSpatial is a Universal Development Environment (UDE), many patterns that developers are used to in traditional frameworks naturally turn into conflicts here.
+
+Most of these conflicts stem from three core concepts historically baked into frameworks:
 
 - Styling
 - Triggers
 - Motion
 
-These are primary systems that are intentionally detached from InSpatial Renderer. Universal Apps are omni-platforms and as such we should never assume the environment the user is in. Detaching these concepts create a conflict-free system one that allows for a universal platform.
+InSpatial intentionally detaches these systems from the renderer. Why? Because Universal Apps are omni-platform by design. We can’t (and shouldn’t) assume which environment a user is in—web, mobile, XR, or beyond.
 
-## First principles: keep it simple, make it reactive
+By decoupling styling, triggers, and motion from the rendering layer, InSpatial avoids environment-specific assumptions and eliminates the hidden clashes that arise when a single platform’s conventions are forced into a universal context.
 
-- **If I make everything reactive or computed, do I need to worry about performance?**
-
-  - **Answer**: No.
-  - **Why?**: InSpatial Kit is built for interactivity, so using reactive patterns by default is generally safe and won’t cause noticeable slowdowns.
-
-- **What “reactive” really means**
-
-  - Values remember who cares about them. When a value changes, only the things that depend on it update.
-  - If nothing changes, nothing runs. Idle cost is basically zero.
-
-- **Signals and `$`**
-
-  - Signals are just values you can watch. `$` makes a value that follows other values.
-  - Don’t wrap hard-coded constants in `$`. Use `$` for anything that’s derived from changing state.
-
-- **State**
-
-  - Each field in your state is its own signal. Update one field without waking the whole app.
-  - Batch multiple updates together when you can.
-
-- **UI flow**
-
-  - `Show`: with a plain boolean, it’s just an if/else. With a signal, it updates when that signal changes.
-  - `Choose`: checks cases in order and updates when their conditions change.
-  - `List`: give items a key when lists get big or reorder often.
-
-- **Good defaults**
-
-  - Make things reactive by default.
-  - Hoist reused computeds and handlers out of tight loops.
-  - Use keys for large lists; group multiple updates.
-
-- **When to think twice**
-
-  - Huge lists that constantly reorder → use keys, paginate, or virtualize.
-  - Creating thousands of new computeds per frame → reuse instead of recreating. In other words - avoid unintended tracking and avoid creating lots of new watchers in tight loops.
-
-- **Bottom line**
-  - Reactive-by-default is safe. Work scales with what actually changes, not with app size.
+**The result:** a conflict-free system that enables truly universal applications.

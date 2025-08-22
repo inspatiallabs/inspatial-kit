@@ -1,7 +1,7 @@
 // deno-lint-ignore-file
 import { $ } from "@inspatial/kit/state";
 import { Show, List } from "@inspatial/kit/control-flow";
-import { ScrollView } from "@inspatial/kit/structure";
+import { ScrollView, Slot, XStack, YStack } from "@inspatial/kit/structure";
 import { Button } from "@inspatial/kit/ornament";
 import { Modal } from "@inspatial/kit/presentation";
 import {
@@ -51,9 +51,34 @@ export function CounterView() {
 
   return (
     <>
+      {/* Modal instance rendered once (global portal handles actual placement) */}
+
+      <Modal
+        id="counter-modal"
+        closeOnEsc
+        closeOnScrim
+        className="flex justify-center items-center h-screen w-screen m-auto"
+      >
+        <YStack className="p-6 gap-3 w-[500px] h-[500px] bg-(--brand) rounded-3xl shadow-effect">
+          <Text className="text-xl font-semibold">Counter Help</Text>
+          <Text>
+            Use the buttons to adjust the counter and explore trigger props.
+            This modal is controlled via on:presentation.
+          </Text>
+          <Slot className="flex justify-end">
+            <Button
+              format="outline"
+              on:presentation={{ id: "counter-modal", action: "close" }}
+            >
+              Close
+            </Button>
+          </Slot>
+        </YStack>
+      </Modal>
+
       <ScrollView>
-        <div className="flex flex-col h-screen justify-center items-center gap-10">
-          <h1 className="text-yellow-500 text-8xl">🚀 InSpatial App</h1>
+        <div className="flex flex-col justify-center items-center gap-10">
+          <h1 className="text-yellow-500 text-8xl">🚀 Counter</h1>
           <div className="max-w-2xl">
             <List each={useCounter.entries} track="id">
               {(entry: EntryProps) => (
@@ -159,9 +184,9 @@ export function CounterView() {
             {/* Modal demo trigger */}
             <Button
               className="bg-zinc-700 p-4 rounded-full text-white font-bold text-lg hover:bg-zinc-800 transition-colors"
-              on:presentation={{ id: "counter-help", action: "toggle" }}
+              on:presentation={{ id: "counter-modal", action: "toggle" }}
             >
-              ℹ️ Help
+              Open Modal
             </Button>
             <Button
               className="bg-purple-600 p-4 rounded-full text-white font-bold text-lg shadow-lg hover:bg-purple-700 transition-colors"
@@ -438,21 +463,6 @@ export function CounterView() {
             </div>
           </div>
         </div>
-
-        {/* Modal instance rendered once (global portal handles actual placement) */}
-        <Modal id="counter-help" closeOnEsc closeOnScrim className="z-10000">
-          <div className="p-6 flex flex-col gap-3">
-            <h3 className="text-xl font-semibold">Counter Help</h3>
-            <p className="text-sm opacity-80">
-              Use the buttons to adjust the counter and explore trigger props. This modal is controlled via on:presentation.
-            </p>
-            <div className="flex justify-end">
-              <Button format="outline" on:presentation={{ id: "counter-help", action: "close" }}>
-                Close
-              </Button>
-            </div>
-          </div>
-        </Modal>
       </ScrollView>
     </>
   );

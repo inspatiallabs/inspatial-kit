@@ -12,7 +12,7 @@ import { AccountView } from "./(auth)/account.tsx";
 /*################################(Route)################################*/
 // Programmatic routing
 export const route = createRoute({
-  mode: "spa",
+  mode: "auto",
   routes: [
     { name: "home", to: "/", view: AppWindow },
     { name: "auth", to: "/auth", view: AuthWindow },

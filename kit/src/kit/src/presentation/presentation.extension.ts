@@ -1,6 +1,5 @@
 import { createExtension } from "@in/extension/index.ts";
 import { envSupportsFeature } from "@in/vader/env/index.ts";
-import { PresentationRegistry } from "./registry.ts";
 import { registerPresentationTrigger } from "./trigger.ts";
 
 export function InPresentation(opts?: { zIndex?: number }) {
@@ -30,5 +29,3 @@ export function InPresentation(opts?: { zIndex?: number }) {
     },
   });
 }
-
-

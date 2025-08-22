@@ -1,5 +1,5 @@
 import { createState, $ } from "@inspatial/kit/state";
-import { Avatar } from "@inspatial/kit/avatar";
+import { Avatar } from "@inspatial/kit/ornament";
 import { Slot, YStack } from "@inspatial/kit/structure";
 import { Text } from "@inspatial/kit/typography";
 import { useAuth } from "./state.ts";

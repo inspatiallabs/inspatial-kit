@@ -1,6 +1,7 @@
 import { Slot } from "../../structure/slot/index.tsx";
 import { iss } from "@in/style";
-import { NotchStyle, type NotchProps } from "./style.ts";
+import { NotchStyle } from "./style.ts";
+import type { NotchProps } from "./type.ts";
 
 //##############################################(COMPONENT)##############################################//
 export function Notch(props: NotchProps) {

@@ -102,7 +102,6 @@
     "@inspatial/kit/icon": "../kit/src/kit/src/icon/index.ts",
     "@inspatial/kit/ornament": "../kit/src/kit/src/ornament/index.ts",
     "@inspatial/kit/media": "../kit/src/kit/src/media/index.ts",
-    "@inspatial/kit/avatar": "../kit/src/kit/src/avatar/index.ts",
     "@inspatial/kit/input": "../kit/src/kit/src/input/index.ts",
     "@inspatial/kit/theme": "../kit/src/kit/src/theme/index.ts",
     "@inspatial/kit/presentation": "../kit/src/kit/src/presentation/index.ts",
