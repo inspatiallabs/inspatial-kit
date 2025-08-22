@@ -408,6 +408,7 @@ export function InDOMTriggerProps(): void {
 export type InUniversalTriggerPropsType =
   | "tap"
   | "longpress"
+  | "escape"
   | "mount"
   | "route"
   | "beforeMount"
@@ -486,17 +487,15 @@ function DOMBeforeMountHandler(): TriggerPropHandler<MaybeSignalHandler> {
   };
 }
 
-let __ROUTE_EVENT_NAME: string | null = null;
-let __routeDocListener: ((ev: Event) => void) | null = null;
-const __routeCallbacks = new Map<Element, AnyEventHandler>();
+let ROUTE_EVENT_NAME: string | null = null;
+let routeDocListener: ((ev: Event) => void) | null = null;
+const routeCallbacks = new Map<Element, AnyEventHandler>();
 
 function DOMRouteHandler(): TriggerPropHandler<MaybeSignalHandler> {
   return function (node: Element, val: MaybeSignalHandler): void {
     if (!node || !val) return;
-    __ROUTE_EVENT_NAME =
-      (globalThis as any).__IN_ROUTE_EVENT_NAME ||
-      __ROUTE_EVENT_NAME ||
-      "in-route";
+    ROUTE_EVENT_NAME =
+      (globalThis as any).IN_ROUTE_EVENT_NAME || ROUTE_EVENT_NAME || "in-route";
 
     let currentHandler: AnyEventHandler | null = null;
     if (isSignal(val)) {
@@ -506,21 +505,21 @@ function DOMRouteHandler(): TriggerPropHandler<MaybeSignalHandler> {
           typeof cb === "function"
             ? (detail: any) => (cb as AnyEventHandler)(detail)
             : null;
-        if (currentHandler) __routeCallbacks.set(node, currentHandler);
-        else __routeCallbacks.delete(node);
+        if (currentHandler) routeCallbacks.set(node, currentHandler);
+        else routeCallbacks.delete(node);
       });
     } else if (typeof val === "function") {
       currentHandler = val as AnyEventHandler;
-      __routeCallbacks.set(node, currentHandler);
+      routeCallbacks.set(node, currentHandler);
     }
 
-    if (!__routeDocListener) {
-      __routeDocListener = function (ev: Event): void {
+    if (!routeDocListener) {
+      routeDocListener = function (ev: Event): void {
         const detail = (ev as any).detail || ev;
         // Iterate stable snapshot to allow mutation during iteration
-        for (const [el, cb] of Array.from(__routeCallbacks.entries())) {
+        for (const [el, cb] of Array.from(routeCallbacks.entries())) {
           if (!(el as any).isConnected) {
-            __routeCallbacks.delete(el);
+            routeCallbacks.delete(el);
             continue;
           }
           try {
@@ -531,64 +530,123 @@ function DOMRouteHandler(): TriggerPropHandler<MaybeSignalHandler> {
         }
       };
       document.addEventListener(
-        __ROUTE_EVENT_NAME || "in-route",
-        __routeDocListener as AnyEventHandler
+        ROUTE_EVENT_NAME || "in-route",
+        routeDocListener as AnyEventHandler
       );
     }
   };
 }
 
-// ========================= (FrameChange Global Loop) =========================
-let __rafId: number | null = null;
-let __lastTs: number | null = null;
-let __frameStart: number = 0;
-let __frameCount: number = 0;
-let __frameLoopActive = false;
-const __frameCallbacks = new Map<Element, AnyEventHandler>();
+// ========================= (Escape Global Listener) =========================
+let escapeDocListener: ((ev: KeyboardEvent) => void) | null = null;
+const escapeCallbacks = new Map<Element, AnyEventHandler>();
 
-function __startFrameLoop(): void {
-  if (__frameLoopActive) return;
-  __frameLoopActive = true;
+function DOMEscapeHandler(): TriggerPropHandler<MaybeSignalHandler> {
+  return function (node: Element, val: MaybeSignalHandler): void {
+    if (!node || !val) return;
+
+    let currentHandler: AnyEventHandler | null = null;
+    if (isSignal(val)) {
+      val.connect(function () {
+        const cb = val.peek();
+        currentHandler =
+          typeof cb === "function"
+            ? (detail: any) => (cb as AnyEventHandler)(detail)
+            : null;
+        if (currentHandler) escapeCallbacks.set(node, currentHandler);
+        else escapeCallbacks.delete(node);
+      });
+    } else if (typeof val === "function") {
+      currentHandler = val as AnyEventHandler;
+      escapeCallbacks.set(node, currentHandler);
+    }
+
+    if (!escapeDocListener) {
+      escapeDocListener = function (ev: KeyboardEvent): void {
+        if (ev.key !== "Escape") return;
+        // Snapshot to allow mutation during iteration
+        for (const [el, cb] of Array.from(escapeCallbacks.entries())) {
+          if (!(el as any).isConnected) {
+            escapeCallbacks.delete(el);
+            continue;
+          }
+          try {
+            cb(ev);
+          } catch {
+            // ignore user handler errors
+          }
+        }
+      };
+      document.addEventListener("keydown", escapeDocListener as any);
+    }
+  };
+}
+
+// ========================= (FrameChange Global Loop) =========================
+let rafId: number | null = null;
+let lastTs: number | null = null;
+let frameStart: number = 0;
+let frameCount: number = 0;
+let frameLoopActive = false;
+const frameCallbacks = new Map<Element, AnyEventHandler>();
+
+function startFrameLoop(): void {
+  if (frameLoopActive) return;
+  frameLoopActive = true;
   const w: any = typeof window !== "undefined" ? window : globalThis;
   const rAF: any = w?.requestAnimationFrame?.bind(w);
   const cAF: any = w?.cancelAnimationFrame?.bind(w);
 
   const step = (ts: number): void => {
-    if (!__frameStart) __frameStart = ts;
-    const delta = __lastTs == null ? 0 : ts - __lastTs;
-    __lastTs = ts;
-    __frameCount++;
-    const elapsed = ts - __frameStart;
+    if (!frameStart) frameStart = ts;
+    const delta = lastTs == null ? 0 : ts - lastTs;
+    lastTs = ts;
+    frameCount++;
+    const elapsed = ts - frameStart;
 
     // Snapshot to allow mutation during iteration
-    for (const [el, cb] of Array.from(__frameCallbacks.entries())) {
+    for (const [el, cb] of Array.from(frameCallbacks.entries())) {
       if (!(el as any).isConnected) {
-        __frameCallbacks.delete(el);
+        frameCallbacks.delete(el);
         continue;
       }
       try {
-        cb({ type: "frameChange", time: ts, delta, elapsed, frame: __frameCount });
+        cb({
+          type: "frameChange",
+          time: ts,
+          delta,
+          elapsed,
+          frame: frameCount,
+        });
       } catch {
         // ignore user callback errors
       }
     }
 
-    if (__frameCallbacks.size === 0) {
-      __frameLoopActive = false;
-      __lastTs = null;
-      __frameStart = 0;
-      __frameCount = 0;
-      if (cAF && __rafId != null) cAF(__rafId);
-      __rafId = null;
+    if (frameCallbacks.size === 0) {
+      frameLoopActive = false;
+      lastTs = null;
+      frameStart = 0;
+      frameCount = 0;
+      if (cAF && rafId != null) cAF(rafId);
+      rafId = null;
       return;
     }
 
-    if (rAF) __rafId = rAF(step);
-    else __rafId = setTimeout(() => step((w?.performance || performance).now()), 16) as any;
+    if (rAF) rafId = rAF(step);
+    else
+      rafId = setTimeout(
+        () => step((w?.performance || performance).now()),
+        16
+      ) as any;
   };
 
-  if (rAF) __rafId = rAF(step);
-  else __rafId = setTimeout(() => step((w?.performance || performance).now()), 16) as any;
+  if (rAF) rafId = rAF(step);
+  else
+    rafId = setTimeout(
+      () => step((w?.performance || performance).now()),
+      16
+    ) as any;
 }
 
 function DOMFrameChangeHandler(): TriggerPropHandler<MaybeSignalHandler> {
@@ -600,19 +658,21 @@ function DOMFrameChangeHandler(): TriggerPropHandler<MaybeSignalHandler> {
         const v = val.peek();
         if (typeof v === "function") {
           cb = v as AnyEventHandler;
-          __frameCallbacks.set(node, cb);
-          __startFrameLoop();
+          frameCallbacks.set(node, cb);
+          startFrameLoop();
         } else {
-          __frameCallbacks.delete(node);
+          frameCallbacks.delete(node);
         }
       });
     } else if (typeof val === "function") {
       cb = val as AnyEventHandler;
-      __frameCallbacks.set(node, cb);
-      __startFrameLoop();
+      frameCallbacks.set(node, cb);
+      startFrameLoop();
     }
   };
 }
+
+/*#################################(Register Platform-Bridged Triggers)#################################*/
 
 /** Register platform-bridged universal triggers */
 export function InUniversalTriggerProps(): void {
@@ -630,6 +690,8 @@ export function InUniversalTriggerProps(): void {
     createTrigger("frameChange", DOMFrameChangeHandler());
     // tap → click
     createTrigger("tap", DOMEventHandler("click"));
+    // escape → document-level keydown Escape
+    createTrigger("escape", DOMEscapeHandler());
     // longpress → synth from pointer events
     createTrigger("longpress", DOMLongPressHandler());
     // change → change
@@ -648,6 +710,7 @@ export function InUniversalTriggerProps(): void {
     createTrigger("route", DOMRouteHandler());
     createTrigger("frameChange", DOMFrameChangeHandler());
     createTrigger("tap", DOMEventHandler("click"));
+    createTrigger("escape", DOMEscapeHandler());
     createTrigger("longpress", DOMLongPressHandler());
     createTrigger("change", DOMEventHandler("change"));
     createTrigger("submit", DOMEventHandler("submit"));

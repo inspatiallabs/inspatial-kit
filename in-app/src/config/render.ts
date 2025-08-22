@@ -14,7 +14,7 @@ createRenderer({
   debug: "minimal",
   extensions: [
     InServe(),
-    InTrigger(), // exposes universal and standard trigger
+    InTrigger(), // exposes universal and standard triggers
     InTheme(),
     InPresentation(), // exposes triggers like on:presentation
     InCloud({ reconnect: "reload" }), // exposes triggers like on:cloudStatus / on:cloudReconnected

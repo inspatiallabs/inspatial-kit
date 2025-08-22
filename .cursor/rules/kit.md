@@ -199,7 +199,7 @@ Uses the Presentation Portals `Inlet/Outlet` to render components outside their 
 import {
   PresentationInlet,
   PresentationOutlet,
-  Modal
+  Modal,
 } from "@inspatial/kit/presentation";
 
 <Modal>
@@ -892,6 +892,28 @@ Use `on:route` to trigger an action on navigation.
 
 ##### E. Physics Triggers
 
+##### F. Key Triggers
+
+**on:escape**
+Allows you to close a presentation when the `ESC` Key is pressed
+
+##### G. Extension/Custom Triggers
+
+Some extensions provide their own triggers as many extensions can tap directly into the trigger registry system. Custom Extension triggers only work when you install them similar to `InTrigger`. Some of these extensions include:
+
+###### `InPresentation` Extension Trigger
+
+**on:presentation**
+...
+
+###### `InCloud` Extension Trigger
+
+**on:cloudStatus**
+..
+
+**on:cloudReconnected**
+..
+
 #### Trigger Prop Extension
 
 Enable trigger props by installing `InTrigger` in your renderer. This extension:
@@ -903,10 +925,12 @@ Enable trigger props by installing `InTrigger` in your renderer. This extension:
 ```typescript
 import { createRenderer } from "@inspatial/kit/renderer";
 import { InTrigger } from "@inspatial/kit/trigger";
+import { InCloud } from "@inspatial/kit/cloud";
+import { InTrigger } from "@inspatial/kit/presentation";
 
 createRenderer({
   mode: "auto",
-  extensions: [InTrigger],
+  extensions: [InTrigger, InCloud, InPresentation],
 });
 ```
 
