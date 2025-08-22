@@ -350,6 +350,7 @@ let InMotion: InMotionEngine;
 if (typeof globalThis !== "undefined" && globalThis.requestAnimationFrame) {
   localTickMethod = globalThis.requestAnimationFrame.bind(globalThis);
   InMotion = new InMotionEngine(now());
+
   if (isBrowser) {
     globalVersions.inMotionEngine = InMotion as any;
     if (doc && typeof doc.addEventListener === "function") {

@@ -1,14 +1,14 @@
 import { iss } from "@in/style";
 import { createState } from "@in/teract/state";
-import { createMotion } from "@in/motion";
+import { createMotion, eases } from "@in/motion";
 import { ScrollViewStyle } from "./style.ts";
 import type { ScrollViewProps } from "./type.ts";
 import { Slot } from "../slot/index.tsx";
 
 /*################################ (HELPERS) ###############################*/
-let __inScrollViewCssInjected = false;
+let inScrollViewCssInjected = false;
 function ensureHideScrollbarCss() {
-  if (__inScrollViewCssInjected) return;
+  if (inScrollViewCssInjected) return;
   try {
     const styleEl = (globalThis as any).document?.createElement?.("style");
     if (styleEl) {
@@ -52,84 +52,87 @@ function ensureHideScrollbarCss() {
         .in-scrollbar-gradient { scrollbar-width: thin; scrollbar-color: var(--brand) transparent; }
       `;
       (globalThis as any).document.head.appendChild(styleEl);
-      __inScrollViewCssInjected = true;
+      inScrollViewCssInjected = true;
     }
   } catch {}
 }
 
 function animateIn(
-  node: any,
+  node: HTMLElement,
   type: ScrollViewProps["animate"],
-  d: number,
-  de: number
+  duration: number,
+  delay: number
 ) {
-  if (type === "none") return;
-  const keyframes: Record<string, any> = {};
-  if (type === "fade")
-    keyframes.opacity = {
-      from: 0,
-      to: 1,
-      duration: d,
-      delay: de,
-      composition: "replace",
-    };
-  if (type === "fadeUp") {
-    keyframes.opacity = {
-      from: 0,
-      to: 1,
-      duration: d,
-      delay: de,
-      composition: "replace",
-    };
-    keyframes.translateY = {
-      from: 12,
-      to: 0,
-      duration: d,
-      delay: de,
-      composition: "replace",
-    };
+  if (!node || type === "none") return;
+
+  // Initialize with invisible state for smooth animation
+  node.style.opacity = "0";
+
+  const animationParams: Record<string, any> = {
+    duration,
+    delay,
+    autoplay: true,
+    ease: eases.outQuad,
+    composition: "replace",
+  };
+
+  switch (type) {
+    case "fade":
+      animationParams.opacity = [0, 1];
+      break;
+
+    case "fadeUp":
+      animationParams.opacity = [0, 1];
+      animationParams.translateY = [20, 0];
+      break;
+
+    case "scale":
+      animationParams.opacity = [0, 1];
+      animationParams.scale = [0.9, 1];
+      // Add translateZ for GPU acceleration
+      animationParams.translateZ = 0;
+      break;
   }
-  if (type === "scale") {
-    keyframes.opacity = {
-      from: 0,
-      to: 1,
-      duration: d,
-      delay: de,
-      composition: "replace",
-    };
-    // prefer translateZ(0) for GPU and use transform scale via short-hand x/y to ensure transforms apply visibly
-    keyframes.scale = {
-      from: 0.95,
-      to: 1,
-      duration: d,
-      delay: de,
-      composition: "replace",
-    } as any;
-    // kick a transform layer
-    try {
-      node.style.transform = (node.style.transform || "") + " translateZ(0)";
-    } catch {}
-  }
+
   try {
-    createMotion(node, {
-      ...keyframes,
-      autoplay: true,
-      // Safety: ensure we end in a visible state even if ticking fails
-      onComplete: () => {
-        try {
-          node.style.opacity = "";
-          node.style.transform = node.style.transform || "";
-        } catch {}
+    const animation = createMotion(node, {
+      ...animationParams,
+      onBegin: () => {
+        // Ensure the element is ready for animation
+        node.style.willChange = "opacity, transform";
       },
-    } as any);
-    // Fallback: force visible after duration+delay (in case animation is interrupted)
-    const total = Math.max(0, (de || 0) + (d || 0) + 50);
-    setTimeout(() => {
-      try {
-        if (getComputedStyle(node).opacity === "0") node.style.opacity = "1";
-      } catch {}
-    }, total);
-  } catch {}
+      onComplete: () => {
+        // Clean up inline styles after animation
+        node.style.opacity = "";
+        node.style.transform = "";
+        node.style.willChange = "";
+      },
+    });
+
+    // Fallback safety: ensure visible state after animation time
+    const totalTime = delay + duration + 100;
+    const fallbackTimer = setTimeout(() => {
+      if (node && getComputedStyle(node).opacity === "0") {
+        node.style.opacity = "1";
+        node.style.transform = "";
+      }
+    }, totalTime);
+
+    // Clean up timer if animation completes normally
+    animation.onComplete = () => {
+      clearTimeout(fallbackTimer);
+      node.style.opacity = "";
+      node.style.transform = "";
+      node.style.willChange = "";
+    };
+
+    return animation;
+  } catch (error) {
+    // Fallback: immediately show the element if animation fails
+    console.warn("ScrollView animation failed:", error);
+    node.style.opacity = "1";
+    node.style.transform = "";
+  }
 }
 
 /*################################ (COMPONENT) ###############################*/
@@ -139,7 +142,7 @@ export function ScrollView(props: ScrollViewProps) {
     children,
     className,
     $ref,
-    animate = "scale", //NOTE: InMotion has a bug so all InMotion animations may cause unexpected behaviour in widgets and components @TODO(benemma): Fix InMotion module
+    animate = "fadeUp", // Default animation now works properly with InMotion
     duration = 400,
     delay = 0,
     preserveChildren,
@@ -165,18 +168,23 @@ export function ScrollView(props: ScrollViewProps) {
   function mountView() {
     ensureHideScrollbarCss();
     state.action.mountView?.();
-    try {
-      const id = (state.domId as any).peek
-        ? (state.domId as any).peek()
-        : state.domId;
-      const node = (globalThis as any).document?.getElementById?.(id) as
-        | any
-        | null;
-      if (node) {
-        animateIn(node, animate, duration, delay);
-        if (typeof $ref === "function") ($ref as any)(node);
+
+    // Get the DOM node for animation
+    requestAnimationFrame(() => {
+      try {
+        const id = (state.domId as any).peek
+          ? (state.domId as any).peek()
+          : state.domId;
+        const node = document?.getElementById?.(id) as HTMLElement | null;
+
+        if (node) {
+          animateIn(node, animate, duration, delay);
+          if (typeof $ref === "function") ($ref as any)(node);
+        }
+      } catch (error) {
+        console.warn("ScrollView mount animation error:", error);
       }
-    } catch {}
+    });
   }
 
   /*********************************(Const)*********************************/

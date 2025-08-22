@@ -63,8 +63,6 @@ import {
   setValue,
 } from "./values.ts";
 
-import { sanitizePropertyName as _sanitizePropertyName } from "./properties.ts";
-
 import { convertValueUnit } from "./units.ts";
 
 import {
@@ -398,7 +396,7 @@ export class JSAnimation extends Timer {
   override _autoplay: boolean = true;
 
   /** Number of iterations */
-  override iterationCount: number = 0;
+  override iterationCount: number = 1;
 
   /** Delay between animation loops */
   override _loopDelay: number = 0;
@@ -643,21 +641,21 @@ export class JSAnimation extends Timer {
               ? (keyEasing as Spring).ease
               : keyEasing || tEasing;
             // Calculate default individual keyframe duration by dividing the tl of keyframes
+            const keyDurationDefault =
+              l > 1
+                ? getFunctionValue(
+                    tDuration as number,
+                    target,
+                    ti,
+                    tl,
+                    {} as Record<string, any>
+                  ) / l
+                : tDuration;
+
             const tweenDuration = hasSpring
               ? (keyEasing as Spring).duration
               : getFunctionValue(
-                  setValue(
-                    key.duration,
-                    l > 1
-                      ? getFunctionValue(
-                          tDuration as number,
-                          target,
-                          ti,
-                          tl,
-                          {} as Record<string, any>
-                        ) / l
-                      : tDuration
-                  ),
+                  setValue(key.duration, keyDurationDefault),
                   target,
                   ti,
                   tl,

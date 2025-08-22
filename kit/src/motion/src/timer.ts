@@ -16,7 +16,6 @@
  * @see https://inspatial.dev/motion
  ****************************************************/
 
-
 import {
   minValue,
   compositionTypes,
@@ -275,6 +274,7 @@ export class Timer extends InMotionClock {
       noop) as unknown as Callback<this>;
     this.iterationDuration = timerDuration; // Duration of one loop
     this.iterationCount = timerIterationCount; // Number of loops
+
     this._autoplay = parent
       ? false
       : ((isUnd(autoplay) ? timerDefaults.autoplay : autoplay) as
@@ -531,14 +531,20 @@ export class Timer extends InMotionClock {
     } else {
       if (!this._running) {
         // Use type assertion for Engine properties
-        addChild(InMotion as any, this, undefined, undefined, undefined);
-        (InMotion as any)._hasChildren = true;
-        this._running = true;
+        if (InMotion) {
+          addChild(InMotion as any, this, undefined, undefined, undefined);
+          (InMotion as any)._hasChildren = true;
+          this._running = true;
+        } else {
+          console.warn("Timer.resume: InMotion not available!");
+        }
       }
       this.resetTime();
       // Forces the timer to advance by at least one frame when the next tick occurs
       this._startTime -= 12;
-      InMotion.wake();
+      if (InMotion) {
+        InMotion.wake();
+      }
     }
     return this;
   }
