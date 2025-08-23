@@ -1,7 +1,7 @@
-import type { ComponentProps } from "@in/kit";
-import type { Signal } from "@in/teract/signal";
+import type { ComponentProps } from "@in/kit/component";
+import type { Signal } from "@in/teract/signal/signal.ts";
 import type { InUniversalTriggerPropsType } from "@in/teract/trigger/index.ts";
-import type { ISSProps as ISSPropsType } from "@in/style";
+import type { ISSProps as ISSPropsType } from "@in/style/iss/type/data-types.ts";
 
 /*################################(JSX/Runtime Prop Types)################################*/
 // Global declaration for JSX to be used with opinionated prop types and attributes
@@ -120,7 +120,7 @@ declare global {
       on?: TriggerPropKey;
 
       /** Children are the elements that will be rendered within the widget or component. */
-      children?: any;
+      children?: unknown;
 
       /** InSpatial style sheet class name(s) for the widget or component. */
       class?: ClassProps;

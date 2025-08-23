@@ -2,7 +2,6 @@ import { createStyle } from "@in/style";
 
 //##############################################(PRESENTATION STYLE)##############################################//
 export const PresentationStyle = createStyle({
-  /*******************************(Base)********************************/
   base: [
     "pointer-events-auto",
     {
@@ -16,6 +15,7 @@ export const PresentationStyle = createStyle({
 //##############################################(MODAL STYLE)##############################################//
 
 export const ModalStyle = {
+  /*******************************(Overlay)********************************/
   overlay: createStyle({
     base: [
       "fixed inset-0 pointer-events-auto",
@@ -63,6 +63,7 @@ export const ModalStyle = {
       format: "tilted",
     },
   }),
+  /*******************************(Wrapper)********************************/
   wrapper: createStyle({
     base: [
       "fixed",
@@ -83,13 +84,14 @@ export const ModalStyle = {
           justifyContent: "center",
           pointerEvents: "none",
           zIndex: 2147483647,
-          minHeight: "fit-content",
-          minWidth: "fit-content",
+          minHeight: "fit-view",
+          minWidth: "fit-view",
         },
       },
     ],
   }),
-  content: createStyle({
+  /*******************************(View)********************************/
+  view: createStyle({
     base: [
       "pointer-events-auto",
       "bg-(--window)",

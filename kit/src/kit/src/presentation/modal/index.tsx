@@ -1,22 +1,32 @@
 import { Slot } from "../../structure/slot/index.tsx";
-import { $ } from "@in/teract/state";
+import { $ } from "@in/teract/signal/signal.ts";
+import { iss } from "@in/style/index.ts";
+import { ensureArray } from "@in/vader/array.ts";
 import { PresentationRegistry } from "../registry.ts";
-import { ModalStyle, PresentationStyle } from "../style.ts";
+import { ModalStyle } from "../style.ts";
 import type {
   ModalOverlayProps,
   ModalWrapperProps,
   ModalProps,
-  ModalContentProps,
+  ModalViewProps,
 } from "../type.ts";
 
 /*#################################(MODAL OVERLAY)#################################*/
 
 function ModalOverlay(props: ModalOverlayProps) {
-  const { className, ...rest } = props;
+  const { className, class: classProp, format, ...rest } = props;
 
   return (
     <>
-      <Slot className={ModalStyle.overlay.getStyle({ className })} {...rest} />
+      <Slot
+        className={ModalStyle.overlay.getStyle({
+          class: classProp,
+          className,
+          format,
+          ...rest,
+        })}
+        {...rest}
+      />
     </>
   );
 }
@@ -24,21 +34,37 @@ function ModalOverlay(props: ModalOverlayProps) {
 /*#################################(MODAL WRAPPER)#################################*/
 
 function ModalWrapper(props: ModalWrapperProps) {
-  const { className, ...rest } = props;
+  const { className, class: classProp, ...rest } = props;
   return (
-    <Slot className={ModalStyle.wrapper.getStyle({ className })} {...rest} />
+    <>
+      <Slot
+        // @ts-ignore
+        className={ModalStyle.wrapper.getStyle({
+          class: classProp,
+          className,
+          ...rest,
+        })}
+        {...rest}
+      />
+    </>
   );
 }
 
 /*#################################(MODAL WINDOW)#################################*/
 
-function ModalContent(props: ModalContentProps) {
-  const { className, children, ...rest } = props;
+function ModalView(props: ModalViewProps) {
+  const { className, class: classProp, children, format, ...rest } = props;
   return (
     <Slot
       role="dialog"
       aria-modal
-      className={ModalStyle.content.getStyle({ className })}
+      // @ts-ignore
+      className={ModalStyle.view.getStyle({
+        class: classProp,
+        className,
+        format,
+        ...rest,
+      })}
       tabIndex={0}
       {...rest}
     >
@@ -58,11 +84,39 @@ export function Modal(props: ModalProps) {
     closeOnEsc = true,
     closeOnScrim = true,
     className,
-    overlay = {
-      display: true,
-    },
     children,
+    ...rest
   } = props;
+
+  // Normalize widget tree props
+  let modalChildren: any = {};
+  let modalViewNode: any = null;
+
+  if (
+    children &&
+    typeof children === "object" &&
+    !Array.isArray(children) &&
+    ("wrapper" in children || "overlay" in children || "view" in children)
+  ) {
+    // Allow only view to be an array
+    const viewArr = ensureArray(children.view).filter(Boolean);
+
+    modalChildren = {
+      wrapper: children.wrapper || {},
+      overlay: { display: true, ...(children.overlay || {}) },
+      view: viewArr.length ? viewArr : undefined,
+    };
+    modalViewNode =
+      (viewArr.length ? null : children.view) ?? rest.children;
+  } else {
+    // Direct children mode
+    modalChildren = {
+      wrapper: {},
+      overlay: { display: true },
+      view: undefined,
+    };
+    modalViewNode = children;
+  }
 
   /*********************************(State)*********************************/
 
@@ -84,12 +138,13 @@ export function Modal(props: ModalProps) {
   let modalRef: any | null = null;
 
   // Create a computed that returns the modal view or null
-  const ModalNode = $(() => {
+  const ModalPresentation = $(() => {
     const isOpen = sig.get();
     if (!isOpen) return null;
 
     /*********************************(Render)*********************************/
-    const hasOverlay = overlay.display;
+    const hasOverlay =
+      modalChildren.overlay && modalChildren.overlay.display !== false;
 
     return (
       <>
@@ -101,25 +156,44 @@ export function Modal(props: ModalProps) {
             on:escape={() =>
               closeOnEsc && PresentationRegistry.setOpen(id, false)
             }
-            {...overlay}
+            {...modalChildren.overlay}
           />
         )}
         <ModalWrapper
           on:escape={() =>
             closeOnEsc && PresentationRegistry.setOpen(id, false)
           }
+          {...modalChildren.wrapper}
         >
-          <ModalContent
-            $ref={(el: any) => (modalRef = el)}
-            on:mount={() => setTimeout(() => modalRef?.focus(), 10)}
-            className={className}
-          >
-            {children}
-          </ModalContent>
+          {ensureArray(modalChildren.view).length ? (
+            ensureArray(modalChildren.view).map((ct: any, idx: number) => (
+              <ModalView
+                key={`view-${idx}`}
+                className={iss(ct?.className, className)}
+                $ref={(el: any) => (modalRef = el)}
+                on:mount={() => setTimeout(() => modalRef?.focus(), 10)}
+                {...ct}
+              >
+                {ct?.children}
+              </ModalView>
+            ))
+          ) : (
+            <ModalView
+              className={className}
+              $ref={(el: any) => (modalRef = el)}
+              on:mount={() => setTimeout(() => modalRef?.focus(), 10)}
+              {...(modalChildren.view &&
+              typeof modalChildren.view === "object"
+                ? modalChildren.view
+                : {})}
+            >
+              {modalViewNode}
+            </ModalView>
+          )}
         </ModalWrapper>
       </>
     );
   });
 
-  return ModalNode;
+  return ModalPresentation;
 }

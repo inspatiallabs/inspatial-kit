@@ -51,25 +51,65 @@ export function CounterView() {
 
   return (
     <>
-      {/* Modal instance rendered once (global portal handles actual placement) */}
-
-      <Modal id="counter-modal">
-        <YStack className="p-6 gap-3">
-          <Text className="text-xl font-semibold">Counter Help</Text>
-          <Text>
-            Use the buttons to adjust the counter and explore trigger props.
-            This modal is controlled via on:presentation.
-          </Text>
-          <Slot className="flex justify-end">
-            <Button
-              format="outline"
-              on:presentation={{ id: "counter-modal", action: "close" }}
-            >
-              Close
-            </Button>
-          </Slot>
-        </YStack>
+      {/* Simple modal with direct children */}
+      <Modal id="simple-modal" className="p-8">
+        <Text className="text-2xl mb-4">Simple Modal</Text>
+        <Text>This modal uses direct children without widget tree.</Text>
+        <Button
+          className="mt-4"
+          on:presentation={{ id: "simple-modal", action: "close" }}
+        >
+          Close
+        </Button>
       </Modal>
+
+      {/* Modal with widget tree customization */}
+      <Modal
+        id="counter-modal"
+        children={{
+          // 1. Custom Overlay
+          overlay: {
+            className: "!bg-purple-500/10",
+            format: "tilted",
+          },
+
+          // 2. Custom View
+          view: [{
+            className: "p-12 !bg-yellow-100 text-black",
+            children: (
+              <YStack className="p-6 gap-3">
+                <Text className="text-xl font-semibold">Counter Help</Text>
+                <Text>
+                  Use the buttons to adjust the counter and explore trigger
+                  props. This modal is controlled via on:presentation.
+                </Text>
+                <Slot className="flex justify-end">
+                  <Button
+                    format="outline"
+                    on:presentation={{ id: "counter-modal", action: "close" }}
+                  >
+                    Close
+                  </Button>
+                </Slot>
+              </YStack>
+            ),
+          }],
+
+          // 3. Optional Wrapper Customization (99% of the time you don't need this)
+          // wrapper: {},
+        }}
+      />
+
+      {/* Multi Modal View */}
+      <Modal
+        id="multi-modal"
+        children={{
+          view: [
+            { className: "p-6", children: <Text>First View</Text> },
+            { className: "p-6 mt-4", children: <Text>Second View</Text> },
+          ],
+        }}
+      />
 
       <ScrollView>
         <div className="flex flex-col justify-center items-center gap-10">
@@ -182,6 +222,18 @@ export function CounterView() {
               on:presentation={{ id: "counter-modal", action: "toggle" }}
             >
               Open Modal
+            </Button>
+            <Button
+              className="bg-teal-600 p-4 rounded-full text-white font-bold text-lg hover:bg-teal-700 transition-colors"
+              on:presentation={{ id: "simple-modal", action: "toggle" }}
+            >
+              Simple Modal
+            </Button>
+            <Button
+              className="bg-orange-500"
+              on:presentation={{ id: "multi-modal", action: "toggle" }}
+            >
+              Multi-Modal
             </Button>
             <Button
               className="bg-purple-600 p-4 rounded-full text-white font-bold text-lg shadow-lg hover:bg-purple-700 transition-colors"

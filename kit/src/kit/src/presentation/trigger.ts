@@ -20,12 +20,6 @@ function coercePayload(val: any): TriggerPayload | null {
 
 export function registerPresentationTrigger(): void {
   createTrigger("presentation", (node: Element, val: any) => {
-    console.log(
-      "[Presentation] Trigger handler called for node:",
-      node,
-      "with value:",
-      val
-    );
     if (!val) return;
 
     let currentPayload: TriggerPayload | null = null;

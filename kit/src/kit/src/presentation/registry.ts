@@ -6,7 +6,6 @@ export const PresentationRegistry = {
   ensureOpenSignal(id: string): Signal<boolean> {
     let sig = idToOpenSignal.get(id);
     if (!sig) {
-      console.log('[Registry] Creating new signal for id:', id, 'with initial value: false');
       sig = createSignal(false);
       idToOpenSignal.set(id, sig);
     }
@@ -20,9 +19,7 @@ export const PresentationRegistry = {
   },
   getSignal(id: string): Signal<boolean> {
     const sig = this.ensureOpenSignal(id);
-    console.log('[Registry] getSignal for id:', id, 'returning signal with value:', sig.peek());
+
     return sig;
   },
 };
-
-
