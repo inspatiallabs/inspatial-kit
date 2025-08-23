@@ -19,7 +19,6 @@ function coercePayload(val: any): TriggerPayload | null {
 }
 
 export function registerPresentationTrigger(): void {
-  console.log("[Presentation] Registering presentation trigger");
   createTrigger("presentation", (node: Element, val: any) => {
     console.log(
       "[Presentation] Trigger handler called for node:",
@@ -32,7 +31,6 @@ export function registerPresentationTrigger(): void {
     let currentPayload: TriggerPayload | null = null;
 
     const clickHandler = (_event: Event) => {
-      console.log("[Presentation] Click handler triggered", currentPayload);
       if (!currentPayload) return;
 
       const { id, action, open } = currentPayload;

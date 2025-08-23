@@ -1,9 +1,112 @@
 import { createStyle } from "@in/style";
 
-export const presentationStyle = createStyle({
+//##############################################(PRESENTATION STYLE)##############################################//
+export const PresentationStyle = createStyle({
+  /*******************************(Base)********************************/
   base: [
-    "flex relative justify-center items-center rounded-xl bg-(--surface) text-(--primary) shadow-(--shadow-effect) min-w-[500px] min-h-[500px] m-auto pointer-events-auto",
+    "pointer-events-auto",
+    {
+      web: {
+        pointerEvents: "auto",
+      },
+    },
   ],
-  settings: {},
-  defaultSettings: {},
 });
+
+//##############################################(MODAL STYLE)##############################################//
+
+export const ModalStyle = {
+  overlay: createStyle({
+    base: [
+      "fixed inset-0 pointer-events-auto",
+      {
+        web: {
+          position: "fixed",
+          inset: 0,
+          minHeight: "100vh",
+          minWidth: "100vw",
+          pointerEvents: "auto",
+          zIndex: 2147483646,
+        },
+      },
+    ],
+    settings: {
+      format: {
+        tilted: [
+          "material-tilted",
+          {
+            web: {
+              background: "var(--surface)",
+              backdropFilter: "blur(var(--blur-base))",
+            },
+          },
+        ],
+        rgb: [
+          "bg-black/40",
+          {
+            web: {
+              background: "rgba(0, 0, 0, 0.4)",
+            },
+          },
+        ],
+        transparent: [
+          "bg-transparent",
+          {
+            web: {
+              background: "transparent",
+            },
+          },
+        ],
+      },
+    },
+    defaultSettings: {
+      format: "tilted",
+    },
+  }),
+  wrapper: createStyle({
+    base: [
+      "fixed",
+      "inset-0",
+      "flex",
+      "items-center",
+      "justify-center",
+      "pointer-events-none",
+      "z-[2147483647]",
+      "min-h-fit",
+      "min-w-fit",
+      {
+        web: {
+          position: "fixed",
+          inset: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          pointerEvents: "none",
+          zIndex: 2147483647,
+          minHeight: "fit-content",
+          minWidth: "fit-content",
+        },
+      },
+    ],
+  }),
+  content: createStyle({
+    base: [
+      "pointer-events-auto",
+      "bg-(--window)",
+      "material-tilted",
+      "border border-(--muted)",
+      "rounded-4xl",
+      "shadow-effect",
+      {
+        web: {
+          pointerEvents: "auto",
+          background: "var(--window)",
+          border: "1px solid var(--muted)",
+          borderRadius: "50px",
+          boxShadow: "shadow(var(--shadow-effect))",
+          backdropFilter: "blur(var(--blur-base))",
+        },
+      },
+    ],
+  }),
+};

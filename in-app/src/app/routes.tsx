@@ -1,5 +1,6 @@
 import { createRoute } from "@inspatial/kit/route";
 import { Dynamic } from "@inspatial/kit/control-flow";
+import { PresentationOutlet } from "@inspatial/kit/presentation";
 import { AppWindow } from "./window.tsx";
 import { CounterAppWindow } from "./(example)/counter/window.tsx";
 import { ProjectsWindow } from "./(dashboard)/projects/window.tsx";
@@ -36,8 +37,9 @@ export function AppRoutes() {
   const Selected = route.selected;
   return () => (
     <>
-      <AppMenu />
       <Dynamic is={Selected} />
+      <AppMenu />
+      <PresentationOutlet />
     </>
   );
 }

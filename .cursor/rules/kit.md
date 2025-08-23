@@ -899,7 +899,7 @@ Allows you to close a presentation when the `ESC` Key is pressed
 
 ##### G. Extension/Custom Triggers
 
-Some extensions provide their own triggers as many extensions can tap directly into the trigger registry system. Custom Extension triggers only work when you install them similar to `InTrigger`. Some of these extensions include:
+Some extensions add their own trigger props, which become available when you install those extensions (just like `InTrigger`). These extension triggers are registered through the trigger system and only work if the corresponding extension is included. Examples of such extensions are:
 
 ###### `InPresentation` Extension Trigger
 

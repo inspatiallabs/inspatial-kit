@@ -480,6 +480,7 @@
   --blur-xl: 24px;
   --blur-2xl: 40px;
   --blur-3xl: 64px;
+  --blur-base: 100px;
   --perspective-dramatic: 100px;
   --perspective-near: 300px;
   --perspective-normal: 500px;
@@ -1038,7 +1039,7 @@
   * Note: You should only use one of these at a time, not both.
   * Comment out the one you are not using.
   *===============================================================================*/
-  
+
 /* Desktop-first (largest → smallest) */
 /* @custom-variant sm (@media (max-width: 640px));
 @custom-variant md (@media (max-width: 768px));
@@ -1060,6 +1061,23 @@
 /*###################################################( BASE )###################################################*/
 
 @layer base {
+  body {
+    font-family: var(--font-inder);
+    background-color: var(--background);
+    color: var(--primary);
+  }
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
+  #app {
+    height: 100vh;
+    overflow: hidden;
+  }
+  canvas {
+    touch-action: none;
+  }
 }
 
 /*###################################################( COMPONENTS )###################################################*/
@@ -1082,4 +1100,24 @@
 
 /*###################################################( UTILITIES )###################################################*/
 @layer utilities {
+  .brand {
+    color: var(--brand);
+  }
+
+  .material-tilted {
+    border-image-source: linear-gradient(
+        180deg,
+        #ffffff 0%,
+        rgba(255, 255, 255, 0) 100%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.5) 0%,
+        rgba(255, 255, 255, 0) 100%
+      );
+
+    @apply bg-(--surface) shadow-effect backdrop-blur-base;
+  }
+
+  /** TODO: .material-translucent */
 }

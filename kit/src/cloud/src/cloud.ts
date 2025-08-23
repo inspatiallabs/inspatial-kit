@@ -19,21 +19,25 @@ import type {
 /*######################################(INIT)######################################*/
 
 declare global {
-  var inCloud: {
+  var incloud: {
+    api?: InCloudClient;
+    live?: InLiveClient;
+  };
+  var cloud: {
     api?: InCloudClient;
     live?: InLiveClient;
   };
 }
 
 interface InCloudGlobal {
-  inCloud?: { api?: InCloudClient; live?: InLiveClient };
+  incloud?: { api?: InCloudClient; live?: InLiveClient };
   location?: Location;
 }
 
 const g = globalThis as unknown as InCloudGlobal;
 
-if (!g.inCloud) {
-  g.inCloud = {
+if (!g.incloud) {
+  g.incloud = {
     api: undefined,
     live: undefined,
   };
@@ -41,32 +45,32 @@ if (!g.inCloud) {
 
 /*######################################(Handlers)######################################*/
 export function setInCloudApi(api: InCloudClient) {
-  g.inCloud = g.inCloud || {};
-  g.inCloud.api = api;
+  g.incloud = g.incloud || {};
+  g.incloud.api = api;
 }
 
 export function setInCloudLive(live: InLiveClient) {
-  g.inCloud = g.inCloud || {};
-  g.inCloud.live = live;
+  g.incloud = g.incloud || {};
+  g.incloud.live = live;
 }
 
 /*######################################(InCloud)######################################*/
 export const incloud = {
   get api(): InCloudClient {
-    if (!g.inCloud?.api) {
+    if (!g.incloud?.api) {
       throw new Error(
         "InCloudClient is not initialized. Please call setInCloudApi() first."
       );
     }
-    return g.inCloud.api as InCloudClient;
+    return g.incloud.api as InCloudClient;
   },
   get live(): InLiveClient {
-    if (!g.inCloud?.live) {
+    if (!g.incloud?.live) {
       throw new Error(
         "InLiveClient is not initialized. Please call setInCloudLive() first."
       );
     }
-    return g.inCloud.live as InLiveClient;
+    return g.incloud.live as InLiveClient;
   },
 };
 
@@ -216,8 +220,8 @@ const live = new InLiveClient(inLiveHost);
 
 /*######################################(SET)######################################*/
 
-globalThis.inCloud.api = api;
-globalThis.inCloud.live = live;
+globalThis.incloud.api = api;
+globalThis.incloud.live = live;
 // ensure live client connects so status changes can be observed immediately
 try {
   live.start();

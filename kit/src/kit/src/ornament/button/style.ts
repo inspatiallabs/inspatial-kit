@@ -34,7 +34,7 @@ export const ButtonStyle = createStyle({
         {
           web: {
             boxShadow: "var(--in-shadow-effect, 0 0 0 0 transparent)",
-            backgroundColor: "var-(--brand)",
+            backgroundColor: "var(--brand)",
           },
         },
       ],
@@ -68,7 +68,7 @@ export const ButtonStyle = createStyle({
         {
           web: {
             textDecorationThickness: "4px",
-            textDecorationColor: "var-(--brand)",
+            textDecorationColor: "var(--brand)",
             textUnderlineOffset: "4px",
             // decoration color via class
           },

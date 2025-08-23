@@ -1,5 +1,5 @@
 import { createSignal, onDispose } from "@in/teract/signal/index.ts";
-import { removeFromArr } from "@in/vader";
+import { removeFromArr } from "@in/vader/index.ts";
 import { disposeComponent, getCurrentSelf } from "../component/index.ts";
 import { List, Fn } from "../control-flow/index.ts";
 
@@ -21,7 +21,7 @@ type OutletFunction = (
   fallback?: ComponentFunction
 ) => ({ c }: { c: any }) => any;
 
-function createPresentationPortal(): [InletFunction, OutletFunction] {
+export function createPresentationPortal(): [InletFunction, OutletFunction] {
   let currentOutlet: any = null;
   const nodes = createSignal<any[]>([]);
 

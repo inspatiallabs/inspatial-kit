@@ -53,13 +53,8 @@ export function CounterView() {
     <>
       {/* Modal instance rendered once (global portal handles actual placement) */}
 
-      <Modal
-        id="counter-modal"
-        closeOnEsc
-        closeOnScrim
-        className="flex justify-center items-center h-screen w-screen m-auto"
-      >
-        <YStack className="p-6 gap-3 w-[500px] h-[500px] bg-(--brand) rounded-3xl shadow-effect">
+      <Modal id="counter-modal">
+        <YStack className="p-6 gap-3">
           <Text className="text-xl font-semibold">Counter Help</Text>
           <Text>
             Use the buttons to adjust the counter and explore trigger props.
@@ -183,7 +178,7 @@ export function CounterView() {
           <div className="flex gap-4 flex-wrap justify-center">
             {/* Modal demo trigger */}
             <Button
-              className="bg-zinc-700 p-4 rounded-full text-white font-bold text-lg hover:bg-zinc-800 transition-colors"
+              className="bg-(--window) p-4 rounded-full text-white font-bold text-lg hover:bg-zinc-800 transition-colors"
               on:presentation={{ id: "counter-modal", action: "toggle" }}
             >
               Open Modal
