@@ -74,26 +74,28 @@ export function CounterView() {
           },
 
           // 2. Custom View
-          view: [{
-            className: "p-12 !bg-yellow-100 text-black",
-            children: (
-              <YStack className="p-6 gap-3">
-                <Text className="text-xl font-semibold">Counter Help</Text>
-                <Text>
-                  Use the buttons to adjust the counter and explore trigger
-                  props. This modal is controlled via on:presentation.
-                </Text>
-                <Slot className="flex justify-end">
-                  <Button
-                    format="outline"
-                    on:presentation={{ id: "counter-modal", action: "close" }}
-                  >
-                    Close
-                  </Button>
-                </Slot>
-              </YStack>
-            ),
-          }],
+          view: [
+            {
+              className: "p-12 !bg-yellow-100 text-black",
+              children: (
+                <YStack className="p-6 gap-3">
+                  <Text className="text-xl font-semibold">Counter Help</Text>
+                  <Text>
+                    Use the buttons to adjust the counter and explore trigger
+                    props. This modal is controlled via on:presentation.
+                  </Text>
+                  <Slot className="flex justify-end">
+                    <Button
+                      format="outline"
+                      on:presentation={{ id: "counter-modal", action: "close" }}
+                    >
+                      Close
+                    </Button>
+                  </Slot>
+                </YStack>
+              ),
+            },
+          ],
 
           // 3. Optional Wrapper Customization (99% of the time you don't need this)
           // wrapper: {},
@@ -105,8 +107,8 @@ export function CounterView() {
         id="multi-modal"
         children={{
           view: [
-            { className: "p-6", children: <Text>First View</Text> },
-            { className: "p-6 mt-4", children: <Text>Second View</Text> },
+            { children: <Text>First View</Text> },
+            { children: <Text>Second View</Text> },
           ],
         }}
       />
@@ -218,16 +220,16 @@ export function CounterView() {
           <div className="flex gap-4 flex-wrap justify-center">
             {/* Modal demo trigger */}
             <Button
-              className="bg-(--window) p-4 rounded-full text-white font-bold text-lg hover:bg-zinc-800 transition-colors"
-              on:presentation={{ id: "counter-modal", action: "toggle" }}
-            >
-              Open Modal
-            </Button>
-            <Button
               className="bg-teal-600 p-4 rounded-full text-white font-bold text-lg hover:bg-teal-700 transition-colors"
               on:presentation={{ id: "simple-modal", action: "toggle" }}
             >
               Simple Modal
+            </Button>
+            <Button
+              className="bg-(--window) p-4 rounded-full text-white font-bold text-lg hover:bg-zinc-800 transition-colors"
+              on:presentation={{ id: "counter-modal", action: "toggle" }}
+            >
+              Open Modal
             </Button>
             <Button
               className="bg-orange-500"

@@ -1,4 +1,5 @@
 import { createStyle } from "@in/style";
+import { ThemeRadius } from "../theme/style.ts";
 
 //##############################################(PRESENTATION STYLE)##############################################//
 export const PresentationStyle = createStyle({
@@ -97,18 +98,44 @@ export const ModalStyle = {
       "bg-(--window)",
       "material-tilted",
       "border border-(--muted)",
-      "rounded-4xl",
+      // "rounded-4xl",
       "shadow-effect",
       {
         web: {
           pointerEvents: "auto",
           background: "var(--window)",
           border: "1px solid var(--muted)",
-          borderRadius: "50px",
+          // borderRadius: "50px",
           boxShadow: "shadow(var(--shadow-effect))",
           backdropFilter: "blur(var(--blur-base))",
         },
       },
     ],
+    settings: {
+      size: {
+        base: [
+          "w-[50%]",
+          "h-[80vh]",
+          {
+            web: {
+              width: "50%",
+              height: "80vh",
+            },
+          },
+        ],
+        fit: [],
+        full: [],
+        xs: [],
+        sm: [],
+        md: [],
+        lg: [],
+        xl: [],
+      },
+      radius: ThemeRadius,
+    },
+    defaultSettings: {
+      size: "base",
+      radius: "4xl",
+    },
   }),
 };

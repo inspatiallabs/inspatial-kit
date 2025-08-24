@@ -79,6 +79,7 @@ export function Modal(props: ModalProps) {
   /*********************************(Props)*********************************/
   const {
     id,
+     
     open,
     defaultOpen,
     closeOnEsc = true,

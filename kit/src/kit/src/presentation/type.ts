@@ -29,16 +29,14 @@ export type ModalWrapperProps = StyleProps<typeof ModalStyle.wrapper> &
 
 export type ModalViewProps = StyleProps<typeof ModalStyle.view> &
   JSX.SharedProps & {
-    format?: "base" | "delete" | "project";
+    format?: "base" | "delete-confimation" | "project-creator" | "account-switcher";
   };
 
 /******************************(Modal)******************************/
 type ModalChildrenTree = {
   wrapper?: ModalWrapperProps;
   overlay?: ModalOverlayProps;
-  view?:
-    | (ModalViewProps & { children?: JSX.SharedProps["children"] })
-    | Array<ModalViewProps & { children?: JSX.SharedProps["children"] }>;
+  view?: ModalViewProps | ModalViewProps[];
 };
 
 type ModalPropsTree = StyleProps<typeof ModalStyle.wrapper> &
@@ -51,6 +49,7 @@ type ModalPropsDirect = StyleProps<typeof ModalStyle.wrapper> &
   PresentationProps & {
     id: string;
     children?: ModalChildrenTree;
+    format?: ModalViewProps["format"];
   };
 
 export type ModalProps = ModalPropsTree | ModalPropsDirect;
