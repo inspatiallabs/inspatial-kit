@@ -352,6 +352,70 @@ export const IconStyle = createStyle({
 
 The example above demonstrates how InSpatial Kit and Widgets support both CSS and Tailwind utility styles for maximum flexibility and platform agnosticism at a low level. However, when building higher-level InSpatial applications, it's recommended to consistently use either CSS or Tailwind utilities, rather than mixing both, to keep your styles clear and maintainable. Use Tailwind utilities if installed, otherwise use CSS utilities.
 
+##### Class Utilities X (Tailwind Selectors): Gotcha
+
+Because of how InSpatial Serve builds styles, dynamic JIT classes and complex attribute selectors embedded directly inside style functions are not reliably included in the final style bundle. InServe runs Tailwind CLI over `src/config/app.css` (which imports `kit.css`) and only includes classes it can statically detect from content globs. Runtime‑injected style from the variant system is not visible to Tailwind at build time.
+
+— In short: if you need keyframes/animations or any bracket‑based arbitrary variants or attribute selectors (anything inside `[...]`) to be present at runtime, create explicit utility classes in your `app.css` or use a premade utility from `kit.css` under `@layer utilities`, then reference those simple class tokens from your `createStyle()` configs.
+
+**✅ Do this**
+
+```css
+/* app.css */
+@layer utilities {
+  /* Precompiled utility classes with attribute context */
+  [data-in-presentation-snap-points="false"][data-state="open"].drawer-slide-from-right {
+    animation: inmotion-drawer-slide-from-right 0.5s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  }
+
+  /* Optional initial positions for non-snap drawers */
+  [data-in-presentation-snap-points="false"].drawer-position-right { transform: translateX(100%); }
+}
+```
+
+```ts
+// style.ts
+export const DrawerStyle = createStyle({
+  base: [
+    // ...
+  ],
+  settings: {
+    direction: {
+      right: [
+        "fixed top-0 right-0 h-full min-w-[320px]",
+        "drawer-position-right",
+        "drawer-slide-from-right",
+        { web: { /* platform styles */ } },
+      ],
+      // left/top/bottom likewise
+    },
+  },
+});
+```
+
+**❌ Don't do this**
+
+```ts
+// style.ts – runtime/JIT tokens Tailwind can’t see at build time
+createStyle({
+  base: [
+    // ❌ Complex attribute + JIT animation tokens
+    "[data-in-presentation-snap-points=false][data-state=open]:animate-[inmotion-drawer-slide-from-right_0.5s_cubic-bezier(0.32,0.72,0,1)_forwards]",
+    // ❌ Dynamic animation variable tokens
+    "animate-[var(--drawer-animation)_0.5s_cubic-bezier(0.32,0.72,0,1)_forwards]",
+    // ❌ Any bracket-based arbitrary variants in class strings (e.g., w-[calc(100%-16px)])
+    //    Put these as precompiled utilities in your app.css if they must be guaranteed in the bundle
+  ],
+});
+```
+
+**Why: If you re using Class Utilities/Tailwind**
+
+- Class Utilities/Tailwind includes only classes they can statically detect from the configured content files.
+- Variant‑injected CSS and dynamic JIT strings are generated at runtime, after Tailwind build.
+- Arbitrary variants and attribute selectors in bracket syntax (e.g., `[data-state=open]:...`, `w-[calc(...)]`) won’t be reliably picked up when composed inside runtime style classes/ strings.
+- Predeclaring utilities in your `app.css` guarantees these styles ship in `dist/kit.css` bundle, and your style tokens remain simple, portable, and platform‑agnostic.
+
 **🚨 Key Things to Know**
 
 Style composition can be tricky when working with deeply nested and complex style settings. Here's what you need to watch out for:

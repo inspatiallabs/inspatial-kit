@@ -560,15 +560,15 @@
   --animate-inmotion-loading: inmotion-loading 2s cubic-bezier(0.16, 1, 0.3, 1);
   --animate-inmotion-subtle-fade: inmotion-subtle-fade 1.5s
     cubic-bezier(0.16, 1, 0.3, 1);
-  --animate-inmotion-drawer-slide-from-bottom: inmotion-drawer-slide-from-bottom
+  --animate-inmotion-slide-from-bottom: inmotion-slide-from-bottom
     0.5s cubic-bezier(0.32, 0.72, 0, 1);
-  --animate-inmotion-drawer-slide-from-top: inmotion-drawer-slide-from-top 0.5s
+  --animate-inmotion-slide-from-top: inmotion-slide-from-top 0.5s
     cubic-bezier(0.32, 0.72, 0, 1);
-  --animate-inmotion-drawer-slide-from-left: inmotion-drawer-slide-from-left
+  --animate-inmotion-slide-from-left: inmotion-slide-from-left 0.5s
+    cubic-bezier(0.32, 0.72, 0, 1);
+  --animate-inmotion-slide-from-right: inmotion-slide-from-right
     0.5s cubic-bezier(0.32, 0.72, 0, 1);
-  --animate-inmotion-drawer-slide-from-right: inmotion-drawer-slide-from-right
-    0.5s cubic-bezier(0.32, 0.72, 0, 1);
-  --animate-inmotion-drawer-fade-in: inmotion-drawer-fade-in 0.5s
+  --animate-inmotion-fade-in: inmotion-fade-in 0.5s
     cubic-bezier(0.32, 0.72, 0, 1);
 
   /*===============================================================================
@@ -859,8 +859,8 @@
     }
   }
 
-  /* Drawer animations */
-  @keyframes inmotion-drawer-slide-from-bottom {
+  /* presentation animations */
+  @keyframes inmotion-slide-from-bottom {
     from {
       transform: translate3d(0, 100%, 0);
     }
@@ -868,7 +868,7 @@
       transform: translate3d(0, 0, 0);
     }
   }
-  @keyframes inmotion-drawer-slide-from-top {
+  @keyframes inmotion-slide-from-top {
     from {
       transform: translate3d(0, -100%, 0);
     }
@@ -876,7 +876,7 @@
       transform: translate3d(0, 0, 0);
     }
   }
-  @keyframes inmotion-drawer-slide-from-left {
+  @keyframes inmotion-slide-from-left {
     from {
       transform: translate3d(-100%, 0, 0);
     }
@@ -884,7 +884,7 @@
       transform: translate3d(0, 0, 0);
     }
   }
-  @keyframes inmotion-drawer-slide-from-right {
+  @keyframes inmotion-slide-from-right {
     from {
       transform: translate3d(100%, 0, 0);
     }
@@ -892,7 +892,7 @@
       transform: translate3d(0, 0, 0);
     }
   }
-  @keyframes inmotion-drawer-fade-in {
+  @keyframes inmotion-fade-in {
     from {
       opacity: 0;
     }
@@ -1181,4 +1181,42 @@
   }
 
   /** TODO: .material-translucent */
+}
+
+@layer utilities {
+  /* Presentation animation utilities with data attribute selectors */
+  [data-in-presentation-snap-points="false"][data-state="open"].inmotion-slide-from-bottom {
+    animation: inmotion-slide-from-bottom 0.5s
+      cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  }
+  [data-in-presentation-snap-points="false"][data-state="open"].inmotion-slide-from-top {
+    animation: inmotion-slide-from-top 0.5s
+      cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  }
+  [data-in-presentation-snap-points="false"][data-state="open"].inmotion-slide-from-left {
+    animation: inmotion-slide-from-left 0.5s
+      cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  }
+  [data-in-presentation-snap-points="false"][data-state="open"].inmotion-slide-from-right {
+    animation: inmotion-slide-from-right 0.5s
+      cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  }
+  [data-state="open"].inmotion-fade-in {
+    animation: inmotion-fade-in 0.5s cubic-bezier(0.32, 0.72, 0, 1)
+      forwards;
+  }
+
+  /* Initial positioning for non-snap-point presentations */
+  [data-in-presentation-snap-points="false"].inmotion-position-right {
+    transform: translateX(100%);
+  }
+  [data-in-presentation-snap-points="false"].inmotion-position-left {
+    transform: translateX(-100%);
+  }
+  [data-in-presentation-snap-points="false"].inmotion-position-top {
+    transform: translateY(-100%);
+  }
+  [data-in-presentation-snap-points="false"].inmotion-position-bottom {
+    transform: translateY(100%);
+  }
 }

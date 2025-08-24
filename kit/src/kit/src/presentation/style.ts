@@ -18,7 +18,7 @@ export const PresentationStyle = {
   overlay: createStyle({
     base: [
       "fixed inset-0 pointer-events-auto",
-      "[data-state=open]:animate-[inmotion-drawer-fade-in_0.5s_cubic-bezier(0.32,0.72,0,1)_forwards]",
+      "inmotion-fade-in",
       {
         web: {
           position: "fixed",
@@ -77,7 +77,7 @@ export const PresentationStyle = {
 
 export const ModalStyle = {
   /*******************************(Overlay)********************************/
-  
+
   overlay: PresentationStyle.overlay,
 
   /*******************************(Wrapper)********************************/
@@ -122,6 +122,12 @@ export const ModalStyle = {
       },
     ],
     settings: {
+      direction: {
+        right: ["inmotion-position-right", "inmotion-slide-from-right"],
+        left: ["inmotion-position-left", "inmotion-slide-from-left"],
+        top: ["inmotion-position-top", "inmotion-slide-from-top"],
+        bottom: ["inmotion-position-bottom", "inmotion-slide-from-bottom"],
+      },
       size: {
         base: [
           "w-[50%]",
@@ -162,6 +168,7 @@ export const ModalStyle = {
       radius: ThemeRadius,
     },
     defaultSettings: {
+      direction: "bottom",
       size: "base",
       radius: "4xl",
     },
@@ -172,11 +179,11 @@ export const ModalStyle = {
 
 export const DrawerStyle = {
   /*******************************(Overlay)********************************/
-  
+
   overlay: PresentationStyle.overlay,
 
   /*******************************(Wrapper)********************************/
-  
+
   wrapper: createStyle({
     base: [
       "fixed inset-0 pointer-events-none z-[2147483647]",
@@ -199,7 +206,6 @@ export const DrawerStyle = {
       "border border-(--muted)",
       "touch-none",
       "will-change-transform",
-      "transition-transform duration-500",
       {
         web: {
           pointerEvents: "auto",
@@ -207,7 +213,6 @@ export const DrawerStyle = {
           border: "1px solid var(--muted)",
           touchAction: "none",
           willChange: "transform",
-          transition: "transform 0.5s cubic-bezier(0.32, 0.72, 0, 1)",
         },
       },
     ],
@@ -215,7 +220,8 @@ export const DrawerStyle = {
       direction: {
         right: [
           "fixed top-0 right-0 h-full min-w-[320px]",
-          "[data-in-presentation-drawer-snap-points=false][data-state=open]:animate-[inmotion-drawer-slide-from-right_0.5s_cubic-bezier(0.32,0.72,0,1)_forwards]",
+          "inmotion-position-right",
+          "inmotion-slide-from-right",
           {
             web: {
               position: "fixed",
@@ -228,8 +234,8 @@ export const DrawerStyle = {
         ],
         left: [
           "fixed top-0 left-0 h-full min-w-[320px]",
-          "animate-inmotion-drawer-slide-from-left",
-          "[data-in-presentation-drawer-snap-points=false][data-state=open]:animate-[inmotion-drawer-slide-from-left_0.5s_cubic-bezier(0.32,0.72,0,1)_forwards]",
+          "inmotion-position-left",
+          "inmotion-slide-from-left",
           {
             web: {
               position: "fixed",
@@ -242,7 +248,8 @@ export const DrawerStyle = {
         ],
         top: [
           "fixed top-0 left-0 right-0 min-h-[320px]",
-          "[data-in-presentation-drawer-snap-points=false][data-state=open]:animate-[inmotion-drawer-slide-from-top_0.5s_cubic-bezier(0.32,0.72,0,1)_forwards]",
+          "inmotion-position-top",
+          "inmotion-slide-from-top",
           {
             web: {
               position: "fixed",
@@ -255,7 +262,8 @@ export const DrawerStyle = {
         ],
         bottom: [
           "fixed bottom-0 left-0 right-0 min-h-[320px]",
-          "[data-in-presentation-drawer-snap-points=false][data-state=open]:animate-[inmotion-drawer-slide-from-bottom_0.5s_cubic-bezier(0.32,0.72,0,1)_forwards]",
+          "inmotion-position-bottom",
+          "inmotion-slide-from-bottom",
           {
             web: {
               position: "fixed",

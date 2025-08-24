@@ -78,9 +78,6 @@ export type DrawerProps = StyleProps<typeof DrawerStyle.view> &
   JSX.SharedProps &
   PresentationProps & {
     id: string;
-    snapPoints?: (number | string)[];
-    fadeFromIndex?: number;
-    snapToSequentialPoint?: boolean;
     overlayFormat?: StyleProps<
       typeof PresentationStyle.overlay
     >["overlayFormat"];

@@ -57,9 +57,10 @@ function ModalView(props: ModalViewProps) {
     className,
     class: classProp,
     children,
-    format,
+    format = "base",
     size,
     radius,
+    direction,
     ...rest
   } = props;
   return (
@@ -71,6 +72,7 @@ function ModalView(props: ModalViewProps) {
         class: classProp,
         className,
         format,
+        direction,
         size,
         radius,
         ...rest,
@@ -91,6 +93,7 @@ export function Modal(props: ModalProps) {
     id,
     format,
     overlayFormat,
+    direction,
     size,
     radius,
     open,
@@ -131,6 +134,7 @@ export function Modal(props: ModalProps) {
       format,
       size,
       radius,
+      direction,
       wrapper: {},
       overlay: { display: true, overlayFormat: overlayFormat },
       view: undefined,
@@ -196,6 +200,10 @@ export function Modal(props: ModalProps) {
                 format={format}
                 size={size}
                 radius={radius}
+                direction={ct?.direction ?? direction}
+                data-in-presentation
+                data-in-presentation-snap-points="false"
+                data-state={isOpen ? "open" : "closed"}
                 $ref={(el: any) => (modalRef = el)}
                 on:mount={() => setTimeout(() => modalRef?.focus(), 10)}
                 {...ct}
@@ -210,6 +218,10 @@ export function Modal(props: ModalProps) {
               format={format}
               size={size}
               radius={radius}
+              direction={direction}
+              data-in-presentation
+              data-in-presentation-snap-points="false"
+              data-state={isOpen ? "open" : "closed"}
               {...rest}
               on:mount={() => setTimeout(() => modalRef?.focus(), 10)}
               {...(modalChildren.view && typeof modalChildren.view === "object"

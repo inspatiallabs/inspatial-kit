@@ -126,17 +126,9 @@ export function CounterView() {
         }}
       />
 
-      {/* Drawer test */}
-      <Drawer
-        id="demo-drawer"
-        direction="left"
-        overlayFormat="rgb"
-        snapPoints={[0.6, 0.3, 0]}
-        snapToSequentialPoint={true}
-        fadeFromIndex={10}
-        className="!bg-red-500 "
-      >
-        <Text>Drawer</Text>
+      {/* Drawer Base */}
+      <Drawer id="base-drawer">
+        <Text>Drawer Base</Text>
       </Drawer>
 
       <ScrollView>
@@ -264,8 +256,8 @@ export function CounterView() {
               Multi-Modal
             </Button>
             <Button
-              className="bg-rose-600 p-4 rounded-full text-white font-bold text-lg hover:bg-rose-700 transition-colors"
-              on:presentation={{ id: "demo-drawer", action: "toggle" }}
+              className="bg-indigo-600 p-4 rounded-full text-white font-bold text-lg hover:bg-indigo-700 transition-colors"
+              on:presentation={{ id: "base-drawer", action: "toggle" }}
             >
               Drawer
             </Button>
