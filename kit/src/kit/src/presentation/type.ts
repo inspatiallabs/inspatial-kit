@@ -1,9 +1,9 @@
 import type { StyleProps } from "@in/style";
-import type { ModalStyle, PresentationStyle } from "./style.ts";
+import type { DrawerStyle, ModalStyle, PresentationStyle } from "./style.ts";
 
 /*#################################(PRESENTATION TYPES)#################################*/
 
-export type PresentationProps = StyleProps<typeof PresentationStyle> &
+export type PresentationProps = StyleProps<typeof PresentationStyle.base> &
   JSX.SharedProps & {
     open?: boolean;
     defaultOpen?: boolean;
@@ -11,19 +11,26 @@ export type PresentationProps = StyleProps<typeof PresentationStyle> &
     closeOnScrim?: boolean;
   };
 
-/*#################################(MODAL TYPES)#################################*/
-
 /******************************(Overlay)******************************/
 
-export type ModalOverlayProps = StyleProps<typeof ModalStyle.overlay> &
+export type PresentationOverlayProps = StyleProps<
+  typeof PresentationStyle.overlay
+> &
   JSX.SharedProps & {
     display?: boolean;
   };
 
+/*#################################(MODAL TYPES)#################################*/
+
+/******************************(Overlay)******************************/
+
+export type ModalOverlayProps = PresentationOverlayProps;
+
 /******************************(Wrapper)******************************/
 
 export type ModalWrapperProps = StyleProps<typeof ModalStyle.wrapper> &
-  JSX.SharedProps & {};
+  JSX.SharedProps &
+  Record<PropertyKey, never>;
 
 /******************************(View)******************************/
 
@@ -58,3 +65,23 @@ type ModalPropsDirect = StyleProps<typeof ModalStyle.wrapper> &
   };
 
 export type ModalProps = ModalPropsTree | ModalPropsDirect;
+
+/*#################################(DRAWER TYPES)#################################*/
+
+/******************************(Overlay)******************************/
+
+export type DrawerOverlayProps = PresentationOverlayProps;
+
+/******************************(Drawer)******************************/
+
+export type DrawerProps = StyleProps<typeof DrawerStyle.view> &
+  JSX.SharedProps &
+  PresentationProps & {
+    id: string;
+    snapPoints?: (number | string)[];
+    fadeFromIndex?: number;
+    snapToSequentialPoint?: boolean;
+    overlayFormat?: StyleProps<
+      typeof PresentationStyle.overlay
+    >["overlayFormat"];
+  };

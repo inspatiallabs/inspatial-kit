@@ -560,6 +560,16 @@
   --animate-inmotion-loading: inmotion-loading 2s cubic-bezier(0.16, 1, 0.3, 1);
   --animate-inmotion-subtle-fade: inmotion-subtle-fade 1.5s
     cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-inmotion-drawer-slide-from-bottom: inmotion-drawer-slide-from-bottom
+    0.5s cubic-bezier(0.32, 0.72, 0, 1);
+  --animate-inmotion-drawer-slide-from-top: inmotion-drawer-slide-from-top 0.5s
+    cubic-bezier(0.32, 0.72, 0, 1);
+  --animate-inmotion-drawer-slide-from-left: inmotion-drawer-slide-from-left
+    0.5s cubic-bezier(0.32, 0.72, 0, 1);
+  --animate-inmotion-drawer-slide-from-right: inmotion-drawer-slide-from-right
+    0.5s cubic-bezier(0.32, 0.72, 0, 1);
+  --animate-inmotion-drawer-fade-in: inmotion-drawer-fade-in 0.5s
+    cubic-bezier(0.32, 0.72, 0, 1);
 
   /*===============================================================================
   * inmotion: animation keyframes
@@ -845,6 +855,48 @@
       opacity: 0;
     }
     100% {
+      opacity: 1;
+    }
+  }
+
+  /* Drawer animations */
+  @keyframes inmotion-drawer-slide-from-bottom {
+    from {
+      transform: translate3d(0, 100%, 0);
+    }
+    to {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+  @keyframes inmotion-drawer-slide-from-top {
+    from {
+      transform: translate3d(0, -100%, 0);
+    }
+    to {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+  @keyframes inmotion-drawer-slide-from-left {
+    from {
+      transform: translate3d(-100%, 0, 0);
+    }
+    to {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+  @keyframes inmotion-drawer-slide-from-right {
+    from {
+      transform: translate3d(100%, 0, 0);
+    }
+    to {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+  @keyframes inmotion-drawer-fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
       opacity: 1;
     }
   }

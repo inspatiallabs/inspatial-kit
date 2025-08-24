@@ -3,7 +3,7 @@ import { $ } from "@inspatial/kit/state";
 import { Show, List } from "@inspatial/kit/control-flow";
 import { ScrollView, Slot, XStack, YStack } from "@inspatial/kit/structure";
 import { Button } from "@inspatial/kit/ornament";
-import { Modal } from "@inspatial/kit/presentation";
+import { Modal, Drawer } from "@inspatial/kit/presentation";
 import {
   useCounter,
   useCounterExplicit,
@@ -52,7 +52,13 @@ export function CounterView() {
   return (
     <>
       {/* Simple modal with direct children */}
-      <Modal id="simple-modal" className="p-8" size="base" radius="4xl" overlayFormat="tilted" >
+      <Modal
+        id="simple-modal"
+        className="p-8"
+        size="base"
+        radius="4xl"
+        overlayFormat="tilted"
+      >
         <Text className="text-2xl mb-4">Simple Modal</Text>
         <Text>This modal uses direct children without widget tree.</Text>
         <Button
@@ -110,12 +116,28 @@ export function CounterView() {
         overlayFormat="rgb"
         children={{
           view: [
-            { children: <Text>First View</Text>, },
-            { children: <Text>Second View</Text>,  },
-            { children: <Text>Third View</Text>,  },
+            {
+              children: <Text>First View</Text>,
+              className: "!bg-red-500 !w-9/12",
+            },
+            { children: <Text>Second View</Text>, className: "!bg-blue-500" },
+            { children: <Text>Third View</Text>, className: "!bg-green-500" },
           ],
         }}
       />
+
+      {/* Drawer test */}
+      <Drawer
+        id="demo-drawer"
+        direction="left"
+        overlayFormat="rgb"
+        snapPoints={[0.6, 0.3, 0]}
+        snapToSequentialPoint={true}
+        fadeFromIndex={10}
+        className="!bg-red-500 "
+      >
+        <Text>Drawer</Text>
+      </Drawer>
 
       <ScrollView>
         <div className="flex flex-col justify-center items-center gap-10">
@@ -240,6 +262,12 @@ export function CounterView() {
               on:presentation={{ id: "multi-modal", action: "toggle" }}
             >
               Multi-Modal
+            </Button>
+            <Button
+              className="bg-rose-600 p-4 rounded-full text-white font-bold text-lg hover:bg-rose-700 transition-colors"
+              on:presentation={{ id: "demo-drawer", action: "toggle" }}
+            >
+              Drawer
             </Button>
             <Button
               className="bg-purple-600 p-4 rounded-full text-white font-bold text-lg shadow-lg hover:bg-purple-700 transition-colors"
