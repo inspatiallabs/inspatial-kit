@@ -33,6 +33,14 @@ export const ModalStyle = {
     ],
     settings: {
       overlayFormat: {
+        none: [
+          "hidden",
+          {
+            web: {
+              display: "none",
+            },
+          },
+        ],
         tilted: [
           "material-tilted",
           {
@@ -137,11 +145,11 @@ export const ModalStyle = {
             },
           },
         ],
-        xs: [],
-        sm: [],
-        md: [],
-        lg: [],
-        xl: [],
+        // xs: [],
+        // sm: [],
+        // md: [],
+        // lg: [],
+        // xl: [],
       },
       radius: ThemeRadius,
     },

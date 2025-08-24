@@ -258,7 +258,7 @@ export function createRenderer(
       // deno-lint-ignore no-inner-declarations
       function flatChildren(childArr: any[]): void {
         for (let child of childArr) {
-          if (child !== null && child !== undefined) {
+          if (child !== null && child !== undefined && child !== false) {
             if (isNode(child)) {
               flushTextBuffer();
               normalizedChildren.push(child);

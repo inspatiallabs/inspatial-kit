@@ -14,7 +14,7 @@ import type {
 /*#################################(MODAL OVERLAY)#################################*/
 
 function ModalOverlay(props: ModalOverlayProps) {
-  const { className, class: classProp, format, ...rest } = props;
+  const { className, class: classProp, overlayFormat, ...rest } = props;
 
   return (
     <>
@@ -22,7 +22,7 @@ function ModalOverlay(props: ModalOverlayProps) {
         className={ModalStyle.overlay.getStyle({
           class: classProp,
           className,
-          format,
+          overlayFormat,
           ...rest,
         })}
         {...rest}
@@ -165,7 +165,9 @@ export function Modal(props: ModalProps) {
 
     /*********************************(Render)*********************************/
     const hasOverlay =
-      modalChildren.overlay && modalChildren.overlay.display !== false;
+      modalChildren.overlay &&
+      modalChildren.overlay.display !== false &&
+      modalChildren.overlay.overlayFormat !== "none";
 
     return (
       <>
