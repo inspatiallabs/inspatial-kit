@@ -52,7 +52,7 @@ export function CounterView() {
   return (
     <>
       {/* Simple modal with direct children */}
-      <Modal id="simple-modal" className="p-8">
+      <Modal id="simple-modal" className="p-8" size="base" radius="4xl" overlayFormat="tilted" >
         <Text className="text-2xl mb-4">Simple Modal</Text>
         <Text>This modal uses direct children without widget tree.</Text>
         <Button
@@ -70,13 +70,15 @@ export function CounterView() {
           // 1. Custom Overlay
           overlay: {
             className: "!bg-purple-500/10",
-            format: "tilted",
+            overlayFormat: "transparent",
           },
 
           // 2. Custom View
           view: [
             {
               className: "p-12 !bg-yellow-100 text-black",
+              size: "base",
+              radius: "none",
               children: (
                 <YStack className="p-6 gap-3">
                   <Text className="text-xl font-semibold">Counter Help</Text>
@@ -105,10 +107,12 @@ export function CounterView() {
       {/* Multi Modal View */}
       <Modal
         id="multi-modal"
+        overlayFormat="rgb"
         children={{
           view: [
-            { children: <Text>First View</Text> },
-            { children: <Text>Second View</Text> },
+            { children: <Text>First View</Text>, },
+            { children: <Text>Second View</Text>,  },
+            { children: <Text>Third View</Text>,  },
           ],
         }}
       />

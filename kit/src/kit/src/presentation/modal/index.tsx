@@ -53,7 +53,15 @@ function ModalWrapper(props: ModalWrapperProps) {
 /*#################################(MODAL WINDOW)#################################*/
 
 function ModalView(props: ModalViewProps) {
-  const { className, class: classProp, children, format, ...rest } = props;
+  const {
+    className,
+    class: classProp,
+    children,
+    format,
+    size,
+    radius,
+    ...rest
+  } = props;
   return (
     <Slot
       role="dialog"
@@ -63,6 +71,8 @@ function ModalView(props: ModalViewProps) {
         class: classProp,
         className,
         format,
+        size,
+        radius,
         ...rest,
       })}
       tabIndex={0}
@@ -79,7 +89,10 @@ export function Modal(props: ModalProps) {
   /*********************************(Props)*********************************/
   const {
     id,
-     
+    format,
+    overlayFormat,
+    size,
+    radius,
     open,
     defaultOpen,
     closeOnEsc = true,
@@ -104,17 +117,24 @@ export function Modal(props: ModalProps) {
 
     modalChildren = {
       wrapper: children.wrapper || {},
-      overlay: { display: true, ...(children.overlay || {}) },
+      overlay: {
+        display: true,
+        overlayFormat: overlayFormat,
+        ...(children.overlay || {}),
+      },
       view: viewArr.length ? viewArr : undefined,
     };
-    modalViewNode =
-      (viewArr.length ? null : children.view) ?? rest.children;
+    modalViewNode = (viewArr.length ? null : children.view) ?? rest.children;
   } else {
     // Direct children mode
     modalChildren = {
+      format,
+      size,
+      radius,
       wrapper: {},
-      overlay: { display: true },
+      overlay: { display: true, overlayFormat: overlayFormat },
       view: undefined,
+      ...rest,
     };
     modalViewNode = children;
   }
@@ -171,6 +191,9 @@ export function Modal(props: ModalProps) {
               <ModalView
                 key={`view-${idx}`}
                 className={iss(ct?.className, className)}
+                format={format}
+                size={size}
+                radius={radius}
                 $ref={(el: any) => (modalRef = el)}
                 on:mount={() => setTimeout(() => modalRef?.focus(), 10)}
                 {...ct}
@@ -182,9 +205,12 @@ export function Modal(props: ModalProps) {
             <ModalView
               className={className}
               $ref={(el: any) => (modalRef = el)}
+              format={format}
+              size={size}
+              radius={radius}
+              {...rest}
               on:mount={() => setTimeout(() => modalRef?.focus(), 10)}
-              {...(modalChildren.view &&
-              typeof modalChildren.view === "object"
+              {...(modalChildren.view && typeof modalChildren.view === "object"
                 ? modalChildren.view
                 : {})}
             >

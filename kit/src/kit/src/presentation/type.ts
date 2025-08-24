@@ -29,7 +29,11 @@ export type ModalWrapperProps = StyleProps<typeof ModalStyle.wrapper> &
 
 export type ModalViewProps = StyleProps<typeof ModalStyle.view> &
   JSX.SharedProps & {
-    format?: "base" | "delete-confimation" | "project-creator" | "account-switcher";
+    format?:
+      | "base"
+      | "delete-confimation"
+      | "project-creator"
+      | "account-switcher";
   };
 
 /******************************(Modal)******************************/
@@ -46,10 +50,11 @@ type ModalPropsTree = StyleProps<typeof ModalStyle.wrapper> &
   };
 
 type ModalPropsDirect = StyleProps<typeof ModalStyle.wrapper> &
-  PresentationProps & {
+  ModalViewProps & {
     id: string;
     children?: ModalChildrenTree;
     format?: ModalViewProps["format"];
+    overlayFormat?: ModalOverlayProps["overlayFormat"];
   };
 
 export type ModalProps = ModalPropsTree | ModalPropsDirect;

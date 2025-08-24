@@ -32,7 +32,7 @@ export const ModalStyle = {
       },
     ],
     settings: {
-      format: {
+      overlayFormat: {
         tilted: [
           "material-tilted",
           {
@@ -61,7 +61,7 @@ export const ModalStyle = {
       },
     },
     defaultSettings: {
-      format: "tilted",
+      overlayFormat: "tilted",
     },
   }),
   /*******************************(Wrapper)********************************/
@@ -74,8 +74,6 @@ export const ModalStyle = {
       "justify-center",
       "pointer-events-none",
       "z-[2147483647]",
-      "min-h-fit",
-      "min-w-fit",
       {
         web: {
           position: "fixed",
@@ -85,8 +83,6 @@ export const ModalStyle = {
           justifyContent: "center",
           pointerEvents: "none",
           zIndex: 2147483647,
-          minHeight: "fit-view",
-          minWidth: "fit-view",
         },
       },
     ],
@@ -98,14 +94,12 @@ export const ModalStyle = {
       "bg-(--window)",
       "material-tilted",
       "border border-(--muted)",
-      // "rounded-4xl",
       "shadow-effect",
       {
         web: {
           pointerEvents: "auto",
           background: "var(--window)",
           border: "1px solid var(--muted)",
-          // borderRadius: "50px",
           boxShadow: "shadow(var(--shadow-effect))",
           backdropFilter: "blur(var(--blur-base))",
         },
@@ -123,8 +117,26 @@ export const ModalStyle = {
             },
           },
         ],
-        fit: [],
-        full: [],
+        fit: [
+          "min-h-fit",
+          "min-w-fit",
+          {
+            web: {
+              minHeight: "fit-content",
+              minWidth: "fit-content",
+            },
+          },
+        ],
+        full: [
+          "min-h-full",
+          "min-w-full",
+          {
+            web: {
+              minHeight: "100%",
+              minWidth: "100%",
+            },
+          },
+        ],
         xs: [],
         sm: [],
         md: [],
