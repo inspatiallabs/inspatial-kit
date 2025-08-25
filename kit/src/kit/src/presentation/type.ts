@@ -38,6 +38,7 @@ export type ModalViewProps = StyleProps<typeof ModalStyle.view> &
   JSX.SharedProps & {
     format?:
       | "base"
+      | "share"
       | "delete-confimation"
       | "project-creator"
       | "account-switcher";
