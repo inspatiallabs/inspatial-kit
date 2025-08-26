@@ -2,6 +2,7 @@ export { Async } from "./async/index.ts";
 export { Dynamic } from "./dynamic/index.ts";
 export { Fn } from "./fn/index.ts";
 export { List } from "./list/index.ts";
+export { Table } from "./table/index.ts";
 export { Show } from "./show/index.ts";
 export { Choose } from "./choose/index.ts";
 export { lazy } from "./lazy/index.ts";

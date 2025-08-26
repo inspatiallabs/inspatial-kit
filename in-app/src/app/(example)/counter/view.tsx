@@ -3,7 +3,7 @@ import { $ } from "@inspatial/kit/state";
 import { Show, List } from "@inspatial/kit/control-flow";
 import { ScrollView, Slot, XStack, YStack } from "@inspatial/kit/structure";
 import { Button } from "@inspatial/kit/ornament";
-import { Modal, Drawer } from "@inspatial/kit/presentation";
+import { Modal, Drawer, Dock } from "@inspatial/kit/presentation";
 import {
   useCounter,
   useCounterExplicit,
@@ -51,6 +51,47 @@ export function CounterView() {
 
   return (
     <>
+      {/* Dock Presentation */}
+      <Dock
+        id="app-dock"
+        axis="y"
+        position="bottom"
+        showToggle={true}
+        onToggle="Close"
+
+        defaultOpen={false}
+        children={{
+          items: [
+            {
+              icon: <Slot className="text-2xl">➕</Slot>,
+              // label: "Increment",
+              on: {
+                "on:tap": () => handleCounter.setIncrement(),
+                "on:longpress": () => handleCounter.setIncrement(10),
+              },
+            },
+            {
+              icon: <Slot className="text-2xl">➖</Slot>,
+              // label: "Decrement",
+              on: {
+                "on:tap": () => handleCounter.setDecrement(),
+                "on:longpress": () => handleCounter.setDecrement(10),
+              },
+            },
+            {
+              icon: <Slot className="text-2xl">🔄</Slot>,
+              // label: "Reset",
+              on: {
+                "on:tap": () => {
+                  handleCounter.setReset();
+                  handleCounter.setResetEntries();
+                },
+              },
+            },
+          ],
+        }}
+      />
+
       {/* Simple modal with direct children */}
       <Modal
         id="simple-modal"
@@ -236,6 +277,13 @@ export function CounterView() {
           </Show>
           {/* Action Buttons */}
           <div className="flex gap-4 flex-wrap justify-center">
+            {/* Dock presentation test */}
+            <Button
+              className="bg-brand p-4 rounded-full text-white font-bold text-lg hover:brightness-110 transition-colors"
+              on:presentation={{ id: "app-dock", action: "toggle" }}
+            >
+              Open Dock
+            </Button>
             {/* Modal demo trigger */}
             <Button
               className="bg-teal-600 p-4 rounded-full text-white font-bold text-lg hover:bg-teal-700 transition-colors"

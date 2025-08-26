@@ -416,6 +416,9 @@ export type InUniversalTriggerPropsType =
   | "change"
   | "submit"
   | "focus"
+  | "hover"
+  | "hoverstart"
+  | "hoverend"
   // Capacitor app lifecycle and navigation
   | "back"
   | "resume"
@@ -672,6 +675,73 @@ function DOMFrameChangeHandler(): TriggerPropHandler<MaybeSignalHandler> {
   };
 }
 
+// ========================= (Hover Handlers) =========================
+function DOMHoverHandler(): TriggerPropHandler<MaybeSignalHandler> {
+  return function (node: Element, val: MaybeSignalHandler): void {
+    if (!node || !val) return;
+
+    let isHovering = false;
+    const cb = isSignal(val) ? val.peek() : val;
+
+    if (typeof cb !== "function") return;
+
+    const handleEnter = (e: Event) => {
+      if (!isHovering) {
+        isHovering = true;
+        cb({ type: "hover", hovering: true, event: e });
+      }
+    };
+
+    const handleLeave = (e: Event) => {
+      if (isHovering) {
+        isHovering = false;
+        cb({ type: "hover", hovering: false, event: e });
+      }
+    };
+
+    node.addEventListener("pointerenter", handleEnter);
+    node.addEventListener("pointerleave", handleLeave);
+
+    // Cleanup
+    return () => {
+      node.removeEventListener("pointerenter", handleEnter);
+      node.removeEventListener("pointerleave", handleLeave);
+    };
+  };
+}
+
+function DOMHoverStartHandler(): TriggerPropHandler<MaybeSignalHandler> {
+  return function (node: Element, val: MaybeSignalHandler): void {
+    if (!node || !val) return;
+
+    const cb = isSignal(val) ? val.peek() : val;
+    if (typeof cb !== "function") return;
+
+    const handler = (e: Event) => cb({ type: "hoverstart", event: e });
+    node.addEventListener("pointerenter", handler);
+
+    return () => {
+      node.removeEventListener("pointerenter", handler);
+    };
+  };
+}
+
+function DOMHoverEndHandler(): TriggerPropHandler<MaybeSignalHandler> {
+  return function (node: Element, val: MaybeSignalHandler): void {
+    if (!node || !val) return;
+
+    const cb = isSignal(val) ? val.peek() : val;
+    if (typeof cb !== "function") return;
+
+    const handler = (e: Event) => cb({ type: "hoverend", event: e });
+    node.addEventListener("pointerleave", handler);
+
+    return () => {
+      node.removeEventListener("pointerleave", handler);
+    };
+  };
+}
+
 /*#################################(Register Platform-Bridged Triggers)#################################*/
 
 /** Register platform-bridged universal triggers */
@@ -700,6 +770,12 @@ export function InUniversalTriggerProps(): void {
     createTrigger("submit", DOMEventHandler("submit"));
     // focus → focus
     createTrigger("focus", DOMEventHandler("focus"));
+    // hover → hover state tracking
+    createTrigger("hover", DOMHoverHandler());
+    // hoverstart → pointerenter
+    createTrigger("hoverstart", DOMHoverStartHandler());
+    // hoverend → pointerleave
+    createTrigger("hoverend", DOMHoverEndHandler());
     return;
   }
   // Capacitor (WebView + native App bridge)
