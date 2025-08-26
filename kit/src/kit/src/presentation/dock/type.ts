@@ -1,6 +1,7 @@
 import type { StyleProps } from "@in/style";
 import type { DockStyle } from "./style.ts";
 import type { PresentationProps } from "../type.ts";
+import type { PresentationStyle } from "../style.ts";
 import type { IconProps } from "../../icon/type.ts";
 import type { TypographyProps } from "../../typography/text/type.ts";
 
@@ -23,14 +24,28 @@ export type DockChildrenTree = {
 
 /*#################################(DOCK PROPS)#################################*/
 
-export type DockProps = StyleProps<typeof DockStyle> &
+export type DockProps = StyleProps<typeof DockStyle.view> &
   PresentationProps & {
     id: string;
+    direction?: "top" | "bottom" | "left" | "right";
     axis?: "x" | "y";
+    overlayFormat?: StyleProps<
+      typeof PresentationStyle.overlay
+    >["overlayFormat"];
     minimized?: boolean;
     toggle?: {
-      type?: "Minimize" | "Close";
-      display?: boolean;
+      modes: ("minimize" | "close")[] | "none";
+      placement?: "start" | "end";
+      layout?: "inline" | "split";
+      icon?: {
+        minimize?: JSX.SharedProps["children"];
+        close?: JSX.SharedProps["children"];
+      };
+      label?: "auto" | "always" | "never";
+      on?: {
+        minimize?: Record<string, any>;
+        close?: Record<string, any>;
+      };
     };
     children?: DockChildrenTree;
   };
@@ -41,12 +56,8 @@ export type DockItemsProps = JSX.SharedProps & {
   axis?: "x" | "y";
 };
 
-export type DockItemProps = JSX.SharedProps & {
-  "on:tap"?: () => void;
-};
+export type DockItemProps = JSX.SharedProps;
 
 export type DockIconProps = JSX.SharedProps;
 
-export type DockLabelProps = JSX.SharedProps & {
-  showOnHover?: boolean;
-};
+export type DockLabelProps = JSX.SharedProps;

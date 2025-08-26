@@ -101,7 +101,7 @@ Control flows allow you to...
 
 - **Structure & Control Flow Components:**
   _ `<Show when={signal}>`: Conditional rendering. Supports `true` and `else` props. For one-off static conditions, you can use inline typescript to return the desired branch directly just like in React(but will not have reactivity).
-  _ `<List each={signalOfArray} track="key" indexed={true}>`: Efficiently renders lists with reconciliation by handling all list rendering scenarios. Automatically handles static arrays and signals, eliminates need for `derivedExtract`, provides direct item access in templates. Use `track` for stable keys when data changes completely. Exposes `getItem()`, `remove()`, `clear()` methods. Template functions receive raw item data directly for clean, readable syntax.
+  _ `<List each={signalOfArray} track="key" indexed={true}>`: Efficiently renders lists with reconciliation by handling all list rendering scenarios. Automatically handles static arrays and signals, eliminates need for `derivedExtract`, provides direct item access in templates. Use `track` for stable keys when data changes completely. Exposes `getItem()`, `remove()`, `clear()` methods. View functions receive raw item data directly for clean, readable syntax.
   _ `<Async future={promise}>`: Manages asynchronous operations (pending, resolved, rejected states). `async` components automatically get `fallback` and `catch` props.
   _ **Error Handling in Asynchronous Components:** Implement robust error handling within `async` components. Utilize the `catch` prop of `<Async>` components or direct `fallback`/`catch` props on async components, and `try...catch` blocks for network requests to gracefully manage and display errors to the user.
   _ `<Dynamic is={componentOrTag}>`: Renders a component or HTML tag that can change dynamically.
@@ -248,7 +248,7 @@ NOTE:
 
 1. both `style` and (`className` or `class`) are reactive at the core. This means you don't have to parse computed/$ to...
 
-2. Template strings are non-reactive. A plain backtick string evaluates once, so it can’t auto‑update. Use the object/array forms (or a Signal) for reactivity.
+2. View strings are non-reactive. A plain backtick string evaluates once, so it can’t auto‑update. Use the object/array forms (or a Signal) for reactivity.
 
 ```typescript
 // ❌  DON'T DO THIS
@@ -365,11 +365,18 @@ Because of how InSpatial Serve builds styles, dynamic JIT classes and complex at
 @layer utilities {
   /* Precompiled utility classes with attribute context */
   [data-in-presentation-snap-points="false"][data-state="open"].drawer-slide-from-right {
-    animation: inmotion-drawer-slide-from-right 0.5s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+    animation: inmotion-drawer-slide-from-right 0.5s cubic-bezier(
+        0.32,
+        0.72,
+        0,
+        1
+      ) forwards;
   }
 
   /* Optional initial positions for non-snap drawers */
-  [data-in-presentation-snap-points="false"].drawer-position-right { transform: translateX(100%); }
+  [data-in-presentation-snap-points="false"].drawer-position-right {
+    transform: translateX(100%);
+  }
 }
 ```
 
@@ -385,7 +392,11 @@ export const DrawerStyle = createStyle({
         "fixed top-0 right-0 h-full min-w-[320px]",
         "drawer-position-right",
         "drawer-slide-from-right",
-        { web: { /* platform styles */ } },
+        {
+          web: {
+            /* platform styles */
+          },
+        },
       ],
       // left/top/bottom likewise
     },
@@ -698,7 +709,7 @@ Use the extensive signal operation methods (`.and()`, `.eq()`, `.gt()`, etc.) fo
 - **State Management:** For complex applications, consider managing state outside of your components and passing it down as props. This promotes better separation of concerns.
 - **Manual Triggering:** When mutating arrays or objects directly, use `.trigger()` to notify InSpatial of the change.
 - **Focus Management:** Use the `$ref` prop with a `setTimeout` to reliably manage focus on elements, especially after asynchronous operations.
-- **Template Literals:** Use `tpl\`...\`` for reactive template strings or the simple template literal \`...\` for string interpolation in URLs.
+- **View Literals:** Use `tpl\`...\`` for reactive template strings or the simple template literal \`...\` for string interpolation in URLs.
 - **Reactivity Pitfalls:** Remember to wrap expressions in `$(...)` within JSX when they need to be reactive. Be mindful of when to use `peek()` or `untrack()` to control signal dependencies and avoid unnecessary re-renders.
 - **Auto Coercion:**
   `.get()` is auto-coerced e.g if you have a value `signal.count` it would auto append or use `.get()` hence making it the same as `signal.count.get()`.
@@ -895,7 +906,7 @@ One requestAnimationFrame (RAF) for the whole app, not per node.
 const ui = createState({ fps: 0 });
 
 // Use Frame Change
-<Template on:frameChange={({ delta, frame }: { delta: number; frame: number }) => {
+<View on:frameChange={({ delta, frame }: { delta: number; frame: number }) => {
     if (frame % 10 === 0) {
       const d = delta || 16;
       const next = Math.max(1, Math.round(1000 / d));
@@ -908,16 +919,23 @@ const ui = createState({ fps: 0 });
    <FPS />
 ```
 
-**on:beforeMount** & **on:mount**
+**on:beforeMount**
 Use `on:beforeMount` to trigger actions you want before an app starts or renders.
-Use `on:mount` to trigger actions you want when/after an app starts or renders.
 
 ```typescript
-<Template
+<View
   on:beforeMount={() => {
     // safe for state setup, timers, subscriptions
     // avoid reading DOM layout here; node may not be connected yet
   }}
+/>
+```
+
+**on:mount**
+Use `on:mount` to trigger actions you want when/after an app starts or renders.
+
+```typescript
+<View
   on:mount={() => {
     // node is now connected; do DOM reads/writes here if needed
   }}
@@ -950,6 +968,11 @@ Use `on:route` to trigger an action on navigation.
 **on:submit**
 ...
 
+**on:hover**
+**on:hoverstart**
+**on:hoverend**
+...
+
 ##### C. Area Triggers
 
 ##### D. Gesture Triggers
@@ -964,6 +987,11 @@ Allows you to close a presentation when the `ESC` Key is pressed
 ##### G. Extension/Custom Triggers
 
 Some extensions add their own trigger props, which become available when you install those extensions (just like `InTrigger`). These extension triggers are registered through the trigger system and only work if the corresponding extension is included. Examples of such extensions are:
+
+###### `InRoute` Extension Trigger
+
+**on:route**
+...
 
 ###### `InPresentation` Extension Trigger
 
@@ -1863,10 +1891,10 @@ const label = $(() => `Status: ${s.status.get()}`);
 <Link to="#" on-prevent:click={() => console.log('prevented')}>Link</Link>
 ```
 
-### 10. Template Literals for URLs
+### 10. View Literals for URLs
 
 ```javascript
-// Template literals with reactive interpolation (State)
+// View literals with reactive interpolation (State)
 import { createState } from "@inspatial/kit/state";
 
 const s = createState({ templateId: 123 });

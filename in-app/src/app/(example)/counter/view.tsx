@@ -54,38 +54,39 @@ export function CounterView() {
       {/* Dock Presentation */}
       <Dock
         id="app-dock"
-        axis="y"
-        position="bottom"
-        showToggle={true}
-        onToggle="Close"
-
-        defaultOpen={false}
+        axis="x"
+        direction="bottom"
+        toggle={{
+          modes: ["minimize", "close"],
+          placement: "start",
+          layout: "split",
+        }}
         children={{
           items: [
             {
               icon: <Slot className="text-2xl">➕</Slot>,
-              // label: "Increment",
+              label: "Increment",
               on: {
                 "on:tap": () => handleCounter.setIncrement(),
                 "on:longpress": () => handleCounter.setIncrement(10),
               },
             },
             {
-              icon: <Slot className="text-2xl">➖</Slot>,
-              // label: "Decrement",
-              on: {
-                "on:tap": () => handleCounter.setDecrement(),
-                "on:longpress": () => handleCounter.setDecrement(10),
-              },
-            },
-            {
               icon: <Slot className="text-2xl">🔄</Slot>,
-              // label: "Reset",
+              label: "Reset",
               on: {
                 "on:tap": () => {
                   handleCounter.setReset();
                   handleCounter.setResetEntries();
                 },
+              },
+            },
+            {
+              icon: <Slot className="text-2xl">➖</Slot>,
+              label: "Decrement",
+              on: {
+                "on:tap": () => handleCounter.setDecrement(),
+                "on:longpress": () => handleCounter.setDecrement(10),
               },
             },
           ],
