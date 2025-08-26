@@ -15,6 +15,8 @@ import {
   type EntryProps,
 } from "./state.ts";
 import { Text } from "@inspatial/kit/typography";
+// @ts-types="@inspatial/kit"
+import { InSpatialIcon } from "@inspatial/kit";
 
 // ########################## (TRIGGER PROPS TEST SIGNALS) ##########################
 

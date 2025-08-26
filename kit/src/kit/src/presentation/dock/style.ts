@@ -196,7 +196,7 @@ export const DockStyle = {
       "items-center",
       "justify-center",
       "h-6 w-6",
-      "text-(--brand)",
+      // "text-(--primary)",
       {
         web: {
           display: "flex",
@@ -204,7 +204,7 @@ export const DockStyle = {
           justifyContent: "center",
           height: "1.5rem",
           width: "1.5rem",
-          color: "var(--brand)",
+          // color: "var(--primary)",
         },
       },
     ],

@@ -1,6 +1,6 @@
 import type { StyleProps } from "@in/style";
 import type { DockStyle } from "./style.ts";
-import type { PresentationProps } from "../type.ts";
+import type { PresentationProps, PresentationToggleConfig } from "../type.ts";
 import type { PresentationStyle } from "../style.ts";
 import type { IconProps } from "../../icon/type.ts";
 import type { TypographyProps } from "../../typography/text/type.ts";
@@ -33,20 +33,7 @@ export type DockProps = StyleProps<typeof DockStyle.view> &
       typeof PresentationStyle.overlay
     >["overlayFormat"];
     minimized?: boolean;
-    toggle?: {
-      modes: ("minimize" | "close")[] | "none";
-      placement?: "start" | "end";
-      layout?: "inline" | "split";
-      icon?: {
-        minimize?: JSX.SharedProps["children"];
-        close?: JSX.SharedProps["children"];
-      };
-      label?: "auto" | "always" | "never";
-      on?: {
-        minimize?: Record<string, any>;
-        close?: Record<string, any>;
-      };
-    };
+    toggle?: PresentationToggleConfig;
     children?: DockChildrenTree;
   };
 

@@ -2,10 +2,12 @@ import { Slot } from "../../structure/slot/index.tsx";
 import { $, createState } from "@in/teract/state";
 import { Show } from "../../control-flow/show/index.ts";
 import { iss } from "@in/style/index.ts";
-import { XPrimeIcon } from "../../icon/x-prime-icon.tsx";
-import { BubbleGridIcon } from "../../icon/bubble-grid-icon.tsx";
 import { PresentationRegistry } from "../registry.ts";
 import { DockStyle } from "./style.ts";
+import {
+  renderPresentationToggles,
+  getPresentationToggleIcon,
+} from "../toggle/index.tsx";
 import type {
   DockProps,
   DockItemConfig,
@@ -136,50 +138,16 @@ export function Dock(props: DockProps) {
       if (modes === "none") return [] as ("minimize" | "close")[];
       return modes as ("minimize" | "close")[];
     })();
-    const togglePlacement = toggle?.placement ?? "end"; // start | end
-    const toggleLayout = toggle?.layout ?? "inline"; // inline | split
-    const toggleIcons = toggle?.icon ?? {};
-    const toggleLabelMode = toggle?.label ?? "auto"; // auto | always | never
-    const toggleOn = toggle?.on ?? {};
 
-    function renderToggle(kind: "minimize" | "close", key: string) {
-      const extraTriggers = toggleOn[kind] || {};
-      const onTap = kind === "close" ? handleClose : handleToggle;
-      const iconNode =
-        kind === "minimize"
-          ? toggleIcons.minimize ?? <BubbleGridIcon format="fill" />
-          : toggleIcons.close ?? <XPrimeIcon format="fill" />;
-      const showLabel = toggleLabelMode !== "never";
-      const label = kind === "minimize" ? "Minimize" : "Close";
-      return (
-        <DockItem key={key} on:tap={onTap} {...extraTriggers}>
-          <DockIcon>{iconNode}</DockIcon>
-          {showLabel && <DockLabel>{label}</DockLabel>}
-        </DockItem>
-      );
-    }
-
-    // Decide placement for inline vs split
-    const startModes =
-      toggleLayout === "split"
-        ? toggleModes.slice(0, 1)
-        : togglePlacement === "start"
-        ? toggleModes
-        : [];
-    const endModes =
-      toggleLayout === "split"
-        ? toggleModes.slice(1)
-        : togglePlacement === "end"
-        ? toggleModes
-        : [];
-    const startToggleItems = startModes.map((k, i) =>
-      renderToggle(k, `__t-s-${i}`)
-    );
-    const endToggleItems = endModes.map((k, i) =>
-      renderToggle(k, `__t-e-${i}`)
-    );
-
-    // No separate minimized view needed - handled inline in render
+    // Render presentation toggles
+    const { startItems: startToggleItems, endItems: endToggleItems } =
+      renderPresentationToggles({
+        id,
+        config: toggle,
+        axis: axis,
+        capabilities: { supportsMinimize: true },
+        handlers: { onMinimize: handleToggle, onClose: handleClose },
+      });
 
     // Determine if vertical layout
     const isVertical = direction === "left" || direction === "right";
@@ -232,7 +200,7 @@ export function Dock(props: DockProps) {
                 // Show only minimized bubble when minimized
                 <DockItem on:tap={handleToggle}>
                   <DockIcon>
-                    <BubbleGridIcon format="fill" />
+                    {getPresentationToggleIcon("maximize", toggle?.icon)}
                   </DockIcon>
                   <DockLabel>Expand</DockLabel>
                 </DockItem>
