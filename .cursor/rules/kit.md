@@ -635,16 +635,42 @@ When both `style` and `class`/`className` are used to compose the same style pro
 
 ```typescript
 <Slot
-className="bg-purple-500"
-style={{
-  web: {
-    backgroundColor: "green",
-  },
-}}
->
+  className="bg-purple text-white" // This looses to style   ❌
+  style={{
+    // ✅ This takes Authority
+    web: {
+      backgroundColor: "green",
+      color: "white",
+    },
+  }}
+/>
 ```
 
-**IMPORTANT** When composing styles in `createStyle()`, always use variables (e.g., CSS custom properties) instead of hardcoded style values. Direct values will not work.`createStyle()` is a Variable system by design, and intended for to craft intentional design systems.
+**Switching Variant Authority**
+You can switch the variant authority to from `style` to `class/className` utilities by simiply prefixing your class value with `!` notation.
+
+```typescript
+<Slot
+className={{
+  "!bg-purple",  // ✅ This takes authority.
+  "!text-white",  // ✅ This takes authority.
+  "hidden" // ❌ Style takes back authority.
+}}
+
+style={{
+  web: {
+    backgroundColor: "green", //  ❌ This looses.
+    color: "white" // ❌ This looses.
+    visibility: "visible" // ✅ This wins because `hidden` is not prefixed with `!`.
+  },
+}}
+/>
+```
+
+**Known Issues with Colors in `Class/className`**
+When using colors inside class utilities, you may need to prefix those values with "!" (e.g., "!bg-purple"). Without it your color changes might not be applied as expected. This is mainly an issue with InSpatial Style Sheet (ISS) Variant Authority ranking system. However doing this means you are also switching the variant authority as seen above.
+
+**NOTE** When composing styles in `createStyle()`, always use variables (e.g., CSS custom properties) instead of hardcoded style values. Direct values will not work.`createStyle()` is a Variable system by design, and intended for to craft intentional design systems.
 
 ```typescript
 // ❌ Don't do this
@@ -1678,7 +1704,7 @@ createEffect(() => {
 
 Most “do something when the view appears/changes” use‑cases don’t need `createEffect`. Prefer lifecycle trigger props and reactive control‑flow.
 
-- **Probability**: You're most likely to gravitate towards lifecycle trigger props (on:beforeMount/on:mount) in alongside a Control Flow component i.e <Show> on ~85% of your use cases, and most likely less than ~15% `createEffect` (subscriptions, timers, explicit side‑effects).
+- **Probability**: You're most likely to gravitate towards lifecycle trigger props (on:beforeMount/on:mount) alongside a Control Flow component i.e <Show> or <Choose> ~85% of your use cases, and most likely less than ~15% `createEffect` (subscriptions, timers, explicit side‑effects).
 
 - What to reach for first
 
@@ -1712,11 +1738,11 @@ import { Show } from "@inspatial/kit/control-flow";
 
 const ui = createState({ render: false });
 
-<Stack on:beforeMount={() => ui.render.set(true)}>
+<View on:beforeMount={() => ui.render.set(true)}>
   <Show when={$(() => ui.render.get())}>
     {() => <Text>This is most likely what you should be doing</Text>}
   </Show>
-</Stack>;
+</View>;
 ```
 
 - Reactive branching without effects
@@ -1952,11 +1978,11 @@ const templateUrl = t`https://inspatial.store/template?id=${s.templateId}`;
 
 ### Anti-Patterns
 
-These are practices that work, but they bend or break the expected mental model of the framework. They don’t necessarily cause harm, and in some cases they can serve as “escape hatches.” The problem is that they disrupt the natural flow and conventions of the system, making things harder to reason about in the long run.
+These are practices that work, but they bend or break the expected mental model of the framework. They don’t necessarily cause harm, and in some cases they can serve as “escape hatches.” The problem is that they disrupt the natural flow and conventions of the system, making things harder to reason about in the long run. In other words, they’re like habits that can easily turn into vices. Having a beer once in a while is fine, but turning it into a daily routine quickly becomes a problem.
 
 ### Footguns
 
-These are not just bad habits they’re dangerous. A footgun is something that will blow your leg off if you try to use it. They are inherently unsafe, unpredictable, and should never be considered—even as escape hatches. In other words: don’t do it, ever.
+These are not just bad habits they’re dangerous. A footgun is something that will blow your leg off if you try to use it. They are inherently unsafe, unpredictable, and should never be considered, even as escape hatches. In other words: don’t do it, EVER!.
 
 ### Conflicts
 

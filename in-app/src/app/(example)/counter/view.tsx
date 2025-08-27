@@ -15,8 +15,6 @@ import {
   type EntryProps,
 } from "./state.ts";
 import { Text } from "@inspatial/kit/typography";
-// @ts-types="@inspatial/kit"
-import { InSpatialIcon } from "@inspatial/kit";
 
 // ########################## (TRIGGER PROPS TEST SIGNALS) ##########################
 
@@ -119,7 +117,7 @@ export function CounterView() {
         children={{
           // 1. Custom Overlay
           overlay: {
-            className: "!bg-purple-500/10",
+            className: "!bg-(--brand)/10",
             overlayFormat: "transparent",
           },
 

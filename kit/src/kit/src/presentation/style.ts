@@ -17,7 +17,12 @@ export const PresentationStyle = {
   /*******************************(Overlay)********************************/
   overlay: createStyle({
     base: [
-      "fixed inset-0 pointer-events-auto",
+      "fixed",
+      "inset-0",
+      "min-h-full",
+      "min-w-full",
+      "pointer-events-auto",
+      "z-[2147483646]",
       "inmotion-fade-in",
       {
         web: {
@@ -27,6 +32,7 @@ export const PresentationStyle = {
           minWidth: "100vw",
           pointerEvents: "auto",
           zIndex: 2147483646,
+          
         },
       },
     ],

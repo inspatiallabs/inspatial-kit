@@ -661,7 +661,8 @@ function createStyleCore<V extends StyleShapeProp>(
           filtered[k] = v;
         }
         if (Object.keys(filtered).length) {
-          const c2 = __ensureClassForWebStyle(filtered, "low");
+          // Use normal specificity for colors - the filtering already handles user overrides
+          const c2 = __ensureClassForWebStyle(filtered, "normal");
           if (c2) classParts.push(c2);
         }
       }
@@ -710,7 +711,7 @@ function createStyleCore<V extends StyleShapeProp>(
           // Map to var(--shadow-<name>)
           const cls = __ensureClassForWebStyle(
             { boxShadow: `var(--shadow-${shadowToken[1]})` },
-            "low"
+            "normal"
           );
           if (cls) expandedClassParts.push(cls);
           return;
@@ -743,8 +744,8 @@ function createStyleCore<V extends StyleShapeProp>(
       if (pct !== null && !Number.isNaN(pct) && colorFamilies.has(util)) {
         value = `color-mix(in oklab, var(${cssVar}) ${pct}%, transparent)`;
       }
-      const spec: "normal" | "low" = colorFamilies.has(util) ? "low" : "normal";
-      const cls = __ensureClassForWebStyle({ [cssProp]: value }, spec);
+      // Always use normal specificity - user utilities override via filtering mechanism
+      const cls = __ensureClassForWebStyle({ [cssProp]: value }, "normal");
       if (cls) expandedClassParts.push(cls);
     };
 
