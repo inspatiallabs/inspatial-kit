@@ -149,7 +149,7 @@ export interface CoreInstance<TData extends RowData> {
 }
 
 /*#####################################(CREATE TABLE)#####################################*/
-export function createTable<TData extends RowData>(
+export function createTableCore<TData extends RowData>(
   options: TableOptionsResolved<TData>
 ): Table<TData> {
   if (!env.isProduction && (options.debugAll || options.debugTable)) {
@@ -265,7 +265,7 @@ export function createTable<TData extends RowData>(
       if (!row) {
         row = table.getCoreRowModel().rowsById[id];
         if (!row) {
-          if (process.env.NODE_ENV !== "production") {
+          if (env.isProduction()) {
             throw new Error(`getRow could not find row with ID: ${id}`);
           }
           throw new Error();
@@ -390,3 +390,4 @@ export function createTable<TData extends RowData>(
 
   return table;
 }
+

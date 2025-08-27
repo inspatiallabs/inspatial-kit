@@ -1,5 +1,16 @@
 import { createStyle } from "@in/style";
 
+/*#################################(CELL STYLES)#################################*/
+
+// export const cellStyle = `
+//   cursor-pointer print:block text-primary ml-[-14px] hover:rounded-b-none w-full hover:bg-background hover:text-primary
+//   print:cursor-default print:hover:bg-transparent print:ml-0
+// `;
+
+// export const cellStyleSpan =
+//   "flex cursor-pointer w-full h-auto items-center justify-start text-sm print:cursor-default";
+
+
 export const TableStyle = createStyle({
   base: [
     "pointer-events-auto",

@@ -1,3 +1,4 @@
+import env from "@in/vader/env/variables.ts"
 import { ResolvedColumnFilter } from '../features/ColumnFiltering.ts'
 import { Table, RowModel, Row, RowData } from '../types.ts'
 import { getMemoOptions, memo } from '../utils.ts'
@@ -38,7 +39,7 @@ export function getFilteredRowModel<TData extends RowData>(): (
           const filterFn = column.getFilterFn()
 
           if (!filterFn) {
-            if (process.env.NODE_ENV !== 'production') {
+            if (env.isDevelopment()) {
               console.warn(
                 `Could not find a valid 'column.filterFn' for column with the ID: ${column.id}.`
               )

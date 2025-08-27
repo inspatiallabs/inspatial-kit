@@ -1,3 +1,4 @@
+import env from "@in/vader/env/variables.ts"
 import { TableOptionsResolved, TableState, Updater } from './types'
 
 export type PartialKeys<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
@@ -212,7 +213,7 @@ export function getMemoOptions(
 ) {
   return {
     debug: () => tableOptions?.debugAll ?? tableOptions[debugLevel],
-    key: process.env.NODE_ENV === 'development' && key,
+    key: env.isDevelopment() && key,
     onChange,
   }
 }

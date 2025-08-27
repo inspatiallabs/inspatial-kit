@@ -408,6 +408,7 @@ export function InDOMTriggerProps(): void {
 export type InUniversalTriggerPropsType =
   | "tap"
   | "longpress"
+  | "rightclick"
   | "escape"
   | "mount"
   | "route"
@@ -742,6 +743,34 @@ function DOMHoverEndHandler(): TriggerPropHandler<MaybeSignalHandler> {
   };
 }
 
+// ========================= (RightClick / Context Menu) =========================
+function DOMRightClickHandler(): TriggerPropHandler<MaybeSignalHandler> {
+  return function (node: Element, val: MaybeSignalHandler): void {
+    if (!node || !val) return;
+
+    const cb = isSignal(val) ? val.peek() : val;
+    if (typeof cb !== "function") return;
+
+    const handler = (e: MouseEvent) => {
+      try {
+        e.preventDefault();
+      } catch {}
+      (cb as AnyEventHandler)({
+        type: "rightclick",
+        event: e,
+        x: e.clientX,
+        y: e.clientY,
+      });
+    };
+
+    node.addEventListener("contextmenu", handler as AnyEventHandler);
+
+    return () => {
+      node.removeEventListener("contextmenu", handler as AnyEventHandler);
+    };
+  };
+}
+
 /*#################################(Register Platform-Bridged Triggers)#################################*/
 
 /** Register platform-bridged universal triggers */
@@ -760,6 +789,8 @@ export function InUniversalTriggerProps(): void {
     createTrigger("frameChange", DOMFrameChangeHandler());
     // tap → click
     createTrigger("tap", DOMEventHandler("click"));
+    // rightclick → contextmenu (prevent default)
+    createTrigger("rightclick", DOMRightClickHandler());
     // escape → document-level keydown Escape
     createTrigger("escape", DOMEscapeHandler());
     // longpress → synth from pointer events
@@ -786,6 +817,7 @@ export function InUniversalTriggerProps(): void {
     createTrigger("route", DOMRouteHandler());
     createTrigger("frameChange", DOMFrameChangeHandler());
     createTrigger("tap", DOMEventHandler("click"));
+    createTrigger("rightclick", DOMRightClickHandler());
     createTrigger("escape", DOMEscapeHandler());
     createTrigger("longpress", DOMLongPressHandler());
     createTrigger("change", DOMEventHandler("change"));
