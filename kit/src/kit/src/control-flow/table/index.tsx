@@ -47,7 +47,6 @@ import { PencilIcon } from "../../icon/pencil-icon.tsx";
 // TODO: Implement Table as composable component with multiple formats
 // - base, zebra (current), spreadsheet
 // - create a Base variant for managing database tables
-// use full power of tanstack/react-table
 
 /*#################################(TABLE)#################################*/
 export function Table<TData, TValue>({
