@@ -1,8 +1,8 @@
 import type { StyleProps } from "@in/style";
 import type { TableStyle } from "./style.ts";
 import type { ColumnDef } from "./src/types.ts";
-import type { ContextMenuActionProps } from "@in/kit/navigation/context-menu/type.ts";
-import type { DockProps } from "@in/kit/presentation/dock/type.ts";
+import type { ContextMenuActionProps } from "../../navigation/context-menu/type.ts";
+import type { DockProps } from "../../presentation/dock/type.ts";
 
 /*####################################(TABLE PRIMITIVE PROPS)####################################*/
 
@@ -10,8 +10,11 @@ export type TableWrapperProps = StyleProps<typeof TableStyle.wrapper> &
   JSX.SharedProps;
 export type TableHeaderProps = StyleProps<typeof TableStyle.header> &
   JSX.SharedProps;
-export type TableBodyProps = StyleProps<typeof TableStyle.body> &
-  JSX.SharedProps;
+export type TableListProps = StyleProps<typeof TableStyle.body> &
+  JSX.SharedProps & {
+    each?: any; // Accept signal or array for internal List integration
+    track?: any; // Optional track key for List
+  };
 export type TableFooterProps = StyleProps<typeof TableStyle.footer> &
   JSX.SharedProps;
 export type TableRowProps = StyleProps<typeof TableStyle.row> & JSX.SharedProps;
@@ -25,7 +28,7 @@ export type TableCaptionProps = StyleProps<typeof TableStyle.caption> &
 export type TablePrimitiveProps =
   | TableWrapperProps
   | TableHeaderProps
-  | TableBodyProps
+  | TableListProps
   | TableFooterProps
   | TableRowProps
   | TableHeadProps
@@ -43,10 +46,7 @@ export type TableProps<TData, TValue> = TablePrimitiveProps & {
   onAllChecked?: (checked: boolean) => void;
   getRowId: (row: TData) => string;
   checkedRows: Set<string>;
-  /**
-   * if set to true, the guest list will be displayed in public mode disabling all form of data mutation
-   */
   isPublic?: boolean;
-  contextMenuActions: ContextMenuActionProps<TData>[];
-  dockMenuActions: DockProps[];
+  contextMenuActions?: ContextMenuActionProps<TData>[];
+  dockMenuActions?: DockProps[];
 };

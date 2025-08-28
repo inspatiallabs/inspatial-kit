@@ -1,6 +1,15 @@
 // deno-lint-ignore-file
 import { $ } from "@inspatial/kit/state";
-import { Show, List } from "@inspatial/kit/control-flow";
+import {
+  Show,
+  List,
+  TableWrapper,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableList,
+  TableCell,
+} from "@inspatial/kit/control-flow";
 import { ScrollView, Slot, XStack, YStack } from "@inspatial/kit/structure";
 import { Button } from "@inspatial/kit/ornament";
 import { Modal, Drawer, Dock } from "@inspatial/kit/presentation";
@@ -176,14 +185,23 @@ export function CounterView() {
       <ScrollView>
         <div className="flex flex-col justify-center items-center gap-10">
           <h1 className="text-yellow-500 text-8xl">🚀 Counter</h1>
-          <div className="max-w-2xl">
-            <List each={useCounter.entries} track="id">
-              {(entry: EntryProps) => (
-                <p className="flex flex-col text-xl text-white mb-2 bg-gray-800 p-3 rounded">
-                  {entry.name}
-                </p>
-              )}
-            </List>
+          <div className="max-w-2xl w-full">
+            <TableWrapper>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>ID</TableHead>
+                  <TableHead>Name</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableList each={useCounter.entries} track="id">
+                {(entry: EntryProps) => (
+                  <TableRow key={entry.id}>
+                    <TableCell>{entry.id}</TableCell>
+                    <TableCell>{entry.name}</TableCell>
+                  </TableRow>
+                )}
+              </TableList>
+            </TableWrapper>
           </div>
 
           {/* Simple Input */}

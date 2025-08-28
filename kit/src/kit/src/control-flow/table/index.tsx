@@ -8,12 +8,13 @@ import {
 import { createTable } from "./create-table.ts";
 import {
   TableWrapper,
-  TableBody,
+  TableList,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "./primitive.tsx";
+import { $ } from "@in/teract/signal/index.ts";
 import { Button } from "../../ornament/button/index.ts";
 import { InputField } from "../../input/inputfield/inputfield.native.tsx";
 
@@ -21,8 +22,6 @@ import { CaretDownPrimeIcon } from "../../icon/caret-down-prime-icon.tsx";
 import { CaretLeftPrimeIcon } from "../../icon/caret-left-prime-icon.tsx";
 import { CaretRightPrimeIcon } from "../../icon/caret-right-prime-icon.tsx";
 import { Dock } from "../../presentation/dock/index.tsx";
-
-import { createComponent } from "../../component/index.ts";
 import {
   Stack,
   XStack,
@@ -34,6 +33,7 @@ import { Text } from "../../typography/index.ts";
 import { Image } from "../../media/image/index.ts";
 import { useTableState } from "./state.ts";
 import type { TableProps } from "./type.ts";
+import { cellRender } from "./cell-render.ts";
 
 // import { DropdownMenu } from "../../navigation/dropdown-menu/index.tsx";
 // import { Switch } from "../../input/switch/index.tsx";
@@ -43,21 +43,6 @@ import type { TableProps } from "./type.ts";
 // This will be - dataList Variant
 // - create a Base variant for managing database tables
 // use full power of tanstack/react-table
-
-/*#################################(FLEX RENDER)#################################*/
-
-function flexRender<TProps>(
-  Comp: ((props: TProps) => JSX.Element) | JSX.Element | undefined,
-  props: TProps
-): JSX.Element {
-  if (!Comp) return null;
-
-  if (typeof Comp === "function") {
-    return createComponent(Comp, props);
-  }
-
-  return Comp;
-}
 
 /*#################################(TABLE)#################################*/
 export function Table<TData, TValue>({
@@ -90,24 +75,26 @@ export function Table<TData, TValue>({
     header: ({ table }) =>
       !isPublic && (
         <>
-          <input
-            type="checkbox"
-            checked={allChecked}
-            on:input={(checked) => onAllChecked?.(!!checked)}
+          <InputField
+            variant="checkbox"
+            format="base"
             className="print:hidden"
             aria-label="Select all"
+            checked={allChecked as any}
+            on:input={(checked: any) => onAllChecked?.(!!checked)}
           />
         </>
       ),
     cell: ({ row }) =>
       !isPublic && (
-        <input
-          type="checkbox"
-          checked={checkedRows.has(getRowId(row.original))}
-          on:input={(checked) => onRowChecked?.(row.original, !!checked)}
+        <InputField
+          variant="checkbox"
+          format="base"
           className="print:hidden"
           aria-label="Select row"
-          on:tap={(e) => e?.stopPropagation?.()}
+          checked={checkedRows.has(getRowId(row.original)) as any}
+          on:input={(checked: any) => onRowChecked?.(row.original, !!checked)}
+          on:tap={(e: any) => e?.stopPropagation?.()}
         />
       ),
     enableSorting: false,
@@ -125,32 +112,28 @@ export function Table<TData, TValue>({
     ? columns
     : [selectionColumn, ...columns];
 
-  const table = createTable({
+  const { table, state } = createTable({
     data,
     columns: allColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     initialState: useTable.snapshot(),
     state: useTable.snapshot(),
-    onStateChange: (updater: any) => {
-      const next =
-        typeof updater === "function" ? updater(useTable.snapshot()) : updater;
-      useTable.batch(() => {
-        if (next.sorting) useTable.sorting.set(next.sorting);
-        if (next.columnFilters) useTable.columnFilters.set(next.columnFilters);
-        if (next.columnVisibility)
-          useTable.columnVisibility.set(next.columnVisibility);
-        if (next.pagination) useTable.pagination.set(next.pagination);
-      });
-    },
     onSortingChange: useTable.action.setSorting,
     onColumnFiltersChange: useTable.action.setColumnFilters,
     onColumnVisibilityChange: useTable.action.setColumnVisibility,
     onPaginationChange: useTable.action.setPagination,
-    manualPagination: true, // Set this to true if you're handling pagination on the server
-    pageCount: Math.ceil(data.length / useTable.pagination.peek().pageSize),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
+    manualPagination: false, // Let the table handle pagination automatically
+    pageCount: Math.ceil(
+      data.length / (useTable.pagination.peek()?.pageSize || 10)
+    ),
+  });
+
+  const rows = $(() => {
+    state.get();
+    return table.getRowModel().rows;
   });
 
   const formatColumnName = (name: string) => {
@@ -164,16 +147,17 @@ export function Table<TData, TValue>({
         <XStack className="print:hidden items-center py-4">
           {filterColumn && (
             <InputField
-              format="search"
+              variant="searchfield"
+              format="base"
               placeholder={`Search by ${formatColumnName(filterColumn)}...`}
               value={
                 (table.getColumn(filterColumn)?.getFilterValue() as string) ??
                 ""
               }
-              on:input={(event) =>
+              on:input={(event: any) =>
                 table
                   .getColumn(filterColumn)
-                  ?.setFilterValue(event.target.value)
+                  ?.setFilterValue(event?.target?.value || event)
               }
               className="max-w-full mr-4"
             />
@@ -220,7 +204,7 @@ export function Table<TData, TValue>({
                   <TableHead key={header.id}>
                     {header.isPlaceholder
                       ? null
-                      : flexRender(
+                      : cellRender(
                           header.column.columnDef.header,
                           header.getContext()
                         )}
@@ -229,44 +213,29 @@ export function Table<TData, TValue>({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={
-                    checkedRows.has(getRowId(row.original)) && "selected"
-                  }
-                  className={
-                    onRowClick
-                      ? "cursor-pointer border-y-2 border-(--muted) hover:bg-background"
-                      : ""
-                  }
-                  on:tap={() => onRowClick && onRowClick(row.original)}
-                  on:rightclick={(e: any) => handleContextMenu(e, row.original)}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              // TODO: Add a loading skeleton state and InSpatial Empty Component here...
-              <TableRow className="w-full min-w-full h-screen-500">
-                <TableCell
-                  colSpan={columns.length}
-                  className="m-auto pl-[140px] text-center border-t-2 border-(--muted)"
-                >
-                  No results.
-                </TableCell>
+          <TableList each={rows} track="id">
+            {(row: any) => (
+              <TableRow
+                key={row.id}
+                data-state={
+                  checkedRows.has(getRowId(row.original)) && "selected"
+                }
+                className={
+                  onRowClick
+                    ? "cursor-pointer border-y-2 border-(--muted) hover:bg-background"
+                    : ""
+                }
+                on:tap={() => onRowClick && onRowClick(row.original)}
+                on:rightclick={(e: any) => handleContextMenu(e, row.original)}
+              >
+                {row.getVisibleCells().map((cell: any) => (
+                  <TableCell key={cell.id}>
+                    {cellRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
               </TableRow>
             )}
-          </TableBody>
+          </TableList>
         </TableWrapper>
         {useTable.contextMenu.get() && (
           <>
@@ -284,7 +253,7 @@ export function Table<TData, TValue>({
                 },
               }}
             >
-              {contextMenuActions.map((action, index) => (
+              {(contextMenuActions ?? []).map((action, index) => (
                 <XStack
                   key={index}
                   on:tap={() => {
@@ -320,7 +289,7 @@ export function Table<TData, TValue>({
         {/* Dock */}
         {selectedRowCount > 0 && (
           <XStack className="m-auto w-full justify-center">
-            {dockMenuActions.map((action, index) => (
+            {(dockMenuActions ?? []).map((action, index) => (
               <Dock
                 axis="x"
                 minimized={false}

@@ -1,6 +1,6 @@
 import { TableStyle } from "./style.ts";
 import type {
-  TableBodyProps,
+  TableListProps,
   TableCaptionProps,
   TableCellProps,
   TableFooterProps,
@@ -8,7 +8,6 @@ import type {
   TableHeadProps,
   TableRowProps,
   TableWrapperProps,
-  TablePrimitiveProps,
 } from "./type.ts";
 
 /*####################################(TABLE HEADER)####################################*/
@@ -35,18 +34,39 @@ export function TableHeader({
   );
 }
 
-/*####################################(TABLE BODY)####################################*/
-export function TableBody({
+/*####################################(TABLE LIST/BODY)####################################*/
+export function TableList({
   className,
   format,
   $ref,
   children,
+  each,
+  track,
   ...rest
-}: TableBodyProps) {
+}: TableListProps) {
+  if (each) {
+    const { lazy } = require("../lazy/index.ts");
+    const List = lazy(() => import("../list/index.ts"), "List");
+    return (
+      <tbody
+        $ref={$ref}
+        className={TableStyle.list.getStyle({
+          class: className as JSX.SharedProps["className"],
+          format,
+        } as any)}
+        {...rest}
+      >
+        <List each={each} track={track}>
+          {children as any}
+        </List>
+      </tbody>
+    );
+  }
+
   return (
     <tbody
       $ref={$ref}
-      className={TableStyle.body.getStyle({
+      className={TableStyle.list.getStyle({
         class: className as JSX.SharedProps["className"],
         format,
       } as any)}

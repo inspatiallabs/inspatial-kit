@@ -240,6 +240,23 @@ function onTriggerProp(
   prefix: string,
   key: string
 ): TriggerPropHandler | undefined {
+  // Normalize common alias keys to canonical universal trigger names
+  const aliasMap: Record<string, string> = {
+    // Gesture aliases
+    press: "tap",
+    pointertap: "tap",
+    doubletap: "dblclick",
+    dbltap: "dblclick",
+    // Context/menu
+    contextmenu: "rightclick",
+    // Hover aliases
+    mouseenter: "hoverstart",
+    mouseover: "hoverstart",
+    mouseleave: "hoverend",
+    mouseout: "hoverend",
+  };
+  const canonicalKey = aliasMap[key] ?? key;
+
   // 1. Check built-in trigger props (style, class) - highest priority
   const builtinHandler = triggerProps[prefix as keyof TriggerPropsType];
   if (builtinHandler) return builtinHandler(key);
@@ -248,7 +265,7 @@ function onTriggerProp(
   const bridgeHandlerByPrefix = triggerBridgeRegistry.getHandler(prefix);
   if (bridgeHandlerByPrefix) return bridgeHandlerByPrefix;
 
-  const bridgeHandlerByKey = triggerBridgeRegistry.getHandler(key);
+  const bridgeHandlerByKey = triggerBridgeRegistry.getHandler(canonicalKey);
   if (bridgeHandlerByKey) return bridgeHandlerByKey;
 
   return undefined;
