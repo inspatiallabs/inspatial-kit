@@ -25,11 +25,11 @@ export function TableView() {
       header: "Name",
       cell: ({ row }: { row: Row<EntryProps> }) => row.original.name,
     },
-    {
-      accessorKey: "name",
-      header: "Name",
-      cell: ({ row }: { row: Row<EntryProps> }) => row.original.name,
-    },
+    // {
+    //   accessorKey: "name",
+    //   header: "Name",
+    //   cell: ({ row }: { row: Row<EntryProps> }) => row.original.name,
+    // },
   ];
 
   //   const dockMenuActions = () => {

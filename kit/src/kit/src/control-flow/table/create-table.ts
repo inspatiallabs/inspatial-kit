@@ -48,6 +48,54 @@ function createInSpatialTable<TData extends RowData>(
     },
   }));
 
+  // Create a generic state update interceptor
+  const stateKeys = [
+    "sorting",
+    "columnFilters",
+    "columnVisibility",
+    "pagination",
+    "rowSelection",
+    "expanded",
+    "grouping",
+    "columnOrder",
+    "columnPinning",
+    "rowPinning",
+    "globalFilter",
+  ] as const;
+
+  const stateUpdateInterceptors: any = {};
+
+  // Dynamically create interceptors for all state keys
+  stateKeys.forEach((key) => {
+    const capitalizedKey = key.charAt(0).toUpperCase() + key.slice(1);
+    const handlerName =
+      `on${capitalizedKey}Change` as keyof TableOptions<TData>;
+
+    if (options[handlerName] || table.options[handlerName]) {
+      stateUpdateInterceptors[handlerName] = (updater: Updater<any>) => {
+        // Update internal state
+        table.setState((old) => ({
+          ...old,
+          [key]:
+            typeof updater === "function"
+              ? updater((old as any)[key])
+              : updater,
+        }));
+        // Forward to user handler
+        const handler = options[handlerName] as any;
+        handler?.(updater);
+      };
+    }
+  });
+
+  // Apply all interceptors
+  if (Object.keys(stateUpdateInterceptors).length > 0) {
+    table.setOptions((prev) => ({
+      ...prev,
+      ...stateUpdateInterceptors,
+    }));
+  }
+
   // Add InSpatial-specific enhancements
   (table as any)._stateSignal = stateSignal;
 
