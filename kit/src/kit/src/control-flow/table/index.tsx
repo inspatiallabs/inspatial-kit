@@ -32,7 +32,7 @@ import {
 } from "../../structure/index.ts";
 import { Text } from "../../typography/index.ts";
 import { Image } from "../../media/image/index.ts";
-import { useTable } from "./state.ts";
+import { useTableState } from "./state.ts";
 import type { TableProps } from "./type.ts";
 
 // import { DropdownMenu } from "../../navigation/dropdown-menu/index.tsx";
@@ -74,6 +74,7 @@ export function Table<TData, TValue>({
   dockMenuActions,
   isPublic = false,
 }: TableProps<TData, TValue>) {
+  const useTable = useTableState<TData>();
   const handleContextMenu = (e: any, row: TData) => {
     useTable.action.openContextMenu({
       row,

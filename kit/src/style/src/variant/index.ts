@@ -541,6 +541,69 @@ function createStyleCore<V extends StyleShapeProp>(
     return className;
   }
 
+  // Serialize nested selector objects like {"& > tr": { backgroundColor: '...'}}
+  function __serializeRules(
+    styleObj: Record<string, any>,
+    baseSelector: string
+  ): string {
+    if (!styleObj) return "";
+    const decls: Record<string, any> = {};
+    const nested: Array<[string, any]> = [];
+
+    for (const [k, v] of Object.entries(styleObj)) {
+      if (v === undefined || v === null || v === false) continue;
+      if (v && typeof v === "object" && !Array.isArray(v)) {
+        nested.push([k, v]);
+      } else {
+        decls[k] = v;
+      }
+    }
+
+    let css = "";
+    const declStr = __serializeWebStyle(decls);
+    if (declStr) css += `${baseSelector} { ${declStr} }`;
+
+    for (const [sel, obj] of nested) {
+      if (sel.startsWith("@media")) {
+        const inner = __serializeRules(obj as any, baseSelector);
+        if (inner) css += `${sel} { ${inner} }`;
+        continue;
+      }
+      const nestedSelector = sel.includes("&")
+        ? sel.replace(/&/g, baseSelector)
+        : `${baseSelector} ${sel}`;
+      const inner = __serializeRules(obj as any, nestedSelector);
+      if (inner) css += inner;
+    }
+
+    return css;
+  }
+
+  function __ensureComplexWebStyle(
+    styleObj: Record<string, any>,
+    specificity: "normal" | "low" = "normal"
+  ): string | null {
+    if (!styleObj) return null;
+    const seed = JSON.stringify(styleObj) + `|${specificity}|complex`;
+    const hash = __hashString(seed);
+    const className = `in-${hash}`;
+    if (__injectedStyleHashes.has(hash)) return className;
+    const el = __ensureStyleEl();
+    if (!el) return className; // SSR/non-DOM
+    try {
+      const selector =
+        specificity === "low" ? `:where(.${className})` : `.${className}`;
+      const css = __serializeRules(styleObj, selector);
+      if (css) {
+        el.appendChild(document.createTextNode(css));
+        __injectedStyleHashes.add(hash);
+      }
+    } catch {
+      // ignore
+    }
+    return className;
+  }
+
   function computeProps(config: InSpatialStyleConfig<V>, props?: any) {
     const { settings, defaultSettings } = config;
     const classParts: any[] = [];
@@ -621,49 +684,58 @@ function createStyleCore<V extends StyleShapeProp>(
     // Append external classes and compile web style to a generated class
     const webStyle = (styleOut && (styleOut as any).web) || null;
     if (webStyle) {
-      // Split color-related properties to low specificity so user utilities/styles win
-      const colorKeys = new Set([
-        "backgroundColor",
-        "background",
-        "color",
-        "borderColor",
-        "outlineColor",
-        "fill",
-        "stroke",
-        "textDecorationColor",
-      ]);
-      const lowSpec: Record<string, any> = {};
-      const normalSpec: Record<string, any> = {};
-      for (const [k, v] of Object.entries(webStyle)) {
-        if (colorKeys.has(k)) lowSpec[k] = v;
-        else normalSpec[k] = v;
-      }
-      if (Object.keys(normalSpec).length) {
-        const c1 = __ensureClassForWebStyle(normalSpec, "normal");
-        if (c1) classParts.push(c1);
-      }
-      if (Object.keys(lowSpec).length) {
-        // Filter out color families when user has provided class utilities for them
-        const mapKeyToFamily: Record<string, string> = {
-          backgroundColor: "bg",
-          background: "bg",
-          color: "text",
-          borderColor: "border",
-          outlineColor: "outline",
-          fill: "fill",
-          stroke: "stroke",
-          textDecorationColor: "decoration",
-        };
-        const filtered: Record<string, any> = {};
-        for (const [k, v] of Object.entries(lowSpec)) {
-          const fam = mapKeyToFamily[k] || "";
-          if (fam && userFamily[fam]) continue;
-          filtered[k] = v;
+      // If there are nested selectors/objects, handle as complex style
+      const hasNested = Object.values(webStyle).some(
+        (v) => v && typeof v === "object" && !Array.isArray(v)
+      );
+      if (hasNested) {
+        const c = __ensureComplexWebStyle(webStyle, "normal");
+        if (c) classParts.push(c);
+      } else {
+        // Split color-related properties to low specificity so user utilities/styles win
+        const colorKeys = new Set([
+          "backgroundColor",
+          "background",
+          "color",
+          "borderColor",
+          "outlineColor",
+          "fill",
+          "stroke",
+          "textDecorationColor",
+        ]);
+        const lowSpec: Record<string, any> = {};
+        const normalSpec: Record<string, any> = {};
+        for (const [k, v] of Object.entries(webStyle)) {
+          if (colorKeys.has(k)) lowSpec[k] = v;
+          else normalSpec[k] = v;
         }
-        if (Object.keys(filtered).length) {
-          // Use normal specificity for colors - the filtering already handles user overrides
-          const c2 = __ensureClassForWebStyle(filtered, "normal");
-          if (c2) classParts.push(c2);
+        if (Object.keys(normalSpec).length) {
+          const c1 = __ensureClassForWebStyle(normalSpec, "normal");
+          if (c1) classParts.push(c1);
+        }
+        if (Object.keys(lowSpec).length) {
+          // Filter out color families when user has provided class utilities for them
+          const mapKeyToFamily: Record<string, string> = {
+            backgroundColor: "bg",
+            background: "bg",
+            color: "text",
+            borderColor: "border",
+            outlineColor: "outline",
+            fill: "fill",
+            stroke: "stroke",
+            textDecorationColor: "decoration",
+          };
+          const filtered: Record<string, any> = {};
+          for (const [k, v] of Object.entries(lowSpec)) {
+            const fam = mapKeyToFamily[k] || "";
+            if (fam && userFamily[fam]) continue;
+            filtered[k] = v;
+          }
+          if (Object.keys(filtered).length) {
+            // Use normal specificity for colors - the filtering already handles user overrides
+            const c2 = __ensureClassForWebStyle(filtered, "normal");
+            if (c2) classParts.push(c2);
+          }
         }
       }
     }

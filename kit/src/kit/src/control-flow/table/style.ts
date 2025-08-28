@@ -71,11 +71,15 @@ export const TableStyle = {
   //##############################################(BODY)##############################################//
   body: createStyle({
     base: [
-      "pointer-events-none",
       "border-b-none",
       {
         web: {
-          pointerEvents: "none",
+          "& > tr:nth-child(odd)": {
+            backgroundColor: "var(--background)",
+          },
+          "& > tr:nth-child(even)": {
+            backgroundColor: "var(--surface)",
+          },
           "& tr:last-child": {
             borderBottom: "0",
           },
@@ -105,14 +109,7 @@ export const TableStyle = {
 
   //##############################################(ROW)##############################################//
   row: createStyle({
-    base: [
-      "pointer-events-none",
-      {
-        web: {
-          pointerEvents: "none",
-        },
-      },
-    ],
+    base: [""],
     settings: {
       format: {
         "1": [
@@ -144,14 +141,7 @@ export const TableStyle = {
 
   //##############################################(HEAD)##############################################//
   head: createStyle({
-    base: [
-      "pointer-events-none",
-      {
-        web: {
-          pointerEvents: "none",
-        },
-      },
-    ],
+    base: [""],
     settings: {
       format: {
         "1": [
@@ -234,14 +224,7 @@ export const TableStyle = {
 
   //##############################################(CAPTION)##############################################//
   caption: createStyle({
-    base: [
-      "pointer-events-none",
-      {
-        web: {
-          pointerEvents: "none",
-        },
-      },
-    ],
+    base: [""],
     settings: {
       format: {
         "1": [
