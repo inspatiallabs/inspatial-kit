@@ -287,7 +287,15 @@ export function Table<TData, TValue>({
   try {
     return (
       <>
-        <ScrollView scrollable={false}>
+        <ScrollView
+          scrollable={false}
+          style={{
+            web: {
+              minHeight: "calc(100vh - 100px)",
+              backgroundColor: "red",
+            },
+          }}
+        >
           {/* Filter and column visibility controls*/}
           <XStack className="print:hidden items-center py-4">
             {filterColumn && (
@@ -299,11 +307,14 @@ export function Table<TData, TValue>({
                   (table.getColumn(filterColumn)?.getFilterValue() as string) ??
                   ""
                 }
-                on:input={(event: any) =>
+                on:input={(event: any) => {
+                  const raw =
+                    typeof event === "string" ? event : event?.target?.value;
+                  const next = typeof raw === "string" ? raw.trim() : raw;
                   table
                     .getColumn(filterColumn)
-                    ?.setFilterValue(event?.target?.value || event)
-                }
+                    ?.setFilterValue(next ? next : undefined);
+                }}
                 className="max-w-full mr-4"
               />
             )}
@@ -468,48 +479,27 @@ export function Table<TData, TValue>({
               <Button
                 format="ghost"
                 on:tap={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
+                // disabled={!table.getCanPreviousPage()}
               >
-                {" "}
-                <Text className="sr-only">Previous</Text>{" "}
                 <CaretLeftPrimeIcon
-                  className="size-5 text-damp group-hover:text-damp/50"
+                  // className="size-5 text-damp group-hover:text-damp/50"
                   aria-hidden={true}
-                />{" "}
-              </Button>{" "}
+                />
+              </Button>
               <Text
                 className="h-5 border-r border-(--muted)"
                 aria-hidden={true}
-              >
-                {" "}
-              </Text>
+              ></Text>
               <Button
                 format="ghost"
                 on:tap={() => table.nextPage()}
                 disabled={!table.getCanNextPage()}
               >
-                {" "}
-                <Text className="sr-only">Next</Text>{" "}
                 <CaretRightPrimeIcon
                   className="size-5 text-damp group-hover:text-damp/50 "
                   aria-hidden={true}
-                />{" "}
+                />
               </Button>
-            </XStack>
-
-            {/* Page */}
-            <XStack className="w-auto">
-              <Text className="text-xs text-damp">
-                Page{" "}
-                <Slot className="font-medium text-gray-900 dark:text-gray-50">{`${
-                  table.getState().pagination.pageIndex + 1
-                }`}</Slot>{" "}
-                of{" "}
-                <Slot className="font-medium text-gray-900 dark:text-gray-50">
-                  {" "}
-                  {`${table.getPageCount()}`}
-                </Slot>
-              </Text>
             </XStack>
           </XStack>
         </ScrollView>
@@ -518,7 +508,13 @@ export function Table<TData, TValue>({
   } catch (error) {
     console.error("Table rendering error:", error);
     return (
-      <Text>Error rendering table: {error?.message || "Unknown error"}</Text>
+      <Text>
+        Error rendering table:{" "}
+        {
+          // @ts-ignore
+          String(error?.message || "Unknown error")
+        }
+      </Text>
     );
   }
 }
