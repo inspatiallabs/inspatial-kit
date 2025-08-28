@@ -173,7 +173,7 @@ Tables are zebra-striped by default. Striping is applied in `TableStyle.body` us
 
 ```typescript
 import {
-  TableBody,
+  TableList,
   TableCell,
   TableHead,
   TableHeader,
@@ -188,7 +188,7 @@ import {
       <TableHead>Name</TableHead>
     </TableRow>
   </TableHeader>
-  <TableBody>
+  <TableList>
     {entries.get().map((entry: EntryProps, idx: number) => (
       <TableRow
         key={entry.id}
@@ -198,7 +198,7 @@ import {
         <TableCell>{entry.name}</TableCell>
       </TableRow>
     ))}
-  </TableBody>
+  </TableList>
 </TableWrapper>;
 ```
 

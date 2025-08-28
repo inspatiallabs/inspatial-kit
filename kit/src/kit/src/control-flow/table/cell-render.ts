@@ -1,5 +1,34 @@
 import { createComponent } from "../../component/index.ts";
 
+function toErgonomicCellProps(ctx: any): any | null {
+  if (!ctx) return null;
+  const row = ctx.row;
+  const original = row?.original ?? row;
+  let value =
+    typeof ctx.getValue === "function"
+      ? ctx.getValue()
+      : ctx.cell?.getValue?.();
+  if (value === undefined && row && ctx.column?.id) {
+    // Fallback to property lookup by column id (accessorKey case)
+    try {
+      value = (original as any)?.[ctx.column.id];
+    } catch {}
+  }
+
+  if (row || value !== undefined) {
+    // Merge ergonomic aliases with the original TanStack context.
+    // Important: do NOT overwrite ctx.row. Keep Row<TData> intact for native usage.
+    return {
+      ...ctx,
+      value,
+      original,
+      index: row?.index,
+      id: row?.id,
+    };
+  }
+  return null;
+}
+
 export function cellRender<TProps>(
   Comp: ((props: TProps) => any) | any,
   props: TProps
@@ -7,7 +36,9 @@ export function cellRender<TProps>(
   if (!Comp) return null;
 
   if (typeof Comp === "function") {
-    const result = Comp(props);
+    // Map TanStack CellContext to merged props (native + ergonomic aliases)
+    const merged = toErgonomicCellProps(props) ?? props;
+    const result = Comp(merged as TProps);
     // If the result is a plain value (string, number, etc), return it directly
     if (
       typeof result === "string" ||

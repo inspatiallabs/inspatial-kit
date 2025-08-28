@@ -11,6 +11,7 @@ export function ThemeController({ className, ...rest }: ThemeProps) {
   return (
     <>
       <Button
+        size="md"
         format="outlineSurface"
         iconOnly={true}
         on:tap={() => useTheme.action.setToggle()}

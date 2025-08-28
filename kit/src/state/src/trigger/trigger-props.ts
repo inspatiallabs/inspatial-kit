@@ -699,32 +699,88 @@ function DOMHoverHandler(): TriggerPropHandler<MaybeSignalHandler> {
     if (!node || !val) return;
 
     let isHovering = false;
-    const cb = isSignal(val) ? val.peek() : val;
+    let cleanupFn: (() => void) | null = null;
 
-    if (typeof cb !== "function") return;
+    // Handle signal changes for reactive hover handlers
+    if (isSignal(val)) {
+      val.connect(function () {
+        // Clean up previous listeners
+        if (cleanupFn) {
+          cleanupFn();
+          cleanupFn = null;
+        }
 
-    const handleEnter = (e: Event) => {
-      if (!isHovering) {
-        isHovering = true;
-        cb({ type: "hover", hovering: true, event: e });
-      }
-    };
+        const cb = val.peek();
+        if (typeof cb !== "function") return;
 
-    const handleLeave = (e: Event) => {
-      if (isHovering) {
-        isHovering = false;
-        cb({ type: "hover", hovering: false, event: e });
-      }
-    };
+        const handleEnter = (e: Event) => {
+          if (!isHovering) {
+            isHovering = true;
+            cb(true);
+          }
+        };
 
-    node.addEventListener("pointerenter", handleEnter);
-    node.addEventListener("pointerleave", handleLeave);
+        const handleLeave = (e: Event) => {
+          if (isHovering) {
+            isHovering = false;
+            cb(false);
+          }
+        };
 
-    // Cleanup
-    return () => {
-      node.removeEventListener("pointerenter", handleEnter);
-      node.removeEventListener("pointerleave", handleLeave);
-    };
+        node.addEventListener("pointerenter", handleEnter);
+        node.addEventListener("pointerleave", handleLeave);
+
+        cleanupFn = () => {
+          node.removeEventListener("pointerenter", handleEnter);
+          node.removeEventListener("pointerleave", handleLeave);
+          // Auto cleanup - ensure we send false when removing listeners
+          if (isHovering) {
+            isHovering = false;
+            try {
+              cb(false);
+            } catch {
+              // Ignore errors during cleanup
+            }
+          }
+        };
+      });
+    } else if (typeof val === "function") {
+      const cb = val;
+
+      const handleEnter = (e: Event) => {
+        if (!isHovering) {
+          isHovering = true;
+          cb(true);
+        }
+      };
+
+      const handleLeave = (e: Event) => {
+        if (isHovering) {
+          isHovering = false;
+          cb(false);
+        }
+      };
+
+      node.addEventListener("pointerenter", handleEnter);
+      node.addEventListener("pointerleave", handleLeave);
+
+      cleanupFn = () => {
+        node.removeEventListener("pointerenter", handleEnter);
+        node.removeEventListener("pointerleave", handleLeave);
+        // Auto cleanup - ensure we send false when removing listeners
+        if (isHovering) {
+          isHovering = false;
+          try {
+            cb(false);
+          } catch {
+            // Ignore errors during cleanup
+          }
+        }
+      };
+    }
+
+    // Return cleanup function for proper disposal
+    return cleanupFn || undefined;
   };
 }
 

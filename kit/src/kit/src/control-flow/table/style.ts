@@ -36,9 +36,15 @@ export const TableStyle = {
   header: createStyle({
     base: [
       "pointer-events-auto",
+      "bg-inherit",
+      "hover:bg-var(--surface)",
       {
         web: {
           pointerEvents: "auto",
+          backgroundColor: "inherit",
+          "&:has(:hover)": {
+            backgroundColor: "var(--surface)",
+          },
         },
       },
     ],
@@ -50,10 +56,10 @@ export const TableStyle = {
             web: {
               borderBottom: "2px solid var(--muted)",
               "& tr": {
-                borderBottom: "1px solid var(--muted)",
+                borderBottom: "2px solid var(--muted)",
               },
               "& th": {
-                borderRight: "1px solid var(--muted)",
+                borderRight: "2px solid var(--muted)",
               },
               "& th:last-child": {
                 borderRight: "0",
@@ -76,9 +82,15 @@ export const TableStyle = {
         web: {
           "& > tr:nth-child(odd)": {
             backgroundColor: "var(--background)",
+            "&:hover": {
+              backgroundColor: "var(--window)",
+            },
           },
           "& > tr:nth-child(even)": {
             backgroundColor: "var(--surface)",
+            "&:hover": {
+              backgroundColor: "var(--window)",
+            },
           },
           "& tr:last-child": {
             borderBottom: "0",
@@ -146,14 +158,17 @@ export const TableStyle = {
       format: {
         "1": [
           "h-[38px]",
-          "px-4",
+          "min-h-[38px]",
+          "max-h-[38px]",
+
           "text-left",
           "align-middle",
           "font-medium",
           {
             web: {
               height: "38px",
-              padding: "0 16px",
+              minHeight: "38px",
+              maxHeight: "38px",
               textAlign: "left",
               verticalAlign: "middle",
               fontWeight: "medium",
@@ -173,10 +188,32 @@ export const TableStyle = {
   //##############################################(CELL)##############################################//
   cell: createStyle({
     base: [
-      "cursor-pointer print:block print:cursor-default print:hover:bg-transparent print:ml-0",
+      "cursor-pointer",
+      "p-[16px]",
+      "hover:rounded-none",
+      "hover:bg-(--background)",
+
+      "print:block",
+      "print:cursor-default",
+      "print:ml-0",
+      "print:hover:bg-transparent",
+
       {
         web: {
           cursor: "pointer",
+          padding: "16px",
+          "&:hover": {
+            borderRadius: "0",
+            backgroundColor: "var(--background)",
+          },
+          "&:print": {
+            display: "block",
+            cursor: "default",
+            marginLeft: "0",
+            "&:hover": {
+              backgroundColor: "transparent",
+            },
+          },
         },
       },
     ],
@@ -200,17 +237,40 @@ export const TableStyle = {
           "w-full",
           "text-(--primary)",
           "ml-[-14px]",
-          "hover:rounded-b-none",
-          "hover:bg-(--background)",
           {
             web: {
               width: "100%",
               color: "var(--primary)",
               marginLeft: "-14px",
-              "&:hover": {
-                borderRadius: "0",
-                backgroundColor: "var(--background)",
-              },
+            },
+          },
+        ],
+        "cell-span": [
+          "flex",
+          "cursor-pointer",
+          "w-full",
+          "h-38px",
+          "min-h-38px",
+          "max-h-38px",
+          "items-center",
+          "justify-start",
+          "text-sm",
+          "gap-[8px]",
+          "print:cursor-default",
+          "bg-none",
+          {
+            web: {
+              display: "flex",
+              cursor: "pointer",
+              width: "100%",
+              height: "38px",
+              minHeight: "38px",
+              maxHeight: "38px",
+              alignItems: "center",
+              justifyContent: "start",
+              fontSize: "var(--font-size-sm)",
+              gap: "8px",
+              backgroundColor: "none",
             },
           },
         ],

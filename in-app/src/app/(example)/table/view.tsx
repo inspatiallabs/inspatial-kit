@@ -1,30 +1,69 @@
-import { Table, type ColumnDef } from "@inspatial/kit/control-flow";
+import {
+  Table,
+  TableCell,
+  type ColumnDef,
+  type Row,
+} from "@inspatial/kit/control-flow";
 import { EntryProps, useCounter } from "../counter/state.ts";
+import { ScrollView, Slot } from "@inspatial/kit/structure";
+import { Button } from "@inspatial/kit/ornament";
+import { Text } from "@inspatial/kit/typography";
+import { InSpatialIcon } from "@inspatial/kit/icon";
+// import { InSpatialIcon } from "@inspatial/kit/components";
 
 export function TableView() {
   const entries = useCounter.entries;
-  const columns: ColumnDef<EntryProps, any>[] = [
+
+  const columns: ColumnDef<EntryProps>[] = [
     {
       accessorKey: "id",
       header: "ID",
-      cell: ({ row }) => row.original.id,
+      cell: ({ row }: { row: Row<EntryProps> }) => row.original.id,
     },
     {
       accessorKey: "name",
       header: "Name",
-      cell: ({ row }) => row.original.name,
+      cell: ({ row }: { row: Row<EntryProps> }) => row.original.name,
+    },
+    {
+      accessorKey: "name",
+      header: "Name",
+      cell: ({ row }: { row: Row<EntryProps> }) => row.original.name,
     },
   ];
 
+  //   const dockMenuActions = () => {
+  //     const actions = [
+  //       {
+  //         label: "Delete",
+  //         icon: <InSpatialIcon />,
+  //         on: tap(() => alert("Delete")),
+  //       },
+  //     ];
+
+  //     if (entries.gte(1)) {
+  //       actions.push({
+  //         label: "Edit",
+  //         icon: <InSpatialIcon />,
+  //         on: tap(() => alert("Edit")),
+  //       });
+  //     }
+
+  //     return actions;
+  //   };
+
   return (
     <>
-      <Table<EntryProps, any>
-        columns={columns}
-        data={entries.get()}
-        filterColumn="name"
-        getRowId={(row) => String(row.id)}
-        checkedRows={new Set<string>()}
-      />
+      <ScrollView className="mt-[48px]">
+        <Table
+          columns={columns}
+          data={entries.get()}
+          filterColumn="name"
+          getRowId={(row: EntryProps) => String(row.id)}
+          checkedRows={new Set<string>()}
+          // dockMenuActions={dockMenuActions}
+        />
+      </ScrollView>
     </>
   );
 }

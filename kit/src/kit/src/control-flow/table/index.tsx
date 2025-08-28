@@ -21,6 +21,7 @@ import { InputField } from "../../input/inputfield/inputfield.native.tsx";
 import { CaretDownPrimeIcon } from "../../icon/caret-down-prime-icon.tsx";
 import { CaretLeftPrimeIcon } from "../../icon/caret-left-prime-icon.tsx";
 import { CaretRightPrimeIcon } from "../../icon/caret-right-prime-icon.tsx";
+import { ArrowSwapIcon } from "../../icon/arrow-swap-icon.tsx";
 import { Dock } from "../../presentation/dock/index.tsx";
 import {
   Stack,
@@ -34,12 +35,16 @@ import { Image } from "../../media/image/index.ts";
 import { useTableState } from "./state.ts";
 import type { TableProps } from "./type.ts";
 import { cellRender } from "./cell-render.ts";
+import { createState } from "@in/teract/state/state.ts";
+import { Show } from "../show/index.ts";
+import { DotSixIcon } from "../../icon/dot-six-icon.tsx";
+import { PencilIcon } from "../../icon/pencil-icon.tsx";
 
 // import { DropdownMenu } from "../../navigation/dropdown-menu/index.tsx";
 // import { Switch } from "../../input/switch/index.tsx";
 // import { Checkbox } from "../../input/checkbox/index.tsx";
 
-// TODO: Implement DataTable as composable component with multiple variants
+// TODO: Implement Table as composable component with multiple variants
 // This will be - dataList Variant
 // - create a Base variant for managing database tables
 // use full power of tanstack/react-table
@@ -57,7 +62,6 @@ export function Table<TData, TValue>({
   checkedRows,
   contextMenuActions,
   dockMenuActions,
-  isPublic = false,
 }: TableProps<TData, TValue>) {
   const useTable = useTableState<TData>();
   const handleContextMenu = (e: any, row: TData) => {
@@ -70,35 +74,22 @@ export function Table<TData, TValue>({
 
   const selectedRowCount = (() => checkedRows.size)();
 
-  const selectionColumn: ColumnDef<TData, any> = {
+  const inputChoiceColumn: ColumnDef<TData, any> = {
     id: "select",
-    header: ({ table }) =>
-      !isPublic && (
-        <>
-          <InputField
-            variant="checkbox"
-            format="base"
-            className="print:hidden"
-            aria-label="Select all"
-            checked={allChecked as any}
-            on:input={(checked: any) => onAllChecked?.(!!checked)}
-          />
-        </>
-      ),
-    cell: ({ row }) =>
-      !isPublic && (
-        <InputField
-          variant="checkbox"
-          format="base"
+    header: ({ table }) => null,
+    cell: ({ row }) => (
+      <>
+        <input
+          type="checkbox"
           className="print:hidden"
-          aria-label="Select row"
-          checked={checkedRows.has(getRowId(row.original)) as any}
-          on:input={(checked: any) => onRowChecked?.(row.original, !!checked)}
-          on:tap={(e: any) => e?.stopPropagation?.()}
+          aria-label="Select all"
+          checked={allChecked as any}
+          on:input={(checked: any) => onAllChecked?.(!!checked)}
         />
-      ),
-    enableSorting: false,
-    enableHiding: false,
+      </>
+    ),
+    // enableSorting: false,
+    // enableHiding: false,
   };
 
   // Check if the selection column already exists in the columns array
@@ -110,7 +101,7 @@ export function Table<TData, TValue>({
   // Only add the selection column if it doesn't already exist
   const allColumns = hasSelectionColumn
     ? columns
-    : [selectionColumn, ...columns];
+    : [inputChoiceColumn, ...columns];
 
   const { table, state } = createTable({
     data,
@@ -139,6 +130,89 @@ export function Table<TData, TValue>({
   const formatColumnName = (name: string) => {
     return name.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
   };
+
+  /*#################################(DEFAULT HEADER)#################################*/
+  function renderDefaultHeader(header: any): JSX.Element {
+    const col = header.column;
+    const def = col.columnDef;
+    const label =
+      typeof def.header === "string" && def.header
+        ? def.header
+        : formatColumnName(col.id);
+
+    const headerState = createState({
+      hover: false,
+    });
+
+    return (
+      <>
+        <Stack
+          style={{
+            web: {
+              width: "100%",
+              justifyContent: "space-between",
+              position: "relative",
+            },
+          }}
+          on:hover={(hovering: any) => headerState.hover.set(hovering)}
+        >
+          <Slot
+            style={{
+              web: {
+                width: "100%",
+              },
+            }}
+          >
+            <TableCell format="cell-span" className="w-full">
+              <ArrowSwapIcon
+                size="sm"
+                on:tap={() => {
+                  if (col.getCanSort?.()) col.toggleSorting?.();
+                }}
+              />
+              <Text>{label}</Text>
+            </TableCell>
+          </Slot>
+
+          <Show when={() => headerState.hover.get()} otherwise={null}>
+            <XStack
+              gap={1}
+              style={{
+                web: {
+                  position: "absolute",
+                  right: "4px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                },
+              }}
+            >
+              <Button
+                size="xs"
+                style={{
+                  web: {
+                    borderRadius: "4px 0px 0px 4px",
+                  },
+                }}
+              >
+                <PencilIcon size="xs" />
+              </Button>
+              <Button
+                size="xs"
+                style={{
+                  web: {
+                    borderRadius: "0px 4px 4px 0px",
+                    backgroundColor: "var(--surface)",
+                  },
+                }}
+              >
+                <DotSixIcon size="xs" />
+              </Button>
+            </XStack>
+          </Show>
+        </Stack>
+      </>
+    );
+  }
 
   return (
     <>
@@ -202,12 +276,15 @@ export function Table<TData, TValue>({
               <TableRow key={headerGroup.id} className="">
                 {headerGroup.headers.map((header) => (
                   <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : cellRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                    {header.isPlaceholder ? null : typeof header.column
+                        .columnDef.header === "function" ? (
+                      cellRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )
+                    ) : (
+                      <Slot>{renderDefaultHeader(header)}</Slot>
+                    )}
                   </TableHead>
                 ))}
               </TableRow>
