@@ -1,4 +1,6 @@
 export { createTable } from "./create-table.ts";
 export { Table } from "./index.tsx";
-export * from "./type.ts";
-export * from "./style.ts";
+export type { TableProps } from "./type.ts";
+export { TableStyle } from "./style.ts";
+export type { ColumnDef } from "./src/types.ts";
+export * from "./primitive.tsx";

@@ -125,7 +125,7 @@
 //         )}
 //       >
 //         <div className="flex shrink-0 gap-4 py-4">
-//           {children as React.ReactNode}
+//           {children}
 //         </div>
 //       </section>
 //     </main>

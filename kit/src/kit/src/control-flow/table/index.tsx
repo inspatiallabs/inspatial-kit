@@ -4,13 +4,10 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   getFilteredRowModel,
-  type ColumnSort,
-  type ColumnFilter,
-  type VisibilityState,
-  type PaginationState,
 } from "./src/index.ts";
 import { createTable } from "./create-table.ts";
 import {
+  TableWrapper,
   TableBody,
   TableCell,
   TableHead,
@@ -19,16 +16,12 @@ import {
 } from "./primitive.tsx";
 import { Button } from "../../ornament/button/index.ts";
 import { InputField } from "../../input/inputfield/inputfield.native.tsx";
-// import {
-//   DropdownMenu,
-// } from "./dropdown-menu";
+
 import { CaretDownPrimeIcon } from "../../icon/caret-down-prime-icon.tsx";
 import { CaretLeftPrimeIcon } from "../../icon/caret-left-prime-icon.tsx";
 import { CaretRightPrimeIcon } from "../../icon/caret-right-prime-icon.tsx";
-import type { ContextMenuActionProps } from "../../navigation/context-menu/type.ts";
 import { Dock } from "../../presentation/dock/index.tsx";
-// import { Switch } from "../../input/switch/index.tsx";
-// import { Checkbox } from "../../input/checkbox/index.tsx";
+
 import { createComponent } from "../../component/index.ts";
 import {
   Stack,
@@ -39,26 +32,12 @@ import {
 } from "../../structure/index.ts";
 import { Text } from "../../typography/index.ts";
 import { Image } from "../../media/image/index.ts";
-import type { DockProps } from "../../presentation/dock/type.ts";
-import { createState, $ } from "@in/teract/state/index.ts";
+import { useTable } from "./state.ts";
+import type { TableProps } from "./type.ts";
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-  filterColumn?: string;
-  onRowClick?: (row: TData) => void;
-  onRowChecked?: (row: TData, checked: boolean) => void;
-  allChecked?: boolean;
-  onAllChecked?: (checked: boolean) => void;
-  getRowId: (row: TData) => string;
-  checkedRows: Set<string>;
-  /**
-   * if set to true, the guest list will be displayed in public mode disabling all form of data mutation
-   */
-  isPublic?: boolean;
-  contextMenuActions: ContextMenuActionProps<TData>[];
-  dockMenuActions: DockProps[];
-}
+// import { DropdownMenu } from "../../navigation/dropdown-menu/index.tsx";
+// import { Switch } from "../../input/switch/index.tsx";
+// import { Checkbox } from "../../input/checkbox/index.tsx";
 
 // TODO: Implement DataTable as composable component with multiple variants
 // This will be - dataList Variant
@@ -94,46 +73,13 @@ export function Table<TData, TValue>({
   contextMenuActions,
   dockMenuActions,
   isPublic = false,
-}: DataTableProps<TData, TValue>) {
-  const tableState = createState.in({
-    id: "in-table",
-    initialState: {
-      sorting: [] as ColumnSort[],
-      columnFilters: [] as ColumnFilter[],
-      columnVisibility: {} as VisibilityState,
-      pagination: { pageIndex: 0, pageSize: 8 } as PaginationState,
-      contextMenu: null as { x: number; y: number; row: TData } | null,
-    },
-    action: {
-      setSorting: {
-        key: "sorting",
-        fn: (_: ColumnSort[], v: ColumnSort[]) => v,
-      },
-      setColumnFilters: {
-        key: "columnFilters",
-        fn: (_: ColumnFilter[], v: ColumnFilter[]) => v,
-      },
-      setColumnVisibility: {
-        key: "columnVisibility",
-        fn: (_: VisibilityState, v: VisibilityState) => v,
-      },
-      setPagination: {
-        key: "pagination",
-        fn: (_: PaginationState, v: PaginationState) => v,
-      },
-      openContextMenu: (_: any, row: TData, x: number, y: number) => ({
-        contextMenu: { row, x, y },
-      }),
-      closeContextMenu: { key: "contextMenu", fn: () => null },
-    },
-  });
-
+}: TableProps<TData, TValue>) {
   const handleContextMenu = (e: any, row: TData) => {
-    tableState.action.openContextMenu(
+    useTable.action.openContextMenu({
       row,
-      e?.event?.clientX ?? 0,
-      e?.event?.clientY ?? 0
-    );
+      x: e?.event?.clientX ?? 0,
+      y: e?.event?.clientY ?? 0,
+    });
   };
 
   const selectedRowCount = (() => checkedRows.size)();
@@ -160,11 +106,11 @@ export function Table<TData, TValue>({
           on:input={(checked) => onRowChecked?.(row.original, !!checked)}
           className="print:hidden"
           aria-label="Select row"
-          on:tap={(e) => e.stopPropagation()}
+          on:tap={(e) => e?.stopPropagation?.()}
         />
       ),
-    // enableSorting: false,
-    // enableHiding: false,
+    enableSorting: false,
+    enableHiding: false,
   };
 
   // Check if the selection column already exists in the columns array
@@ -183,28 +129,25 @@ export function Table<TData, TValue>({
     columns: allColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    initialState: tableState.snapshot(),
-    state: tableState.snapshot(),
+    initialState: useTable.snapshot(),
+    state: useTable.snapshot(),
     onStateChange: (updater: any) => {
       const next =
-        typeof updater === "function"
-          ? updater(tableState.snapshot())
-          : updater;
-      tableState.batch(() => {
-        if (next.sorting) tableState.sorting.set(next.sorting);
-        if (next.columnFilters)
-          tableState.columnFilters.set(next.columnFilters);
+        typeof updater === "function" ? updater(useTable.snapshot()) : updater;
+      useTable.batch(() => {
+        if (next.sorting) useTable.sorting.set(next.sorting);
+        if (next.columnFilters) useTable.columnFilters.set(next.columnFilters);
         if (next.columnVisibility)
-          tableState.columnVisibility.set(next.columnVisibility);
-        if (next.pagination) tableState.pagination.set(next.pagination);
+          useTable.columnVisibility.set(next.columnVisibility);
+        if (next.pagination) useTable.pagination.set(next.pagination);
       });
     },
-    onSortingChange: tableState.action.setSorting,
-    onColumnFiltersChange: tableState.action.setColumnFilters,
-    onColumnVisibilityChange: tableState.action.setColumnVisibility,
-    onPaginationChange: tableState.action.setPagination,
+    onSortingChange: useTable.action.setSorting,
+    onColumnFiltersChange: useTable.action.setColumnFilters,
+    onColumnVisibilityChange: useTable.action.setColumnVisibility,
+    onPaginationChange: useTable.action.setPagination,
     manualPagination: true, // Set this to true if you're handling pagination on the server
-    pageCount: Math.ceil(data.length / tableState.pagination.peek().pageSize),
+    pageCount: Math.ceil(data.length / useTable.pagination.peek().pageSize),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
   });
@@ -268,7 +211,7 @@ export function Table<TData, TValue>({
           </select>
         </XStack>
         {/* Table Controls */}
-        <YStack className="relative w-auto">
+        <TableWrapper className="relative w-auto border-collapse">
           <TableHeader className="border-b-2 border-(--muted)">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="">
@@ -323,20 +266,20 @@ export function Table<TData, TValue>({
               </TableRow>
             )}
           </TableBody>
-        </YStack>
-        {tableState.contextMenu.get() && (
+        </TableWrapper>
+        {useTable.contextMenu.get() && (
           <>
             <Slot
               className="fixed inset-0"
-              on:tap={() => tableState.action.closeContextMenu()}
+              on:tap={() => useTable.action.closeContextMenu()}
               style={{ web: { background: "transparent" } }}
             />
             <Stack
               className="fixed p-[5px] shadow-subtle bg-surface z-50 min-w-[200px] max-w-[215px] overflow-hidden rounded-md !border-0  text-sm animate-in fade-in-80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
               style={{
                 web: {
-                  top: tableState.contextMenu.peek()?.y,
-                  left: tableState.contextMenu.peek()?.x,
+                  top: useTable.contextMenu.peek()?.y,
+                  left: useTable.contextMenu.peek()?.x,
                 },
               }}
             >
@@ -344,9 +287,9 @@ export function Table<TData, TValue>({
                 <XStack
                   key={index}
                   on:tap={() => {
-                    const row = tableState.contextMenu.peek()?.row as any;
+                    const row = useTable.contextMenu.peek()?.row as any;
                     action.action(row);
-                    tableState.action.closeContextMenu();
+                    useTable.action.closeContextMenu();
                   }}
                   className="relative flex h-[32px] cursor-pointer select-none items-center rounded px-2 py-1.5 text-sm border-none outline-0 outline-none hover:bg-background text-primary data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
                   style={{

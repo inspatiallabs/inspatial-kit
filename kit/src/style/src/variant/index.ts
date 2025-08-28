@@ -686,6 +686,79 @@ function createStyleCore<V extends StyleShapeProp>(
     const expandedClassParts: string[] = [];
     const pushToken = (t: string, fromUser: boolean = false) => {
       if (!t) return;
+
+      // Check for bracket selector syntax first [&_tr]:border-b
+      const bracketSelectorMatch = t.match(/^\[([^\]]+)\]:(.+)$/);
+      if (bracketSelectorMatch) {
+        const [, selector, utilities] = bracketSelectorMatch;
+        // Convert selector to web style format
+        const selectorKey = selector.replace(/^&/, "");
+
+        // For bracket selectors, we need to ensure the utilities are included
+        // in the Tailwind build process. We do this by:
+        // 1. Adding the utilities as regular classes (so Tailwind sees them)
+        // 2. Creating a CSS rule that applies them to the selector
+
+        // Add utilities to the output so Tailwind processes them
+        const utilityList = utilities.split(/\s+/).filter(Boolean);
+        expandedClassParts.push(...utilityList);
+
+        // Create a unique parent class for this bracket selector
+        const bracketClass = `in-bracket-${__hashString(selector + utilities)}`;
+        expandedClassParts.push(bracketClass);
+
+        // Generate CSS that applies the utilities to child elements
+        // We'll create a rule like: .in-bracket-xyz > tr { /* utility styles */ }
+        // But since we can't resolve Tailwind utilities at runtime,
+        // we use a trick: add a data attribute that triggers the styles
+        const _cssRule = `.${bracketClass}${selectorKey} { @apply ${utilities}; }`;
+
+        // Since we can't use @apply at runtime, we'll mark this element
+        // to inherit the utility classes from its parent
+        const webStyle: Record<string, any> = {};
+
+        // This is a placeholder that tells Tailwind to process these utilities
+        // The actual application happens via the user's Tailwind-CLI at build time
+        webStyle[`${selectorKey}`] = `/* bracket-selector: ${utilities} */`;
+
+        // For now, as a fallback, we'll also emit a class that can be targeted
+        const placeholderClass = __ensureClassForWebStyle(webStyle, "normal");
+        if (placeholderClass) expandedClassParts.push(placeholderClass);
+
+        return;
+      }
+
+      // Check for pseudo-class utilities (odd:, even:, etc.)
+      const pseudoClassMatch = t.match(
+        /^(odd|even|first|last|first-child|last-child):(.+)$/
+      );
+      if (pseudoClassMatch) {
+        const [, pseudo, utilities] = pseudoClassMatch;
+        const utilityList = utilities.split(/\s+/).filter(Boolean);
+
+        // Parse utilities
+        const styleObj: Record<string, any> = {};
+        for (const util of utilityList) {
+          if (util.startsWith("bg-")) {
+            const color = util.substring(3);
+            styleObj.backgroundColor = color.startsWith("(--")
+              ? `var${color}`
+              : `var(--color-${color})`;
+          } else if (util.startsWith("text-")) {
+            const color = util.substring(5);
+            styleObj.color = color.startsWith("(--")
+              ? `var${color}`
+              : `var(--color-${color})`;
+          }
+        }
+
+        // Create pseudo-class selector
+        const webStyle = { [`&:${pseudo}`]: styleObj };
+        const cls = __ensureClassForWebStyle(webStyle, "normal");
+        if (cls) expandedClassParts.push(cls);
+        return;
+      }
+
       // Support two syntaxes: util-(--var) and util-[var(--var)]
       const bracketVarUtilRegex =
         /^(bg|text|border|outline|fill|stroke|decoration|shadow)-\[var\((--[a-zA-Z0-9_-]+)\)\](?:\/(\d{1,3}))?$/;
@@ -828,7 +901,7 @@ function createStyleCore<V extends StyleShapeProp>(
  * style manager that knows how to combine classes without conflicts.
  *
  * @since 0.1.1
- * @category InSpatial Theme
+ * @category InSpatial Style Sheet (ISS)
  * @module iss
  * @kind utility
  * @access public
@@ -886,7 +959,7 @@ export const composeStyle = baseSystem.composeStyle;
  * clothing designer that lets you create your own styling rules and combinations.
  *
  * @since 0.1.1
- * @category InSpatial Theme
+ * @category InSpatial Style Sheet (ISS)
  * @module iss
  * @kind function
  * @access public

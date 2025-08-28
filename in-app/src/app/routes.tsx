@@ -9,6 +9,7 @@ import { RouteTestWindow } from "./(example)/route-test/window.tsx";
 import { AuthWindow } from "./(auth)/window.tsx";
 import { AppMenu } from "./menu.tsx";
 import { AccountView } from "./(auth)/account.tsx";
+import { TableView } from "./(example)/table/view.tsx";
 
 /*################################(Route)################################*/
 // Programmatic routing
@@ -26,8 +27,12 @@ export const route = createRoute({
       //   { name: "projects.counter", to: "counter", view: CounterAppWindow },
       // ],
     },
+
+    /*################################(Example)################################*/
+    
     { name: "routeTest", to: "/route-test", view: RouteTestWindow },
     { name: "counter", to: "/counter", view: CounterAppWindow },
+    { name: "table", to: "/table", view: TableView },
   ],
   defaultView: ErrorWindow,
 });

@@ -1,5 +1,5 @@
 import env from "@in/vader/env/variables.ts"
-import { TableOptionsResolved, TableState, Updater } from './types'
+import type { TableOptionsResolved, TableState, Updater } from './types.ts'
 
 export type PartialKeys<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 export type RequiredKeys<T, K extends keyof T> = Omit<T, K> &

@@ -12,7 +12,7 @@ type AnimationStyleType =
   | "fadeInContainer"
   | "fadeUpContainer";
 
-export type TypographyProps = StyleProps<typeof TypographyStyle.variant> &
+export type TypographyProps = StyleProps<typeof TypographyStyle.getStyle> &
   JSX.SharedProps &
   ITypographyProps & {
     words?: string | string[];

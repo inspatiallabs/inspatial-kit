@@ -1,4 +1,4 @@
-import {
+import type {
   OnChangeFn,
   Table,
   RowModel,
@@ -116,7 +116,7 @@ export const RowPagination: TableFeature = {
     };
     table.setPagination = (updater) => {
       const safeUpdater: Updater<PaginationState> = (old) => {
-        let newState = functionalUpdate(updater, old);
+        const newState = functionalUpdate(updater, old);
 
         return newState;
       };

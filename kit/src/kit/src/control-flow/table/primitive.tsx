@@ -1,13 +1,28 @@
 import { TableStyle } from "./style.ts";
-import type { TableProps } from "./type.ts";
+import type {
+  TableBodyProps,
+  TableCaptionProps,
+  TableCellProps,
+  TableFooterProps,
+  TableHeaderProps,
+  TableHeadProps,
+  TableRowProps,
+  TableWrapperProps,
+  TablePrimitiveProps,
+} from "./type.ts";
 
 /*####################################(TABLE HEADER)####################################*/
-export function TableHeader({ className, $ref, ...rest }: TableProps) {
+export function TableHeader({
+  className,
+  format,
+  $ref,
+  ...rest
+}: TableHeaderProps) {
   return (
     <>
       <thead
         $ref={$ref}
-        className={TableStyle.getStyle({ className, header: "base" })}
+        className={TableStyle.header.getStyle({ className, format })}
         {...rest}
       />
     </>
@@ -15,33 +30,43 @@ export function TableHeader({ className, $ref, ...rest }: TableProps) {
 }
 
 /*####################################(TABLE BODY)####################################*/
-export function TableBody({ className, $ref, ...rest }: TableProps) {
+export function TableBody({
+  className,
+  format,
+  $ref,
+  ...rest
+}: TableBodyProps) {
   return (
     <tbody
       $ref={$ref}
-      className={TableStyle.getStyle({ className, body: "base" })}
+      className={TableStyle.body.getStyle({ className, format })}
       {...rest}
     />
   );
 }
 
 /*####################################(TABLE FOOTER)####################################*/
-export function TableFooter({ className, $ref, ...rest }: TableProps) {
+export function TableFooter({
+  className,
+  format,
+  $ref,
+  ...rest
+}: TableFooterProps) {
   return (
     <tfoot
       $ref={$ref}
-      className={TableStyle.getStyle({ className, footer: "base" })}
+      className={TableStyle.footer.getStyle({ className, format })}
       {...rest}
     />
   );
 }
 
 /*####################################(TABLE ROW)####################################*/
-export function TableRow({ className, $ref, ...rest }: TableProps) {
+export function TableRow({ className, format, $ref, ...rest }: TableRowProps) {
   return (
     <tr
       $ref={$ref}
-      className={TableStyle.getStyle({ className, row: "base" })}
+      className={TableStyle.row.getStyle({ className, format })}
       {...rest}
     />
   );
@@ -49,33 +74,64 @@ export function TableRow({ className, $ref, ...rest }: TableProps) {
 
 /*####################################(TABLE HEAD)####################################*/
 
-export function TableHead({ className, $ref, ...rest }: TableProps) {
+export function TableHead({
+  className,
+  format,
+  $ref,
+  ...rest
+}: TableHeadProps) {
   return (
     <th
       $ref={$ref}
-      className={TableStyle.getStyle({ className, head: "base" })}
+      className={TableStyle.head.getStyle({ className, format })}
       {...rest}
     />
   );
 }
 
 /*####################################(TABLE CELL)####################################*/
-export function TableCell({ className, $ref, ...rest }: TableProps) {
+export function TableCell({
+  className,
+  format,
+  $ref,
+  ...rest
+}: TableCellProps) {
   return (
     <td
       $ref={$ref}
-      className={TableStyle.getStyle({ className, cell: "base" })}
+      className={TableStyle.cell.getStyle({ className, format })}
       {...rest}
     />
   );
 }
 
 /*####################################(TABLE CAPTION)####################################*/
-export function TableCaption({ className, $ref, ...rest }: TableProps) {
+export function TableCaption({
+  className,
+  format,
+  $ref,
+  ...rest
+}: TableCaptionProps) {
   return (
     <caption
       $ref={$ref}
-      className={TableStyle.getStyle({ className, caption: "base" })}
+      className={TableStyle.caption.getStyle({ className, format })}
+      {...rest}
+    />
+  );
+}
+
+/*####################################(TABLE)####################################*/
+export function TableWrapper({
+  className,
+  format,
+  $ref,
+  ...rest
+}: TableWrapperProps) {
+  return (
+    <table
+      $ref={$ref}
+      className={TableStyle.wrapper.getStyle({ className, format })}
       {...rest}
     />
   );

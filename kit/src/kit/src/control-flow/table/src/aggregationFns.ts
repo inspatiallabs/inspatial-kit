@@ -1,5 +1,5 @@
-import { AggregationFn } from './features/ColumnGrouping'
-import { isNumberArray } from './utils'
+import { AggregationFn } from './features/ColumnGrouping.ts'
+import { isNumberArray } from './utils.ts'
 
 const sum: AggregationFn<any> = (columnId, _leafRows, childRows) => {
   // It's faster to just add the aggregations together instead of

@@ -999,6 +999,10 @@ Use `on:route` to trigger an action on navigation.
 **on:hoverend**
 ...
 
+
+**on:rightclick**
+...
+
 ##### C. Area Triggers
 
 ##### D. Gesture Triggers
