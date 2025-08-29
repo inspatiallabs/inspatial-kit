@@ -14,7 +14,7 @@ import { InSpatialIcon } from "@inspatial/kit/icon";
 export function TableView() {
   const entries = useCounter.entries;
 
-  const columns: ColumnDef<EntryProps>[] = [
+  const fields: ColumnDef<EntryProps>[] = [
     {
       accessorKey: "id",
       header: "ID",
@@ -54,9 +54,9 @@ export function TableView() {
 
   return (
     <>
-      <ScrollView className="mt-[48px]">
+      <ScrollView className="mt-[64px]">
         <Table
-          columns={columns}
+          columns={fields}
           data={entries.get()}
           filterColumn="name"
           getRowId={(row: EntryProps) => String(row.id)}

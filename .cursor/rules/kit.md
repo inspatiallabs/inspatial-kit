@@ -866,6 +866,196 @@ export const MyStyle = createStyle({
 });
 ```
 
+##### Composition API
+
+**How composition styling works (and why you’ll love it)**
+
+- If you’ve ever thought: “I want my Drawer to slide from the right, but I also want only the left corners rounded” — and found that your base settings kept winning — this is where the Composition API comes in.
+- Or: “I set `direction` and `size`, but I also want `radius` to react to `direction` without rewriting the base styles.” Composition does exactly that.
+
+###### What it is
+
+- **Composition** lets you add “conditional style add‑ons” that run after everything else.
+- It’s evaluated based on your current style props (e.g., `direction`, `size`) and then applied last, so it reliably wins without needing `!important`.
+
+###### The precedence model
+
+- Base < Settings < User classes < **Composition (last)**
+- This ensures your intent-driven overrides (like “round the entering edge”) always take effect.
+
+###### What you can do with it
+
+- **Condition on any setting**: Apply styles only when `direction="right"` or `size="full"`, etc.
+- **Mix classes and CSS**: Provide utilities (like `rounded-l-xl`) and/or exact CSS (like `borderTopLeftRadius: "20px"`).
+- **Layer smaller rules**: Add multiple composition entries; all matching rules apply.
+- **Avoid `!important`**: Because composition runs last, you keep styles clean.
+
+###### Drawer example: directional radius
+
+- Goal: Round corners based on where the drawer enters.
+- With composition, you define rules like:
+  - **Right**: round the left corners (entering edge opposite gets radius)
+  - **Left**: round the right corners
+  - **Top**: round the bottom corners
+  - **Bottom**: round the top corners
+- These rules activate automatically when `direction` changes — no base rewrites.
+
+```typescript
+  createStyle({
+    base: [ { web: { pointerEvents: "auto" } }],
+    settings: {
+      direction: {
+        right: [
+          {
+            web: {
+              position: "fixed",
+              top: 0,
+              right: 0,
+              height: "100%",
+              minWidth: "40%",
+            },
+          },
+        ],
+        left: [
+
+          {
+            web: {
+              position: "fixed",
+              top: 0,
+              left: 0,
+              height: "100%",
+              minWidth: "40%",
+            },
+          },
+        ],
+        top: [
+          {
+            web: {
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: "40%",
+              minWidth: "100%",
+            },
+          },
+        ],
+        bottom: [
+          {
+            web: {
+              position: "fixed",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              minHeight: "40%",
+            },
+          },
+        ],
+      },
+    },
+    defaultSettings: {
+      direction: "right",
+    },
+    //##########################(START COMPOSITION)###############################
+    //*****************(Apply specific radius based on direction)*****************
+    //############################################################################
+    composition: [
+      // Right drawer - round left corners
+      {
+        direction: "right",
+        style: {
+          web: {
+            borderTopLeftRadius: "20px",
+            borderBottomLeftRadius: "20px",
+            borderTopRightRadius: "0",
+            borderBottomRightRadius: "0",
+          },
+        },
+      },
+      // Left drawer - round right corners
+      {
+        direction: "left",
+        style: {
+          web: {
+            borderTopRightRadius: "20px",
+            borderBottomRightRadius: "20px",
+            borderTopLeftRadius: "0",
+            borderBottomLeftRadius: "0",
+          },
+        },
+      },
+      // Top drawer - round bottom corners
+      {
+        direction: "top",
+        style: {
+          web: {
+            borderBottomLeftRadius: "20px",
+            borderBottomRightRadius: "20px",
+            borderTopLeftRadius: "0",
+            borderTopRightRadius: "0",
+          },
+        },
+      },
+      // Bottom drawer - round top corners
+      {
+        direction: "bottom",
+        style: {
+          web: {
+            borderTopLeftRadius: "20px",
+            borderTopRightRadius: "20px",
+            borderBottomLeftRadius: "0",
+            borderBottomRightRadius: "0",
+          },
+        },
+      },
+    ],
+     //############################################################################
+     //******************************(End Composition)*****************************
+     //############################################################################
+  }),
+```
+
+###### Patterns you’ll use
+
+- “You want size to take precedence over direction” → add size-centric composition rules that finalize width/height.
+- “You want theme radius to react to direction” → gate radius by `direction` using composition so base stays generic.
+- “You want variations without bloat” → keep base minimal, express differences via composition rules.
+
+###### Tips
+
+- Keep base/styles simple; move “contextual” tweaks into composition.
+- Use CSS in `style.web` for precision; use classes for quick utility layering.
+- If two composition rules match, both apply; keep them complementary.
+- You rarely need `!important`—composition already runs last.
+
+- **IMPORTANT:** The Composition API only works with the `style` property; using `class` or `className` utilities inside composition rules will not have any effect.
+
+```typescript
+composition: [
+  // ❌ Don't do this
+  {
+    direction: "right",
+    class: ["bg-green-500"],
+  },
+
+  // ✅ Do This
+  {
+    direction: "right",
+    style: {
+      web: {
+        backgroundColor: "green",
+      },
+    },
+  },
+];
+```
+
+###### Quick mental model
+
+- Define what’s always true in base/settings.
+- Define what’s true “when X happens” in composition.
+- Composition is your “finishing pass” — clean, conditional, and reliable.
+
 ## Interactivity
 
 ### 4. Signals (@in/teract/signal)

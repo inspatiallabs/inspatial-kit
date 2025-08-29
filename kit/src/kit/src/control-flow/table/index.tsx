@@ -13,14 +13,10 @@ import {
   TableHeaderColumn,
   TableHeader,
   TableRow,
+  TableHeaderBar,
 } from "./primitive.tsx";
 import { $ } from "@in/teract/signal/index.ts";
 import { Button } from "../../ornament/button/index.ts";
-import { InputField } from "../../input/inputfield/inputfield.native.tsx";
-
-import { CaretDownPrimeIcon } from "../../icon/caret-down-prime-icon.tsx";
-import { CaretLeftPrimeIcon } from "../../icon/caret-left-prime-icon.tsx";
-import { CaretRightPrimeIcon } from "../../icon/caret-right-prime-icon.tsx";
 import { ArrowSwapIcon } from "../../icon/arrow-swap-icon.tsx";
 import { Dock } from "../../presentation/dock/index.tsx";
 import {
@@ -39,11 +35,9 @@ import { createState } from "@in/teract/state/state.ts";
 import { Show } from "../show/index.ts";
 import { DotSixIcon } from "../../icon/dot-six-icon.tsx";
 import { PencilIcon } from "../../icon/pencil-icon.tsx";
-import { FunnelIcon } from "../../icon/funnel-icon.tsx";
-import { APIIcon } from "../../icon/api-icon.tsx";
-import { ShareIIIcon } from "../../icon/share-ii-icon.tsx";
-import { SettingsIcon } from "../../icon/settings-icon.tsx";
 import { PlusPrimeIcon } from "../../icon/plus-prime-icon.tsx";
+import { Modal } from "../../presentation/modal/index.tsx";
+import { Drawer } from "../../presentation/drawer/index.tsx";
 
 // import { DropdownMenu } from "../../navigation/dropdown-menu/index.tsx";
 // import { Switch } from "../../input/switch/index.tsx";
@@ -96,17 +90,10 @@ export function Table<TData, TValue>({
         />
       </>
     ),
-    // enableSorting: false,
-    // enableHiding: false,
   };
 
-  // Check if the selection column already exists in the columns array
-  // If it does, then we don't need to add it again
-  // However, this means you have to implement your own
-  // Checkbox selection logic in the cell
   const hasSelectionColumn = columns.some((col) => col.id === "select");
 
-  // Only add the selection column if it doesn't already exist
   const allColumns = hasSelectionColumn
     ? columns
     : [inputChoiceColumn, ...columns];
@@ -136,7 +123,6 @@ export function Table<TData, TValue>({
   });
 
   const rows = $(() => {
-    // Add reactive dependencies
     useTable.sorting.get();
     useTable.columnFilters.get();
     useTable.pagination.get();
@@ -196,17 +182,8 @@ export function Table<TData, TValue>({
                     <ArrowSwapIcon
                       size="sm"
                       on:tap={() => {
-                        console.log(
-                          "Sort clicked (non-hover)",
-                          col.id,
-                          col.getCanSort?.()
-                        );
                         if (col.getCanSort?.()) {
                           col.toggleSorting?.();
-                          console.log(
-                            "Sorting state after toggle:",
-                            useTable.sorting.get()
-                          );
                         }
                       }}
                       style={{
@@ -232,13 +209,8 @@ export function Table<TData, TValue>({
                       },
                     }}
                     on:tap={() => {
-                      console.log("Sort clicked", col.id, col.getCanSort?.());
                       if (col.getCanSort?.()) {
                         col.toggleSorting?.();
-                        console.log(
-                          "Sorting state after toggle:",
-                          useTable.sorting.get()
-                        );
                       }
                     }}
                   />
@@ -300,209 +272,128 @@ export function Table<TData, TValue>({
             },
           }}
         >
-          {/*********************************(Table Header Bar)*********************************/}
-          <XStack
-            style={{
-              web: {
-                width: "100%",
-                alignItems: "center",
-                paddingTop: "10px",
-                paddingBottom: "10px",
-                paddingRight: "50px",
-                paddingLeft: "10px",
-                backgroundColor: "var(--surface)",
-                marginBottom: "2px",
-              },
-            }}
+          {/* <Modal
+            id="import-export-modal"
+            className="p-8"
+            size="base"
+            radius="4xl"
+            overlayFormat="transparent"
+          
           >
-            {/*----------------------(Paginate With Filters)----------------------*/}
-            <XStack
-              style={{
-                web: {
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: "10px",
-                },
+            <Text className="text-2xl mb-4">Simple Modal</Text>
+            <Text>This modal uses direct children without widget tree.</Text>
+            <Button
+              className="mt-4"
+              on:presentation={{
+                id: "import-export-modal",
+                action: "close",
               }}
             >
-              {/***********(Paginated Buttons)************/}
-              <Button
-                format="background"
-                size="lg"
-                style={{
-                  web: {
-                    color: "var(--secondary)",
-                    borderRadius: "8px",
-                    padding: "4px",
-                  },
-                }}
-                on:tap={() => table.previousPage()}
-                // disabled={!table.getCanPreviousPage()}
-              >
-                <CaretLeftPrimeIcon />
-              </Button>
-              <Button
-                format="background"
-                size="lg"
-                style={{
-                  web: {
-                    color: "var(--secondary)",
-                    borderRadius: "8px",
-                    padding: "4px",
-                  },
-                }}
-                on:tap={() => table.nextPage()}
-                // disabled={!table.getCanNextPage()}
-              >
-                <CaretRightPrimeIcon />
-              </Button>
+              Close
+            </Button>
+          </Modal> */}
 
-              {/***********(Filter Button)************/}
-              <Button
-                format="outlineBackground"
-                style={{
-                  web: {
-                    color: "var(--secondary)",
-                    borderRadius: "8px",
-                    padding: "0px 6px 0px 10px",
-                  },
-                }}
-              >
-                <XStack gap={6} align="center">
-                  <Text>Filter</Text>
-                  <Slot
-                    style={{
-                      web: {
-                        backgroundColor: "var(--background)",
-                        borderRadius: "6px",
-                        width: "32px",
-                        height: "32px",
-                      },
-                    }}
-                  >
-                    <FunnelIcon
-                      size="md"
-                      style={{
-                        web: {
-                          padding: "4px",
-                        },
-                      }}
-                    />
-                  </Slot>
-                </XStack>
-              </Button>
-            </XStack>
-            {/*-------------------------(Search)-----------------------*/}
-            {filterColumn && (
-              <InputField
-                variant="searchfield"
-                format="base"
-                placeholder={`Search by ${formatColumnName(filterColumn)}...`}
-                value={
-                  (table.getColumn(filterColumn)?.getFilterValue() as string) ??
-                  ""
-                }
-                on:input={(event: any) => {
+          {/* <Modal
+            id="import-export-modal"
+            children={{
+              // 1. Custom Overlay
+              overlay: {
+                className: "!bg-(--brand)/10",
+                overlayFormat: "transparent",
+              },
+
+              // 2. Custom View
+              view: [
+                {
+                  className: "p-12 !bg-yellow-100 text-black",
+                  size: "base",
+                  radius: "none",
+                  children: (
+                    <YStack className="p-6 gap-3">
+                      <Text className="text-xl font-semibold">
+                        Counter Help
+                      </Text>
+                      <Text>
+                        Use the buttons to adjust the counter and explore
+                        trigger props. This modal is controlled via
+                        on:presentation.
+                      </Text>
+                      <Slot className="flex justify-end">
+                        <Button
+                          format="outline"
+                          on:presentation={{
+                            id: "import-export-modal",
+                            action: "close",
+                          }}
+                        >
+                          Close
+                        </Button>
+                      </Slot>
+                    </YStack>
+                  ),
+                },
+              ],
+
+              // 3. Optional Wrapper Customization (99% of the time you don't need this)
+              // wrapper: {},
+            }}
+          /> */}
+
+          <Drawer id="new-entry-drawer">
+            <Text>New Entry</Text>
+          </Drawer>
+
+          {/*#################################(Table Header Bar)#################################*/}
+          <TableHeaderBar
+            pagination={{
+              display: true,
+              prev: { "on:tap": () => table.previousPage() } as any,
+              next: { "on:tap": () => table.nextPage() } as any,
+            }}
+            filter={{ display: true }}
+            search={
+              {
+                display: Boolean(filterColumn),
+                placeholder: filterColumn
+                  ? `Search by ${formatColumnName(filterColumn)}...`
+                  : "Search...",
+                value:
+                  (filterColumn &&
+                    (table
+                      .getColumn(filterColumn)
+                      ?.getFilterValue() as string)) ||
+                  "",
+                "on:input": (event: any) => {
+                  if (!filterColumn) return;
                   const raw =
                     typeof event === "string" ? event : event?.target?.value;
                   const next = typeof raw === "string" ? raw.trim() : raw;
                   table
                     .getColumn(filterColumn)
                     ?.setFilterValue(next ? next : undefined);
-                }}
-                style={{
-                  web: {
-                    width: "100%",
-                    marginRight: "10px",
-                    marginLeft: "10px",
-                  },
-                }}
-              />
-            )}
+                },
+              } as any
+            }
+            actions={{
+              display: true,
 
-            {/*-------------------------(Actions)-----------------------*/}
-            <XStack gap={10}>
-              {/***********(API Docs Button)************/}
-              <Button
-                format="outlineBackground"
-                style={{
-                  web: {
-                    color: "var(--secondary)",
-                    borderRadius: "8px",
-                    padding: "0px 10px 0px 6px",
-                  },
-                }}
-              >
-                <XStack gap={6} align="center">
-                  <Slot
-                    style={{
-                      web: {
-                        background:
-                          "linear-gradient(0deg, rgba(17, 20, 44, 0.50) 0%, rgba(17, 20, 44, 0.50) 100%), radial-gradient(102.81% 102.81% at 70.4% 31.2%, #B53FFE 0%, rgba(144, 0, 255, 0.10) 100%), var(--brand)", // brand-bubble
-                        borderRadius: "6px",
-                        width: "32px",
-                        height: "32px",
-                      },
-                    }}
-                  >
-                    <APIIcon
-                      size="md"
-                      style={{
-                        web: {
-                          padding: "4px",
-                          color: "var(--color-white)",
-                        },
-                      }}
-                    />
-                  </Slot>
-                  <Text
-                    style={{
-                      web: {
-                        color: "var(--primary)",
-                      },
-                    }}
-                  >
-                    Docs
-                  </Text>
-                </XStack>
-              </Button>
+              importExport: {
+                "on:presentation": {
+                  id: "import-export-modal",
+                  action: "toggle",
+                },
+              },
 
-              {/***********(Settings Button)************/}
-              <Button
-                format="outlineBackground"
-                size="lg"
-                style={{
-                  web: {
-                    color: "var(--primary)",
-                    borderRadius: "8px",
-                    padding: "4px",
-                  },
-                }}
-              >
-                <SettingsIcon />
-              </Button>
+              newEntry: {
+                "on:presentation": {
+                  id: "new-entry-drawer",
+                  action: "toggle",
+                },
+              },
+            }}
+          />
 
-              {/***********(Import/Export Button)************/}
-              <Button
-                format="outlineBackground"
-                size="lg"
-                style={{
-                  web: {
-                    color: "var(--primary)",
-                    borderRadius: "8px",
-                    padding: "4px",
-                  },
-                }}
-              >
-                <ShareIIIcon />
-              </Button>
-
-              {/***********(New Entry (Row) Button)************/}
-              <Button>New Entry</Button>
-            </XStack>
-          </XStack>
-
-          {/* Table Controls */}
+          {/* Table Wrapper */}
           <TableWrapper>
             {/*#################################(Table Header)#################################*/}
             <TableHeader>
@@ -522,7 +413,6 @@ export function Table<TData, TValue>({
                       )}
                     </TableHeaderColumn>
                   ))}
-                  {/***********(New Table Column Button)************/}
                   <Button
                     size="md"
                     format="background"
@@ -617,14 +507,12 @@ export function Table<TData, TValue>({
           )}
           {/* Dock */}
           {selectedRowCount > 0 && (
-            <XStack className="m-auto w-full justify-center">
+            <XStack className="m-auto w_full justify=center">
               {(dockMenuActions ?? []).map((action, index) => (
                 <Dock
                   axis="x"
                   minimized={false}
-                  toggle={{
-                    modes: ["minimize"],
-                  }}
+                  toggle={{ modes: ["minimize"] }}
                 >
                   <Slot on:tap={action.onClick}>{action.icon}</Slot>
                 </Dock>
@@ -639,10 +527,7 @@ export function Table<TData, TValue>({
     return (
       <Text>
         Error rendering table:{" "}
-        {
-          // @ts-ignore
-          String(error?.message || "Unknown error")
-        }
+        {String((error as any)?.message || "Unknown error")}
       </Text>
     );
   }

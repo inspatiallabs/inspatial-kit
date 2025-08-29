@@ -390,7 +390,7 @@ export function CounterView() {
               🔄 Reset All
             </Button>
             <Button
-              className="bg-yellow-500 p-4 rounded-full text-black font-bold text-lg shadow-lg hover:bg-yellow-600 transition-colors"
+              className="!bg-yellow-500 p-4 rounded-full text-black font-bold text-lg shadow-lg hover:bg-yellow-600 transition-colors"
               on:tap={() => {
                 // Force a re-render without changing count to show the difference
                 console.log("🔄 Forcing re-render (no count change)");
@@ -477,6 +477,7 @@ export function CounterView() {
                   Standard Events
                 </h3>
                 <Button
+                  size="auto"
                   className="bg-teal-600 px-3 py-1 rounded mb-1 text-white w-full"
                   on:tap={() => {
                     console.log("✅ Standard on:tap working!");

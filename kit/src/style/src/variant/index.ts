@@ -365,6 +365,7 @@ export interface InSpatialStyleConfig<V extends StyleShapeProp> {
     StyleSchemaProp<V> & {
       class?: ClassValueProp;
       className?: ClassValueProp;
+      style?: JSX.UniversalStyleProps
     }
   >;
 
@@ -622,9 +623,12 @@ function createStyleCore<V extends StyleShapeProp>(
       shadow: false,
     };
     for (const t of userTokens) {
-      const fam = t.split(":").pop()?.split("-")?.[0] || "";
-      if ((userFamily as any)[fam] !== undefined)
+      // Extract the utility part after any variant prefixes (hover:, focus:, etc.)
+      const utilityPart = t.split(":").pop() || "";
+      const fam = utilityPart.split("-")?.[0] || "";
+      if ((userFamily as any)[fam] !== undefined) {
         (userFamily as any)[fam] = true;
+      }
     }
 
     // Base can be string/array/object; collect classes and style
@@ -660,27 +664,6 @@ function createStyleCore<V extends StyleShapeProp>(
       }
     }
 
-    // Composition
-    if (config.composition && config.composition.length) {
-      for (const rule of config.composition as any[]) {
-        const {
-          class: cvClass,
-          className: cvClassName,
-          style: cvStyle,
-          ...conds
-        } = rule || {};
-        const matches = Object.entries(conds).every(([key, value]) => {
-          const pv = props?.[key] ?? defaultSettings?.[key as any];
-          return Array.isArray(value) ? value.includes(pv) : pv === value;
-        });
-        if (matches) {
-          if (cvClass) classParts.push(cvClass);
-          if (cvClassName) classParts.push(cvClassName);
-          if (cvStyle) styleOut = mergeStyle(styleOut, cvStyle);
-        }
-      }
-    }
-
     // Append external classes and compile web style to a generated class
     const webStyle = (styleOut && (styleOut as any).web) || null;
     if (webStyle) {
@@ -689,53 +672,84 @@ function createStyleCore<V extends StyleShapeProp>(
         (v) => v && typeof v === "object" && !Array.isArray(v)
       );
       if (hasNested) {
-        const c = __ensureComplexWebStyle(webStyle, "normal");
-        if (c) classParts.push(c);
-      } else {
-        // Split color-related properties to low specificity so user utilities/styles win
-        const colorKeys = new Set([
-          "backgroundColor",
-          "background",
-          "color",
-          "borderColor",
-          "outlineColor",
-          "fill",
-          "stroke",
-          "textDecorationColor",
-        ]);
-        const lowSpec: Record<string, any> = {};
-        const normalSpec: Record<string, any> = {};
-        for (const [k, v] of Object.entries(webStyle)) {
-          if (colorKeys.has(k)) lowSpec[k] = v;
-          else normalSpec[k] = v;
-        }
-        if (Object.keys(normalSpec).length) {
-          const c1 = __ensureClassForWebStyle(normalSpec, "normal");
-          if (c1) classParts.push(c1);
-        }
-        if (Object.keys(lowSpec).length) {
-          // Filter out color families when user has provided class utilities for them
-          const mapKeyToFamily: Record<string, string> = {
-            backgroundColor: "bg",
-            background: "bg",
-            color: "text",
-            borderColor: "border",
-            outlineColor: "outline",
-            fill: "fill",
-            stroke: "stroke",
-            textDecorationColor: "decoration",
-          };
+        // For nested styles, we need to filter color properties recursively
+        const colorKeyToFamily: Record<string, string> = {
+          backgroundColor: "bg",
+          background: "bg",
+          color: "text",
+          borderColor: "border",
+          outlineColor: "outline",
+          fill: "fill",
+          stroke: "stroke",
+          textDecorationColor: "decoration",
+          boxShadow: "shadow",
+        };
+
+        const filterNestedColors = (obj: any): any => {
           const filtered: Record<string, any> = {};
-          for (const [k, v] of Object.entries(lowSpec)) {
-            const fam = mapKeyToFamily[k] || "";
-            if (fam && userFamily[fam]) continue;
-            filtered[k] = v;
+          for (const [key, value] of Object.entries(obj)) {
+            if (key.startsWith("&:") && typeof value === "object") {
+              // This is a pseudo-selector, check if user has variant utilities
+              const variant = key.substring(2); // Remove &:
+              const hasVariantOverride = userTokens.some((t) => {
+                const [prefix, util] = t.split(":");
+                if (prefix === variant && util) {
+                  const utilFamily = util.split("-")[0];
+                  return Object.values(colorKeyToFamily).includes(utilFamily);
+                }
+                return false;
+              });
+
+              if (hasVariantOverride) {
+                // Skip this entire pseudo-selector if user has variant utilities
+                continue;
+              } else {
+                // Recursively filter the nested object
+                filtered[key] = filterNestedColors(value);
+              }
+            } else if (typeof value === "object" && !Array.isArray(value)) {
+              // Recursively filter nested objects
+              filtered[key] = filterNestedColors(value);
+            } else {
+              // For direct properties, check if it's a color property
+              const fam = colorKeyToFamily[key];
+              if (fam && userFamily[fam]) continue;
+              filtered[key] = value;
+            }
           }
-          if (Object.keys(filtered).length) {
-            // Use normal specificity for colors - the filtering already handles user overrides
-            const c2 = __ensureClassForWebStyle(filtered, "normal");
-            if (c2) classParts.push(c2);
-          }
+          return filtered;
+        };
+
+        const filteredWebStyle = filterNestedColors(webStyle);
+        if (Object.keys(filteredWebStyle).length) {
+          const c = __ensureComplexWebStyle(filteredWebStyle, "normal");
+          if (c) classParts.push(c);
+        }
+      } else {
+        // Filter out color properties when user has provided utilities for that family
+        const colorKeyToFamily: Record<string, string> = {
+          backgroundColor: "bg",
+          background: "bg",
+          color: "text",
+          borderColor: "border",
+          outlineColor: "outline",
+          fill: "fill",
+          stroke: "stroke",
+          textDecorationColor: "decoration",
+          boxShadow: "shadow",
+        };
+
+        const filtered: Record<string, any> = {};
+        for (const [k, v] of Object.entries(webStyle)) {
+          const fam = colorKeyToFamily[k];
+          // Skip this property if user has provided utilities for this family
+          if (fam && userFamily[fam]) continue;
+          filtered[k] = v;
+        }
+
+        if (Object.keys(filtered).length) {
+          const c = __ensureClassForWebStyle(filtered, "normal");
+          if (c) classParts.push(c);
         }
       }
     }
@@ -940,7 +954,7 @@ function createStyleCore<V extends StyleShapeProp>(
       else flatTokens.push(String(cp));
     }
     if (flatTokens.length) {
-      for (const token of flatTokens) pushToken(token);
+      for (const token of flatTokens) pushToken(token, false);
     }
 
     // Convert user-provided variable utilities and filter them out of raw classes
@@ -957,12 +971,61 @@ function createStyleCore<V extends StyleShapeProp>(
 
     // Use iss to finalize classes including processed user classes (user classes last)
     const className = iss(expandedClassParts, filteredUserStr);
-    return { className, style: styleOut };
+    return {
+      className,
+      style: styleOut,
+      composition: config.composition,
+      defaultSettings,
+      props,
+      userCls: filteredUserStr,
+    };
   }
 
   const style: StyleProp = (config) => (props) => {
-    const { className } = computeProps(config as any, props);
-    return className;
+    const result = computeProps(config as any, props);
+
+    // If no composition rules, return early
+    if (!result.composition || !result.composition.length) {
+      return result.className;
+    }
+
+    // Apply composition rules after all other classes
+    const compositionClasses: string[] = [];
+    let compositionStyle: any = {};
+
+    for (const rule of result.composition as any[]) {
+      const {
+        class: cvClass,
+        className: cvClassName,
+        style: cvStyle,
+        ...conds
+      } = rule || {};
+
+      const matches = Object.entries(conds).every(([key, value]) => {
+        const pv = result.props?.[key] ?? result.defaultSettings?.[key as any];
+        return Array.isArray(value) ? value.includes(pv) : pv === value;
+      });
+
+      if (matches) {
+        if (cvClass) compositionClasses.push(cvClass);
+        if (cvClassName) compositionClasses.push(cvClassName);
+        if (cvStyle) compositionStyle = mergeStyle(compositionStyle, cvStyle);
+      }
+    }
+
+    // Handle composition styles
+    if (compositionStyle.web) {
+      const webStyle = compositionStyle.web;
+      const c = __ensureClassForWebStyle(webStyle, "normal");
+      if (c) compositionClasses.push(c);
+    }
+
+    // Merge composition classes on top of everything else
+    if (compositionClasses.length) {
+      return iss(result.className, compositionClasses);
+    }
+
+    return result.className;
   };
 
   const composeStyle: ComposeStyleProp =

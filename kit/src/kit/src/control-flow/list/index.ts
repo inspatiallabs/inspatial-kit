@@ -1,5 +1,4 @@
 import {
-  type SignalValueType,
   type SignalDisposerFunctionType,
   peek,
   type Signal,
@@ -17,27 +16,30 @@ import {
   exposeComponent,
 } from "../../component/index.ts";
 import type { RenderFunction } from "../render/index.ts";
-
-export interface ListProps<T = any> {
-  name?: string;
-  each: SignalValueType<T[]> | T[]; // Accept both signals and static arrays
-  track?: SignalValueType<keyof T>;
-  indexed?: boolean;
-  unkeyed?: boolean;
-  children?: any; // Support direct JSX children
-}
+import type { ListProps } from "./type.ts";
 
 export function List<T>(
   props: ListProps<T>,
   itemTemplate?: ComponentFunction | any
 ): RenderFunction {
-  const { name = "List", each: eachProp, track, indexed, unkeyed, children } = props;
-  
+  const {
+    name = "List",
+    each: eachProp,
+    track,
+    indexed,
+    unkeyed,
+    children,
+  } = props;
+
   // Support both children prop and second parameter
   const actualTemplate = children ?? itemTemplate;
-  
-  // Auto-convert static arrays to signals for consistent handling  
-  const each = isSignal(eachProp) ? eachProp : (typeof eachProp === 'function' ? $(eachProp) : $(()=> eachProp));
+
+  // Auto-convert static arrays to signals for consistent handling
+  const each = isSignal(eachProp)
+    ? eachProp
+    : typeof eachProp === "function"
+    ? $(eachProp)
+    : $(() => eachProp);
   let currentData: any[] = [];
 
   let kv = track && new Map();
@@ -103,10 +105,10 @@ export function List<T>(
       const rawEntries = read(each);
       const oldLength = rawSigEntries.length;
       rawSigEntries.length = rawEntries.length;
-              for (const i in rawEntries) {
-          if (rawSigEntries[i]) rawSigEntries[i].value = rawEntries[i];
-          else rawSigEntries[i] = createSignal(rawEntries[i]);
-        }
+      for (const i in rawEntries) {
+        if (rawSigEntries[i]) rawSigEntries[i].value = rawEntries[i];
+        else rawSigEntries[i] = createSignal(rawEntries[i]);
+      }
 
       if (oldLength !== rawEntries.length) sigEntries!.trigger();
     });
@@ -124,12 +126,13 @@ export function List<T>(
           idxSig = createSignal(0);
           ks.set(itemKey, idxSig);
         }
-        
+
         // Simplify item access - automatically unwrap signals and provide direct access
-        const wrappedTemplate = typeof actualTemplate === 'function' 
-          ? actualTemplate
-          : () => actualTemplate;
-        
+        const wrappedTemplate =
+          typeof actualTemplate === "function"
+            ? actualTemplate
+            : () => actualTemplate;
+
         const dispose = collectDisposers(
           [],
           function () {
@@ -177,9 +180,10 @@ export function List<T>(
           const dispose = collectDisposers(
             [],
             function () {
-              const wrappedTemplate = typeof actualTemplate === 'function' 
-                ? actualTemplate
-                : () => actualTemplate;
+              const wrappedTemplate =
+                typeof actualTemplate === "function"
+                  ? actualTemplate
+                  : () => actualTemplate;
               const node = R.c(wrappedTemplate, item, idxSig);
               nodeCache.set(itemKey, node);
               R.appendNode(fragment, node);
@@ -345,4 +349,4 @@ export function List<T>(
 
     return fragment;
   };
-} 
+}
