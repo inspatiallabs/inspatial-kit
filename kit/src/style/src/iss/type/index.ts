@@ -5516,6 +5516,7 @@ export interface StandardShorthandProperties<
    * @see https://developer.mozilla.org/docs/Web/CSS/border-radius
    */
   borderRadius?: Property.BorderRadius<TLength> | undefined;
+  cornerRadius?: Property.BorderRadius<TLength> | undefined;
   /**
    * The **`border-right`** shorthand CSS property sets all the properties of an element's right border.
    *
@@ -13683,6 +13684,7 @@ export interface StandardShorthandPropertiesHyphen<
    * @see https://developer.mozilla.org/docs/Web/CSS/border-radius
    */
   "border-radius"?: Property.BorderRadius<TLength> | undefined;
+  "corner-radius"?: Property.BorderRadius<TLength> | undefined;
   /**
    * The **`border-right`** shorthand CSS property sets all the properties of an element's right border.
    *
@@ -17457,6 +17459,11 @@ export namespace Property {
     | DataType.LineWidth<TLength>;
 
   export type BorderRadius<TLength = (string & {}) | 0> =
+    | Globals
+    | TLength
+    | (string & {});
+
+  export type CornerRadius<TLength = (string & {}) | 0> =
     | Globals
     | TLength
     | (string & {});

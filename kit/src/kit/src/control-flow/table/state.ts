@@ -1,4 +1,4 @@
-import { createState } from "@in/teract/state";
+import { createState } from "@in/teract/state/index.ts";
 import type {
   ColumnSort,
   ColumnFilter,
@@ -15,7 +15,7 @@ export function useTableState<TData>() {
       sorting: [] as ColumnSort[],
       columnFilters: [] as ColumnFilter[],
       columnVisibility: {} as VisibilityState,
-      pagination: { pageIndex: 0, pageSize: 8 } as PaginationState,
+      pagination: { pageIndex: 0, pageSize: 10 } as PaginationState,
       contextMenu: null as { x: number; y: number; row: TData } | null,
     },
     action: {

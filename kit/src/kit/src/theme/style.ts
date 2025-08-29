@@ -80,7 +80,7 @@ export const ThemeBoxSize = {
     "min-h-[40px]",
     "max-h-[40px]",
     "max-w-full",
-    "px-4",
+    // "px-4",
     {
       web: {
         height: "40px",
@@ -88,8 +88,8 @@ export const ThemeBoxSize = {
         minHeight: "40px",
         maxHeight: "40px",
         maxWidth: "100%",
-        paddingLeft: "1rem",
-        paddingRight: "1rem",
+        // paddingLeft: "1rem",
+        // paddingRight: "1rem",
       },
     },
   ],
@@ -99,7 +99,7 @@ export const ThemeBoxSize = {
     "min-h-[48px]",
     "max-h-[48px]",
     "max-w-full",
-    "px-4",
+    // "px-4",
     {
       web: {
         height: "48px",
@@ -107,8 +107,8 @@ export const ThemeBoxSize = {
         minHeight: "48px",
         maxHeight: "48px",
         maxWidth: "100%",
-        paddingLeft: "1rem",
-        paddingRight: "1rem",
+        // paddingLeft: "1rem",
+        // paddingRight: "1rem",
       },
     },
   ],

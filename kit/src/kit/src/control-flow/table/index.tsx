@@ -292,12 +292,65 @@ export function Table<TData, TValue>({
           style={{
             web: {
               minHeight: "calc(100vh - 100px)",
-              backgroundColor: "red",
+              backgroundColor: "var(--secondary)",
             },
           }}
         >
-          {/* Filter and column visibility controls*/}
-          <XStack className="print:hidden items-center py-4">
+          {/*********************************(Table Bar)*********************************/}
+          <XStack
+            style={{
+              web: {
+                width: "100%",
+                minWidth: "100%",
+                alignItems: "center",
+                gap: "10px",
+                padding: "10px",
+                backgroundColor: "var(--surface)",
+                marginBottom: "2px",
+
+              },
+            }}
+          >
+            {/*----------------------(Paginated Buttons)----------------------*/}
+            <XStack
+              style={{
+                web: {
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "10px",
+                },
+              }}
+            >
+              <Button
+                format="outlineSurface"
+                size="lg"
+                style={{
+                  web: {
+                    color: "var(--secondary)",
+                    borderRadius: "8px",
+                  },
+                }}
+                on:tap={() => table.previousPage()}
+                // disabled={!table.getCanPreviousPage()}
+              >
+                <CaretLeftPrimeIcon />
+              </Button>
+              <Button
+                format="outlineSurface"
+                size="lg"
+                style={{
+                  web: {
+                    color: "var(--secondary)",
+                    borderRadius: "8px",
+                  },
+                }}
+                on:tap={() => table.nextPage()}
+                // disabled={!table.getCanNextPage()}
+              >
+                <CaretRightPrimeIcon />
+              </Button>
+            </XStack>
+            {/*-------------------------(Filter & Search)-----------------------*/}
             {filterColumn && (
               <InputField
                 variant="searchfield"
@@ -315,18 +368,23 @@ export function Table<TData, TValue>({
                     .getColumn(filterColumn)
                     ?.setFilterValue(next ? next : undefined);
                 }}
-                className="max-w-full mr-4"
+                style={{
+                  web: {
+                    minWidth: "100%",
+                    marginRight: "10px",
+                  },
+                }}
               />
             )}
-            <select>
+            <select style:width="200px">
               <option>
                 <Button className="flex bg-surface border border-(--muted) min-w-fit max-w-sm justify-between ml-auto gap-3">
                   Filter
                   <CaretDownPrimeIcon className="size-4 cursor-pointer transition-transform" />
                 </Button>
               </option>
-              <option>
-                {table
+              {/* <option> */}
+              {/* {table
                   .getAllColumns()
                   .filter((column) => column.getCanHide())
                   .map((column) => {
@@ -338,17 +396,17 @@ export function Table<TData, TValue>({
                         <Text className="text-primary text-sm mx-2">
                           {formatColumnName(column.id)}
                         </Text>
-                        switch coming soon...
-                        {/* <Switch
+                        switch coming soon... */}
+              {/* <Switch
                         checked={column.getIsVisible()}
                         onCheckedChange={(value) =>
                           column.toggleVisibility(!!value)
                         }
                       /> */}
-                      </XStack>
-                    );
+              {/* </XStack> */}
+              {/* );
                   })}
-              </option>
+              </option> */}
             </select>
           </XStack>
           {/* Table Controls */}
@@ -464,44 +522,6 @@ export function Table<TData, TValue>({
               ))}
             </XStack>
           )}
-          {/****************Pagination controls****************/}
-          <XStack className="items-center justify-between py-4">
-            {/* Selected Row Count */}
-            <XStack className="gap-4">
-              <Text className="print:hidden flex w-auto text-xs text-primary">
-                {selectedRowCount} of {table.getFilteredRowModel().rows.length}{" "}
-                row(s) selected.
-              </Text>
-            </XStack>
-
-            {/* Paginated Buttons */}
-            <XStack className="print:hidden inline-flex rounded-md ring-1 ring-inset ring-(--muted)">
-              <Button
-                format="ghost"
-                on:tap={() => table.previousPage()}
-                // disabled={!table.getCanPreviousPage()}
-              >
-                <CaretLeftPrimeIcon
-                  // className="size-5 text-damp group-hover:text-damp/50"
-                  aria-hidden={true}
-                />
-              </Button>
-              <Text
-                className="h-5 border-r border-(--muted)"
-                aria-hidden={true}
-              ></Text>
-              <Button
-                format="ghost"
-                on:tap={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-              >
-                <CaretRightPrimeIcon
-                  className="size-5 text-damp group-hover:text-damp/50 "
-                  aria-hidden={true}
-                />
-              </Button>
-            </XStack>
-          </XStack>
         </ScrollView>
       </>
     );
