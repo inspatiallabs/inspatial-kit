@@ -6,7 +6,7 @@ import {
   TableWrapper,
   TableHeader,
   TableRow,
-  TableHead,
+  TableHeaderColumn,
   TableList,
   TableCell,
 } from "@inspatial/kit/control-flow";
@@ -189,8 +189,8 @@ export function CounterView() {
             <TableWrapper>
               <TableHeader>
                 <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Name</TableHead>
+                  <TableHeaderColumn>ID</TableHeaderColumn>
+                  <TableHeaderColumn>Name</TableHeaderColumn>
                 </TableRow>
               </TableHeader>
               <TableList each={useCounter.entries} track="id">

@@ -10,7 +10,7 @@ export type TableWrapperProps = StyleProps<typeof TableStyle.wrapper> &
   JSX.SharedProps;
 export type TableHeaderProps = StyleProps<typeof TableStyle.header> &
   JSX.SharedProps;
-export type TableListProps = StyleProps<typeof TableStyle.body> &
+export type TableListProps = StyleProps<typeof TableStyle.list> &
   JSX.SharedProps & {
     each?: any; // Accept signal or array for internal List integration
     track?: any; // Optional track key for List
@@ -18,7 +18,7 @@ export type TableListProps = StyleProps<typeof TableStyle.body> &
 export type TableFooterProps = StyleProps<typeof TableStyle.footer> &
   JSX.SharedProps;
 export type TableRowProps = StyleProps<typeof TableStyle.row> & JSX.SharedProps;
-export type TableHeadProps = StyleProps<typeof TableStyle.head> &
+export type TableHeaderColumnProps = StyleProps<typeof TableStyle.head> &
   JSX.SharedProps;
 export type TableCellProps = StyleProps<typeof TableStyle.cell> &
   JSX.SharedProps;
@@ -31,7 +31,7 @@ export type TablePrimitiveProps =
   | TableListProps
   | TableFooterProps
   | TableRowProps
-  | TableHeadProps
+  | TableHeaderColumnProps
   | TableCellProps
   | TableCaptionProps;
 

@@ -10,7 +10,7 @@ import {
   TableWrapper,
   TableList,
   TableCell,
-  TableHead,
+  TableHeaderColumn,
   TableHeader,
   TableRow,
 } from "./primitive.tsx";
@@ -39,6 +39,11 @@ import { createState } from "@in/teract/state/state.ts";
 import { Show } from "../show/index.ts";
 import { DotSixIcon } from "../../icon/dot-six-icon.tsx";
 import { PencilIcon } from "../../icon/pencil-icon.tsx";
+import { FunnelIcon } from "../../icon/funnel-icon.tsx";
+import { APIIcon } from "../../icon/api-icon.tsx";
+import { ShareIIIcon } from "../../icon/share-ii-icon.tsx";
+import { SettingsIcon } from "../../icon/settings-icon.tsx";
+import { PlusPrimeIcon } from "../../icon/plus-prime-icon.tsx";
 
 // import { DropdownMenu } from "../../navigation/dropdown-menu/index.tsx";
 // import { Switch } from "../../input/switch/index.tsx";
@@ -291,27 +296,26 @@ export function Table<TData, TValue>({
           scrollable={false}
           style={{
             web: {
-              minHeight: "calc(100vh - 100px)",
-              backgroundColor: "var(--secondary)",
+              width: "100%",
             },
           }}
         >
-          {/*********************************(Table Bar)*********************************/}
+          {/*********************************(Table Header Bar)*********************************/}
           <XStack
             style={{
               web: {
                 width: "100%",
-                minWidth: "100%",
                 alignItems: "center",
-                gap: "10px",
-                padding: "10px",
+                paddingTop: "10px",
+                paddingBottom: "10px",
+                paddingRight: "50px",
+                paddingLeft: "10px",
                 backgroundColor: "var(--surface)",
                 marginBottom: "2px",
-
               },
             }}
           >
-            {/*----------------------(Paginated Buttons)----------------------*/}
+            {/*----------------------(Paginate With Filters)----------------------*/}
             <XStack
               style={{
                 web: {
@@ -321,13 +325,15 @@ export function Table<TData, TValue>({
                 },
               }}
             >
+              {/***********(Paginated Buttons)************/}
               <Button
-                format="outlineSurface"
+                format="background"
                 size="lg"
                 style={{
                   web: {
                     color: "var(--secondary)",
                     borderRadius: "8px",
+                    padding: "4px",
                   },
                 }}
                 on:tap={() => table.previousPage()}
@@ -336,12 +342,13 @@ export function Table<TData, TValue>({
                 <CaretLeftPrimeIcon />
               </Button>
               <Button
-                format="outlineSurface"
+                format="background"
                 size="lg"
                 style={{
                   web: {
                     color: "var(--secondary)",
                     borderRadius: "8px",
+                    padding: "4px",
                   },
                 }}
                 on:tap={() => table.nextPage()}
@@ -349,8 +356,43 @@ export function Table<TData, TValue>({
               >
                 <CaretRightPrimeIcon />
               </Button>
+
+              {/***********(Filter Button)************/}
+              <Button
+                format="outlineBackground"
+                style={{
+                  web: {
+                    color: "var(--secondary)",
+                    borderRadius: "8px",
+                    padding: "0px 6px 0px 10px",
+                  },
+                }}
+              >
+                <XStack gap={6} align="center">
+                  <Text>Filter</Text>
+                  <Slot
+                    style={{
+                      web: {
+                        backgroundColor: "var(--background)",
+                        borderRadius: "6px",
+                        width: "32px",
+                        height: "32px",
+                      },
+                    }}
+                  >
+                    <FunnelIcon
+                      size="md"
+                      style={{
+                        web: {
+                          padding: "4px",
+                        },
+                      }}
+                    />
+                  </Slot>
+                </XStack>
+              </Button>
             </XStack>
-            {/*-------------------------(Filter & Search)-----------------------*/}
+            {/*-------------------------(Search)-----------------------*/}
             {filterColumn && (
               <InputField
                 variant="searchfield"
@@ -370,52 +412,105 @@ export function Table<TData, TValue>({
                 }}
                 style={{
                   web: {
-                    minWidth: "100%",
+                    width: "100%",
                     marginRight: "10px",
+                    marginLeft: "10px",
                   },
                 }}
               />
             )}
-            <select style:width="200px">
-              <option>
-                <Button className="flex bg-surface border border-(--muted) min-w-fit max-w-sm justify-between ml-auto gap-3">
-                  Filter
-                  <CaretDownPrimeIcon className="size-4 cursor-pointer transition-transform" />
-                </Button>
-              </option>
-              {/* <option> */}
-              {/* {table
-                  .getAllColumns()
-                  .filter((column) => column.getCanHide())
-                  .map((column) => {
-                    return (
-                      <XStack
-                        key={column.id}
-                        className="flex items-center justify-between px-2 py-1"
-                      >
-                        <Text className="text-primary text-sm mx-2">
-                          {formatColumnName(column.id)}
-                        </Text>
-                        switch coming soon... */}
-              {/* <Switch
-                        checked={column.getIsVisible()}
-                        onCheckedChange={(value) =>
-                          column.toggleVisibility(!!value)
-                        }
-                      /> */}
-              {/* </XStack> */}
-              {/* );
-                  })}
-              </option> */}
-            </select>
+
+            {/*-------------------------(Actions)-----------------------*/}
+            <XStack gap={10}>
+              {/***********(API Docs Button)************/}
+              <Button
+                format="outlineBackground"
+                style={{
+                  web: {
+                    color: "var(--secondary)",
+                    borderRadius: "8px",
+                    padding: "0px 10px 0px 6px",
+                  },
+                }}
+              >
+                <XStack gap={6} align="center">
+                  <Slot
+                    style={{
+                      web: {
+                        background:
+                          "linear-gradient(0deg, rgba(17, 20, 44, 0.50) 0%, rgba(17, 20, 44, 0.50) 100%), radial-gradient(102.81% 102.81% at 70.4% 31.2%, #B53FFE 0%, rgba(144, 0, 255, 0.10) 100%), var(--brand)", // brand-bubble
+                        borderRadius: "6px",
+                        width: "32px",
+                        height: "32px",
+                      },
+                    }}
+                  >
+                    <APIIcon
+                      size="md"
+                      style={{
+                        web: {
+                          padding: "4px",
+                          color: "var(--color-white)",
+                        },
+                      }}
+                    />
+                  </Slot>
+                  <Text
+                    style={{
+                      web: {
+                        color: "var(--primary)",
+                      },
+                    }}
+                  >
+                    Docs
+                  </Text>
+                </XStack>
+              </Button>
+
+              {/***********(Settings Button)************/}
+              <Button
+                format="outlineBackground"
+                size="lg"
+                style={{
+                  web: {
+                    color: "var(--primary)",
+                    borderRadius: "8px",
+                    padding: "4px",
+                  },
+                }}
+              >
+                <SettingsIcon />
+              </Button>
+
+              {/***********(Import/Export Button)************/}
+              <Button
+                format="outlineBackground"
+                size="lg"
+                style={{
+                  web: {
+                    color: "var(--primary)",
+                    borderRadius: "8px",
+                    padding: "4px",
+                  },
+                }}
+              >
+                <ShareIIIcon />
+              </Button>
+
+              {/***********(New Entry (Row) Button)************/}
+              <Button>New Entry</Button>
+            </XStack>
           </XStack>
+
           {/* Table Controls */}
-          <TableWrapper className="relative w-auto border-collapse">
-            <TableHeader className="border-b-2 border-(--muted)">
+          <TableWrapper>
+            {/*#################################(Table Header)#################################*/}
+            <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id} className="">
+                <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id}>
+                    /*********************************(Table Header Columns)*********************************/
+                    <TableHeaderColumn key={header.id}>
                       {header.isPlaceholder ? null : typeof header.column
                           .columnDef.header === "function" ? (
                         cellRender(
@@ -425,22 +520,36 @@ export function Table<TData, TValue>({
                       ) : (
                         <Slot>{renderDefaultHeader(header)}</Slot>
                       )}
-                    </TableHead>
+                    </TableHeaderColumn>
                   ))}
+                  {/***********(New Table Column Button)************/}
+                  <Button
+                    size="md"
+                    format="background"
+                    radius="none"
+                    style={{
+                      web: {
+                        position: "absolute",
+                        right: "0px",
+                        color: "var(--primary)",
+                        width: "fit-content",
+                        height: "100%",
+                      },
+                    }}
+                  >
+                    <PlusPrimeIcon />
+                  </Button>
                 </TableRow>
               ))}
             </TableHeader>
+
+            {/*#################################(Table List)#################################*/}
             <TableList each={rows}>
               {(row: any) => (
                 <TableRow
                   key={getRowId(row.original)}
                   data-state={
                     checkedRows.has(getRowId(row.original)) && "selected"
-                  }
-                  className={
-                    onRowClick
-                      ? "cursor-pointer border-y-2 border-(--muted) hover:bg-background"
-                      : ""
                   }
                   on:tap={() => onRowClick && onRowClick(row.original)}
                   on:rightclick={(e: any) => handleContextMenu(e, row.original)}

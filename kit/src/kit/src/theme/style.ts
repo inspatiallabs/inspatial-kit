@@ -93,6 +93,41 @@ export const ThemeBoxSize = {
       },
     },
   ],
+  fit: [
+    "h-fit",
+    "min-w-fit",
+    "min-h-fit",
+    "max-w-full",
+    "px-4",
+    {
+      web: {
+        height: "fit-content",
+        minWidth: "fit-content",
+        minHeight: "fit-content",
+        maxWidth: "100%",
+        paddingLeft: "1rem",
+        paddingRight: "1rem",
+      },
+    },
+  ],
+  base: [
+    "h-[48px]",
+    "min-w-fit",
+    "min-h-[48px]",
+    "w-full",
+    "max-w-full",
+    "px-5 py-3",
+    {
+      web: {
+        height: "48px",
+        minWidth: "fit-content",
+        minHeight: "48px",
+        width: "100%",
+        maxWidth: "100%",
+        padding: "12px 20px",
+      },
+    },
+  ],
   lg: [
     "h-[48px]",
     "min-w-[48px]",

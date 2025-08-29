@@ -9,7 +9,11 @@ import {
 export const ButtonStyle = createStyle({
   /*******************************(Base)********************************/
   base: [
-    "inline-flex cursor-pointer items-center justify-center text-center",
+    "inline-flex",
+    "cursor-pointer",
+    "items-center",
+    "justify-center",
+    "text-center",
     {
       web: {
         display: "inline-flex",
@@ -17,6 +21,11 @@ export const ButtonStyle = createStyle({
         alignItems: "center",
         justifyContent: "center",
         textAlign: "center",
+        "&:hover": {
+          background:
+            "radial-gradient(101.08% 100% at 50% 100%, rgba(94, 94, 94, 0.14) 0%, rgba(94, 94, 94, 0.00) 73.85%), radial-gradient(100.02% 100% at 50% 100%, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.00) 55.59%), var(--color-inherit-default, var(--brand))",
+          backgroundBlendMode: "color-dodge, normal, normal",
+        },
       },
     },
   ],
@@ -36,11 +45,18 @@ export const ButtonStyle = createStyle({
     //##############################################(FORMAT PROP)##############################################//
     format: {
       base: [
-        "bg-(--brand) text-white shadow-effect hover:shadow-base",
+        "bg-(--brand)",
+        "text-white",
+        "shadow-effect",
         {
           web: {
-            boxShadow: "var(--in-shadow-effect, 0 0 0 0 transparent)",
             backgroundColor: "var(--brand)",
+            color: "var(--color-white)",
+            boxShadow: "shadow-(--shadow-effect)",
+            "&:hover": {
+              boxShadow: "shadow-(--shadow-prime)",
+              backgroundColor: "var(--brand)",
+            },
           },
         },
       ],
@@ -55,19 +71,86 @@ export const ButtonStyle = createStyle({
         },
       ],
       outlineSurface: [
-        "border-2 border-(--surface) shadow-muted text-primary bg-(--surface)",
+        "border-2",
+        "border-(--surface)",
+        "shadow-muted",
+        "text-primary",
+        "bg-(--surface)",
+        "hover:bg-(--surface)",
+        {
+          web: {
+            borderWidth: "2px",
+            boxShadow: "shadow-(--shadow-muted)",
+            borderColor: "var(--surface)",
+            "&:hover": {
+              backgroundColor: "var(--surface)",
+            },
+          },
+        },
+      ],
+      outlineBackground: [
+        "border-2",
+        "shadow-muted",
+        "border-(--background)",
+
+        "hover:bg-(--surface)",
+        "hover:border-(--brand)",
+        "hover:border-t-4",
+        "hover:border-b-0.5",
+        "hover:border-l-2",
+        "hover:border-r-2",
+        "hover:text-(--primary)",
+        {
+          web: {
+            borderWidth: "2px",
+            boxShadow: "shadow-(--shadow-muted)",
+            borderColor: "var(--background)",
+            "&:hover": {
+              backgroundColor: "var(--surface)",
+              borderColor: "var(--brand)",
+              borderTopWidth: "4px",
+              borderBottomWidth: "0.5px",
+              borderLeftWidth: "2px",
+              borderRightWidth: "2px",
+              color: "var(--primary)",
+            },
+          },
+        },
+      ],
+      outlineMuted: [
+        "border-2 border-(--muted) shadow-muted text-primary bg-(--surface)",
         {
           web: {
             borderWidth: "2px",
             // borderColor/backgroundColor via classes for override
             boxShadow: "var(--in-shadow-muted, 0 0 0 0 transparent)",
-            borderColor: "var(--surface)",
+            borderColor: "var(--muted)",
           },
         },
       ],
       ghost: [
         "bg-transparent shadow-none text-primary",
         { web: { backgroundColor: "transparent", boxShadow: "none" } },
+      ],
+      background: [
+        "bg-(--background)",
+        "shadow-none",
+        "text-(--secondary)",
+        "hover:bg-(--surface)",
+        "hover:border-2",
+        "hover:border-(--background)",
+        {
+          web: {
+            backgroundColor: "var(--background)",
+            boxShadow: "none",
+            color: "var(--secondary)",
+            "&:hover": {
+              backgroundColor: "var(--surface)",
+              borderWidth: "2px",
+              borderColor: "var(--background)",
+            },
+          },
+        },
       ],
       underline: [
         "bg-inherit text-primary shadow-none underline-offset-[4px] underline decoration-4 decoration-(--brand)",
@@ -114,7 +197,7 @@ export const ButtonStyle = createStyle({
     variant: "base",
     format: "base",
     size: "base",
-    radius: "base",
+    radius: "md",
     axis: "x",
     disabled: false,
     iconOnly: false,

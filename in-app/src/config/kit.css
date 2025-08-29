@@ -98,6 +98,7 @@
   --surface: hsl(var(--surface));
   --background: hsl(var(--background));
   --brand: hsl(var(--brand));
+  --brand-bubble: var(--brand-bubble);
   --primary: hsl(var(--primary));
   --secondary: hsl(var(--secondary));
   --muted: hsl(var(--muted));
@@ -560,14 +561,14 @@
   --animate-inmotion-loading: inmotion-loading 2s cubic-bezier(0.16, 1, 0.3, 1);
   --animate-inmotion-subtle-fade: inmotion-subtle-fade 1.5s
     cubic-bezier(0.16, 1, 0.3, 1);
-  --animate-inmotion-slide-from-bottom: inmotion-slide-from-bottom
-    0.5s cubic-bezier(0.32, 0.72, 0, 1);
+  --animate-inmotion-slide-from-bottom: inmotion-slide-from-bottom 0.5s
+    cubic-bezier(0.32, 0.72, 0, 1);
   --animate-inmotion-slide-from-top: inmotion-slide-from-top 0.5s
     cubic-bezier(0.32, 0.72, 0, 1);
   --animate-inmotion-slide-from-left: inmotion-slide-from-left 0.5s
     cubic-bezier(0.32, 0.72, 0, 1);
-  --animate-inmotion-slide-from-right: inmotion-slide-from-right
-    0.5s cubic-bezier(0.32, 0.72, 0, 1);
+  --animate-inmotion-slide-from-right: inmotion-slide-from-right 0.5s
+    cubic-bezier(0.32, 0.72, 0, 1);
   --animate-inmotion-fade-in: inmotion-fade-in 0.5s
     cubic-bezier(0.32, 0.72, 0, 1);
 
@@ -1165,6 +1166,35 @@
     color: var(--brand);
   }
 
+  .bg-brand-bubble {
+    background: linear-gradient(
+        0deg,
+        rgba(17, 20, 44, 0.5) 0%,
+        rgba(17, 20, 44, 0.5) 100%
+      ),
+      radial-gradient(
+        102.81% 102.81% at 70.4% 31.2%,
+        #b53ffe 0%,
+        rgba(144, 0, 255, 0.1) 100%
+      ),
+      var(--brand);
+  }
+
+  .bg-brand-orb {
+    background: radial-gradient(
+        101.08% 100% at 50% 100%,
+        rgba(94, 94, 94, 0.14) 0%,
+        rgba(94, 94, 94, 0) 73.85%
+      ),
+      radial-gradient(
+        100.02% 100% at 50% 100%,
+        rgba(255, 255, 255, 0.07) 0%,
+        rgba(255, 255, 255, 0) 55.59%
+      ),
+      var(--brand);
+    background-blend-mode: color-dodge, normal, normal;
+  }
+
   .material-tilted {
     border-image-source: linear-gradient(
         180deg,
@@ -1186,24 +1216,23 @@
 @layer utilities {
   /* Presentation animation utilities with data attribute selectors */
   [data-in-presentation-snap-points="false"][data-state="open"].inmotion-slide-from-bottom {
-    animation: inmotion-slide-from-bottom 0.5s
-      cubic-bezier(0.32, 0.72, 0, 1) forwards;
+    animation: inmotion-slide-from-bottom 0.5s cubic-bezier(0.32, 0.72, 0, 1)
+      forwards;
   }
   [data-in-presentation-snap-points="false"][data-state="open"].inmotion-slide-from-top {
-    animation: inmotion-slide-from-top 0.5s
-      cubic-bezier(0.32, 0.72, 0, 1) forwards;
+    animation: inmotion-slide-from-top 0.5s cubic-bezier(0.32, 0.72, 0, 1)
+      forwards;
   }
   [data-in-presentation-snap-points="false"][data-state="open"].inmotion-slide-from-left {
-    animation: inmotion-slide-from-left 0.5s
-      cubic-bezier(0.32, 0.72, 0, 1) forwards;
+    animation: inmotion-slide-from-left 0.5s cubic-bezier(0.32, 0.72, 0, 1)
+      forwards;
   }
   [data-in-presentation-snap-points="false"][data-state="open"].inmotion-slide-from-right {
-    animation: inmotion-slide-from-right 0.5s
-      cubic-bezier(0.32, 0.72, 0, 1) forwards;
+    animation: inmotion-slide-from-right 0.5s cubic-bezier(0.32, 0.72, 0, 1)
+      forwards;
   }
   [data-state="open"].inmotion-fade-in {
-    animation: inmotion-fade-in 0.5s cubic-bezier(0.32, 0.72, 0, 1)
-      forwards;
+    animation: inmotion-fade-in 0.5s cubic-bezier(0.32, 0.72, 0, 1) forwards;
   }
 
   /* Initial positioning for non-snap-point presentations */

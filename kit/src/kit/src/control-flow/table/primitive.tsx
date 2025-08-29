@@ -5,7 +5,7 @@ import type {
   TableCellProps,
   TableFooterProps,
   TableHeaderProps,
-  TableHeadProps,
+  TableHeaderColumnProps,
   TableRowProps,
   TableWrapperProps,
 } from "./type.ts";
@@ -121,15 +121,15 @@ export function TableRow({
   );
 }
 
-/*####################################(TABLE HEAD)####################################*/
+/*####################################(TABLE HEADER COLUMN)####################################*/
 
-export function TableHead({
+export function TableHeaderColumn({
   className,
   format,
   $ref,
   children,
   ...rest
-}: TableHeadProps) {
+}: TableHeaderColumnProps) {
   return (
     <th
       $ref={$ref}
@@ -197,15 +197,17 @@ export function TableWrapper({
   ...rest
 }: TableWrapperProps) {
   return (
-    <table
-      $ref={$ref}
-      className={TableStyle.wrapper.getStyle({
-        class: className as JSX.SharedProps["className"],
-        format,
-      } as any)}
-      {...rest}
-    >
-      {children}
-    </table>
+    <>
+      <table
+        $ref={$ref}
+        className={TableStyle.wrapper.getStyle({
+          class: className as JSX.SharedProps["className"],
+          format,
+        } as any)}
+        {...rest}
+      >
+        {children}
+      </table>
+    </>
   );
 }

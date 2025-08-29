@@ -831,6 +831,41 @@ function createStyleCore<V extends StyleShapeProp>(
         return;
       }
 
+      // Handle variant-prefixed variable utilities like hover:bg-(--brand)/80 and hover:bg-[var(--brand)]/80
+      const variantVarUtilRegex =
+        /^(hover|focus|active|disabled|visited|checked|focus-visible|focus-within):(bg|text|border|outline|fill|stroke|decoration)-\((--[a-zA-Z0-9_-]+)\)(?:\/(\d{1,3}))?$/;
+      const variantBracketVarUtilRegex =
+        /^(hover|focus|active|disabled|visited|checked|focus-visible|focus-within):(bg|text|border|outline|fill|stroke|decoration)-\[var\((--[a-zA-Z0-9_-]+)\)\](?:\/(\d{1,3}))?$/;
+      const vm =
+        t.match(variantVarUtilRegex) || t.match(variantBracketVarUtilRegex);
+      if (vm) {
+        const [, variant, util, cssVar, opacity] = vm as unknown as [
+          string,
+          string,
+          keyof typeof utilToCssProp,
+          string,
+          string | undefined
+        ];
+        const cssProp = utilToCssProp[util] || "";
+        if (cssProp) {
+          let value = `var(${cssVar})`;
+          const pct = opacity
+            ? Math.max(0, Math.min(100, parseInt(opacity, 10)))
+            : null;
+          if (pct !== null && !Number.isNaN(pct)) {
+            value = `color-mix(in oklab, var(${cssVar}) ${pct}%, transparent)`;
+          }
+          const webStyle = { [`&:${variant}`]: { [cssProp]: value } } as Record<
+            string,
+            any
+          >;
+          // Nested selector requires complex style injection
+          const cls = __ensureComplexWebStyle(webStyle, "normal");
+          if (cls) expandedClassParts.push(cls);
+          return;
+        }
+      }
+
       // Support two syntaxes: util-(--var) and util-[var(--var)]
       const bracketVarUtilRegex =
         /^(bg|text|border|outline|fill|stroke|decoration|shadow)-\[var\((--[a-zA-Z0-9_-]+)\)\](?:\/(\d{1,3}))?$/;

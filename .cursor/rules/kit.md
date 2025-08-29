@@ -175,7 +175,7 @@ Tables are zebra-striped by default. Striping is applied in `TableStyle.body` us
 import {
   TableList,
   TableCell,
-  TableHead,
+  TableHeaderColumn,
   TableHeader,
   TableRow,
   TableWrapper,
@@ -184,8 +184,8 @@ import {
 <TableWrapper>
   <TableHeader>
     <TableRow>
-      <TableHead>ID</TableHead>
-      <TableHead>Name</TableHead>
+      <TableHeaderColumn>ID</TableHeaderColumn>
+      <TableHeaderColumn>Name</TableHeaderColumn>
     </TableRow>
   </TableHeader>
   <TableList>
@@ -445,13 +445,13 @@ className={{
 />
 ```
 
-#### Lazy Styling (Alternative)
+#### Lazy Styling (Anti-Pattern/Escape Hatch)
 
 Lazy styling allows you to pass multiple style prop in a single component
 Styling can also be done by calling multiple direct style props e.g
 
 ```typescript
-// ❌  DON'T DO THIS: Anti-Pattern but works
+// ❌  DON'T DO THIS
 <Component
   style:color="black"
   style:background-color="yellow"
@@ -460,7 +460,7 @@ Styling can also be done by calling multiple direct style props e.g
 />
 ```
 
-While this approach is available, it should mainly be used as an "escape hatch" for special cases. Using multiple direct style props assumes you are only targeting the web, lacks types-safety and can lead to anti-patterns such as parsing the same prop multiple times within a single component. Prefer the standard reactive style and className patterns for most use cases. If you choose to use this pattern only use it for one style prop e.g
+While this approach is available, it should mainly be used as an "escape hatch" for special cases. Using multiple direct style props assumes you are only targeting the web, lacks types-safety and can lead to anti-patterns such as parsing the same style prop multiple times within a single component. Prefer the standard reactive style and className patterns for most use cases. If you choose to use this pattern only use it for one style prop e.g
 
 ```typescript
 // ✅ DO THIS
