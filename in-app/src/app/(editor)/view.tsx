@@ -4,14 +4,14 @@ import {
   type ColumnDef,
   type Row,
 } from "@inspatial/kit/control-flow";
-import { EntryProps, useCounter } from "../counter/state.ts";
 import { ScrollView, Slot } from "@inspatial/kit/structure";
 import { Button } from "@inspatial/kit/ornament";
 import { Text } from "@inspatial/kit/typography";
 import { InSpatialIcon } from "@inspatial/kit/icon";
+import { EntryProps, useCounter } from "../(example)/counter/state.ts";
 // import { InSpatialIcon } from "@inspatial/kit/components";
 
-export function TableView() {
+export function EditorView() {
   const entries = useCounter.entries;
 
   const fields: ColumnDef<EntryProps>[] = [
@@ -54,7 +54,7 @@ export function TableView() {
 
   return (
     <>
-      <ScrollView className="mt-[64px]">
+      {/* <ScrollView className="mt-[64px]"> */}
         <Table
           columns={fields}
           data={entries.get()}
@@ -63,7 +63,7 @@ export function TableView() {
           checkedRows={new Set<string>()}
           // dockMenuActions={dockMenuActions}
         />
-      </ScrollView>
+      {/* </ScrollView> */}
     </>
   );
 }

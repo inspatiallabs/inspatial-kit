@@ -15,7 +15,7 @@ export function useTableState<TData>() {
       sorting: [] as ColumnSort[],
       columnFilters: [] as ColumnFilter[],
       columnVisibility: {} as VisibilityState,
-      pagination: { pageIndex: 0, pageSize: 10 } as PaginationState,
+      pagination: { pageIndex: 0, pageSize: 13 } as PaginationState,
       contextMenu: null as { x: number; y: number; row: TData } | null,
     },
     action: {

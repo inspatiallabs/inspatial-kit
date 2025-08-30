@@ -9,7 +9,10 @@ import { RouteTestWindow } from "./(example)/route-test/window.tsx";
 import { AuthWindow } from "./(auth)/window.tsx";
 import { AppMenu } from "./menu.tsx";
 import { AccountView } from "./(auth)/account.tsx";
-import { TableView } from "./(example)/table/view.tsx";
+import { EditorView } from "./(editor)/view.tsx";
+import { FPS } from "./fps.tsx";
+import { ThemeController } from "@inspatial/kit/theme";
+import { KitBorder } from "@inspatial/kit/ornament";
 
 /*################################(Route)################################*/
 // Programmatic routing
@@ -27,12 +30,12 @@ export const route = createRoute({
       //   { name: "projects.counter", to: "counter", view: CounterAppWindow },
       // ],
     },
+    { name: "editor", to: "/editor", view: EditorView },
 
     /*################################(Example)################################*/
-    
+
     { name: "routeTest", to: "/route-test", view: RouteTestWindow },
     { name: "counter", to: "/counter", view: CounterAppWindow },
-    { name: "table", to: "/table", view: TableView },
   ],
   defaultView: ErrorWindow,
 });
@@ -43,7 +46,10 @@ export function AppRoutes() {
   return () => (
     <>
       <Dynamic is={Selected} />
-      <AppMenu />
+      {/* <KitBorder />
+      <AppMenu /> */}
+      <FPS />
+      <ThemeController className="absolute bottom-4 left-4 z-100" />
       <PresentationOutlet />
     </>
   );

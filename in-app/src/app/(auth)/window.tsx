@@ -5,6 +5,7 @@ import { InputField } from "@inspatial/kit/input";
 import { GoogleIcon } from "@inspatial/kit/icon";
 import { AppMenu } from "../menu.tsx";
 import { Image } from "@inspatial/kit/media";
+import { route } from "../routes.tsx";
 
 export function AuthWindow() {
   //##############################################(RENDER)##############################################//
@@ -56,7 +57,8 @@ export function AuthWindow() {
                   name: "John Doe",
                   email: "john.doe@example.com",
                 };
-                useAuth.view.value = "dashboard";
+                // useAuth.view.value = "dashboard";
+                route.to("projects");
               }}
             >
               Continue to InSpatial

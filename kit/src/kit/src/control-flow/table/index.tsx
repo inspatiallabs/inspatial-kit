@@ -118,7 +118,7 @@ export function Table<TData, TValue>({
     onPaginationChange: useTable.action.setPagination,
     manualPagination: false,
     pageCount: Math.ceil(
-      data.length / (useTable.pagination.peek()?.pageSize || 10)
+      data.length / (useTable.pagination.peek()?.pageSize || 13)
     ),
   });
 
@@ -239,6 +239,10 @@ export function Table<TData, TValue>({
                     borderRadius: "4px 0px 0px 4px",
                   },
                 }}
+                on:presentation={{
+                  id: "update-field-modal",
+                  action: "toggle",
+                }}
               >
                 <PencilIcon size="xs" />
               </Button>
@@ -248,6 +252,7 @@ export function Table<TData, TValue>({
                   web: {
                     borderRadius: "0px 4px 4px 0px",
                     backgroundColor: "var(--surface)",
+                    cursor: "grab",
                   },
                 }}
               >
@@ -272,75 +277,50 @@ export function Table<TData, TValue>({
             },
           }}
         >
-          {/* <Modal
-            id="import-export-modal"
-            className="p-8"
-            size="base"
-            radius="4xl"
-            overlayFormat="transparent"
-          
-          >
-            <Text className="text-2xl mb-4">Simple Modal</Text>
-            <Text>This modal uses direct children without widget tree.</Text>
-            <Button
-              className="mt-4"
-              on:presentation={{
-                id: "import-export-modal",
-                action: "close",
-              }}
-            >
-              Close
-            </Button>
-          </Modal> */}
+          {/*#################################(Table Presentations)#################################*/}
 
-          {/* <Modal
-            id="import-export-modal"
+          <Modal id="import-export-modal" className="p-8">
+            <Text className="text-2xl mb-4">Import/Export Entries</Text>
+          </Modal>
+
+          <Modal
+            id="create-new-field-modal"
             children={{
-              // 1. Custom Overlay
-              overlay: {
-                className: "!bg-(--brand)/10",
-                overlayFormat: "transparent",
-              },
-
-              // 2. Custom View
               view: [
                 {
-                  className: "p-12 !bg-yellow-100 text-black",
-                  size: "base",
-                  radius: "none",
                   children: (
                     <YStack className="p-6 gap-3">
-                      <Text className="text-xl font-semibold">
-                        Counter Help
-                      </Text>
-                      <Text>
-                        Use the buttons to adjust the counter and explore
-                        trigger props. This modal is controlled via
-                        on:presentation.
-                      </Text>
-                      <Slot className="flex justify-end">
-                        <Button
-                          format="outline"
-                          on:presentation={{
-                            id: "import-export-modal",
-                            action: "close",
-                          }}
-                        >
-                          Close
-                        </Button>
-                      </Slot>
+                      <Text className="text-xl font-semibold">New Field</Text>
                     </YStack>
                   ),
                 },
               ],
-
-              // 3. Optional Wrapper Customization (99% of the time you don't need this)
-              // wrapper: {},
             }}
-          /> */}
+          />
 
-          <Drawer id="new-entry-drawer">
-            <Text>New Entry</Text>
+          <Modal
+            id="update-field-modal"
+            children={{
+              view: [
+                {
+                  children: (
+                    <YStack className="p-6 gap-3">
+                      <Text className="text-xl font-semibold">
+                        Update Field
+                      </Text>
+                    </YStack>
+                  ),
+                },
+              ],
+            }}
+          />
+
+          <Drawer id="create-new-entry-drawer">
+            <Text>New Entry Form</Text>
+          </Drawer>
+
+          <Drawer id="update-entry-drawer">
+            <Text>Update Entry Form</Text>
           </Drawer>
 
           {/*#################################(Table Header Bar)#################################*/}
@@ -386,7 +366,7 @@ export function Table<TData, TValue>({
 
               newEntry: {
                 "on:presentation": {
-                  id: "new-entry-drawer",
+                  id: "create-new-entry-drawer",
                   action: "toggle",
                 },
               },
@@ -426,6 +406,10 @@ export function Table<TData, TValue>({
                         height: "100%",
                       },
                     }}
+                    on:presentation={{
+                      id: "create-new-field-modal",
+                      action: "toggle",
+                    }}
                   >
                     <PlusPrimeIcon />
                   </Button>
@@ -441,8 +425,14 @@ export function Table<TData, TValue>({
                   data-state={
                     checkedRows.has(getRowId(row.original)) && "selected"
                   }
-                  on:tap={() => onRowClick && onRowClick(row.original)}
                   on:rightclick={(e: any) => handleContextMenu(e, row.original)}
+                  on:tap={() => {
+                    onRowClick && onRowClick(row.original);
+                  }}
+                  on:presentation={{
+                    id: "update-entry-drawer",
+                    action: "toggle",
+                  }}
                 >
                   {row.getVisibleCells().map((cell: any) => (
                     <TableCell key={cell.id}>
