@@ -4,19 +4,7 @@ InSpatial Kit is based on InSpatial's own signal reactive primitives `@in/teract
 
 InSpatial Kit is the Framework Runtime for InSpatial universal renderer `@in/renderer` which targets all platforms with support for multiple templating e.g JSX.
 
-**Important** InSpatial Kit is its own independent self-contained framework powered by its own dev modules, concept, opinions and renderers and as such IT IS IS DIFFERENT FROM REACT, SOLIDJS, PREACT or any other framework.
-
 InSpatial Kit is the highest layer of abstraction for both InSpatial dev and cloud UDE modules. All core utilities, actions and APIs are encapsulated into simpler functions and file routes essentially removing the need for any form of project initialization or configurations. InSpatial Kit removes the need to install or use any of InSpatial's stand-alone dev and cloud modules as they come bundled with it by default.
-
-### NOTE
-
-- **THIS IS NOT A REACT PROJECT**: Do not import, write or use React apis and hooks.
-
-- All InSpatial Dev Modules start with `@in` directive
-
-- Build success doesn't mean no runtime issues. Check carefully if you have made any existing variables disappear during an edit, or the new variables has not been declared.
-
-- If you want to check build errors in deno use the deno core command `deno task build` when using `InServe` renderer extension. Use `deno check` or `deno lint` too for comprehensive checks. For pnpm use `pnpm build`, do not use `pnpm dev`, as `pnpm dev` spawns a blocking dev server that never automatically exits.
 
 ## AI contribution rules (apply to every task)
 
