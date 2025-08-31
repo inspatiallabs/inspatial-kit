@@ -24,3 +24,4 @@ export * from "./loading-icon.tsx";
 export * from "./funnel-icon.tsx";
 export * from "./arrow-swap-icon.tsx";
 export * from "./security-key-icon.tsx";
+export * from "./direction-right-icon.tsx";

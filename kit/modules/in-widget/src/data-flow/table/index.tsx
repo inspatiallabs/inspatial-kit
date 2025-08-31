@@ -39,6 +39,7 @@ import { PlusPrimeIcon } from "@in/widget/icon/plus-prime-icon.tsx";
 import { Modal } from "@in/widget/presentation/modal/index.tsx";
 import { Drawer } from "@in/widget/presentation/drawer/index.tsx";
 import { SecurityKeyIcon } from "@in/widget/icon/security-key-icon.tsx";
+import { DirectionRightIcon } from "@in/widget/icon/direction-right-icon.tsx";
 
 // import { DropdownMenu } from "../../navigation/dropdown-menu/index.tsx";
 // import { Switch } from "../../input/switch/index.tsx";
@@ -153,7 +154,7 @@ export function Table<TData, TValue>({
       if (col.getCanSort?.()) col.toggleSorting?.();
     };
 
-    const renderSortIcon = (labelText: string, hovered: boolean) => {
+    const renderSortIcon = (labelText: string, hover: boolean) => {
       const isId = String(labelText).trim().toLowerCase() === "id";
       const Icon = isId ? SecurityKeyIcon : ArrowSwapIcon;
       return (
@@ -161,7 +162,7 @@ export function Table<TData, TValue>({
           size="sm"
           on:tap={handleSortTap}
           style={{
-            web: hovered
+            web: hover
               ? {
                   transform: "rotate(90deg)",
                   borderRadius: "var(--radius-xl)",
@@ -441,12 +442,60 @@ export function Table<TData, TValue>({
                     action: "toggle",
                   }}
                 >
-                  {row.getVisibleCells().map((cell: any) => (
+                  {row.getVisibleCells().map((cell: any, hover: boolean) => (
                     <TableCell key={cell.id}>
-                      {cellRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      {(() => {
+                        const isIdCol =
+                          String(cell.column?.id ?? "")
+                            .trim()
+                            .toLowerCase() === "id";
+                        const content = cellRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        );
+                        return isIdCol ? (
+                          <XStack
+                            style={{
+                              web: {
+                                borderRadius: "var(--radius-full)",
+                                background: "var(--surface)",
+                                color: "var(--secondary)",
+                                width: "fit-content",
+                                height: "auto",
+                                padding: "4px 10px",
+                                alignItems: "center",
+                                gap: "4px",
+                                minWidth: "68px",
+                              },
+                            }}
+                          >
+                            <DirectionRightIcon
+                              size="sm"
+                              style={{
+                                web: {
+                                  stroke: "var(--secondary)",
+                                },
+                              }}
+                            />
+                            <Slot
+                              style={{
+                                web: {
+                                  marginBottom: "2px",
+                                  display: "inline-block",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                  whiteSpace: "nowrap",
+                                  maxWidth: "20px",
+                                },
+                              }}
+                            >
+                              {content}
+                            </Slot>
+                          </XStack>
+                        ) : (
+                          content
+                        );
+                      })()}
                     </TableCell>
                   ))}
                 </TableRow>
