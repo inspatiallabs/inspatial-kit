@@ -1,7 +1,6 @@
 // deno-lint-ignore-file
 import { $ } from "@inspatial/kit/state";
 import {
-  Show,
   List,
   TableWrapper,
   TableHeader,
@@ -9,7 +8,8 @@ import {
   TableHeaderColumn,
   TableList,
   TableCell,
-} from "@inspatial/kit/control-flow";
+} from "@inspatial/kit/data-flow";
+import { Show } from "@inspatial/kit/control-flow";
 import { ScrollView, Slot, XStack, YStack } from "@inspatial/kit/structure";
 import { Button } from "@inspatial/kit/ornament";
 import { Modal, Drawer, Dock } from "@inspatial/kit/presentation";

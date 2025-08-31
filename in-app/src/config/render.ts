@@ -2,7 +2,7 @@ import { createRenderer } from "@inspatial/kit/renderer";
 import { envSupportsFeature } from "@inspatial/kit/vader/env";
 import { InTrigger } from "@inspatial/kit/trigger";
 import { InTheme } from "@inspatial/kit/theme";
-import { InServe } from "@inspatial/kit/serve";
+import { InServe } from "@inspatial/kit/build";
 import { InPresentation } from "@inspatial/kit/presentation";
 import { AppRoutes } from "../app/routes.tsx";
 import { InCloud } from "@inspatial/kit/cloud";

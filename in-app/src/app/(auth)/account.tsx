@@ -3,7 +3,7 @@ import { Avatar } from "@inspatial/kit/ornament";
 import { Slot, YStack } from "@inspatial/kit/structure";
 import { Text } from "@inspatial/kit/typography";
 import { useAuth } from "./state.ts";
-import { List, Table } from "@inspatial/kit/control-flow";
+import { List, Table } from "@inspatial/kit/data-flow";
 import type { SessionData } from "@inspatial/kit/cloud";
 
 export function AccountView() {

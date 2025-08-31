@@ -3,7 +3,7 @@ import {
   TableCell,
   type ColumnDef,
   type Row,
-} from "@inspatial/kit/control-flow";
+} from "@inspatial/kit/data-flow";
 import { ScrollView, Slot } from "@inspatial/kit/structure";
 import { Button } from "@inspatial/kit/ornament";
 import { Text } from "@inspatial/kit/typography";

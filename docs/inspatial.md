@@ -1812,7 +1812,7 @@ When using `InServe()` extension there's no need to use or configure a build too
 ```typescript
 // render.ts
 import { createRenderer } from "@inspatial/kit/renderer";
-import { InServe } from "@in/serve";
+import { InServe } from "@in/build";
 
 createRenderer({
   extensions: [InServe()],
@@ -1838,7 +1838,7 @@ Use `InVite` plugin for Vite. Create a `vite.config.ts` file and add the followi
 
 ```typescript
 import { defineConfig } from "vite";
-import { InVite } from "@in/vite";
+import { InVite } from "@in/build";
 
 export default defineConfig({
   server: {
@@ -1890,7 +1890,7 @@ Use the `InPack` plugin for Webpack and/or RSPack/RSBuild
 
 ```javascript
 import { defineConfig } from "@rsbuild/core";
-import InPack from "@in/pack";
+import { InPack } from "@in/build";
 
 export default defineConfig({
   plugins: [InPack()],

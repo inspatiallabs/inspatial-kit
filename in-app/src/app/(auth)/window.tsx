@@ -1,5 +1,5 @@
 import { XStack, Slot, YStack } from "@inspatial/kit/structure";
-import { Button } from "@in/kit/ornament/button/index.native.tsx";
+import { Button } from "@inspatial/kit/ornament";
 import { useAuth } from "./state.ts";
 import { InputField } from "@inspatial/kit/input";
 import { GoogleIcon } from "@inspatial/kit/icon";
