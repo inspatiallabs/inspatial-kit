@@ -32,12 +32,13 @@ import { useTableState } from "./state.ts";
 import type { TableProps } from "./type.ts";
 import { cellRender } from "./cell-render.ts";
 import { createState } from "@in/teract/state/state.ts";
-import { Show } from "@in/widget/control-flow/show/index.ts";
+import { Choose } from "@in/widget/control-flow/choose/index.ts";
 import { DotSixIcon } from "@in/widget/icon/dot-six-icon.tsx";
 import { PencilIcon } from "@in/widget/icon/pencil-icon.tsx";
 import { PlusPrimeIcon } from "@in/widget/icon/plus-prime-icon.tsx";
 import { Modal } from "@in/widget/presentation/modal/index.tsx";
 import { Drawer } from "@in/widget/presentation/drawer/index.tsx";
+import { SecurityKeyIcon } from "@in/widget/icon/security-key-icon.tsx";
 
 // import { DropdownMenu } from "../../navigation/dropdown-menu/index.tsx";
 // import { Switch } from "../../input/switch/index.tsx";
@@ -148,6 +149,34 @@ export function Table<TData, TValue>({
       arrowHover: false,
     });
 
+    const handleSortTap = () => {
+      if (col.getCanSort?.()) col.toggleSorting?.();
+    };
+
+    const renderSortIcon = (labelText: string, hovered: boolean) => {
+      const isId = String(labelText).trim().toLowerCase() === "id";
+      const Icon = isId ? SecurityKeyIcon : ArrowSwapIcon;
+      return (
+        <Icon
+          size="sm"
+          on:tap={handleSortTap}
+          style={{
+            web: hovered
+              ? {
+                  transform: "rotate(90deg)",
+                  borderRadius: "var(--radius-xl)",
+                  padding: "2px",
+                  fontWeight: "bold",
+                }
+              : {
+                  transition: "transform 120ms ease",
+                  transform: "rotate(0deg)",
+                },
+          }}
+        />
+      );
+    };
+
     return (
       <>
         <Stack
@@ -176,90 +205,68 @@ export function Table<TData, TValue>({
               on:hover={(hovering: any) => headerState.arrowHover.set(hovering)}
             >
               <XStack className="items-center gap-2">
-                <Show
-                  when={() => headerState.arrowHover.get()}
-                  otherwise={
-                    <ArrowSwapIcon
-                      size="sm"
-                      on:tap={() => {
-                        if (col.getCanSort?.()) {
-                          col.toggleSorting?.();
-                        }
-                      }}
-                      style={{
-                        web: {
-                          transition: "transform 120ms ease",
-                          transform: "rotate(0deg)",
-                        },
-                      }}
-                    />
-                  }
-                >
-                  <ArrowSwapIcon
-                    size="sm"
-                    style={{
-                      web: {
-                        transition:
-                          "transform 120ms ease, background-color 120ms ease",
-                        transform: "rotate(90deg)",
-                        backgroundColor: "var(--surface)",
-                        borderRadius: "var(--radius-xl)",
-                        padding: "2px",
-                        fontWeight: "bold",
-                      },
-                    }}
-                    on:tap={() => {
-                      if (col.getCanSort?.()) {
-                        col.toggleSorting?.();
-                      }
-                    }}
-                  />
-                </Show>
+                <Choose
+                  cases={[
+                    {
+                      when: () => headerState.arrowHover.get(),
+                      children: () => renderSortIcon(label, true),
+                    },
+                  ]}
+                  otherwise={renderSortIcon(label, false)}
+                />
                 <Text>{label}</Text>
               </XStack>
             </TableCell>
           </Slot>
 
-          <Show when={() => headerState.hover.get()} otherwise={null}>
-            <XStack
-              gap={1}
-              style={{
-                web: {
-                  position: "absolute",
-                  right: "4px",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                },
-              }}
-            >
-              <Button
-                size="xs"
-                style={{
-                  web: {
-                    borderRadius: "4px 0px 0px 4px",
-                  },
-                }}
-                on:presentation={{
-                  id: "update-field-modal",
-                  action: "toggle",
-                }}
-              >
-                <PencilIcon size="xs" />
-              </Button>
-              <Button
-                size="xs"
-                style={{
-                  web: {
-                    borderRadius: "0px 4px 4px 0px",
-                    backgroundColor: "var(--surface)",
-                    cursor: "grab",
-                  },
-                }}
-              >
-                <DotSixIcon size="xs" />
-              </Button>
-            </XStack>
-          </Show>
+          <Choose
+            cases={[
+              {
+                when: () => headerState.hover.get(),
+                children: () => (
+                  <XStack
+                    gap={1}
+                    style={{
+                      web: {
+                        position: "absolute",
+                        right: "4px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                      },
+                    }}
+                  >
+                    <Button
+                      size="xs"
+                      style={{
+                        web: {
+                          borderRadius: "4px 0px 0px 4px",
+                        },
+                      }}
+                      on:presentation={{
+                        id: "update-field-modal",
+                        action: "toggle",
+                      }}
+                    >
+                      <PencilIcon size="xs" />
+                    </Button>
+                    <Button
+                      size="xs"
+                      style={{
+                        web: {
+                          borderRadius: "0px 4px 4px 0px",
+                          backgroundColor: "var(--surface)",
+                          cursor: "grab",
+                        },
+                      }}
+                    >
+                      <DotSixIcon size="xs" />
+                    </Button>
+                  </XStack>
+                ),
+              },
+            ]}
+            otherwise={null}
+          />
         </Stack>
       </>
     );

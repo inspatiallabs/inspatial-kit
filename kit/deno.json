@@ -50,7 +50,7 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "@inspatial/kit",
-    "allowImportingTsExtensions": true,
+    "types": ["@inspatial/kit/jsx-runtime"],
     "lib": [
       "dom",
       "dom.iterable",

@@ -186,17 +186,24 @@ class BuildQueue {
     // Base content globs always include the app sources
     const contentGlobs = ["src/**/*.{ts,tsx,js,jsx}"] as string[];
 
-    // Conditionally include monorepo framework sources (../kit/src) when present
+    // Conditionally include monorepo framework sources
+    // Support both legacy path ../kit/src and current ../kit/modules
     try {
-      const stat = await InZero.stat("../kit/src");
+      const statSrc = await InZero.stat("../kit/src");
       // deno-lint-ignore no-explicit-any
-      if ((stat as any)?.isDirectory) {
+      if ((statSrc as any)?.isDirectory) {
         contentGlobs.push("../kit/src/**/*.{ts,tsx,js,jsx}");
         console.log("📦 Including ../kit/src in Tailwind content globs");
       }
-    } catch {
-      // Not a monorepo; skip
-    }
+    } catch {}
+    try {
+      const statModules = await InZero.stat("../kit/modules");
+      // deno-lint-ignore no-explicit-any
+      if ((statModules as any)?.isDirectory) {
+        contentGlobs.push("../kit/modules/**/*.{ts,tsx,js,jsx}");
+        console.log("📦 Including ../kit/modules in Tailwind content globs");
+      }
+    } catch {}
 
     // Repeat --content per glob (Tailwind CLI expects individual flags)
     const contentArgs = ([] as string[]).concat(
@@ -419,7 +426,7 @@ export class InSpatialServe {
         // optional; ignore if package path not present
       }
 
-      // Conditionally also watch monorepo source (../kit/src) when present
+      // Conditionally also watch monorepo source (../kit/src or ../kit/modules) when present
       (async () => {
         try {
           const stat = await InZero.stat("../kit/src");
@@ -436,9 +443,23 @@ export class InSpatialServe {
             })();
             console.log("👁️ Watching ../kit/src for framework changes");
           }
-        } catch {
-          // not monorepo; skip
-        }
+        } catch {}
+        try {
+          const stat = await InZero.stat("../kit/modules");
+          // deno-lint-ignore no-explicit-any
+          if ((stat as any)?.isDirectory) {
+            const kitWatcher = InZero.watchFs("../kit/modules", {
+              recursive: true,
+            });
+            this.watchers.push(kitWatcher);
+            (async () => {
+              for await (const event of kitWatcher) {
+                await this.handleSourceChange(event);
+              }
+            })();
+            console.log("👁️ Watching ../kit/modules for framework changes");
+          }
+        } catch {}
       })();
 
       // Watch root files (index.html, etc.)
@@ -687,12 +708,13 @@ export class InSpatialServe {
         // Inject InSpatial hot reload client for HTML files
         if (pathname.endsWith(".html")) {
           const textContent = new TextDecoder().decode(content);
+          const wsPort = (this.wsServer as any)?.addr?.port || 8888;
           const modifiedContent = textContent.replace(
             "</body>",
             `
             <script>
               // InSpatial Hot Reload Client
-              const ws = new WebSocket('ws://localhost:8888');
+              const ws = new WebSocket('ws://localhost:${wsPort}');
               ws.onmessage = (event) => {
                 const data = JSON.parse(event.data);
                 if (data.type === 'reload') {

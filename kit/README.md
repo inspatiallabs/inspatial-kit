@@ -139,7 +139,7 @@ InSpatial Kit is a comprehensive suite of cross-platform tools and infrastructur
     <tr style="background-color: #1b2240;">
       <td align="left"><strong>Kit</strong></td>
       <td align="left">UDE Client Framework</td>
-      <td align="left"><code>deno add jsr:@inspatial/run/kit</code></td>
+      <td align="left"><code>deno add jsr:@inspatial/kit</code></td>
       <td align="left"><a href="https://www.inspatial.dev/kit">inspatial.dev/kit</a></td>
       <td align="left">🟢 Stable</td>
     </tr>
