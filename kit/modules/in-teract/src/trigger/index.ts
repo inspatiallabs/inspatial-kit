@@ -6,4 +6,4 @@ export {
   InUniversalTriggerProps,
   type InUniversalTriggerPropsType,
 } from "./trigger-props.ts";
-export { InTrigger } from "./trigger-prop-extension.ts";
+export { InTrigger } from "./extension.ts";
