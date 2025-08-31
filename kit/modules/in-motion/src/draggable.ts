@@ -392,7 +392,7 @@ export interface IDraggable {
   snapX: number | number[];
   snapY: number | number[];
   scroll: { x: number; y: number };
-  scrollView: [number, number];
+  view: [number, number];
   dragArea: [number, number, number, number];
   scrollBounds: [number, number, number, number];
   targetBounds: [number, number, number, number];
@@ -524,7 +524,7 @@ export class InMotionDraggable implements IDraggable {
   snapX!: number | number[];
   snapY!: number | number[];
   scroll!: { x: number; y: number };
-  scrollView!: [number, number];
+  view!: [number, number];
   dragArea!: [number, number, number, number];
   scrollBounds!: [number, number, number, number];
   targetBounds!: [number, number, number, number];
@@ -794,7 +794,7 @@ export class InMotionDraggable implements IDraggable {
     this.coords = [0, 0, 0, 0]; // x, y, temp x, temp y
     this.snapped = [0, 0]; // x, y
     this.pointer = [0, 0, 0, 0, 0, 0, 0, 0]; // x1, y1, x2, y2, temp x1, temp y1, temp x2, temp y2
-    this.scrollView = [0, 0]; // w, h
+    this.view = [0, 0]; // w, h
     this.dragArea = [0, 0, 0, 0]; // x, y, w, h
     this.containerBounds = [-maxValue, maxValue, maxValue, -maxValue]; // t, r, b, l
     this.scrollBounds = [0, 0, 0, 0]; // t, r, b, l
@@ -1162,8 +1162,8 @@ export class InMotionDraggable implements IDraggable {
 
     this.dragArea[0] = uw ? 0 : transformContainerRect.left;
     this.dragArea[1] = uw ? 0 : transformContainerRect.top;
-    this.scrollView[0] = uw ? clamp(sw, iw, sw) : sw;
-    this.scrollView[1] = uw ? clamp(sh, ih, sh) : sh;
+    this.view[0] = uw ? clamp(sw, iw, sw) : sw;
+    this.view[1] = uw ? clamp(sh, ih, sh) : sh;
 
     this.updateScrollCoords();
 
@@ -1195,10 +1195,10 @@ export class InMotionDraggable implements IDraggable {
       const hiddenLeft = canScroll ? (uw ? 0 : $container.scrollLeft) : 0;
       const hiddenTop = canScroll ? (uw ? 0 : $container.scrollTop) : 0;
       const hiddenRight = canScroll
-        ? this.scrollView[0] - hiddenLeft - width
+        ? this.view[0] - hiddenLeft - width
         : 0;
       const hiddenBottom = canScroll
-        ? this.scrollView[1] - hiddenTop - height
+        ? this.view[1] - hiddenTop - height
         : 0;
 
       this.targetBounds[0] = round(targetRect.top + sy - (uw ? 0 : top), 0);
@@ -1401,7 +1401,7 @@ export class InMotionDraggable implements IDraggable {
 
     if (this.canScroll) {
       const [cpt, cpr, cpb, cpl] = this.containerPadding;
-      const [sw, sh] = this.scrollView;
+      const [sw, sh] = this.view;
       const daw = this.dragArea[2];
       const dah = this.dragArea[3];
       const csx = this.scroll.x;
@@ -1416,12 +1416,12 @@ export class InMotionDraggable implements IDraggable {
       // Handle cases where the scrollarea dimensions changes during drag
       if (this.dragged && swd > 0) {
         this.coords[0] -= swd;
-        this.scrollView[0] = csw;
+        this.view[0] = csw;
       }
 
       if (this.dragged && shd > 0) {
         this.coords[1] -= shd;
-        this.scrollView[1] = csh;
+        this.view[1] = csh;
       }
 
       // Handle autoscroll when target is at the edges of the scroll bounds

@@ -110,16 +110,50 @@ Control flows allow you to...
 
 ### Structure
 
-A Structure is for...
+When you build anything, a house, a painting, or an app, you need **a frame**.
 
-#### <`view`> / `<ScrollView>`
+* In a house, it’s the walls and floors.
+* In a painting, it’s the canvas.
+* In Spatial, it’s the **Structure** widget.
 
-By default, InSpatial apps display content at the maximum width and height of the viewport, so scrolling and scrollbars are not enabled automatically. The `ScrollView` structure component provides scrolling functionality when needed. It offers properties to show or hide the scrollbar, select different scrollbar variants, and supports animating its children with various `InMotion` effects and animations.
+Without structure, you have chaos. Elements float around without clear boundaries or rules. The Structure Widget gives **shape** and **intent** to everything that comes after.
+
+**Structure** is the skeleton of your app → gives layout meaning.
+
+---
+
+#### `<View>`
+
+`View` is a variant of the Structure Widget. Its generally the entry-point to building a component. It’s the surface where everything else in your component gets painted or placed.
+
+* That’s why you only need **one `<View>`** at the root of your component, just like you only need **one canvas** for a single painting.
+* Having multiple `<View>`s at the same level is like starting several canvases for one artwork: confusing, fragmented, and difficult to manage. 
+
+
+**Why It Fills the Whole Screen**
+
+By default, `<View>` expands to the **maximum width and height of the viewport**.
+
+* This ensures your “canvas” is **complete**, no cutoff edges.
+* But since it covers the whole space, it doesn’t scroll automatically. Why? Because if your canvas is already infinite, you don’t need scroll until your content overflows.
+
+So scroll is **opt-in**, not forced. That’s where the `View`’s scrollbar settings come in.
+
+
+**Scrolling In Views**
+
+The `<View>` component is not just a passive box. It’s your **stage**.
+
+* Sometimes the stage needs to allow the audience (users) to move around → **scrollbars**.
+* Sometimes the stage needs to shift moods, pace, or transitions → **motion and animation**.
+
+Because `View` is the stage, it controls these high-level experiences. You don’t sprinkle scroll or motion randomly across elements; you anchor them at the structural level.
+
 
 **Example Usage**
 
 ```typescript
-<ScrollView>
+<View>
   <Stack variant="yStack" className="space-y-2 p-2 bg-(--brand) w-full">
     {Array.from({ length: 30 }).map((_, i) => (
       <YStack key={i} className="p-3 rounded bg-(--surface) text-(--primary)">
@@ -127,26 +161,26 @@ By default, InSpatial apps display content at the maximum width and height of th
       </YStack>
     ))}
   </Stack>
-</ScrollView>
+</View>
 ```
 
-**ScrollView `Bar`Themes & Properties**
+**View `ScrollBar`Themes & Properties**
 
 ```typescript
 // Thin (default)
-<ScrollView scrollbar scrollbarTheme="thin">...</ScrollView>
+<View scrollbar scrollbarTheme="thin">...</View>
 
 // Minimal (thumb appears on hover)
-<ScrollView scrollbar scrollbarTheme="minimal">...</ScrollView>
+<View scrollbar scrollbarTheme="minimal">...</View>
 
 // Rounded
-<ScrollView scrollbar scrollbarTheme="rounded">...</ScrollView>
+<View scrollbar scrollbarTheme="rounded">...</View>
 
 // Pill
-<ScrollView scrollbar scrollbarTheme="pill">...</ScrollView>
+<View scrollbar scrollbarTheme="pill">...</View>
 
 // Gradient
-<ScrollView scrollbar scrollbarTheme="gradient">...</ScrollView>
+<View scrollbar scrollbarTheme="gradient">...</View>
 ```
 
 #### `<Table>`
@@ -2262,7 +2296,7 @@ const label = $(() => `Status: ${s.status.get()}`);
 // Different event modifiers
 <Button on:tap={() => console.log('normal')}>Click</Button>
 <Button on-once:click={() => console.log('only once')}>Click Once</Button>
-<ScrollView on-passive:scroll={() => console.log('passive scroll')}>Scrollable</ScrollView>
+<View on-passive:scroll={() => console.log('passive scroll')}>Scrollable</View>
 <Link to="#" on-prevent:click={() => console.log('prevented')}>Link</Link>
 ```
 

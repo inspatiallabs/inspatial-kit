@@ -10,7 +10,7 @@ import {
   TableCell,
 } from "@inspatial/kit/data-flow";
 import { Show } from "@inspatial/kit/control-flow";
-import { ScrollView, Slot, XStack, YStack } from "@inspatial/kit/structure";
+import { View, Slot, XStack, YStack } from "@inspatial/kit/structure";
 import { Button } from "@inspatial/kit/ornament";
 import { Modal, Drawer, Dock } from "@inspatial/kit/presentation";
 import {
@@ -182,7 +182,7 @@ export function CounterView() {
         <Text>Drawer Base</Text>
       </Drawer>
 
-      <ScrollView>
+      <View scrollable>
         <div className="flex flex-col justify-center items-center gap-10">
           <h1 className="text-yellow-500 text-8xl">🚀 Counter</h1>
           <div className="max-w-2xl w-full">
@@ -604,7 +604,7 @@ export function CounterView() {
             </div>
           </div>
         </div>
-      </ScrollView>
+      </View>
     </>
   );
 }

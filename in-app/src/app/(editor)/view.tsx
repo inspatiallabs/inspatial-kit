@@ -4,7 +4,7 @@ import {
   type ColumnDef,
   type Row,
 } from "@inspatial/kit/data-flow";
-import { ScrollView, Slot } from "@inspatial/kit/structure";
+import { View, Slot } from "@inspatial/kit/structure";
 import { Button } from "@inspatial/kit/ornament";
 import { Text } from "@inspatial/kit/typography";
 import { InSpatialIcon } from "@inspatial/kit/icon";
@@ -54,7 +54,7 @@ export function EditorView() {
 
   return (
     <>
-      {/* <ScrollView className="mt-[64px]"> */}
+      {/* <View className="mt-[64px]"> */}
         <Table
           columns={fields}
           data={entries.get()}
@@ -63,7 +63,7 @@ export function EditorView() {
           checkedRows={new Set<string>()}
           // dockMenuActions={dockMenuActions}
         />
-      {/* </ScrollView> */}
+      {/* </View> */}
     </>
   );
 }
