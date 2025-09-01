@@ -1,6 +1,7 @@
 import { iss } from "@in/style";
-import { StackStyle, type StackProps } from "./style.ts";
+import { StackStyle } from "./style.ts";
 import { Slot } from "../../slot/index.tsx";
+import type { StackProps } from "./type.ts";
 
 /*#####################################(COMPONENT)#####################################*/
 

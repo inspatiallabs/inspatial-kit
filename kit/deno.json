@@ -1,40 +1,29 @@
 {
-  "name": "@inspatial/kit",
   "license": "Intentional-License-1.0",
-  "version": "1.0.0",
-  "exports": {
-    ".": "./modules/index.ts",
-    "./signal": "./modules/in-teract/src/signal/index.ts",
-    "./widget": "./modules/in-widget/src/index.ts",
-    "./widget/control-flow": "./modules/in-widget/src/control-flow/index.ts",
-    "./widget/navigation": "./modules/in-widget/src/navigation/index.ts",
-    "./widget/structure": "./modules/in-widget/src/structure/index.ts",
-    "./widget/media": "./modules/in-widget/src/media/index.ts",
-    "./extension": "./modules/in-teract/src/extension/index.ts",
-    "./renderer": "./modules/in-renderer/src/index.ts",
-    "./renderer/create-renderer": "./modules/in-renderer/src/create-renderer.ts",
-    "./renderer/dom": "./modules/in-renderer/src/dom.ts",
-    "./renderer/ssr": "./modules/in-renderer/src/ssr.ts",
-    "./renderer/xr": "./modules/in-renderer/src/xr.ts",
-    "./renderer/android-xr": "./modules/in-renderer/src/android-xr.ts",
-    "./renderer/vision-os": "./modules/in-renderer/src/vision-os.ts",
-    "./renderer/horizon-os": "./modules/in-renderer/src/horizon-os.ts",
-    "./renderer/generic-xr": "./modules/in-renderer/src/generic-xr.ts",
-    "./renderer/nativescript": "./modules/in-renderer/src/nativescript.ts",
-    "./runtime": "./modules/in-runtime/src/index.ts",
-    "./jsx-runtime": "./modules/in-runtime/src/jsx-runtime.ts",
-    "./jsx-dev-runtime": "./modules/in-runtime/src/jsx-dev-runtime.ts",
-    "./state": "./modules/in-teract/src/state/index.ts",
-    "./state/core": "./modules/in-teract/src/state/index.ts",
-    "./state/trigger": "./modules/in-teract/src/trigger/index.ts",
-    "./env": "./modules/in-vader/src/env/index.ts",
-    "./build": "./modules/in-build/src/index.ts",
-    "./cloud": "./modules/in-cloud/src/index.ts",
-    "./style": "./modules/in-style/src/index.ts",
-    "./motion": "./modules/in-motion/src/index.ts",
-    "./vader": "./modules/in-vader/src/index.ts",
-    "./presentation": "./modules/in-widget/src/presentation/index.ts"
-  },
+  "homepage": "https://www.inspatial.io",
+  "repository": "https://github.com/inspatiallabs/inspatial-kit",
+  "author": "InSpatial Labs",
+  "bugs": "https://github.com/inspatiallabs/inspatial-kit/issues",
+  "description": "InSpatial Kit",
+  "workspace": [
+    "./modules/*",
+    "./modules/in-accesibility/*",
+    "./modules/in-build/*",
+    "./modules/in-cloud/*",
+    "./modules/in-motion/*",
+    "./modules/in-readme/*",
+    "./modules/in-renderer/*",
+    "./modules/in-route/*",
+    "./modules/in-runtime/*",
+    "./modules/in-style/*",
+    "./modules/in-teract/*",
+    "./modules/in-ternationalize/*",
+    "./modules/in-test/*",
+    "./modules/in-type/*",
+    "./modules/in-vader/*",
+    "./modules/in-widget/*",
+    "./modules/in-zero/*"
+  ],
   "tasks": {
     "test": "deno test --allow-read --allow-write --unstable-sloppy-imports ./modules/",
     "test:style": "deno test --allow-read --allow-write --unstable-sloppy-imports ./modules/style/src/",
@@ -51,6 +40,7 @@
     "jsx": "react-jsx",
     "jsxImportSource": "@inspatial/kit",
     "types": ["@inspatial/kit/jsx-runtime"],
+    "allowImportingTsExtensions": true,
     "lib": [
       "dom",
       "dom.iterable",
@@ -68,33 +58,27 @@
       "scripthost"
     ]
   },
+  "unstable": [
+    "cron",
+    "kv",
+    "webgpu",
+    "byonm",
+    "http",
+    "fs",
+    "net",
+    "fmt-sql",
+    "worker-options",
+    "broadcast-channel",
+    "node-globals",
+    "bare-node-builtins",
+    "detect-cjs"
+  ],
+  "nodeModulesDir": "auto",
   "fmt": {
     "semiColons": false,
     "singleQuote": false,
     "proseWrap": "preserve",
     "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.mdx"]
-  },
-  "lint": {
-    "rules": {
-      "tags": ["recommended", "jsx", "jsr"],
-      "include": [
-        "no-var",
-        "no-window",
-        "no-unused-vars",
-        "ban-untagged-todo",
-        "no-empty-interface",
-        "no-slow-types",
-        "no-deprecated-deno-api",
-        "no-duplicate-case",
-        "no-dupe-class-members",
-        "camelcase",
-        "no-dupe-args",
-        "no-sloppy-imports",
-        "no-class-assign",
-        "no-unsafe-finally"
-      ],
-      "exclude": ["no-explicit-any", "ban-ts-comment"]
-    }
   },
   "imports": {
     "@in/kit/": "./modules/",
@@ -117,7 +101,6 @@
     "@in/widget/typography/": "./modules/in-widget/src/typography/",
     "@in/widget/ornament/": "./modules/in-widget/src/ornament/",
     "@in/widget/icon/": "./modules/in-widget/src/icon/",
-
 
     "@in/renderer/": "./modules/in-renderer/src/",
     "@in/runtime/": "./modules/in-runtime/src/",
@@ -160,5 +143,38 @@
     "@in/cloud": "./modules/in-cloud/src/index.ts",
 
     "@inspatial/cloud-client": "jsr:@inspatial/cloud-client@^0.1.28"
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended", "jsx", "jsr"],
+      "include": [
+        "no-var",
+        "no-window",
+        "no-unused-vars",
+        "ban-untagged-todo",
+        "no-empty-interface",
+        "no-slow-types",
+        "no-deprecated-deno-api",
+        "no-duplicate-case",
+        "no-dupe-class-members",
+        "camelcase",
+        "no-dupe-args",
+        "no-sloppy-imports",
+        "no-class-assign",
+        "no-unsafe-finally"
+      ],
+      "exclude": ["no-explicit-any", "ban-ts-comment"]
+    },
+    "exclude": [
+      "**/test/**/*",
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "**/*.test.jsx",
+      "**/*.test.js",
+      "**/*_test.ts",
+      "**/*_test.tsx",
+      "**/*_test.jsx",
+      "**/*_test.js"
+    ]
   }
 }

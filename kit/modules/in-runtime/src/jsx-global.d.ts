@@ -81,12 +81,6 @@ declare global {
     type TriggerPropKey = `on:${InUniversalTriggerPropsType | string}`;
     type UniversalTriggerProps = InUniversalTriggerPropsType | string;
 
-    // Attributes available on all intrinsic elements
-    interface IntrinsicAttributes {
-      key?: any;
-      $ref?: ComponentProps["$ref"];
-    }
-
     /**
      * SharedProps are a set of commonly used properties that can be applied to various widget or components across your application.
      * These props provide a consistent interface for frequently recurring attributes, enhancing reusability and maintainability.
@@ -108,7 +102,7 @@ declare global {
       id?: string;
 
       /** Reference to a widget or component instance. */
-      $ref?: IntrinsicAttributes["$ref"];
+      $ref?: ComponentProps["$ref"];
 
       /** Trigger props are used to handle events and actions within the widget or component.
        *
@@ -156,6 +150,10 @@ declare global {
     // Default: All elements will default to InSpatial's shared props
     interface IntrinsicElements {
       [elemName: string]: SharedProps;
+    }
+    // Attributes available on all intrinsic elements
+    interface IntrinsicAttributes extends SharedProps {
+      key?: any;
     }
   }
 }

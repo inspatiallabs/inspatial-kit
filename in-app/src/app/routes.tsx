@@ -50,7 +50,7 @@ export function AppRoutes() {
       <AppMenu /> */}
       <FPS />
       <ThemeController className="absolute bottom-4 left-4 z-100" />
-      <PresentationOutlet />
+      <PresentationOutlet  />
     </>
   );
 }

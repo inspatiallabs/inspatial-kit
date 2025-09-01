@@ -8,7 +8,7 @@ import { AuthWindow } from "./(auth)/window.tsx";
 export function AppWindow() {
   return (
     <>
-      <Stack
+      <Stack 
         // on:beforeMount={() => {
         //   const existing = useAuth.user.peek();
         //     useAuth.view.value = existing ? "dashboard" : "auth";
