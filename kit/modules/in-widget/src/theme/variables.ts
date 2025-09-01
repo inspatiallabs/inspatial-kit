@@ -1,5 +1,5 @@
-import type { ThemeProps } from "./types.ts";
-import generateThemeMode from "../helpers.ts";
+import type { ThemeProps } from "./type.ts";
+import generateThemeMode from "@in/style/helpers.ts";
 
 /*#######################################(Theme Variables)###########################################*/
 /*
@@ -49,6 +49,9 @@ import generateThemeMode from "../helpers.ts";
  * const isDark = theme.mode === 'dark';
  * const primaryColor = isDark ? theme.format.dark.primary : theme.format.light.primary;
  */
+
+// NOTE: We might not this file anymore, we will mostly likely move the primitives here
+// To use `createStyle()` composition in the style.ts file to create the theme styles and variables
 export const ThemeVariable: ThemeProps[] = [
   /*************(Default Theme)***************/
   /*                                         */
@@ -57,7 +60,7 @@ export const ThemeVariable: ThemeProps[] = [
   /* --------------------------------------- */
 
   {
-    variant: "flat",
+    material: "tilted",
     mode: "auto",
     cursor: "auto",
     radius: "lg",
@@ -70,7 +73,7 @@ export const ThemeVariable: ThemeProps[] = [
       transform: "none",
     },
     format: {
-      name: "default",
+      name: "inspatialKit",
       light: {
         brand: "hsl(var(--brand))",
         background: "hsl(var(--background))",
@@ -100,7 +103,7 @@ export const ThemeVariable: ThemeProps[] = [
   /* -------------------------------------------*/
 
   {
-    variant: "flat",
+    material: "tilted",
     mode: "auto",
     cursor: "auto",
     radius: "xl",
@@ -123,7 +126,7 @@ export const ThemeVariable: ThemeProps[] = [
   },
 
   {
-    variant: "flat",
+    material: "tilted",
     mode: "auto",
     cursor: "auto",
     radius: "sm",
@@ -145,7 +148,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "neutral",
+    material: "translucent",
     mode: "auto",
     cursor: "auto",
     radius: "md",
@@ -167,7 +170,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "brutal",
+    material: "flat",
     mode: "auto",
     cursor: "auto",
     radius: "lg",
@@ -189,7 +192,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "flat",
+    material: "tilted",
     mode: "auto",
     cursor: "auto",
     radius: "2xl",
@@ -211,7 +214,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "neutral",
+    material: "translucent",
     mode: "auto",
     cursor: "auto",
     radius: "xs",
@@ -233,7 +236,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "brutal",
+    material: "flat",
     mode: "auto",
     cursor: "auto",
     radius: "xl",
@@ -255,7 +258,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "flat",
+    material: "tilted",
     mode: "auto",
     cursor: "auto",
     radius: "md",
@@ -277,7 +280,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "neutral",
+    material: "translucent",
     mode: "auto",
     cursor: "auto",
     radius: "lg",
@@ -299,7 +302,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "brutal",
+    material: "flat",
     mode: "auto",
     cursor: "auto",
     radius: "sm",
@@ -321,7 +324,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "flat",
+    material: "tilted",
     mode: "auto",
     cursor: "auto",
     radius: "base",
@@ -343,7 +346,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "neutral",
+    material: "translucent",
     mode: "auto",
     cursor: "auto",
     radius: "4xl",
@@ -365,7 +368,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "brutal",
+    material: "flat",
     mode: "auto",
     cursor: "auto",
     radius: "xl",
@@ -387,7 +390,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "flat",
+    material: "tilted",
     mode: "auto",
     cursor: "auto",
     radius: "md",
@@ -409,7 +412,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "neutral",
+    material: "translucent",
     mode: "auto",
     cursor: "auto",
     radius: "sm",
@@ -431,7 +434,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "brutal",
+    material: "flat",
     mode: "auto",
     cursor: "auto",
     radius: "lg",
@@ -453,7 +456,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "flat",
+    material: "tilted",
     mode: "auto",
     cursor: "auto",
     radius: "base",
@@ -475,7 +478,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "neutral",
+    material: "translucent",
     mode: "auto",
     cursor: "auto",
     radius: "3xl",
@@ -527,7 +530,7 @@ export const ThemeVariable: ThemeProps[] = [
   /* -------------------------------------------*/
 
   {
-    variant: "flat",
+    material: "tilted",
     mode: "auto",
     cursor: "auto",
     radius: "md",
@@ -564,7 +567,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "neutral",
+    material: "translucent",
     mode: "auto",
     cursor: "auto",
     radius: "lg",
@@ -601,7 +604,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "brutal",
+    material: "flat",
     mode: "auto",
     cursor: "auto",
     radius: "sm",
@@ -676,7 +679,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "neutral",
+    material: "translucent",
     mode: "auto",
     cursor: "auto",
     radius: "base",
@@ -713,7 +716,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "brutal",
+    material: "flat",
     mode: "auto",
     cursor: "auto",
     radius: "xl",
@@ -750,7 +753,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "flat",
+    material: "tilted",
     mode: "auto",
     cursor: "auto",
     radius: "md",
@@ -787,7 +790,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "neutral",
+    material: "translucent",
     mode: "auto",
     cursor: "auto",
     radius: "lg",
@@ -824,7 +827,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "brutal",
+    material: "flat",
     mode: "auto",
     cursor: "auto",
     radius: "sm",
@@ -861,7 +864,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "flat",
+    material: "tilted",
     mode: "auto",
     cursor: "auto",
     radius: "base",
@@ -898,7 +901,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "neutral",
+    material: "translucent",
     mode: "auto",
     cursor: "auto",
     radius: "md",
@@ -935,7 +938,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "brutal",
+    material: "flat",
     mode: "auto",
     cursor: "auto",
     radius: "xl",
@@ -972,7 +975,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "flat",
+    material: "tilted",
     mode: "auto",
     cursor: "auto",
     radius: "md",
@@ -1009,7 +1012,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "neutral",
+    material: "translucent",
     mode: "auto",
     cursor: "auto",
     radius: "lg",
@@ -1046,7 +1049,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "brutal",
+    material: "flat",
     mode: "auto",
     cursor: "auto",
     radius: "sm",
@@ -1120,7 +1123,7 @@ export const ThemeVariable: ThemeProps[] = [
     },
   },
   {
-    variant: "neutral",
+    material: "translucent",
     mode: "auto",
     cursor: "auto",
     radius: "2xl",

@@ -43,7 +43,7 @@ import { DirectionRightIcon } from "@in/widget/icon/direction-right-icon.tsx";
 
 // import { DropdownMenu } from "../../navigation/dropdown-menu/index.tsx";
 // import { Switch } from "../../input/switch/index.tsx";
-// import { Checkbox } from "../../input/checkbox/index.tsx";
+import { Checkbox } from "@in/widget/input/checkbox/index.tsx";
 
 // TODO: Implement Table as composable component with multiple formats
 // - base, zebra (current), spreadsheet
@@ -83,8 +83,7 @@ export function Table<TData, TValue>({
     header: ({ table }) => null,
     cell: ({ row }) => (
       <>
-        <input
-          type="checkbox"
+        <Checkbox
           className="print:hidden"
           aria-label="Select all"
           checked={allChecked as any}

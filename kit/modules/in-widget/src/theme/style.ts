@@ -1,4 +1,8 @@
 import { createStyle } from "@in/style";
+import type {
+  ITypographyProps,
+  TypographyStyleProps,
+} from "@in/style/font/types.ts";
 
 //##############################################(THEME RADIUS)##############################################//
 
@@ -20,6 +24,200 @@ export const ThemeRadius = {
 //##############################################(THEME [BOX] SIZE)##############################################//
 
 export const ThemeBoxSize = {
+  none: [
+    "h-[0px]",
+    "w-[0px]",
+    {
+      web: {
+        height: "0px",
+        width: "0px",
+      },
+    },
+  ],
+  "12xs": [
+    "h-[2px]",
+    "min-w-[2px]",
+    "min-h-[2px]",
+    "max-h-[2px]",
+    "max-w-full",
+    {
+      web: {
+        height: "2px",
+        minWidth: "2px",
+        minHeight: "2px",
+        maxHeight: "2px",
+        maxWidth: "100%",
+      },
+    },
+  ],
+  "11xs": [
+    "h-[4px]",
+    "min-w-[4px]",
+    "min-h-[4px]",
+    "max-h-[4px]",
+    "max-w-full",
+    {
+      web: {
+        height: "4px",
+        minWidth: "4px",
+        minHeight: "4px",
+        maxHeight: "4px",
+        maxWidth: "100%",
+      },
+    },
+  ],
+  "10xs": [
+    "h-[6px]",
+    "min-w-[6px]",
+    "min-h-[6px]",
+    "max-h-[6px]",
+    "max-w-full",
+    "px-1",
+    {
+      web: {
+        height: "6px",
+        minWidth: "6px",
+        minHeight: "6px",
+        maxHeight: "6px",
+        maxWidth: "100%",
+        paddingLeft: "0.125rem",
+        paddingRight: "0.125rem",
+      },
+    },
+  ],
+  "9xs": [
+    "h-[8px]",
+    "min-w-[8px]",
+    "min-h-[8px]",
+    "max-h-[8px]",
+    "max-w-full",
+    "px-1",
+    {
+      web: {
+        height: "8px",
+        minWidth: "8px",
+        minHeight: "8px",
+        maxHeight: "8px",
+        maxWidth: "100%",
+        paddingLeft: "0.125rem",
+        paddingRight: "0.125rem",
+      },
+    },
+  ],
+  "8xs": [
+    "h-[10px]",
+    "min-w-[10px]",
+    "min-h-[10px]",
+    "max-h-[10px]",
+    "max-w-full",
+    "px-1",
+    {
+      web: {
+        height: "10px",
+        minWidth: "10px",
+        minHeight: "10px",
+        maxHeight: "10px",
+        maxWidth: "100%",
+        paddingLeft: "0.125rem",
+        paddingRight: "0.125rem",
+      },
+    },
+  ],
+  "7xs": [
+    "h-[12px]",
+    "min-w-[12px]",
+    "min-h-[12px]",
+    "max-h-[12px]",
+    "max-w-full",
+    "px-2",
+    {
+      web: {
+        height: "12px",
+        minWidth: "12px",
+        minHeight: "12px",
+        maxHeight: "12px",
+        maxWidth: "100%",
+        paddingLeft: "0.25rem",
+        paddingRight: "0.25rem",
+      },
+    },
+  ],
+  "6xs": [
+    "h-[14px]",
+    "min-w-[14px]",
+    "min-h-[14px]",
+    "max-h-[14px]",
+    "max-w-full",
+    "px-2",
+    {
+      web: {
+        height: "14px",
+        minWidth: "14px",
+        minHeight: "14px",
+        maxHeight: "14px",
+        maxWidth: "100%",
+        paddingLeft: "0.25rem",
+        paddingRight: "0.25rem",
+      },
+    },
+  ],
+  "5xs": [
+    "h-[16px]",
+    "min-w-[16px]",
+    "min-h-[16px]",
+    "max-h-[16px]",
+    "max-w-full",
+    "px-3",
+    {
+      web: {
+        height: "16px",
+        minWidth: "16px",
+        minHeight: "16px",
+        maxHeight: "16px",
+        maxWidth: "100%",
+        paddingLeft: "0.5rem",
+        paddingRight: "0.5rem",
+      },
+    },
+  ],
+  "4xs": [
+    "h-[20px]",
+    "min-w-[20px]",
+    "min-h-[20px]",
+    "max-h-[20px]",
+    "max-w-full",
+    "px-4",
+    {
+      web: {
+        height: "20px",
+        minWidth: "20px",
+        minHeight: "20px",
+        maxHeight: "20px",
+        maxWidth: "100%",
+        paddingLeft: "1rem",
+        paddingRight: "1rem",
+      },
+    },
+  ],
+  "3xs": [
+    "h-[24px]",
+    "min-w-[24px]",
+    "min-h-[24px]",
+    "max-h-[24px]",
+    "max-w-full",
+    "px-4",
+    {
+      web: {
+        height: "24px",
+        minWidth: "24px",
+        minHeight: "24px",
+        maxHeight: "24px",
+        maxWidth: "100%",
+        paddingLeft: "1rem",
+        paddingRight: "1rem",
+      },
+    },
+  ],
   "2xs": [
     "h-[28px]",
     "min-w-[28px]",
@@ -224,38 +422,132 @@ export const ThemeBoxSize = {
   ],
 } as const;
 
-//##############################################(THEME VARIANT)##############################################//
+//##############################################(THEME SPACING)##############################################//
 
-export const ThemeVariant = {
-  flat: [""],
-  hollow: [""],
+export const ThemeSpacing = {
+  none: [""],
+} as const;
+
+//##############################################(THEME CURSOR)##############################################//
+
+export const ThemeCursor = {
+  auto: [""],
+  base: [""],
+  select: ["cursor-select", { web: { cursor: "select" } }],
+  Orbit: ["cursor-orbit", { web: { cursor: "orbit" } }],
+  pointer: ["cursor-pointer", { web: { cursor: "pointer" } }],
+  pan: ["cursor-pan", { web: { cursor: "pan" } }],
+  panning: ["cursor-panning", { web: { cursor: "panning" } }],
+  loading: ["cursor-loading", { web: { cursor: "loading" } }],
+  Help: ["cursor-help", { web: { cursor: "help" } }],
+  disabled: ["cursor-disabled", { web: { cursor: "disabled" } }],
+  textX: ["cursor-text-x", { web: { cursor: "text-x" } }],
+  textY: ["cursor-text-y", { web: { cursor: "text-y" } }],
+  cross: ["cursor-cross", { web: { cursor: "cross" } }],
+  zoomIn: ["cursor-zoom-in", { web: { cursor: "zoom-in" } }],
+  zoomOut: ["cursor-zoom-out", { web: { cursor: "zoom-out" } }],
+  copy: ["cursor-copy", { web: { cursor: "copy" } }],
+  move: ["cursor-move", { web: { cursor: "move" } }],
+  resizeY: ["cursor-resize-y", { web: { cursor: "resize-y" } }],
+  resizeX: ["cursor-resize-x", { web: { cursor: "resize-x" } }],
+  resizeT: ["cursor-resize-t", { web: { cursor: "resize-t" } }],
+  resizeR: ["cursor-resize-r", { web: { cursor: "resize-r" } }],
+  resizeB: ["cursor-resize-b", { web: { cursor: "resize-b" } }],
+  resizeL: ["cursor-resize-l", { web: { cursor: "resize-l" } }],
+  resizeTLBR: ["cursor-resize-tlbr", { web: { cursor: "resize-tlbr" } }],
+  resizeTRBL: ["cursor-resize-trbl", { web: { cursor: "resize-trbl" } }],
+  resizeTL: ["cursor-resize-tl", { web: { cursor: "resize-tl" } }],
+  resizeTR: ["cursor-resize-tr", { web: { cursor: "resize-tr" } }],
+  resizeBL: ["cursor-resize-bl", { web: { cursor: "resize-bl" } }],
+  resizeBR: ["cursor-resize-br", { web: { cursor: "resize-br" } }],
 } as const;
 
 //##############################################(THEME FORMAT)##############################################//
-// TODO(@benemma): extend from Theme Variables
 export const ThemeFormat = {
-  inspatial: [""],
+  inspatialKit: [""],
+  weddingClub: [""],
+  appleCupertino: [""],
+  googleMaterial: [""],
+  microsoftFluent: [""],
+  lavender: [""],
+  blossom: [""],
+  sky: [""],
+  sunset: [""],
+  forest: [""],
+  ocean: [""],
+  midnight: [""],
+  autumn: [""],
+  polar: [""],
+  mocha: [""],
+  neon: [""],
+  pastel: [""],
+  monochrome: [""],
+  metropolis: [""],
+  cyberpunk: [""],
+  earth: [""],
+  retro: [""],
+  noire: [""],
+  tropical: [""],
+  nordic: [""],
+  steampunk: [""],
+  breeze: [""],
+  emerald: [""],
+  dusk: [""],
   amethyst: [""],
+  cherry: [""],
+  rustic: [""],
+  arctic: [""],
+  expresso: [""],
+  sherbet: [""],
+  mamal: [""],
+  cyberpunk: [""],
+  terra: [""],
+  vintage: [""],
+  noir: [""],
+  island: [""],
+  fjord: [""],
+  brass: [""],
+  unoclub: [""],
+  duoclub: [""],
+  tresclub: [""],
+  zinc: [""],
+} as const;
+
+//##############################################(THEME EFFECT)##############################################//
+
+export const ThemeEffect = {
+  base: [""],
+  hollow: [""],
+  brutal: [""],
+  soft: [""],
+  chasm: [""],
+  cool: [""],
+  prime: [""],
+  line: [""],
+  inn: [""],
 } as const;
 
 //##############################################(THEME MODE)##############################################//
 
 export const ThemeMode = {
-  base: [""],
+  auto: [""],
+  light: [""],
+  dark: [""],
 } as const;
 
 //##############################################(THEME MATERIAL)##############################################//
 
 export const ThemeMaterial = {
-  tilted: [""],
+  tilted: ["material-tilted"],
   translucent: [""],
+  flat: [""],
 } as const;
 
 //##############################################(THEME TYPOGRAPHY)##############################################//
 
 export const ThemeTypography = {
   base: [""],
-} as const;
+} as ITypographyProps | TypographyStyleProps;
 
 //##############################################(THEME SCALE)##############################################//
 
@@ -309,11 +601,13 @@ export const ThemeStyle = createStyle({
   settings: {
     mode: ThemeMode,
     material: ThemeMaterial,
-    variant: ThemeVariant,
-    format: ThemeFormat,
-    typography: ThemeTypography,
+    effect: ThemeEffect,
+    cursor: ThemeCursor,
+    format: ThemeFormat as typeof ThemeFormat,
+    typography: typeof ThemeTypography as ITypographyProps | TypographyStyleProps,
     scale: ThemeScale,
     size: ThemeBoxSize,
+    spacing: ThemeSpacing,
     radius: ThemeRadius,
     disabled: {
       true: [
@@ -333,12 +627,15 @@ export const ThemeStyle = createStyle({
 
   /*******************************(Default Settings)********************************/
   defaultSettings: {
-    mode: "base",
+    effect: "base",
+    format: "inspatialKit",
+    mode: "auto",
     material: "tilted",
-    variant: "flat",
-    format: "inspatial",
-    size: "base",
+    spacing: "none",
+    cursor: "auto",
     radius: "base",
+    size: "base",
+    typography: "base",
     disabled: false,
   },
 });

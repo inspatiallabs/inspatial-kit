@@ -1,6 +1,30 @@
 import type { StyleProps } from "@in/style";
-import type { ThemeStyle } from "./style.ts";
+import type { ThemeStyle, ThemeFormat } from "./style.ts";
 
-//##############################################(TYPES)##############################################//
+/*##############################################(THEME VARIANT)##############################################*/
 
-export type ThemeProps = StyleProps<typeof ThemeStyle> & JSX.SharedProps & {};
+export interface ThemeVariant {
+  name: typeof ThemeFormat | string;
+  light?: {
+    brand?: string;
+    background?: string;
+    surface?: string;
+    primary?: string;
+    secondary?: string;
+    muted?: string;
+    window?: string;
+  };
+  dark?: {
+    brand?: string;
+    background?: string;
+    surface?: string;
+    primary?: string;
+    secondary?: string;
+    muted?: string;
+    window?: string;
+  };
+}
+
+//##############################################(THEME PROPS)##############################################//
+
+export type ThemeProps = StyleProps<typeof ThemeStyle> & ThemeVariant;
