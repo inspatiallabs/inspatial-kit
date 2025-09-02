@@ -95,7 +95,7 @@ export const CheckboxStyle = {
                   "radial-gradient(101.08% 100% at 50% 100%, rgba(94, 94, 94, 0.14) 0%, rgba(94, 94, 94, 0.00) 73.85%), radial-gradient(100.02% 100% at 50% 100%, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.00) 55.59%), var(--color-inherit-default, var(--brand))",
                 backgroundBlendMode: "color-dodge, normal, normal",
                 border: "0px",
-                opacity: "0.2",
+                opacity: "0.6",
               },
 
               ".peer:checked ~ &": {
@@ -129,7 +129,7 @@ export const CheckboxStyle = {
                   "radial-gradient(101.08% 100% at 50% 100%, rgba(94, 94, 94, 0.14) 0%, rgba(94, 94, 94, 0.00) 73.85%), radial-gradient(100.02% 100% at 50% 100%, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.00) 55.59%), var(--color-inherit-default, var(--brand))",
                 backgroundBlendMode: "color-dodge, normal, normal",
                 border: "0px",
-                opacity: "0.2",
+                opacity: "0.6",
               },
               ".peer:checked ~ &": {
                 backgroundColor: "var(--brand)",
