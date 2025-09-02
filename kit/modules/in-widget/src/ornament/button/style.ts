@@ -52,9 +52,9 @@ export const ButtonStyle = createStyle({
           web: {
             backgroundColor: "var(--brand)",
             color: "var(--color-white)",
-            boxShadow: "shadow-(--shadow-effect)",
+            boxShadow: "var(--shadow-effect)",
             "&:hover": {
-              boxShadow: "shadow-(--shadow-prime)",
+              boxShadow: "var(--shadow-prime)",
               backgroundColor: "var(--brand)",
             },
           },
@@ -80,7 +80,7 @@ export const ButtonStyle = createStyle({
         {
           web: {
             borderWidth: "2px",
-            boxShadow: "shadow-(--shadow-muted)",
+            boxShadow: "var(--shadow-subtle)",
             borderColor: "var(--surface)",
             "&:hover": {
               backgroundColor: "var(--surface)",
@@ -103,7 +103,7 @@ export const ButtonStyle = createStyle({
         {
           web: {
             borderWidth: "2px",
-            boxShadow: "shadow-(--shadow-muted)",
+            boxShadow: "var(--shadow-subtle)",
             borderColor: "var(--background)",
             "&:hover": {
               backgroundColor: "var(--surface)",
@@ -123,7 +123,7 @@ export const ButtonStyle = createStyle({
           web: {
             borderWidth: "2px",
             // borderColor/backgroundColor via classes for override
-            boxShadow: "var(--in-shadow-muted, 0 0 0 0 transparent)",
+            boxShadow: "var(--shadow-subtle)",
             borderColor: "var(--muted)",
           },
         },

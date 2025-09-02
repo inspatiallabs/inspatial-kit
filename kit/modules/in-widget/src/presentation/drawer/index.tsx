@@ -9,7 +9,7 @@ export function Drawer(props: DrawerProps) {
   const {
     id,
     direction,
-    overlayFormat = "rgb",
+    backdrop = "rgb",
     open,
     defaultOpen,
     closeOnEsc = true,
@@ -36,7 +36,7 @@ export function Drawer(props: DrawerProps) {
     const isOpen = sig.get();
     if (!isOpen) return null;
 
-    const hasOverlay = overlayFormat !== "none";
+    const hasOverlay = backdrop !== "none";
 
     return (
       <>
@@ -45,7 +45,7 @@ export function Drawer(props: DrawerProps) {
             // overlay
             data-in-presentation-overlay
             data-state={isOpen ? "open" : "closed"}
-            className={DrawerStyle.overlay.getStyle({ overlayFormat })}
+            className={DrawerStyle.overlay.getStyle({ backdrop })}
             on:tap={() =>
               closeOnScrim && PresentationRegistry.setOpen(id, false)
             }

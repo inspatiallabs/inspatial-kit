@@ -1,3 +1,3 @@
-export { Checkbox } from "./index.tsx";
+export { Checkbox } from "./index.native.tsx";
 export type { CheckboxProps } from "./type.ts";
-export * from "./style.ts";
+export { CheckboxStyle } from "./style.ts";

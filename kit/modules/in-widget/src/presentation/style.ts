@@ -36,7 +36,7 @@ export const PresentationStyle = {
       },
     ],
     settings: {
-      overlayFormat: {
+      backdrop: {
         none: [
           "hidden",
           {
@@ -73,7 +73,7 @@ export const PresentationStyle = {
       },
     },
     defaultSettings: {
-      overlayFormat: "tilted",
+      backdrop: "tilted",
     },
   }),
 };
@@ -121,7 +121,7 @@ export const ModalStyle = {
           pointerEvents: "auto",
           background: "var(--window)",
           border: "1px solid var(--muted)",
-          boxShadow: "shadow(var(--shadow-effect))",
+          boxShadow: "var(--shadow-effect)",
           backdropFilter: "blur(var(--blur-base))",
         },
       },

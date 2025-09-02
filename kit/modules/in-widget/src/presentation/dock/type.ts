@@ -29,9 +29,9 @@ export type DockProps = StyleProps<typeof DockStyle.view> &
     id: string;
     direction?: "top" | "bottom" | "left" | "right";
     axis?: "x" | "y";
-    overlayFormat?: StyleProps<
+    backdrop?: StyleProps<
       typeof PresentationStyle.overlay
-    >["overlayFormat"];
+    >["backdrop"];
     minimized?: boolean;
     toggle?: PresentationToggleConfig;
     children?: DockChildrenTree;

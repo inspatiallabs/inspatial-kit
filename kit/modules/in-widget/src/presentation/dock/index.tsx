@@ -83,7 +83,7 @@ export function Dock(props: DockProps) {
     toggle,
     closeOnEsc = false,
     closeOnScrim = false,
-    overlayFormat = "none",
+    backdrop = "none",
     open,
     defaultOpen = false,
     className,
@@ -156,12 +156,12 @@ export function Dock(props: DockProps) {
     /*********************************(Render)*********************************/
     return (
       <>
-        {closeOnScrim && overlayFormat !== "none" && (
+        {closeOnScrim && backdrop !== "none" && (
           <Slot
             // overlay
             data-in-presentation-overlay
             data-state={isOpen ? "open" : "closed"}
-            className={DockStyle.overlay.getStyle({ overlayFormat })}
+            className={DockStyle.overlay.getStyle({ backdrop })}
             on:tap={() => PresentationRegistry.setOpen(id, false)}
           />
         )}

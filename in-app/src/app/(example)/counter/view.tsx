@@ -108,7 +108,7 @@ export function CounterView() {
         className="p-8"
         size="base"
         radius="4xl"
-        overlayFormat="tilted"
+        backdrop="tilted"
       >
         <Text className="text-2xl mb-4">Simple Modal</Text>
         <Text>This modal uses direct children without widget tree.</Text>
@@ -127,7 +127,7 @@ export function CounterView() {
           // 1. Custom Overlay
           overlay: {
             className: "!bg-(--brand)/10",
-            overlayFormat: "transparent",
+            backdrop: "transparent",
           },
 
           // 2. Custom View
@@ -164,7 +164,7 @@ export function CounterView() {
       {/* Multi Modal View */}
       <Modal
         id="multi-modal"
-        overlayFormat="rgb"
+        backdrop="rgb"
         children={{
           view: [
             {

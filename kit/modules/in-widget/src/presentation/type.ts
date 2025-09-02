@@ -81,7 +81,7 @@ type ModalPropsDirect = StyleProps<typeof ModalStyle.wrapper> &
     id: string;
     children?: ModalChildrenTree;
     format?: ModalViewProps["format"];
-    overlayFormat?: ModalOverlayProps["overlayFormat"];
+    backdrop?: ModalOverlayProps["backdrop"];
   };
 
 export type ModalProps = ModalPropsTree | ModalPropsDirect;
@@ -98,7 +98,7 @@ export type DrawerProps = StyleProps<typeof DrawerStyle.view> &
   JSX.SharedProps &
   PresentationProps & {
     id: string;
-    overlayFormat?: StyleProps<
+    backdrop?: StyleProps<
       typeof PresentationStyle.overlay
-    >["overlayFormat"];
+    >["backdrop"];
   };

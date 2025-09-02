@@ -9,10 +9,14 @@ import { Button } from "@inspatial/kit/ornament";
 import { Text } from "@inspatial/kit/typography";
 import { InSpatialIcon } from "@inspatial/kit/icon";
 import { EntryProps, useCounter } from "../(example)/counter/state.ts";
+import { createSignal } from "@inspatial/kit/signal";
 // import { InSpatialIcon } from "@inspatial/kit/components";
 
 export function EditorView() {
   const entries = useCounter.entries;
+  // const checkedRows = createSignal(new Set<string>());
+  // const allChecked = createSignal(false);
+
 
   const fields: ColumnDef<EntryProps>[] = [
     {
@@ -55,14 +59,17 @@ export function EditorView() {
   return (
     <>
       {/* <View className="mt-[64px]"> */}
-        <Table
-          columns={fields}
-          data={entries.get()}
-          filterColumn="name"
-          getRowId={(row: EntryProps) => String(row.id)}
-          checkedRows={new Set<string>()}
-          // dockMenuActions={dockMenuActions}
-        />
+      <Table
+        columns={fields}
+        data={entries.get()}
+        filterColumn="name"
+        getRowId={(row: EntryProps) => String(row.id)}
+        // checkedRows={checkedRows.get()}
+        // allChecked={allChecked.get()}
+        // onAllChecked={handleAllChecked}
+        // onRowChecked={handleRowChecked}
+        // dockMenuActions={dockMenuActions}
+      />
       {/* </View> */}
     </>
   );

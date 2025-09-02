@@ -40,10 +40,10 @@ import { Modal } from "@in/widget/presentation/modal/index.tsx";
 import { Drawer } from "@in/widget/presentation/drawer/index.tsx";
 import { SecurityKeyIcon } from "@in/widget/icon/security-key-icon.tsx";
 import { DirectionRightIcon } from "@in/widget/icon/direction-right-icon.tsx";
+import { Checkbox } from "@in/widget/input/checkbox/index.ts";
 
 // import { DropdownMenu } from "../../navigation/dropdown-menu/index.tsx";
 // import { Switch } from "../../input/switch/index.tsx";
-import { Checkbox } from "@in/widget/input/checkbox/index.tsx";
 
 // TODO: Implement Table as composable component with multiple formats
 // - base, zebra (current), spreadsheet
@@ -76,21 +76,71 @@ export function Table<TData, TValue>({
     });
   };
 
-  const selectedRowCount = (() => checkedRows.size)();
+  const selectedRowCount = $(() => {
+    const rows =
+      typeof checkedRows === "object" && "get" in checkedRows
+        ? (checkedRows as any).get()
+        : (checkedRows as any);
+    return rows?.size || 0;
+  });
 
   const inputChoiceColumn: ColumnDef<TData, any> = {
     id: "select",
-    header: ({ table }) => null,
-    cell: ({ row }) => (
-      <>
+    header: ({ table }) => (
+      <Slot
+        style={{
+          web: {
+            padding: "0",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          },
+        }}
+      >
         <Checkbox
           className="print:hidden"
           aria-label="Select all"
-          checked={allChecked as any}
-          on:input={(checked: any) => onAllChecked?.(!!checked)}
+          checked={
+            typeof allChecked === "object" && "get" in allChecked
+              ? (allChecked as any).get()
+              : (allChecked as any)
+          }
+          on:input={(e: any) => {
+            const checked = e?.target?.checked ?? e;
+            onAllChecked?.(!!checked);
+          }}
         />
-      </>
+      </Slot>
     ),
+    cell: ({ row }) => {
+      const rowsSet =
+        typeof checkedRows === "object" && "get" in checkedRows
+          ? (checkedRows as any).get()
+          : (checkedRows as any);
+      const isChecked = rowsSet?.has(getRowId(row.original)) || false;
+      return (
+        <Slot
+          style={{
+            web: {
+              padding: "0",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            },
+          }}
+        >
+          <Checkbox
+            className="print:hidden"
+            aria-label="Select row"
+            checked={isChecked}
+            on:input={(e: any) => {
+              const checked = e?.target?.checked ?? e;
+              onRowChecked?.(row.original, !!checked);
+            }}
+          />
+        </Slot>
+      );
+    },
   };
 
   const hasSelectionColumn = columns.some((col) => col.id === "select");
@@ -430,7 +480,10 @@ export function Table<TData, TValue>({
                 <TableRow
                   key={getRowId(row.original)}
                   data-state={
-                    checkedRows.has(getRowId(row.original)) && "selected"
+                    (typeof checkedRows === "object" && "get" in checkedRows
+                      ? (checkedRows as any).get()
+                      : (checkedRows as any)
+                    )?.has(getRowId(row.original)) && "selected"
                   }
                   on:rightclick={(e: any) => handleContextMenu(e, row.original)}
                   on:tap={() => {
@@ -551,7 +604,7 @@ export function Table<TData, TValue>({
             </>
           )}
           {/* Dock */}
-          {selectedRowCount > 0 && (
+          {selectedRowCount.get() > 0 && (
             <XStack className="m-auto w_full justify=center">
               {(dockMenuActions ?? []).map((action, index) => (
                 <Dock

@@ -1,4 +1,5 @@
 import { createStyle } from "@in/style";
+import { ThemeBoxSize } from "@in/widget/theme/style.ts"
 
 //##############################################(CREATE STYLE)##############################################//
 
@@ -13,13 +14,7 @@ export const IconStyle = createStyle({
       fill: ["fill-current", { web: { fill: "currentColor" } }],
     },
 
-    size: {
-      xs: ["w-[16px] h-[16px]", { web: { width: "16px", height: "16px" } }],
-      sm: ["w-[24px] h-[24px]", { web: { width: "24px", height: "24px" } }],
-      md: ["w-[32px] h-[32px]", { web: { width: "32px", height: "32px" } }],
-      lg: ["w-[40px] h-[40px]", { web: { width: "40px", height: "40px" } }],
-      xl: ["w-[48px] h-[48px]", { web: { width: "48px", height: "48px" } }],
-    },
+    size: ThemeBoxSize,
 
     disabled: {
       true: [

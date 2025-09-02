@@ -72,7 +72,6 @@ export const ThemeBoxSize = {
     "min-h-[6px]",
     "max-h-[6px]",
     "max-w-full",
-    "px-1",
     {
       web: {
         height: "6px",
@@ -80,8 +79,6 @@ export const ThemeBoxSize = {
         minHeight: "6px",
         maxHeight: "6px",
         maxWidth: "100%",
-        paddingLeft: "0.125rem",
-        paddingRight: "0.125rem",
       },
     },
   ],
@@ -91,7 +88,6 @@ export const ThemeBoxSize = {
     "min-h-[8px]",
     "max-h-[8px]",
     "max-w-full",
-    "px-1",
     {
       web: {
         height: "8px",
@@ -99,8 +95,6 @@ export const ThemeBoxSize = {
         minHeight: "8px",
         maxHeight: "8px",
         maxWidth: "100%",
-        paddingLeft: "0.125rem",
-        paddingRight: "0.125rem",
       },
     },
   ],
@@ -110,7 +104,6 @@ export const ThemeBoxSize = {
     "min-h-[10px]",
     "max-h-[10px]",
     "max-w-full",
-    "px-1",
     {
       web: {
         height: "10px",
@@ -118,8 +111,6 @@ export const ThemeBoxSize = {
         minHeight: "10px",
         maxHeight: "10px",
         maxWidth: "100%",
-        paddingLeft: "0.125rem",
-        paddingRight: "0.125rem",
       },
     },
   ],
@@ -129,7 +120,6 @@ export const ThemeBoxSize = {
     "min-h-[12px]",
     "max-h-[12px]",
     "max-w-full",
-    "px-2",
     {
       web: {
         height: "12px",
@@ -137,8 +127,6 @@ export const ThemeBoxSize = {
         minHeight: "12px",
         maxHeight: "12px",
         maxWidth: "100%",
-        paddingLeft: "0.25rem",
-        paddingRight: "0.25rem",
       },
     },
   ],
@@ -148,7 +136,6 @@ export const ThemeBoxSize = {
     "min-h-[14px]",
     "max-h-[14px]",
     "max-w-full",
-    "px-2",
     {
       web: {
         height: "14px",
@@ -156,8 +143,6 @@ export const ThemeBoxSize = {
         minHeight: "14px",
         maxHeight: "14px",
         maxWidth: "100%",
-        paddingLeft: "0.25rem",
-        paddingRight: "0.25rem",
       },
     },
   ],
@@ -167,7 +152,6 @@ export const ThemeBoxSize = {
     "min-h-[16px]",
     "max-h-[16px]",
     "max-w-full",
-    "px-3",
     {
       web: {
         height: "16px",
@@ -175,8 +159,6 @@ export const ThemeBoxSize = {
         minHeight: "16px",
         maxHeight: "16px",
         maxWidth: "100%",
-        paddingLeft: "0.5rem",
-        paddingRight: "0.5rem",
       },
     },
   ],
@@ -186,7 +168,6 @@ export const ThemeBoxSize = {
     "min-h-[20px]",
     "max-h-[20px]",
     "max-w-full",
-    "px-4",
     {
       web: {
         height: "20px",
@@ -194,8 +175,6 @@ export const ThemeBoxSize = {
         minHeight: "20px",
         maxHeight: "20px",
         maxWidth: "100%",
-        paddingLeft: "1rem",
-        paddingRight: "1rem",
       },
     },
   ],
@@ -205,7 +184,7 @@ export const ThemeBoxSize = {
     "min-h-[24px]",
     "max-h-[24px]",
     "max-w-full",
-    "px-4",
+
     {
       web: {
         height: "24px",
@@ -213,8 +192,6 @@ export const ThemeBoxSize = {
         minHeight: "24px",
         maxHeight: "24px",
         maxWidth: "100%",
-        paddingLeft: "1rem",
-        paddingRight: "1rem",
       },
     },
   ],
@@ -224,7 +201,6 @@ export const ThemeBoxSize = {
     "min-h-[28px]",
     "max-h-[28px]",
     "max-w-full",
-    "px-4",
     {
       web: {
         height: "28px",
@@ -232,8 +208,6 @@ export const ThemeBoxSize = {
         minHeight: "28px",
         maxHeight: "28px",
         maxWidth: "100%",
-        paddingLeft: "1rem",
-        paddingRight: "1rem",
       },
     },
   ],
@@ -259,7 +233,6 @@ export const ThemeBoxSize = {
     "min-h-[36px]",
     "max-h-[36px]",
     "max-w-full",
-    "px-4",
     {
       web: {
         height: "36px",
@@ -267,8 +240,6 @@ export const ThemeBoxSize = {
         minHeight: "36px",
         maxHeight: "36px",
         maxWidth: "100%",
-        paddingLeft: "1rem",
-        paddingRight: "1rem",
       },
     },
   ],
@@ -278,7 +249,6 @@ export const ThemeBoxSize = {
     "min-h-[40px]",
     "max-h-[40px]",
     "max-w-full",
-    // "px-4",
     {
       web: {
         height: "40px",
@@ -286,8 +256,6 @@ export const ThemeBoxSize = {
         minHeight: "40px",
         maxHeight: "40px",
         maxWidth: "100%",
-        // paddingLeft: "1rem",
-        // paddingRight: "1rem",
       },
     },
   ],
@@ -350,7 +318,6 @@ export const ThemeBoxSize = {
     "min-h-[48px]",
     "max-h-[48px]",
     "max-w-full",
-    // "px-4",
     {
       web: {
         height: "48px",
@@ -358,8 +325,6 @@ export const ThemeBoxSize = {
         minHeight: "48px",
         maxHeight: "48px",
         maxWidth: "100%",
-        // paddingLeft: "1rem",
-        // paddingRight: "1rem",
       },
     },
   ],
@@ -369,7 +334,6 @@ export const ThemeBoxSize = {
     "min-h-[52px]",
     "max-h-[52px]",
     "max-w-full",
-    "px-4",
     {
       web: {
         height: "52px",
@@ -377,8 +341,6 @@ export const ThemeBoxSize = {
         minHeight: "52px",
         maxHeight: "52px",
         maxWidth: "100%",
-        paddingLeft: "1rem",
-        paddingRight: "1rem",
       },
     },
   ],
@@ -388,7 +350,6 @@ export const ThemeBoxSize = {
     "min-h-[56px]",
     "max-h-[56px]",
     "max-w-full",
-    "px-4",
     {
       web: {
         height: "56px",
@@ -396,8 +357,6 @@ export const ThemeBoxSize = {
         minHeight: "56px",
         maxHeight: "56px",
         maxWidth: "100%",
-        paddingLeft: "1rem",
-        paddingRight: "1rem",
       },
     },
   ],
@@ -407,7 +366,6 @@ export const ThemeBoxSize = {
     "min-h-[64px]",
     "max-h-[64px]",
     "max-w-full",
-    "px-4",
     {
       web: {
         height: "64px",
@@ -415,8 +373,6 @@ export const ThemeBoxSize = {
         minHeight: "64px",
         maxHeight: "64px",
         maxWidth: "100%",
-        paddingLeft: "1rem",
-        paddingRight: "1rem",
       },
     },
   ],
@@ -500,7 +456,6 @@ export const ThemeFormat = {
   expresso: [""],
   sherbet: [""],
   mamal: [""],
-  cyberpunk: [""],
   terra: [""],
   vintage: [""],
   noir: [""],
@@ -604,7 +559,9 @@ export const ThemeStyle = createStyle({
     effect: ThemeEffect,
     cursor: ThemeCursor,
     format: ThemeFormat as typeof ThemeFormat,
-    typography: typeof ThemeTypography as ITypographyProps | TypographyStyleProps,
+    typography: typeof ThemeTypography as
+      | ITypographyProps
+      | TypographyStyleProps,
     scale: ThemeScale,
     size: ThemeBoxSize,
     spacing: ThemeSpacing,
@@ -638,4 +595,8 @@ export const ThemeStyle = createStyle({
     typography: "base",
     disabled: false,
   },
+
+  /*******************************(Variable Composition)********************************/
+  // Move the composition from the variables.ts file here
+  // composition: {},
 });

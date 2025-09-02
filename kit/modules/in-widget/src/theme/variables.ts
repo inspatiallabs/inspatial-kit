@@ -51,7 +51,7 @@ import generateThemeMode from "@in/style/helpers.ts";
  */
 
 // NOTE: We might not this file anymore, we will mostly likely move the primitives here
-// To use `createStyle()` composition in the style.ts file to create the theme styles and variables
+// To use `createStyle()` [ThemeStyle] composition in the style.ts file to create the theme styles and variables
 export const ThemeVariable: ThemeProps[] = [
   /*************(Default Theme)***************/
   /*                                         */

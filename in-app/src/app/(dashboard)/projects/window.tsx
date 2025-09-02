@@ -30,7 +30,7 @@ export function ProjectsWindow() {
             //     backgroundColor: "yellow",
             //   },
             // },
-            overlayFormat: "transparent",
+            backdrop: "transparent",
           },
 
           // Custom View
