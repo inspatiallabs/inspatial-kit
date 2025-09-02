@@ -1,7 +1,7 @@
 
-## Extension
+# Extension
 
-### Extending InSpatial Renderer/App
+## Extending InSpatial Renderer/App
 
 InSpatial Kit exposes a lightweight extension API. An extension is a plain object created with `createExtension({ meta, capabilities, lifecycle, ... })` and consumed by renderers via `extensions: [/* your extensions */]`.
 
@@ -9,7 +9,7 @@ InSpatial Kit exposes a lightweight extension API. An extension is a plain objec
 - **Lifecycle**: Use `lifecycle.setup(renderer)` for one-time registration (e.g., registering trigger props). Validation hooks are optional (`validate`).
 - **Events**: All event listeners must flow through the trigger prop system. Register new events with `createTrigger()` and ensure `InTrigger` is present.
 
-### Demo: a tiny directive extension
+## Demo: a tiny directive extension
 
 Add a `datax:*` directive that maps to `data-*` attributes across platforms.
 
@@ -72,7 +72,7 @@ Notes:
 
 - The demo shows a directive resolver (no raw listeners). For custom events, register via the trigger bridge and keep `InTrigger()` installed so `on:*` props resolve.
 
-### Extending InSpatial Cloud
+## Extending InSpatial Cloud
 
 ```ts
 import { CloudExtension } from "@inspatial/cloud";

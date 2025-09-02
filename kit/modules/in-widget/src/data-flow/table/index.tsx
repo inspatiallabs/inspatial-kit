@@ -41,9 +41,9 @@ import { Drawer } from "@in/widget/presentation/drawer/index.tsx";
 import { SecurityKeyIcon } from "@in/widget/icon/security-key-icon.tsx";
 import { DirectionRightIcon } from "@in/widget/icon/direction-right-icon.tsx";
 import { Checkbox } from "@in/widget/input/checkbox/index.ts";
+import { Switch } from "@in/widget/input/switch/index.native.tsx"
 
 // import { DropdownMenu } from "../../navigation/dropdown-menu/index.tsx";
-// import { Switch } from "../../input/switch/index.tsx";
 
 // TODO: Implement Table as composable component with multiple formats
 // - base, zebra (current), spreadsheet
@@ -97,7 +97,20 @@ export function Table<TData, TValue>({
           },
         }}
       >
-        <Checkbox
+        {/* <Checkbox
+          className="print:hidden"
+          aria-label="Select all"
+          checked={
+            typeof allChecked === "object" && "get" in allChecked
+              ? (allChecked as any).get()
+              : (allChecked as any)
+          }
+          on:input={(e: any) => {
+            const checked = e?.target?.checked ?? e;
+            onAllChecked?.(!!checked);
+          }}
+        /> */}
+        <Switch
           className="print:hidden"
           aria-label="Select all"
           checked={
@@ -110,6 +123,7 @@ export function Table<TData, TValue>({
             onAllChecked?.(!!checked);
           }}
         />
+        
       </Slot>
     ),
     cell: ({ row }) => {
@@ -129,7 +143,16 @@ export function Table<TData, TValue>({
             },
           }}
         >
-          <Checkbox
+          {/* <Checkbox
+            className="print:hidden"
+            aria-label="Select row"
+            checked={isChecked}
+            on:input={(e: any) => {
+              const checked = e?.target?.checked ?? e;
+              onRowChecked?.(row.original, !!checked);
+            }}
+          /> */}
+          <Switch
             className="print:hidden"
             aria-label="Select row"
             checked={isChecked}
