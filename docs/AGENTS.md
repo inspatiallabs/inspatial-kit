@@ -2,28 +2,30 @@
 
 You are incharge of everything documentation.
 
-- Add comments in code
-- Inline comments must start with /** ... **/
+Write documentation that assumes the user doesn't know anything about anything, and therefore explains everything like a beginner.
 
-MUST ALWAYS use js doc documentation where every instance of a generated code snippet assumes the user doesn't know anything about anything, and therefore explains everything like a beginner.
-
-IMPORTANT: MUST NOT complicate itself with buzzwords or tech jargon and MUST read naturally.
+IMPORTANT: MUST NOT complicate itself with buzzwords or tech jargon and MUST read naturally like a conversation.
 
 IMPORTANT: MUST include correct indentations, markdown elements for visual cohesion like reading a blog, where the core function MUST ALWAYS be highlighted by the biggest heading, followed by a succinct descriptive one-line summary as a subheading, before getting to the main explanation.
 
 IMPORTANT: The documentation must be consistent and well-formatted.
 
-IMPORTANT: If a kind of symbol e.g (class, constant, event, external, file, function, memeber, mixin, module, namespace, typedef etc...) or code warrants an explanation not inclusive of the base or core definition then highlight that explanation on `NOTE:...`, also if there's a buzzword or word that deviates from the path of simplicity (if for any reason has to) e.g an industry term or something along those lines then highlight the word or words in `Terminology: ...` explaining and breaking the term from first principles like a beginner.
+IMPORTANT: If a symbol or code warrants an explanation beyond the basic definition, highlight that explanation with `> **Note:** ...`. If there's a technical term that needs explanation, highlight it with `> **Terminology:** ...` and explain it from first principles like a beginner.
 
-IMPORTANT: When the documentation refers to another symbol within/outside the package, library or project then make it easy for users to navigate throughout the docs, by linking using appropraite linking tags e.g @link, @linkcode, @linkplain and @tutorial.
+IMPORTANT: When the documentation refers to another symbol within/outside the package, library or project, make it easy for users to navigate by using markdown links.
 
-IMPORTANT: Use tags like @param, @returns, @throws and @typeParam to provide more information about specific parts of the symbol.
+IMPORTANT: Always check for and maintain technical accuracy to ensure documentation matches the actual implementation.
 
-IMPORTANT: Provide good type information
+IMPORTANT: ALWAYS document every symbol that the package exports. For classes and interfaces, document the symbol itself and each method or property on it, including constructors.
 
-IMPORTANT: Always check for and maintain technical accuracy to ensure documentation is not different from logic
+IMPORTANT: Use consistent naming convention:
+- Ben Emma -> (24) -> ben@inspatial.io
+- Mike Anderson -> (36) -> mike@inspatial.io
+- Charlotte Rhodes -> (34) -> charolotte@inspatial.io
+- Ben Barrow -> (35) -> benbarrow@inspatial.io
+- Eli Veffer -> (37) -> eli@inspatial.io
 
-IMPORTANT: ALWAYS document every symbol in the package, library or project exports, i.e class, constant, event, external, file, function, memeber, mixin, module, namespace, typedef etc.... For classes and interfaces for example, you should document the symbol itself, each method or property on it, including constructors
+Human names must not fall outside these five.
 
 **InSpatial Kit Modules**
 
@@ -135,352 +137,85 @@ IMPORTANT: ALWAYS document every symbol in the package, library or project expor
 - Add a performance section if the symbol is performance critical
 - Focuse on practical optimizations
 
-IMPORTANT: Prefer this visual hierarchy and template whenever possible.
-/\*\*
+IMPORTANT: Prefer this clean, conversational approach:
 
-- # FunctionName (preferably a verb starts with a capital letter)
-- @summary #### clear, one-line description of what this does
--
-- The `FunctionName`. Think of it like [insert real-world analogy].
-- The explanation continues with natural, conversational language that anyone can understand.
--
-- @since ${await getPackageVersion()} // Automatically detected from deno.json/package.json
-- @category CategoryName
-- @module ModuleName
-- @kind <kindName>
-- @access <package|private|protected|public>
--
-- ### 💡 Core Concepts
-- - Explain the main ideas behind this function
-- - Break down complex ideas into simple terms
-- - Use everyday analogies where possible
--
-- {@tutorial core-concepts-deep-dive} // Deep dive into the core concepts
--
-- ### 🎯 Prerequisites
-- Before you start:
-- - What you need to know
-- - What should be set up
-- - Any dependencies required
--
-- ### 📚 Terminology
-- > **Term1**: Here's what this means in simple words...
-- > **Term2**: Another technical term explained simply...
--
-- ### ⚠️ Important Notes
-- <details>
-- <summary>Click to learn more about edge cases</summary>
--
-- > [!NOTE]
-- > Important information about specific scenarios
--
-- > [!NOTE]
-- > Additional considerations to keep in mind
-- </details>
--
-- ### 📝 Type Definitions
-- ```typescript
+# FunctionName
 
-  ```
-- interface TypeName {
-- property: string; // Explain what this property is for
-- optional?: number; // Explain when this might be needed
-- }
-- ```
+#### Clear, one-line description of what this does
 
-  ```
-- {@tutorial working-with-types} // Guide to using types effectively
--
-- @param {Type} paramName - Start with a verb (e.g., "Stores", "Calculates", "Finds")
-- Continued explanation with real-world examples.
-- Can span multiple lines for clarity.
--
-- @typeParam T - If using generics, explain like teaching a newcomer
--
-- ### 🎮 Usage
-- #### Installation
-- ```bash
+The `FunctionName` function is like [insert real-world analogy]. Think of it as your helpful assistant that [does whatever the function does].
 
-  ```
-- # Deno
-- deno add jsr:@in/module-name
-- ```
+The explanation continues with natural, conversational language that anyone can understand. No technical jargon, just plain English that makes sense to everyone.
 
-  ```
-- {@tutorial installation-and-setup} // Complete setup guide
--
-- #### Examples
-- Here's how you might use this in real life:
--
-- @example
-- ### Example 1: Your First Shopping Cart
-- ```typescript
+> **Note:** If there's something important or non-obvious about this function, explain it here in simple terms.
 
-  ```
-- // Let's create a simple shopping list, just like you would at a grocery store
-- const groceries = [
-- { name: "Bread", price: 3 }, // A loaf of bread
-- { name: "Milk", price: 4 } // A carton of milk
-- ];
--
-- // Now, let's calculate how much you need to pay
-- const totalCost = functionName(groceries);
--
-- // The function adds it up for you: $3 + $4 = $7
-- console.log(`Your total is: ${totalCost}`); // Output: Your total is: $7
--
-- // Want to know the total with tax included? Just like at a real store!
-- const totalWithTax = functionName(groceries, { includeTax: true });
-- console.log(`Total with tax: ${totalWithTax}`); // Output: Total with tax: $7.70
-- ```
+> **Terminology:** If you need to use a technical term, define it here like you're explaining to a friend.
 
-  ```
--
-- @example
-- ### Example 2: Handling Special Cases
-- ```typescript
+### Examples
 
-  ```
-- // Sometimes your shopping cart might be empty
-- // (like when you realize you forgot your shopping list at home!)
-- const emptyCart = [];
-- const emptyTotal = functionName(emptyCart);
-- console.log(emptyTotal); // Output: 0 (No items = no cost)
--
-- // Or maybe some items have pricing errors
-- // (like when the price tag is missing or damaged)
-- const itemsWithProblems = [
-- { name: "Apple", price: 1 }, // This price is fine
-- { name: "Orange", price: null }, // Oops, missing price tag!
-- { name: "Banana", price: -2 } // Wait, negative price? That's not right!
-- ];
--
-- // Don't worry! The function handles these problems gracefully
-- const validTotal = functionName(itemsWithProblems);
-- console.log(`Total for valid items: ${validTotal}`); // Output: Total for valid items: $1
-- ```
+Here's how you might use this in real life:
 
-  ```
--
-- @example
-- ### Example 3: Planning a Birthday Party 🎉
-- ```typescript
+#### Example 1: Your First Shopping Cart
 
-  ```
-- // Let's calculate party supplies with some special discounts
-- const partySupplies = [
-- { name: "Birthday Cake", price: 30 }, // Every party needs a cake!
-- { name: "Balloons", price: 10 }, // A bunch of colorful balloons
-- { name: "Party Hats", price: 15 } // Fun party hats for everyone
-- ];
--
-- // Let's make it a special deal with:
-- // - 20% birthday discount
-- // - Prices rounded to make it easier to handle cash
-- // - Show prices in your local currency
-- const partyOptions = {
-- currency: "USD", // Using US dollars
-- discount: 0.2, // 20% birthday discount
-- roundToNearest: 1 // Round to nearest dollar
-- };
--
-- const partyTotal = functionName(partySupplies, partyOptions);
--
-- // The function does all the math for you:
-- // 1. Adds up all items: $30 + $10 + $15 = $55
-- // 2. Applies 20% discount: $55 - (55 × 20%) = $44
-- console.log(`Party total with birthday discount: ${partyTotal}`);
-- // Output: Party total with birthday discount: $44
-- ```
+```typescript
+// Let's create a simple shopping list, just like you would at a grocery store
+const groceries = [
+  { name: "Bread", price: 3 }, // A loaf of bread
+  { name: "Milk", price: 4 }, // A carton of milk
+];
 
-  ```
--
-- ### ⚡ Performance Tips (if applicable)
-- <details>
-- <summary>Click to learn about performance</summary>
--
-- - Best practices for optimal performance
-- - When to use alternatives
-- - Resource usage considerations
-- </details>
--
-- {@tutorial performance-optimization} // Comprehensive performance guide
--
-- ### ❌ Common Mistakes
-- <details>
-- <summary>Click to see what to avoid</summary>
--
-- - Mistake 1: What not to do and why
-- - Mistake 2: Common pitfall and how to avoid it
-- </details>
--
-- {@tutorial troubleshooting} // Common problems and solutions
--
-- @throws {ErrorType}
-- Explains when and why errors might occur in plain language.
-- For example: "This will show an error if you try to check out with an empty cart"
--
-- @returns {ReturnType}
-- Explains what you get back, using real-world analogies.
-- For example: "You'll get back a receipt with all your items and the total"
--
-- ### 📝 Uncommon Knowledge
-- `You want to drop little nuggests of uncomomon philosophical knowledge that are
-- true but really uncommon and often times contrarian here related to the overaching
-- module. an Example for a BDD module in a Test library or package will be something
-- like - "BDD is a mindset and process, not a syntax.
-- If your tests describe behavior clearly — you're doing BDD, regardless of what your
-- code looks like.".
--
-- ### 🔧 Runtime Support
-- - ✅ Node.js
-- - ✅ Deno
-- - ✅ Bun
--
-- {@tutorial understanding-runtime} // Runtime guides
--
-- ### ♿ Accessibility (if applicable)
-- <details>
-- <summary>Click to see accessibility features</summary>
--
-- - Considerations for screen readers
-- - Keyboard navigation support
-- - ARIA attributes (if applicable)
-- - Color contrast guidelines
-- </details>
--
-- {@tutorial accessibility-best-practices} // Complete accessibility guide
--
-- ### 🔄 Migration Guide (if applicable)
-- <details>
-- <summary>Click to see version changes</summary>
--
-- If you're upgrading from an older version:
-- - What's changed
-- - How to update your code
-- - Breaking changes
-- </details>
--
-- {@tutorial migration-walkthrough} // Step-by-step migration guide
--
-- ### 🔗 Related Resources (if applicable)
--
-- #### Internal References
-- - {@link OtherFunction} - Here's how this relates to what you're looking at
-- - {@linkcode RelatedClass} - Another helpful tool you might want to use
--
-- #### External Resources
--
-- @external GitHub
-- {@link https://github.com/inspatiallabs/inspatial-core GitHub Repository}
-- Source code and issue tracking
--
-- #### Community Resources
-- @external Discord
-- {@link https://discord.gg/inspatiallabs Discord Community}
-- Join our community for support and discussions
--
-- @external Twitter
-- {@link https://x.com/inspatiallabs Twitter}
-- Follow us for updates and announcements
--
-- @external LinkedIn
-- {@link https://www.linkedin.com/company/inspatiallabs LinkedIn}
-- Follow us for updates and announcements
-  \*/
+// Now, let's calculate how much you need to pay
+const totalCost = functionName(groceries);
 
-// The actual implementation would go here
-<kindName> name ...
+// The function adds it up for you: $3 + $4 = $7
+console.log(`Your total is: ${totalCost}`); // Output: Your total is: $7
+```
 
-### Module Level
+#### Example 2: Handling Edge Cases
 
-Write a module-level documentation block optimized for code using the following template. This block should be placed at the top of the module, before any imports or main code.
+```typescript
+// Sometimes your shopping cart might be empty
+const emptyCart = [];
+const emptyTotal = functionName(emptyCart);
+console.log(emptyTotal); // Output: 0 (No items = no cost)
+```
 
-/\*\*
+### What You Get Back
 
-- @module @package/path/to/utility
--
-- [Brief description of the utility's purpose and core functionality in 2-3 sentences.
-- Highlight what problem it solves and why developers would want to use it.]
--
-- @example Basic Usage
-- ```typescript
+Explain what the function returns using simple language and real-world comparisons.
 
-  ```
-- import { mainFunction } from "@package/path/to/utility";
--
-- // Example showing the most common use case
-- // Keep this simple and clear
-- ```
+### Common Mistakes to Avoid
 
-  ```
--
-- @features
-- - [Key Feature 1]: [Brief explanation]
-- - [Key Feature 2]: [Brief explanation]
-- - [Key Feature 3]: [Brief explanation]
-- - [Key Feature 4]: [Brief explanation]
-- - [Key Feature 5]: [Brief explanation]
-- - [Key Feature 6]: [Brief explanation]
-- - [Key Feature 7]: [Brief explanation]
-- - [Key Feature 8]: [Brief explanation]
-- - [Key Feature 9]: [Brief explanation]
--
-- @example [Advanced Use Case Name]
-- ```typescript
+- Don't do this because...
+- Watch out for this situation...
 
-  ```
-- // Example demonstrating a more advanced scenario
-- // Include relevant imports and context
-- ```
+### Related Functions
 
-  ```
--
-- @example [Creating Extensions/Specialized Versions]
-- ```typescript
+- [OtherFunction](#otherfunction) - Use this when you need to...
+- [RelatedFunction](#relatedfunction) - This works great with...
 
-  ```
-- // Example showing how to extend or customize the utility
-- // Highlight flexible design patterns
-- ```
+### Module Level Documentation
 
-  ```
--
-- @example [Common Workflow Example]
-- ```typescript
+**IMPORTANT:** Only use this JSDoc format when documenting `.ts/.js/.jsx/.tsx` files. Markdown files (`.md/.mdx`) should use the clean conversational approach above.
 
-  ```
-- // Example demonstrating the utility in a typical workflow
-- // Show integration with other parts of the system
-- ```
+For TypeScript/JavaScript modules, use this simplified JSDoc template at the top of the file:
 
-  ```
--
-- @example [Configuration/Options Example]
-- ```typescript
+````typescript
+/**
+ * @module @package/path/to/utility
+ *
+ * Brief description of what this module does and why it's useful.
+ * Keep it simple and focused on the main purpose.
+ *
+ * @example
+ * ```typescript
+ * import { mainFunction } from "@package/path/to/utility";
+ *
+ * // Show the most common use case
+ * const result = mainFunction("example");
+ * ```
+ */
+````
 
-  ```
-- // Example demonstrating how to configure the utility
-- // Highlight key configuration options
-- ```
-
-  ```
--
-- @apiOptions
-- - [option1]: [type] - [Description of what this option controls]
-- - [option2]: [type] - [Description of what this option controls]
-- - [option3]: [type] - [Description of what this option controls]
-- - [option4]: [type] - [Description of what this option controls]
-- - [option5]: [type] - [Description of what this option controls]
--
-- @bestPractices
-- 1.  [Best practice recommendation #1]
-- 2.  [Best practice recommendation #2]
-- 3.  [Best practice recommendation #3]
-- 4.  [Best practice recommendation #4]
-- 5.  [Best practice recommendation #5]
--
-- @see {@link mainFunction} - [Brief description of main function]
-- @see {@link helperFunction} - [Brief description of helper function]
-- @see {@link utilityFunction} - [Brief description of utility function]
-  \*/
+Keep module-level JSDoc documentation minimal and focused. The detailed explanations should be in the markdown documentation files.
+Add comments in code. Inline comments must start with /** ... **/
