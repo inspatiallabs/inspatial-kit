@@ -13,7 +13,7 @@
  */
 
 // @ts-ignore: Allow importing .ts files in Deno
-import { resolve, dirname, fromFileUrl } from "@std/path";
+import { resolve, dirname, fromFileUrl } from "jsr:@std/path";
 
 // Type definition for Deno to help TypeScript
 declare global {

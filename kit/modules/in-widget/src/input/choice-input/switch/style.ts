@@ -1,15 +1,17 @@
 import { createStyle } from "@in/style/variant/index.ts";
-import {
-  ThemeBoxSize,
-  ThemeRadius,
-  ThemeDisabled,
-} from "@in/widget/theme/index.ts";
+import { ThemeDisabled } from "@in/widget/theme/index.ts";
 
 //##############################################(CREATE STYLE)##############################################//
+
+// For type-safe cross-references, you can extract types using StyleProps:
+// type TrackProps = StyleProps<typeof SwitchStyle.track.getStyle>;
+// type HandleProps = StyleProps<typeof SwitchStyle.handle.getStyle>;
+// Then use with crossRef<TrackProps>("switch-track", "size", "lg", {...})
 
 export const SwitchStyle = {
   /*******************************(WRAPPER)******************************/
   wrapper: createStyle({
+    name: "switch-wrapper",
     base: [
       {
         web: {
@@ -30,6 +32,7 @@ export const SwitchStyle = {
 
   /*******************************(INPUT)******************************/
   input: createStyle({
+    name: "switch-input",
     base: [
       "sr-only",
       "peer",
@@ -51,6 +54,7 @@ export const SwitchStyle = {
 
   /*******************************(TRACK)******************************/
   track: createStyle({
+    name: "switch-track",
     base: [
       // "shadow-hollow",
       {
@@ -58,8 +62,6 @@ export const SwitchStyle = {
           position: "relative",
           display: "inline-flex",
           alignItems: "center",
-          height: "20px",
-          width: "36px",
           backgroundColor: "var(--background)",
           transitionProperty: "all",
           transitionDuration: "200ms",
@@ -102,17 +104,70 @@ export const SwitchStyle = {
       },
     ],
     settings: {
-      //   size: ThemeBoxSize,
-      radius: ThemeRadius,
+      size: {
+        sm: [
+          {
+            web: {
+              height: "20px",
+              width: "36px",
+            },
+          },
+        ],
+        md: [
+          {
+            web: {
+              height: "40px",
+              width: "72px",
+            },
+          },
+        ],
+        lg: [
+          {
+            web: {
+              height: "48px",
+              width: "90px",
+            },
+          },
+        ],
+      },
+      radius: {
+        rounded: [
+          {
+            web: {
+              borderRadius: "var(--radius-full)",
+            },
+          },
+        ],
+        squared: [
+          {
+            web: {
+              borderRadius: "var(--radius-md)",
+            },
+          },
+        ],
+      },
     },
     defaultSettings: {
-      //   size: "md",
-      radius: "full",
+      size: "sm",
+      radius: "rounded",
     },
+
+    composition: [
+      {
+        size: "sm",
+        radius: "squared",
+        style: {
+          web: {
+            borderRadius: "var(--radius-xs)",
+          },
+        },
+      },
+    ],
   }),
 
   /*******************************(HANDLE)******************************/
   handle: createStyle({
+    name: "switch-handle",
     base: [
       {
         web: {
@@ -120,11 +175,6 @@ export const SwitchStyle = {
           position: "absolute",
           left: "2px",
           top: "50%",
-
-          // Checked state - move handle to right
-          ".peer:checked ~ * &": {
-            transform: "translateY(-50%) translateX(16px)",
-          },
 
           // Disabled state
           ".peer:disabled ~ * &": {
@@ -154,44 +204,110 @@ export const SwitchStyle = {
           },
         ],
       },
-      radius: ThemeRadius,
-      size: {
-        base: [
-          {
-            web: {
-              width: "16px",
-              height: "16px",
-            },
-          },
-        ],
-        longhand: [
-          {
-            web: {
-              width: "58%",
-              height: "16px",
-
-              ".peer:checked ~ * &": {
-                width: "58%",
-                minHeight: "100%",
-              },
-            },
-          },
-        ],
-      },
     },
 
     defaultSettings: {
       format: "base",
-      radius: "full",
-      size: "base",
     },
-    // composition: [
-    //   {
-    //     format: "base",
-    //     style: {
-    //       web: {},
-    //     },
-    //   },
-    // ],
+    composition: [
+      // Base handle size (default for all track sizes)
+      {
+        style: {
+          web: {
+            width: "50%",
+            height: "90%",
+          },
+        },
+      },
+      {
+        "$switch-track.size": "lg",
+        style: {
+          web: {
+            left: "2px",
+
+            // Checked state - move handle to right
+            ".peer:checked ~ * &": {
+              transform: "translateY(-50%) translateX(90%)",
+            },
+          },
+        },
+      },
+      {
+        "$switch-track.size": "md",
+        style: {
+          web: {
+            left: "2px",
+
+            // Checked state - move handle to right
+            ".peer:checked ~ * &": {
+              transform: "translateY(-50%) translateX(88%)",
+            },
+          },
+        },
+      },
+      {
+        "$switch-track.size": "sm",
+        style: {
+          web: {
+            width: "16px",
+            height: "16px",
+            
+
+            // Checked state - move handle to right
+            ".peer:checked ~ * &": {
+              transform: "translateY(-50%) translateX(100%)",
+            },
+          },
+        },
+      },
+      {
+        "$switch-track.radius": "rounded",
+        style: {
+          web: {
+            borderRadius: "var(--radius-full)",
+          },
+        },
+      },
+      {
+        "$switch-track.radius": "squared",
+        style: {
+          web: {
+            borderRadius: "var(--radius-md)",
+          },
+        },
+      },
+      // Example: Multiple cross-references - when track is small AND squared
+      {
+        "$switch-track.size": "sm",
+        "$switch-track.radius": "squared",
+        style: {
+          web: {
+            borderRadius: "2px", // Override with specific value for this combination
+          },
+        },
+      },
+    ],
+  }),
+
+  /*******************************(ICON)******************************/
+  icon: createStyle({
+    name: "switch-icon",
+    base: [
+      {
+        web: {
+          height: "100%",
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "var(--secondary)",
+          size: "20px",
+
+          ".peer:checked ~ * &": {
+            color: "var(--brand)",
+          },
+        },
+      },
+    ],
   }),
 };

@@ -34,7 +34,7 @@ type CompiledRoute<T extends BaseRouteConfig> = T & {
 };
 
 /** The Route class for handling navigation and route matching. */
-import { detectBrowserEngine } from "@in/vader/env";
+import { detectBrowserEngine } from "@in/vader/env/index.ts";
 
 export class Route<T extends BaseRouteConfig, C = null> {
   private mappings: RegExp | null = null;

@@ -15,7 +15,7 @@
 
 
 
-// import { createVariant, type VariantProps } from "@inspatial/theme/variant";
+// import { createVariant, type VariantProps } from "@in/style/variant";
 // import { SharedProps } from "@inspatial/type/util";
 // import { type TextVariantType } from "../../typography/text/variant";
 // import { PatternVariantType } from "../../pattern/variant";

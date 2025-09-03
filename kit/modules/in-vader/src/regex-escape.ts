@@ -41,8 +41,8 @@ const RX_REGEXP_ESCAPE = new RegExp(
  *
  * @example Usage
  * ```ts
- * import { regEscape } from "@inspatial/util";
- * import { assertEquals, assertMatch, assertNotMatch } from "@inspatial/test";
+ * import { regEscape } from "@in/vader";
+ * import { assertEquals, assertMatch, assertNotMatch } from "@in/test";
  *
  * const re = new RegExp(`^${regEscape(".")}$`, "u");
  *

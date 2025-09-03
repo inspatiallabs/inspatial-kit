@@ -1,7 +1,7 @@
 // @ts-ignore: Allow importing .ts files in Deno
 import { generateGoogleFontTypes } from "./font-generator.ts";
 // @ts-ignore: Allow importing from JSR in TypeScript
-import { resolve, dirname, fromFileUrl, join } from "@std/path";
+import { resolve, dirname, fromFileUrl, join } from "jsr:@std/path";
 import { exists } from "jsr:@std/fs";
 // @ts-ignore: Allow importing from the generator
 import { POPULAR_FONTS, generateGoogleFontStubs } from "./stub-generator.ts";

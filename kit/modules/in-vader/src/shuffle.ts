@@ -45,7 +45,7 @@
  * #### Installation
  * ```bash
  * # Deno
- * deno add jsr:@inspatial/util/shuffle.ts
+ * deno add jsr:@in/vader/shuffle.ts
  * ```
  *
  * #### Examples

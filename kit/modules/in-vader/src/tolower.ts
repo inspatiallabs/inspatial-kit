@@ -1,12 +1,12 @@
 /**
- * @module @inspatial/util/tolowercase
+ * @module @in/vader/tolowercase
  *
  * String utility for converting text to lowercase. This simple utility ensures consistent
  * string case transformation with built-in type safety and null handling.
  *
  * @example Basic Usage
  * ```typescript
- * import { toLower } from "@inspatial/util/tolowercase.ts";
+ * import { toLower } from "@in/vader/tolowercase.ts";
  *
  * const lowercased = toLower("HELLO WORLD");
  * console.log(lowercased); // "hello world"

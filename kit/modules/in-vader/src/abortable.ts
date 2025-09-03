@@ -55,7 +55,7 @@
  * #### Installation
  * ```bash
  * # Deno
- * deno add jsr:@inspatial/util
+ * deno add jsr:@in/vader
  * ```
  * {@tutorial installation-and-setup}
  *
@@ -65,7 +65,7 @@
  * @example
  * ### Example 1: Aborting a Promise
  * ```typescript
- * import { abortable } from '@inspatial/util/abortable.ts';
+ * import { abortable } from '@in/vader/abortable.ts';
  *
  * const promise = new Promise((resolve) => setTimeout(resolve, 5000));
  * const controller = new AbortController();
@@ -81,7 +81,7 @@
  * @example
  * ### Example 2: Aborting an Async Iterable
  * ```typescript
- * import { abortable } from '@inspatial/util/abortable.ts';
+ * import { abortable } from '@in/vader/abortable.ts';
  *
  * async function* generateNumbers() {
  *   let i = 0;

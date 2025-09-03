@@ -99,7 +99,7 @@ const colorCodeToShorterNames = (string: string): string => {
  * #### Installation
  * ```bash
  * # Deno
- * deno add jsr:@inspatial/util
+ * deno add jsr:@in/vader
  * ```
  *
  * #### Examples
@@ -107,7 +107,7 @@ const colorCodeToShorterNames = (string: string): string => {
  * @example
  * ### Example 1: Basic SVG Conversion
  * ```typescript
- * import { svgToTinyDataUri } from '@inspatial/util/svg-to-tiny-data-uri.ts';
+ * import { svgToTinyDataUri } from '@in/vader/svg-to-tiny-data-uri.ts';
  *
  * const simpleSvg = `
  *   <svg viewBox="0 0 100 100">
@@ -123,7 +123,7 @@ const colorCodeToShorterNames = (string: string): string => {
  * @example
  * ### Example 2: Using with Theme Colors
  * ```typescript
- * import { svgToTinyDataUri } from '@inspatial/util/svg-to-tiny-data-uri.ts';
+ * import { svgToTinyDataUri } from '@in/vader/svg-to-tiny-data-uri.ts';
  *
  * const themedSvg = `
  *   <svg viewBox="0 0 100 100">

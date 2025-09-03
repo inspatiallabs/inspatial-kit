@@ -1,12 +1,12 @@
 /**
- * @module @inspatial/util/create-attribute-filter
+ * @module @in/vader/create-attribute-filter
  *
  * Utility for creating filter functions that match attributes by namespace and name.
  * This makes it easy to find specific attributes in collections of objects, with case-insensitive name matching.
  *
  * @example Basic Usage
  * ```typescript
- * import { createAttributeFilter } from "@inspatial/util/create-attribute-filter.ts";
+ * import { createAttributeFilter } from "@in/vader/create-attribute-filter.ts";
  *
  * const svgPathFilter = createAttributeFilter("svg", "path");
  * const matchingElements = elements.filter(svgPathFilter);

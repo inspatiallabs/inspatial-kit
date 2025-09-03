@@ -1,6 +1,6 @@
 // import {  } from "@inspatial/types/util";
-// import { createVariant } from "@inspatial/theme/variant";
-// import { Effect } from "@inspatial/theme/effect";
+// import { createVariant } from "@in/style/variant";
+// import { Effect } from "@in/style/effect";
 
 
 // //##############################################(BASE TYPES)##############################################//

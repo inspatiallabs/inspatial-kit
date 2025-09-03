@@ -1,9 +1,16 @@
-import { iss } from "@in/style";
+import { iss, composeStyle } from "@in/style";
 import { SwitchStyle } from "./style.ts";
 import type { SwitchProps } from "./type.ts";
 import { Slot } from "@in/widget/structure/index.ts";
+import { getChoiceInputIcon } from "../helpers.tsx";
 
 /*##############################(SWITCH)####################################*/
+
+// Create composed style for cross-references to work
+const composedSwitchStyle = composeStyle(
+  SwitchStyle.track.getStyle,
+  SwitchStyle.handle.getStyle
+);
 
 export function Switch(props: SwitchProps) {
   /**************************(Props)**************************/
@@ -15,34 +22,34 @@ export function Switch(props: SwitchProps) {
     checked = false,
     defaultChecked,
     onChange,
+    icon,
     $ref,
     ...rest
   } = props;
 
-  const styleProps = {
-    size,
-    radius,
-    disabled,
-    className,
-  } as const;
+  // Track gets size, radius, disabled - handle only gets disabled
+  const trackProps = { size, radius, disabled } as const;
+  const handleProps = { disabled } as const;
+  const wrapperProps = { disabled, className } as const;
 
   /**************************(State)**************************/
-  const isChecked = checked === true;
+  const isChosen = checked === true;
 
   /**************************(Handlers)**************************/
   const handleChange = (event: any) => {
-    const newChecked = event?.target?.checked ?? !isChecked;
+    const newChecked = event?.target?.checked ?? !isChosen;
     onChange?.(newChecked);
   };
 
   /**************************(Render)**************************/
+
   return (
     <>
-      <label className={iss(SwitchStyle.wrapper.getStyle(styleProps))}>
+      <label className={iss(SwitchStyle.wrapper.getStyle(wrapperProps))}>
         <input
           type="checkbox"
-          className={iss(SwitchStyle.input.getStyle(styleProps))}
-          checked={isChecked}
+          className={iss(SwitchStyle.input.getStyle({}))}
+          checked={isChosen}
           disabled={disabled}
           defaultChecked={defaultChecked}
           on:input={handleChange}
@@ -51,13 +58,19 @@ export function Switch(props: SwitchProps) {
           {...rest}
         />
         <Slot
-          className={iss(SwitchStyle.track.getStyle(styleProps))}
-          data-checked={isChecked}
+          className={iss(SwitchStyle.track.getStyle(trackProps))}
+          data-checked={isChosen}
         >
           <Slot
-            className={iss(SwitchStyle.handle.getStyle(styleProps))}
-            data-checked={isChecked}
-          />
+            className={iss(
+              composedSwitchStyle({ ...trackProps, ...handleProps })
+            )}
+            data-checked={isChosen}
+          >
+            <Slot className={iss(SwitchStyle.icon.getStyle({ className }))}>
+              {getChoiceInputIcon(icon, isChosen)}
+            </Slot>
+          </Slot>
         </Slot>
       </label>
     </>

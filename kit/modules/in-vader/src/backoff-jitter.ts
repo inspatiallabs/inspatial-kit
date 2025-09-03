@@ -30,7 +30,7 @@
  *
  * @example
  * // Simple retry with backoff
- * import { backoffJitter } from "@inspatial/util/backoff-jitter";
+ * import { backoffJitter } from "@in/vader/backoff-jitter";
  *
  * async function fetchWithRetry(url: string) {
  *   for (let attempt = 0; attempt < 5; attempt++) {

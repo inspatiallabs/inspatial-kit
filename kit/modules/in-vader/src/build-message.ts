@@ -27,9 +27,9 @@ import { DiffResultProp, DiffTypeProp } from "./difference.ts";
  *
  * @example Usage
  * ```ts
- * import { createDiffColor } from "@inspatial/util";
- * import { expect, test } from "@inspatial/test";
- * import { bold, green, red, white } from "@inspatial/theme/color";
+ * import { createDiffColor } from "@in/vader";
+ * import { expect, test } from "@in/test";
+ * import { bold, green, red, white } from "@in/style/color";
  *
  *
  * test ({
@@ -90,8 +90,8 @@ export function createDiffColor(
  *
  * @example Usage
  * ```ts
- * import { createDiffSign } from "@inspatial/util";
- * import { expect } from "@inspatial/test";
+ * import { createDiffSign } from "@in/vader";
+ * import { expect } from "@in/test";
  *
  * expect(createDiffSign("added")).toBe("+   ");
  * expect(createDiffSign("removed")).toBe("-   ");
@@ -136,7 +136,7 @@ interface BuildMessageOptions {
  *
  * @example Usage
  * ```ts no-assert
- * import { diffStr, buildMessage } from "@inspatial/util";
+ * import { diffStr, buildMessage } from "@in/vader";
  *
  * const diffResult = diffStr("Hello, world!", "Hello, world");
  *

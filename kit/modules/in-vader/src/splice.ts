@@ -1,12 +1,12 @@
 /**
- * @module @inspatial/util/splice
+ * @module @in/vader/splice
  *
  * Array manipulation utilities for finding and splicing elements with flexible comparison options.
  * These utilities help you work with arrays more effectively by providing enhanced search and modification capabilities.
  *
  * @example Basic Usage
  * ```typescript
- * import { findWhere, splice } from "@inspatial/util/splice.ts";
+ * import { findWhere, splice } from "@in/vader/splice.ts";
  *
  * const users = [{ id: 1, name: "Alice" }, { id: 2, name: "Bob" }];
  * const bob = findWhere(users, user => user.id === 2, false, false);

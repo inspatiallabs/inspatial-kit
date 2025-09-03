@@ -354,6 +354,9 @@ type StyleSchemaProp<V extends StyleShapeProp> = {
  * For type inference and IDE autocompletion
  */
 export interface InSpatialStyleConfig<V extends StyleShapeProp> {
+  /** Name identifier for cross-style composition references */
+  name?: string;
+
   /** Base classes applied to all instances */
   base?: ClassValueProp;
 
@@ -361,13 +364,12 @@ export interface InSpatialStyleConfig<V extends StyleShapeProp> {
   settings?: V;
 
   /** Compound styles for complex combinations */
-  composition?: Array<
-    StyleSchemaProp<V> & {
-      class?: ClassValueProp;
-      className?: ClassValueProp;
-      style?: JSX.UniversalStyleProps
-    }
-  >;
+  composition?: Array<{
+    [key: string]: any;
+    class?: ClassValueProp;
+    className?: ClassValueProp;
+    style?: JSX.UniversalStyleProps;
+  }>;
 
   /** Default values for styles */
   defaultSettings?: StyleSchemaProp<V>;
@@ -1033,13 +1035,95 @@ function createStyleCore<V extends StyleShapeProp>(
     (props) => {
       const { class: cls, className, ...styleProps } = props || {};
 
-      // Get the raw classes from each component
-      const componentResults = components.map((component) =>
-        component(styleProps as any)
-      );
+      // Step 1: Build style context by evaluating each component
+      const styleContext: Record<string, any> = {};
+      const componentData: Array<{
+        classes: string;
+        config: any;
+        name: string;
+        usedSettings: any;
+      }> = [];
 
-      // Combine with other provided classes
-      const allClasses = [...componentResults, cls, className];
+      components.forEach((component, index) => {
+        // Get the raw classes
+        const classes = component(styleProps as any);
+
+        // Extract config and name if available (set by createStyle)
+        const config = (component as any).__styleConfig;
+        const name = (component as any).__styleName || `style${index}`;
+
+        // Extract what settings were actually used
+        const usedSettings: Record<string, any> = {};
+        if (config?.settings) {
+          for (const key of Object.keys(config.settings)) {
+            usedSettings[key] =
+              (styleProps as Record<string, any>)[key] ??
+              config.defaultSettings?.[key];
+          }
+        }
+
+        styleContext[name] = usedSettings;
+        componentData.push({ classes, config, name, usedSettings });
+      });
+
+      // Step 2: Re-evaluate compositions with cross-references
+      const crossCompositionClasses: string[] = [];
+
+      componentData.forEach(({ config }) => {
+        if (!config?.composition) return;
+
+        for (const rule of config.composition) {
+          const {
+            class: cvClass,
+            className: cvClassName,
+            style: cvStyle,
+            ...conds
+          } = rule || {};
+
+          const matches = Object.entries(conds).every(([key, value]) => {
+            if (key.startsWith("$")) {
+              // Cross-reference: $track.size
+              const path = key.substring(1).split(".");
+              const styleName = path[0];
+              const propName = path[1];
+              return styleContext[styleName]?.[propName] === value;
+            }
+            // Regular composition check
+            const pv =
+              (styleProps as Record<string, any>)[key] ??
+              config?.defaultSettings?.[key];
+            return Array.isArray(value) ? value.includes(pv) : pv === value;
+          });
+
+          if (matches) {
+            if (cvClass) crossCompositionClasses.push(cvClass);
+            if (cvClassName) crossCompositionClasses.push(cvClassName);
+            if (cvStyle?.web) {
+              // Process web styles with proper nested selector support
+              const className = `in-${__hashString(JSON.stringify(cvStyle.web))}`;
+              if (!__injectedStyleHashes.has(className)) {
+                const el = __ensureStyleEl();
+                if (el) {
+                  const rules = __serializeRules(cvStyle.web, `.${className}`);
+                  if (rules) {
+                    el.appendChild(document.createTextNode(rules));
+                    __injectedStyleHashes.add(className);
+                  }
+                }
+              }
+              crossCompositionClasses.push(className);
+            }
+          }
+        }
+      });
+
+      // Step 3: Combine everything
+      const allClasses = [
+        ...componentData.map((d) => d.classes),
+        ...crossCompositionClasses,
+        cls,
+        className,
+      ];
 
       // Use iss to apply intelligent conflict resolution
       return iss(...allClasses);
@@ -1215,15 +1299,28 @@ export function createStyle<V extends StyleShapeProp>(
   ) {
     const styleFn = system.style(configOrOptions as InSpatialStyleConfig<V>);
 
+    // Tag the function with its config for cross-composition
+    (styleFn as any).__styleConfig = configOrOptions;
+    // Use the name from config if provided, otherwise default to "self"
+    (styleFn as any).__styleName =
+      (configOrOptions as InSpatialStyleConfig<V>).name || "self";
+
+    // Also tag the getStyle method
+    const getStyle = styleFn as (
+      props?: StyleSchemaProp<V> & {
+        class?: ClassValueProp;
+        className?: ClassValueProp;
+      }
+    ) => string;
+
+    (getStyle as any).__styleConfig = configOrOptions;
+    (getStyle as any).__styleName =
+      (configOrOptions as InSpatialStyleConfig<V>).name || "self";
+
     // Return with strongly typed getStyle
     return {
       ...system,
-      getStyle: styleFn as (
-        props?: StyleSchemaProp<V> & {
-          class?: ClassValueProp;
-          className?: ClassValueProp;
-        }
-      ) => string,
+      getStyle,
       config: configOrOptions as InSpatialStyleConfig<V>,
     };
   }

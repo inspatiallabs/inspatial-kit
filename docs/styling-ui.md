@@ -1052,6 +1052,262 @@ composition: [
 - Define what’s true “when X happens” in composition.
 - Composition is your “finishing pass” — clean, conditional, and reliable.
 
+##### Cross-Style Composition (Advanced)
+
+#### When one style needs to react to settings from other styles
+
+Cross-style composition is like having a conversation between different parts of your component. Think of it as your handle asking the track "Hey, what size are you?" and then adjusting itself accordingly.
+
+Imagine you're building a switch component where the handle needs to position itself differently based on the track's size. Without cross-style composition, each style lives in its own bubble - they can't talk to each other. But with cross-style composition, your styles become aware of each other's settings and can react accordingly.
+
+This is especially powerful for complex UI components where child elements need to adapt based on parent or sibling configurations, like handles adjusting to track sizes, or icons changing based on button variants.
+
+> **Note:** Cross-style composition only works when styles are composed together using the `composeStyle` function. Individual styles called separately don't have access to each other's context.
+
+> **Terminology:** The `$` prefix in composition rules tells the system "look at another style's setting" rather than your own style's setting.
+
+##### The Problem Without Cross-Style Composition
+
+Here's what happens when you try to reference other styles without cross-composition:
+
+```typescript
+// ❌ This doesn't work - can't reference other style's settings
+const handleStyle = createStyle({
+  composition: [
+    {
+      trackSize: "sm", // This only looks at handle's own settings
+      style: { web: { left: "1px" } }
+    }
+  ]
+});
+```
+
+##### The Solution: Named Styles and Cross-References
+
+First, give your styles names so they can reference each other:
+
+```typescript
+import { createStyle } from "@inspatial/kit/style";
+
+// Track style with a name
+const track = createStyle({
+  name: "switch-track", // This name lets other styles reference it
+  settings: {
+    size: {
+      sm: [{ web: { width: "36px", height: "20px" } }],
+      lg: [{ web: { width: "90px", height: "48px" } }],
+    }
+  },
+  defaultSettings: { size: "lg" }
+});
+
+// Handle style that reacts to track's settings
+const handle = createStyle({
+  name: "switch-handle",
+  base: [{ web: { position: "absolute", left: "2px" } }],
+  composition: [
+    // Use $ prefix to reference OTHER styles
+    {
+      "$switch-track.size": "sm", // When track is small
+      style: {
+        web: {
+          width: "16px",
+          height: "16px",
+          ".peer:checked ~ * &": {
+            transform: "translateY(-50%) translateX(100%)"
+          }
+        }
+      }
+    },
+    {
+      "$switch-track.size": "lg", // When track is large  
+      style: {
+        web: {
+          left: "2px",
+          ".peer:checked ~ * &": {
+            transform: "translateY(-50%) translateX(90%)"
+          }
+        }
+      }
+    }
+  ]
+});
+```
+
+##### Multiple Cross-References
+
+You can even reference multiple styles in a single composition rule:
+
+```typescript
+const handle = createStyle({
+  name: "switch-handle",
+  composition: [
+    {
+      // Multiple conditions - ALL must match
+      "$switch-track.size": "sm",
+      "$switch-track.radius": "squared",
+      style: {
+        web: { borderRadius: "2px" } // Special case for small + squared
+      }
+    }
+  ]
+});
+```
+
+##### Using Cross-Style Composition in Components
+
+The magic happens when you use `composeStyle` to bring everything together:
+
+```typescript
+import { composeStyle, iss } from "@inspatial/kit/style";
+
+// ❌ Without composeStyle - styles don't know about each other
+function SwitchBroken(props) {
+  return (
+    <label>
+      <input type="checkbox" />
+      <div className={iss(SwitchStyle.track.getStyle(props))}>
+        <div className={iss(SwitchStyle.handle.getStyle(props))}>
+          {/* Handle can't react to track's size */}
+        </div>
+      </div>
+    </label>
+  );
+}
+
+// ✅ With composeStyle - styles can cross-reference each other
+function Switch(props) {
+  // Create composed style that knows about all related styles
+  const composedSwitchStyle = composeStyle(
+    SwitchStyle.track.getStyle,
+    SwitchStyle.handle.getStyle
+  );
+
+  return (
+    <label>
+      <input type="checkbox" />
+      <div className={iss(composedSwitchStyle(props))}>
+        {/* Now handle can react to track's size! */}
+      </div>
+    </label>
+  );
+}
+```
+
+##### Real-World Example: Complete Switch Component
+
+Here's how cross-style composition works in a real switch component:
+
+```typescript
+// styles/switch.ts
+export const SwitchStyle = {
+  track: createStyle({
+    name: "switch-track",
+    base: [{ web: { position: "relative", cursor: "pointer" } }],
+    settings: {
+      size: {
+        sm: [{ web: { width: "36px", height: "20px" } }],
+        lg: [{ web: { width: "90px", height: "48px" } }]
+      },
+      radius: {
+        rounded: [{ web: { borderRadius: "9999px" } }],
+        squared: [{ web: { borderRadius: "4px" } }]
+      }
+    },
+    defaultSettings: { size: "lg", radius: "rounded" }
+  }),
+
+  handle: createStyle({
+    name: "switch-handle", 
+    base: [{ web: { position: "absolute", left: "2px", top: "50%" } }],
+    composition: [
+      // React to track size
+      {
+        "$switch-track.size": "sm",
+        style: {
+          web: {
+            width: "16px", 
+            height: "16px",
+            ".peer:checked ~ * &": {
+              transform: "translateY(-50%) translateX(100%)"
+            }
+          }
+        }
+      },
+      // React to both size AND radius
+      {
+        "$switch-track.size": "sm",
+        "$switch-track.radius": "squared", 
+        style: {
+          web: { borderRadius: "2px" } // Override for this combination
+        }
+      }
+    ]
+  })
+};
+
+// components/Switch.tsx
+export function Switch(props) {
+  const { size, radius, checked, onChange } = props;
+  
+  // Compose styles so they can cross-reference
+  const composedStyle = composeStyle(
+    SwitchStyle.track.getStyle,
+    SwitchStyle.handle.getStyle
+  );
+
+  return (
+    <label className={iss(SwitchStyle.wrapper.getStyle(props))}>
+      <input 
+        type="checkbox"
+        checked={checked}
+        onChange={onChange}
+        className="sr-only peer"
+      />
+      <div className={iss(composedStyle({ size, radius }))}>
+        {/* Handle automatically adjusts based on track settings */}
+      </div>
+    </label>
+  );
+}
+```
+
+##### Common Patterns
+
+**Size-based positioning:**
+```typescript
+composition: [
+  { "$parent.size": "sm", style: { web: { left: "1px" } } },
+  { "$parent.size": "lg", style: { web: { left: "3px" } } }
+]
+```
+
+**Theme-aware styling:**
+```typescript
+composition: [
+  { "$theme.mode": "dark", style: { web: { backgroundColor: "#333" } } },
+  { "$theme.mode": "light", style: { web: { backgroundColor: "#fff" } } }
+]
+```
+
+**Multi-condition rules:**
+```typescript
+composition: [
+  {
+    "$button.size": "lg",
+    "$button.variant": "primary",
+    style: { web: { padding: "16px 24px" } }
+  }
+]
+```
+
+##### Important Notes
+
+- **Naming is required:** Styles must have a `name` property to be referenced by others
+- **Use `composeStyle`:** Cross-references only work when styles are composed together
+- **Order matters:** Composition rules are applied in order, later rules can override earlier ones
+- **All conditions must match:** When using multiple cross-references, ALL conditions must be true
+
 ##### Pseudo Selectors and Variable Utilities (in @variant)
 
 This section explains how to compose pseudo selectors (hover, focus-visible, peer-checked, data attributes) and variable-aware class utilities inside `createStyle()` while keeping everything portable and predictable across platforms.
@@ -1061,7 +1317,7 @@ Key ideas:
 - Write simple utility tokens in `base` and `settings` when Tailwind can statically see them.
 - Use `style.web` nested selectors for pseudo-classes, peer relations, or data attributes the same way you would write CSS, but in JS objects.
 - Use variable utilities like `bg-(--brand)`, `text-(--primary)`, `border-(--surface)` so your tokens bind to theme variables.
-- For tokens Tailwind can’t safely detect or for vendor-specific shorthands (e.g., ring), either define a utility in CSS or use `style.web` to set the exact CSS property.
+- For tokens Tailwind can't safely detect or for vendor-specific shorthands (e.g., ring), either define a utility in CSS or use `style.web` to set the exact CSS property.
 
 Example: simple checkbox indicator (utilities + one nested selector)
 

@@ -1,5 +1,5 @@
 // @ts-ignore: Allow importing from JSR in TypeScript
-import { resolve, dirname, fromFileUrl } from "@std/path";
+import { resolve, dirname, fromFileUrl } from "jsr:@std/path";
 import { exists } from "jsr:@std/fs";
 // @ts-ignore: Allow importing from the generator
 import { generateGoogleFontStubs } from "./stub-generator.ts";

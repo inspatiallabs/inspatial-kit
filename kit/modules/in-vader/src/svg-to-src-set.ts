@@ -41,13 +41,13 @@ import svgToTinyDataUri from "./svg-to-tiny-data-uri.ts";
  * #### Installation
  * ```bash
  * # Deno
- * deno add jsr:@inspatial/util
+ * deno add jsr:@in/vader
  * ```
  *
  * @example
  * ### Example 1: Basic Usage with Responsive Images
  * ```typescript
- * import { svgToSrcSet } from '@inspatial/util/svg-to-tiny-data-uri.ts';
+ * import { svgToSrcSet } from '@in/vader/svg-to-tiny-data-uri.ts';
  *
  * const svgLogo = `
  *   <svg viewBox="0 0 100 100">
@@ -65,7 +65,7 @@ import svgToTinyDataUri from "./svg-to-tiny-data-uri.ts";
  * @example
  * ### Example 2: Using with Picture Element
  * ```typescript
- * import { svgToSrcSet } from '@inspatial/util/svg-to-tiny-data-uri.ts';
+ * import { svgToSrcSet } from '@in/vader/svg-to-tiny-data-uri.ts';
  *
  * const darkLogo = `
  *   <svg viewBox="0 0 100 100">

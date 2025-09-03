@@ -5,14 +5,14 @@
  *
  * @example
  * // Basic usage
- * import { printPage } from '@inspatial/util';
+ * import { printPage } from '@in/vader';
  *
  * // Print the current page
  * printPage();
  *
  * @example
  * // Usage with a button click event
- * import { printPage } from '@inspatial/util';
+ * import { printPage } from '@in/vader';
  *
  * function PrintButton() {
  *   return (
@@ -24,7 +24,7 @@
  *
  * @example
  * // Usage with custom print styles
- * import { printPage } from '@inspatial/util';
+ * import { printPage } from '@in/vader';
  *
  * // Add print-specific styles in your CSS
  * // @media print {

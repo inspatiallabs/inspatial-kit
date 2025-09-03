@@ -40,7 +40,7 @@ import { Modal } from "@in/widget/presentation/modal/index.tsx";
 import { Drawer } from "@in/widget/presentation/drawer/index.tsx";
 import { SecurityKeyIcon } from "@in/widget/icon/security-key-icon.tsx";
 import { DirectionRightIcon } from "@in/widget/icon/direction-right-icon.tsx";
-import { Switch, Checkbox } from "@in/widget/input/index.ts"
+import { Switch, Checkbox } from "@in/widget/input/index.ts";
 
 // import { DropdownMenu } from "../../navigation/dropdown-menu/index.tsx";
 
@@ -96,20 +96,7 @@ export function Table<TData, TValue>({
           },
         }}
       >
-        {/* <Checkbox
-          className="print:hidden"
-          aria-label="Select all"
-          checked={
-            typeof allChecked === "object" && "get" in allChecked
-              ? (allChecked as any).get()
-              : (allChecked as any)
-          }
-          on:input={(e: any) => {
-            const checked = e?.target?.checked ?? e;
-            onAllChecked?.(!!checked);
-          }}
-        /> */}
-        <Switch
+        <Checkbox
           className="print:hidden"
           aria-label="Select all"
           checked={
@@ -122,7 +109,20 @@ export function Table<TData, TValue>({
             onAllChecked?.(!!checked);
           }}
         />
-        
+        {/* <Switch
+          className="print:hidden"
+          aria-label="Select all"
+          checked={
+            typeof allChecked === "object" && "get" in allChecked
+              ? (allChecked as any).get()
+              : (allChecked as any)
+          }
+          on:input={(e: any) => {
+            const checked = e?.target?.checked ?? e;
+            onAllChecked?.(!!checked);
+          }}
+        />
+         */}
       </Slot>
     ),
     cell: ({ row }) => {

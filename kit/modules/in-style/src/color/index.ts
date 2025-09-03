@@ -244,13 +244,13 @@ let enabled = !noColor;
 /**
  * Enable or disable text color when styling.
  *
- * `@inspatial/util` automatically detects NO_COLOR environmental variable
+ * `@in/vader` automatically detects NO_COLOR environmental variable
  * and disables text color. Use this API only when the automatic detection
  * doesn't work.
  *
  * @example Usage
  * ```ts no-assert
- * import { setColorEnabled } from "@inspatial/util";
+ * import { setColorEnabled } from "@in/vader";
  *
  * // Disable text color
  * setColorEnabled(false);
@@ -274,7 +274,7 @@ export function setColorEnabled(value: boolean) {
  *
  * @example Usage
  * ```ts no-assert
- * import { getColorEnabled } from "@inspatial/util";
+ * import { getColorEnabled } from "@in/vader";
  *
  * console.log(getColorEnabled()); // true if enabled, false if disabled
  * ```
@@ -313,7 +313,7 @@ function run(str: string, code: Code): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { reset } from "@inspatial/util";
+ * import { reset } from "@in/vader";
  *
  * console.log(reset("Hello, world!"));
  * ```
@@ -330,7 +330,7 @@ export function reset(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { bold } from "@inspatial/util";
+ * import { bold } from "@in/vader";
  *
  * console.log(bold("Hello, world!"));
  * ```
@@ -347,7 +347,7 @@ export function bold(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { dim } from "@inspatial/util";
+ * import { dim } from "@in/vader";
  *
  * console.log(dim("Hello, world!"));
  * ```
@@ -367,7 +367,7 @@ export function dim(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { italic } from "@inspatial/util";
+ * import { italic } from "@in/vader";
  *
  * console.log(italic("Hello, world!"));
  * ```
@@ -384,7 +384,7 @@ export function italic(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { underline } from "@inspatial/util";
+ * import { underline } from "@in/vader";
  *
  * console.log(underline("Hello, world!"));
  * ```
@@ -401,7 +401,7 @@ export function underline(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { inverse } from "@inspatial/util";
+ * import { inverse } from "@in/vader";
  *
  * console.log(inverse("Hello, world!"));
  * ```
@@ -418,7 +418,7 @@ export function invert(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { hidden } from "@inspatial/util";
+ * import { hidden } from "@in/vader";
  *
  * console.log(hidden("Hello, world!"));
  * ```
@@ -435,7 +435,7 @@ export function hidden(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { strikethrough } from "@inspatial/util";
+ * import { strikethrough } from "@in/vader";
  *
  * console.log(strikethrough("Hello, world!"));
  * ```
@@ -452,7 +452,7 @@ export function strikethrough(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { black } from "@inspatial/util";
+ * import { black } from "@in/vader";
  *
  * console.log(black("Hello, world!"));
  * ```
@@ -469,7 +469,7 @@ export function black(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { red } from "@inspatial/util";
+ * import { red } from "@in/vader";
  *
  * console.log(red("Hello, world!"));
  * ```
@@ -486,7 +486,7 @@ export function red(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { green } from "@inspatial/util";
+ * import { green } from "@in/vader";
  *
  * console.log(green("Hello, world!"));
  * ```
@@ -503,7 +503,7 @@ export function green(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { yellow } from "@inspatial/util";
+ * import { yellow } from "@in/vader";
  *
  * console.log(yellow("Hello, world!"));
  * ```
@@ -520,7 +520,7 @@ export function yellow(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { blue } from "@inspatial/util";
+ * import { blue } from "@in/vader";
  *
  * console.log(blue("Hello, world!"));
  * ```
@@ -537,7 +537,7 @@ export function blue(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { magenta } from "@inspatial/util";
+ * import { magenta } from "@in/vader";
  *
  * console.log(magenta("Hello, world!"));
  * ```
@@ -554,7 +554,7 @@ export function magenta(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { cyan } from "@inspatial/util";
+ * import { cyan } from "@in/vader";
  *
  * console.log(cyan("Hello, world!"));
  * ```
@@ -571,7 +571,7 @@ export function cyan(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { white } from "@inspatial/util";
+ * import { white } from "@in/vader";
  *
  * console.log(white("Hello, world!"));
  * ```
@@ -588,7 +588,7 @@ export function white(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { gray } from "@inspatial/util";
+ * import { gray } from "@in/vader";
  *
  * console.log(gray("Hello, world!"));
  * ```
@@ -605,7 +605,7 @@ export function gray(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { brightBlack } from "@inspatial/util";
+ * import { brightBlack } from "@in/vader";
  *
  * console.log(brightBlack("Hello, world!"));
  * ```
@@ -622,7 +622,7 @@ export function brightBlack(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { brightRed } from "@inspatial/util";
+ * import { brightRed } from "@in/vader";
  *
  * console.log(brightRed("Hello, world!"));
  * ```
@@ -639,7 +639,7 @@ export function brightRed(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { brightGreen } from "@inspatial/util";
+ * import { brightGreen } from "@in/vader";
  *
  * console.log(brightGreen("Hello, world!"));
  * ```
@@ -656,7 +656,7 @@ export function brightGreen(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { brightYellow } from "@inspatial/util";
+ * import { brightYellow } from "@in/vader";
  *
  * console.log(brightYellow("Hello, world!"));
  * ```
@@ -673,7 +673,7 @@ export function brightYellow(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { brightBlue } from "@inspatial/util";
+ * import { brightBlue } from "@in/vader";
  *
  * console.log(brightBlue("Hello, world!"));
  * ```
@@ -690,7 +690,7 @@ export function brightBlue(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { brightMagenta } from "@inspatial/util";
+ * import { brightMagenta } from "@in/vader";
  *
  * console.log(brightMagenta("Hello, world!"));
  * ```
@@ -707,7 +707,7 @@ export function brightMagenta(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { brightCyan } from "@inspatial/util";
+ * import { brightCyan } from "@in/vader";
  *
  * console.log(brightCyan("Hello, world!"));
  * ```
@@ -724,7 +724,7 @@ export function brightCyan(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { brightWhite } from "@inspatial/util";
+ * import { brightWhite } from "@in/vader";
  *
  * console.log(brightWhite("Hello, world!"));
  * ```
@@ -741,7 +741,7 @@ export function brightWhite(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { bgBlack } from "@inspatial/util";
+ * import { bgBlack } from "@in/vader";
  *
  * console.log(bgBlack("Hello, world!"));
  * ```
@@ -758,7 +758,7 @@ export function bgBlack(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { bgRed } from "@inspatial/util";
+ * import { bgRed } from "@in/vader";
  *
  * console.log(bgRed("Hello, world!"));
  * ```
@@ -775,7 +775,7 @@ export function bgRed(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { bgGreen } from "@inspatial/util";
+ * import { bgGreen } from "@in/vader";
  *
  * console.log(bgGreen("Hello, world!"));
  * ```
@@ -792,7 +792,7 @@ export function bgGreen(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { bgYellow } from "@inspatial/util";
+ * import { bgYellow } from "@in/vader";
  *
  * console.log(bgYellow("Hello, world!"));
  * ```
@@ -809,7 +809,7 @@ export function bgYellow(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { bgBlue } from "@inspatial/util";
+ * import { bgBlue } from "@in/vader";
  *
  * console.log(bgBlue("Hello, world!"));
  * ```
@@ -826,7 +826,7 @@ export function bgBlue(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { bgMagenta } from "@inspatial/util";
+ * import { bgMagenta } from "@in/vader";
  *
  * console.log(bgMagenta("Hello, world!"));
  * ```
@@ -843,7 +843,7 @@ export function bgMagenta(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { bgCyan } from "@inspatial/util";
+ * import { bgCyan } from "@in/vader";
  *
  * console.log(bgCyan("Hello, world!"));
  * ```
@@ -860,7 +860,7 @@ export function bgCyan(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { bgWhite } from "@inspatial/util";
+ * import { bgWhite } from "@in/vader";
  *
  * console.log(bgWhite("Hello, world!"));
  * ```
@@ -877,7 +877,7 @@ export function bgWhite(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { bgBrightBlack } from "@inspatial/util";
+ * import { bgBrightBlack } from "@in/vader";
  *
  * console.log(bgBrightBlack("Hello, world!"));
  * ```
@@ -894,7 +894,7 @@ export function bgBrightBlack(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { bgBrightRed } from "@inspatial/util";
+ * import { bgBrightRed } from "@in/vader";
  *
  * console.log(bgBrightRed("Hello, world!"));
  * ```
@@ -911,7 +911,7 @@ export function bgBrightRed(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { bgBrightGreen } from "@inspatial/util";
+ * import { bgBrightGreen } from "@in/vader";
  *
  * console.log(bgBrightGreen("Hello, world!"));
  * ```
@@ -928,7 +928,7 @@ export function bgBrightGreen(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { bgBrightYellow } from "@inspatial/util";
+ * import { bgBrightYellow } from "@in/vader";
  *
  * console.log(bgBrightYellow("Hello, world!"));
  * ```
@@ -945,7 +945,7 @@ export function bgBrightYellow(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { bgBrightBlue } from "@inspatial/util";
+ * import { bgBrightBlue } from "@in/vader";
  *
  * console.log(bgBrightBlue("Hello, world!"));
  * ```
@@ -962,7 +962,7 @@ export function bgBrightBlue(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { bgBrightMagenta } from "@inspatial/util";
+ * import { bgBrightMagenta } from "@in/vader";
  *
  * console.log(bgBrightMagenta("Hello, world!"));
  * ```
@@ -979,7 +979,7 @@ export function bgBrightMagenta(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { bgBrightCyan } from "@inspatial/util";
+ * import { bgBrightCyan } from "@in/vader";
  *
  * console.log(bgBrightCyan("Hello, world!"));
  * ```
@@ -996,7 +996,7 @@ export function bgBrightCyan(str: string): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { bgBrightWhite } from "@inspatial/util";
+ * import { bgBrightWhite } from "@in/vader";
  *
  * console.log(bgBrightWhite("Hello, world!"));
  * ```
@@ -1026,7 +1026,7 @@ function clampAndTruncate(n: number, max = 255, min = 0): number {
  *
  * @example Usage
  * ```ts no-assert
- * import { rgb8 } from "@inspatial/util";
+ * import { rgb8 } from "@in/vader";
  *
  * console.log(rgb8("Hello, world!", 42));
  * ```
@@ -1045,7 +1045,7 @@ export function rgb8(str: string, color: number): string {
  *
  * @example Usage
  * ```ts no-assert
- * import { bgRgb8 } from "@inspatial/util";
+ * import { bgRgb8 } from "@in/vader";
  *
  * console.log(bgRgb8("Hello, world!", 42));
  * ```
@@ -1065,7 +1065,7 @@ export function bgRgb8(str: string, color: number): string {
  *
  * @example To produce the color magenta:
  * ```ts no-assert
- * import { rgb24 } from "@inspatial/util";
+ * import { rgb24 } from "@in/vader";
  *
  * rgb24("foo", 0xff00ff);
  * rgb24("foo", {r: 255, g: 0, b: 255});
@@ -1102,7 +1102,7 @@ export function rgb24(str: string, color: number | Rgb): string {
  *
  * @example To produce the color magenta:
  * ```ts no-assert
- * import { bgRgb24 } from "@inspatial/util";
+ * import { bgRgb24 } from "@in/vader";
  *
  * bgRgb24("foo", 0xff00ff);
  * bgRgb24("foo", {r: 255, g: 0, b: 255});
@@ -1147,7 +1147,7 @@ const ANSI_PATTERN = new RegExp(
  *
  * @example Usage
  * ```ts no-assert
- * import { stripAnsiCode, red } from "@inspatial/util";
+ * import { stripAnsiCode, red } from "@in/vader";
  *
  * console.log(stripAnsiCode(red("Hello, world!")));
  * ```

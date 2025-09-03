@@ -1,12 +1,12 @@
 /**
- * @module @inspatial/util/toupper
+ * @module @in/vader/toupper
  *
  * String utility for converting text to uppercase. This simple utility ensures consistent
  * string case transformation with built-in type safety and null handling.
  *
  * @example Basic Usage
  * ```typescript
- * import { toUpper } from "@inspatial/util/toupper.ts";
+ * import { toUpper } from "@in/vader/toupper.ts";
  *
  * const uppercased = toUpper("hello world");
  * console.log(uppercased); // "HELLO WORLD"

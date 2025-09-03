@@ -37,7 +37,7 @@ const ADDED = 0;
  *
  * @example Testing with expect syntax
  * ```ts
- * import { expect, test } from "@inspatial/test";
+ * import { expect, test } from "@in/test";
  *
  * test("it finds differences between lists", () => {
  *   const list1 = [1, 2, 3];
@@ -55,7 +55,7 @@ const ADDED = 0;
  *
  * @example Testing with object style
  * ```ts
- * import { expect, test } from "@inspatial/test";
+ * import { expect, test } from "@in/test";
  *
  * test({
  *   name: "it handles empty lists",

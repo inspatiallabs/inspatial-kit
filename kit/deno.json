@@ -25,8 +25,8 @@
     "./modules/in-zero/*"
   ],
   "tasks": {
-    "test": "deno test --allow-read --allow-write --unstable-sloppy-imports ./modules/",
-    "test:style": "deno test --allow-read --allow-write --unstable-sloppy-imports ./modules/style/src/",
+    "test": "deno test --no-check --allow-env --allow-read --allow-write --allow-run --allow-net --unstable-sloppy-imports ./modules/",
+    "test:style": "deno test --no-check --allow-env --allow-read --allow-write --allow-run --allow-net --unstable-sloppy-imports ./modules/in-style/src/",
     "lint": "deno lint",
     "fmt": "deno fmt",
     "check": "deno check **/*.ts",
@@ -83,7 +83,8 @@
   "imports": {
     "@in/kit/": "./modules/",
 
-    "@in/test": "jsr:@inspatial/test@^0.1.1",
+    "@in/test/": "./modules/in-test/src/",
+    "@in/test": "./modules/in-test/src/index.ts",
 
     "@in/style/": "./modules/in-style/src/",
     "@in/style": "./modules/in-style/src/index.ts",

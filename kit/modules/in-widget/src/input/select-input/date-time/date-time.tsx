@@ -1,7 +1,7 @@
 // "use client";
 
 // import * as React from "react";
-// import { kit } from "@inspatial/theme/variant";
+// import { kit } from "@in/style/variant";
 // import {
 //   addDays,
 //   addMonths,

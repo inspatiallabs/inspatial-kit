@@ -1,6 +1,6 @@
 // import Pattern from "@/inspatial/kit/ui/pattern";
 // import View from "@/inspatial/kit/ui/structure/view";
-// import { kit } from "@inspatial/theme/variant";
+// import { kit } from "@in/style/variant";
 
 // interface ThanksWidgetProps {
 //   title?: string;

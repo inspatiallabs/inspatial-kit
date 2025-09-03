@@ -1,5 +1,5 @@
 /**
- * @module @inspatial/util/safe-lookup-map
+ * @module @in/vader/safe-lookup-map
  *
  * SafeLookupMap provides a unified interface for storing key-value pairs
  * where keys can be any type (objects, primitives, null, undefined).
@@ -7,7 +7,7 @@
  *
  * @example Basic Usage
  * ```typescript
- * import { SafeLookupMap } from "@inspatial/util/safe-lookup-map";
+ * import { SafeLookupMap } from "@in/vader/safe-lookup-map";
  * 
  * const map = new SafeLookupMap<any, string>();
  * map.set("primitive", "value");  // Uses Map internally
@@ -92,7 +92,7 @@
  * @example
  * ### Example 1: Basic Mixed Key Usage
  * ```typescript
- * import { SafeLookupMap } from "@inspatial/util/safe-lookup-map";
+ * import { SafeLookupMap } from "@in/vader/safe-lookup-map";
  * 
  * // Create a map that can handle any key type
  * const animationMap = new SafeLookupMap<any, string>();

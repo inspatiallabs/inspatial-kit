@@ -43,7 +43,7 @@ const ADDED = 3;
  *
  * Using `assert` syntax:
  * ```ts
- * import { assertEquals } from "@inspatial/test";
+ * import { assertEquals } from "@in/test";
  *
  * test({
  *   name: "farthestPoint with assert",
@@ -56,7 +56,7 @@ const ADDED = 3;
  *
  * Using `expect` syntax:
  * ```ts
- * import { expect } from "@inspatial/test";
+ * import { expect } from "@in/test";
  *
  * test({
  *   name: "farthestPoint with expect",
@@ -116,7 +116,7 @@ export function farthestPoint(
  * ### Example without tests:
  * ```ts
  * // Import the assertion function
- * import { farthestPointAssertion } from "@inspatial/test";
+ * import { farthestPointAssertion } from "@in/test";
  *
  * // This will pass as the object matches the expected structure
  * farthestPointAssertion({ y: 0, id: 0 });
@@ -131,7 +131,7 @@ export function farthestPoint(
  *
  * Using `assert` syntax:
  * ```ts
- * import { test, assertThrows } from "@inspatial/test";
+ * import { test, assertThrows } from "@in/test";
  *
  * test({
  *   name: "farthestPointAssertion with assert",
@@ -149,7 +149,7 @@ export function farthestPoint(
  *
  * Using `expect` syntax:
  * ```ts
- * import { test, expect } from "@inspatial/test";
+ * import { test, expect } from "@in/test";
  *
  * test({
  *   name: "farthestPointAssertion with expect",

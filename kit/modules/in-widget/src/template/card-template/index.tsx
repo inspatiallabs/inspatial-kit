@@ -3,7 +3,7 @@
 // import { Text } from "../../typography/text/text.dom";
 // import { CardWidgetVariant, CardWidgetVariantType } from "./variant";
 // import { Link } from "react-router";
-// import { kit } from "@inspatial/theme/variant";
+// import { kit } from "@in/style/variant";
 // import SafePatternWrapper from "../../pattern/safe-pattern";
 // import { Button } from "../../ornament/button";
 // import { motion } from "motion/react";

@@ -17,7 +17,7 @@
  *
  * Simple examples:
  * ```ts
- * import { format } from "@inspatial/util";
+ * import { format } from "@in/vader";
  *
  * // Objects become readable
  * format({ a: 1, b: 2 })
@@ -47,8 +47,8 @@
  *
  * @example Using assertEquals
  * ```ts
- * import { test, assertEquals } from "@inspatial/test";
- * import { format } from "@inspatial/util";
+ * import { test, assertEquals } from "@in/test";
+ * import { format } from "@in/vader";
  *
  * test("formatting with assertEquals", () => {
  *   // Simple object test
@@ -62,8 +62,8 @@
  *
  * @example Using expect
  * ```ts
- * import { test, expect } from "@inspatial/test";
- * import { format } from "@inspatial/util";
+ * import { test, expect } from "@in/test";
+ * import { format } from "@in/vader";
  *
  * test("formatting with expect", () => {
  *   // Simple object test
@@ -78,8 +78,8 @@
  *
  * @example Testing collections
  * ```ts
- * import { test, expect } from "@inspatial/test";
- * import { format } from "@inspatial/util";
+ * import { test, expect } from "@in/test";
+ * import { format } from "@in/vader";
  *
  * test("formatting collections", () => {
  *   // Testing a Map
@@ -94,8 +94,8 @@
  *
  * @example Testing complex structures
  * ```ts
- * import { test, expect } from "@inspatial/test";
- * import { format } from "@inspatial/util";
+ * import { test, expect } from "@in/test";
+ * import { format } from "@in/vader";
  *
  * test("formatting nested data", () => {
  *   const gameState = {

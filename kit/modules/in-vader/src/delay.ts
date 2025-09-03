@@ -40,7 +40,7 @@ export interface DelayOptionsProp {
  *
  * ### Basic Usage
  * ```ts
- * import { delay } from "@inspatial/util/delay";
+ * import { delay } from "@in/vader/delay";
  *
  * // Wait for 1 second
  * await delay(1000);
@@ -49,7 +49,7 @@ export interface DelayOptionsProp {
  *
  * ### With Cancellation
  * ```ts
- * import { delay } from "@inspatial/util/delay";
+ * import { delay } from "@in/vader/delay";
  *
  * const controller = new AbortController();
  *
@@ -66,7 +66,7 @@ export interface DelayOptionsProp {
  *
  * ### Non-Persistent Delay
  * ```ts
- * import { delay } from "@inspatial/util/delay";
+ * import { delay } from "@in/vader/delay";
  *
  * // This delay won't keep the program running
  * await delay(100, { persistent: false });
@@ -78,7 +78,7 @@ export interface DelayOptionsProp {
  *
  * @example
  * // Simple delay
- * import { delay } from "@inspatial/util/delay";
+ * import { delay } from "@in/vader/delay";
  * import { inFetch } from "@inspatial/infetch";
  *
  * async function fetchWithRetry() {
@@ -93,7 +93,7 @@ export interface DelayOptionsProp {
  *
  * @example
  * // Cancellable delay
- * import { delay } from "@inspatial/util/delay";
+ * import { delay } from "@in/vader/delay";
  *
  * const controller = new AbortController();
  *

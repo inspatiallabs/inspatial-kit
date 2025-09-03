@@ -27,7 +27,7 @@
  *
  * @example Testing with expect syntax
  * ```ts
- * import { expect, test } from "@inspatial/test";
+ * import { expect, test } from "@in/test";
  *
  * test("it finds matching numbers at start", () => {
  *   const list1 = [1, 2, 3];
@@ -39,7 +39,7 @@
  *
  * @example Testing with assert syntax
  * ```ts
- * import { assertEquals, test } from "@inspatial/test";
+ * import { assertEquals, test } from "@in/test";
  *
  * test("it finds matching strings at start", () => {
  *   const list1 = ["a", "b", "c"];
@@ -51,7 +51,7 @@
  *
  * @example Testing with object style
  * ```ts
- * import { expect, test } from "@inspatial/test";
+ * import { expect, test } from "@in/test";
  *
  * test({
  *   name: "it handles empty lists",

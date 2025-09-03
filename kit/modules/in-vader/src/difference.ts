@@ -48,8 +48,8 @@ const COMMON = 2;
  *
  * @example Usage
  * ```ts
- * import { diff } from "@inspatial/util";
- * import { assertEquals } from "@inspatial/test";
+ * import { diff } from "@in/vader";
+ * import { assertEquals } from "@in/test";
  *
  * const a = [1, 2, 3];
  * const b = [1, 2, 4];
@@ -163,8 +163,8 @@ export function diff<T>(A: T[], B: T[]): DiffResultProp<T>[] {
  *
  * @example
  * ```ts
- * import { unescapeString } from "@inspatial/util";
- * import { test, assertEquals, expect } from "@inspatial/test";
+ * import { unescapeString } from "@in/vader";
+ * import { test, assertEquals, expect } from "@in/test";
  *
  * test({
  *   name: "unescapeString with assert",
@@ -210,8 +210,8 @@ const WHITESPACE_SYMBOLS = /([^\S\r\n]+|[()[\]{}'"\r\n]|\b)/;
  *
  * @example
  * ```ts
- * import { tokenizeString } from "@inspatial/util";
- * import { test, assertEquals, expect } from "@inspatial/test";
+ * import { tokenizeString } from "@in/vader";
+ * import { test, assertEquals, expect } from "@in/test";
  *
  * test({
  *   name: "tokenizeString with assert",
@@ -263,8 +263,8 @@ export function tokenizeString(string: string, wordDiff = false): string[] {
  *
  * @example
  * ```ts
- * import { createDetailedDiff } from "@inspatial/util";
- * import { test, assertEquals, expect } from "@inspatial/test";
+ * import { createDetailedDiff } from "@in/vader";
+ * import { test, assertEquals, expect } from "@in/test";
  *
  * const tokens = [
  *   { type: "added", value: "a" },
@@ -333,8 +333,8 @@ const NON_WHITESPACE_REGEXP = /\S/;
  *
  * @example
  * ```ts
- * import { differenceString } from "@inspatial/util";
- * import { test, assertEquals, expect } from "@inspatial/test";
+ * import { differenceString } from "@in/vader";
+ * import { test, assertEquals, expect } from "@in/test";
  *
  * test({
  *   name: "differenceString with assert",

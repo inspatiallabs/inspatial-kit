@@ -95,7 +95,7 @@ Human names must not fall outside these five.
 
 **Category Name - @category (required)**
 
-- The category name is the name of the InSpatial core package, library or project that the symbol belongs to e.g if @inspatial/util category name will be InSpatial Util.
+- The category name is the name of the InSpatial core package, library or project that the symbol belongs to e.g if @in/vader category name will be InSpatial Util.
 
 **Access - @access (required)**
 
@@ -104,7 +104,7 @@ Human names must not fall outside these five.
 **When the feature was added - @since (required)**
 
 - check the current working directory where the symbol is defined for a deno.json or package.json to the current version of the package and apply the correct version.
-- Use the version checker utility {@linkcode getPackageVersion} from @inspatial/util/getPackageVersion to fetch the version from your project files.
+- Use the version checker utility {@linkcode getPackageVersion} from @in/vader/getPackageVersion to fetch the version from your project files.
 
 **Examples Section**
 
