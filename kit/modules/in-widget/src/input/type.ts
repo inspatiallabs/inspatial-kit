@@ -1,6 +1,6 @@
-import type { StyleProps } from "@in/style";
 import type { Signal } from "@in/teract/signal";
-import type { InputFieldStyle } from "./style.ts";
+import type { TextInputProps } from "./text-input/type.ts";
+import type { ChoiceInputProps } from "./choice-input/type.ts";
 
 /*################################(INPUT FIELD SCHEMA)################################*/
 export interface InputFieldSchema {
@@ -38,33 +38,8 @@ export interface InputFieldSchema {
 }
 
 /*################################(INPUT FIELD PROPS)################################*/
-export type InputFieldProps = StyleProps<typeof InputFieldStyle> &
-  JSX.SharedProps &
+export type InputFieldProps = JSX.SharedProps &
   InputFieldSchema & {
-    placeholder?: string;
-    variant?:
-      | "textfield"
-      | "searchfield"
-      | "numberfield"
-      | "emailfield"
-      | "phonefield"
-      | "passwordfield"
-      | "currencyfield"
-      | "pinfield"
-      | "urlfield"
-      | "locationfield"
-      | "multifield" // multi select
-      | "datefield"
-      | "timefield"
-      | "filefield"
-      | "switch"
-      | "slider"
-      | "checkbox"
-      | "tag"
-      | "joystick"
-      | "intelligence"
-      | "counter"
-      | "alignbox"
-      | "togglegroup"
-      | "choicegroup";
+    variant?: TextInputProps["type"] | ChoiceInputProps["type"];
+    // | SelectInputProps["type"];
   };

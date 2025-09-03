@@ -1,8 +1,9 @@
-import type { InputFieldProps } from "../type.ts";
-import { InputFieldStyle } from "../style.ts";
+import type { TextInputProps } from "../type.ts";
+import { TextInputStyle } from "../style.ts";
+import { iss } from "@in/style/index.ts"
 
 /*################################(TEXTFIELD)################################*/
-export function SearchField(props: InputFieldProps) {
+export function TextField(props: TextInputProps) {
   /***************************(Props)***************************/
 
   const {
@@ -28,10 +29,10 @@ export function SearchField(props: InputFieldProps) {
   return (
     <>
       <input
-        type="search"
+        type="text"
         required={required || false}
-        placeholder={placeholder || "Search..."}
-        className={InputFieldStyle.getStyle({ ...styleProps })}
+        placeholder={placeholder || "Text Value..."}
+        className={iss(TextInputStyle.getStyle({ ...styleProps }))}
         disabled={disabled || false}
         $ref={$ref}
         {...rest}

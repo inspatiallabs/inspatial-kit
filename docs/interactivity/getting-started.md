@@ -3,11 +3,9 @@ This section introduces the basics of interactivity. There are primarily three c
 
 
 ## 1. Signal
-A Signal provides a streamlined reactive system that helps you manage changing data in your application. Think of it like a smart notification system where values can announce when they change, and other parts of your code can automatically listen and react accordingly.
+A reactive data management system that makes your application values smart and responsive 
 
 ## 2. State
-
-
 
 
 ## 3. Trigger

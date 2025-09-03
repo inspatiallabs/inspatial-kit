@@ -1,8 +1,7 @@
-export * from "./inputfield/inputfield.native.tsx";
-export * from "./textfield/textfield.native.tsx";
-export * from "./emailfield/emailfield.native.tsx";
-export * from "./passwordfield/passwordfield.native.tsx";
-export * from "./searchfield/searchfield.native.tsx";
+export * from "./index.native.tsx";
+
+export * from "./text-input/index.ts";
+export * from "./choice-input/index.ts";
 
 export * from "./type.ts";
-export * from "./style.ts";
+export * from "./text-input/style.ts";

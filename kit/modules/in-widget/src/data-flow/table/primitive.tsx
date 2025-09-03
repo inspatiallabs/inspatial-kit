@@ -17,7 +17,7 @@ import { CaretLeftPrimeIcon } from "@in/widget/icon/caret-left-prime-icon.tsx";
 import { CaretRightPrimeIcon } from "@in/widget/icon/caret-right-prime-icon.tsx";
 import { FunnelIcon } from "@in/widget/icon/funnel-icon.tsx";
 import { ShareIIIcon } from "@in/widget/icon/share-ii-icon.tsx";
-import { InputField } from "@in/widget/input/inputfield/inputfield.native.tsx";
+import { InputField } from "@in/widget/input/index.ts";
 
 /*####################################(TABLE HEADER)####################################*/
 export function TableHeader({

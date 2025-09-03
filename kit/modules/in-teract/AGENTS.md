@@ -27,6 +27,46 @@ All core utilities, actions and APIs are encapsulated into simpler functions and
 
 ## InSpatial Documentation Reference
 
+
+- **Definition:** Reactive containers (`createSignal()`) that notify observers on value changes.
+- **Computed Signals:** Derive values from other signals (`computed()`, or `$(...)` alias) and update automatically.
+- **Effects:** Functions (`watch()` or `createEffect()`) that re-run when their signal dependencies change.
+- **Access:** Use `.value` for read/write. `peek()` reads without creating dependencies.
+- **Signal Batching:** Updates are automatically batched - effects only run once per tick.
+- **Important:** In JSX, dynamic expressions depending on signals _must_ be wrapped in `$(...)` to be reactive (e.g., `$(() => \`Count: ${count.value}\`)`). Simple signal references like `{count}` are automatically handled.
+- **One-off combined condition:** You don't need to wrap static combined conditions in `$(...)` if they're only used one-off, and don't change in the future. Like when a condition doesn't include any signal dependencies.
+
+**Signal Operations:**
+Use the extensive signal operation methods (`.and()`, `.eq()`, `.gt()`, etc.) for cleaner conditional logic instead of complex computed signals.
+
+- **Utility Functions:** `read()`, `write()`, `readAll()`, `poke()`, `touch()` for safe signal manipulation
+- **Logical Operations:** `.and()`, `.or()`, `.andNot()`, `.orNot()`, `.inverse()`, `.inverseAnd()`, etc.
+- **Comparisons:** `.eq()`, `.neq()`, `.gt()`, `.lt()`
+- **Conditional:** `.nullishThen()`, `.hasValue()`
+- **Advanced:** `merge()`, `derive()`, `extract()`, `tpl\`...\``, `not()`, `onCondition()`
+
+**Best Practices:**
+
+- Create renderer instances **once** at the application entry point.
+- Use computed signals (`$()`) for derived data and reactive expressions in JSX.
+- Dispose of effects when no longer needed (`dispose()` from `watch()`, or `onDispose()`).
+- Use `peek()` to avoid creating unnecessary dependencies.
+- Updates are automatically batched.
+- Use `untrack()` for non-reactive operations.
+- Use `watch()` for effects without returning cleanup functions.
+- `createEffect()` handles cleanup automatically and passes additional arguments to the effect.
+- Always use `$ref` for component references in development with Hot Reaload.
+- **State Management:** For complex applications, consider managing state outside of your components and passing it down as props. This promotes better separation of concerns.
+- **Manual Triggering:** When mutating arrays or objects directly, use `.trigger()` to notify InSpatial of the change.
+- **Focus Management:** Use the `$ref` prop with a `setTimeout` to reliably manage focus on elements, especially after asynchronous operations.
+- **View Literals:** Use `tpl\`...\`` for reactive template strings or the simple template literal \`...\` for string interpolation in URLs.
+- **Reactivity Pitfalls:** Remember to wrap expressions in `$(...)` within JSX when they need to be reactive. Be mindful of when to use `peek()` or `untrack()` to control signal dependencies and avoid unnecessary re-renders.
+- **Auto Coercion:**
+  `.get()` is auto-coerced e.g if you have a value `signal.count` it would auto append or use `.get()` hence making it the same as `signal.count.get()`.
+  While `.get()` is the default appended value you can opt out because `.get()` assumes your function is reactive by default and that may not always be the case, if this is not the case and you want to avoid tracking or create dependencies in imperative `.set()` calls, then use `.peek()`. Also don't be a stranger and utilize all the other available interactive signal operators at your disposal for their appropriate use case.
+
+NOTE: hasValue returns plain boolean. Returns true when the value of the signal is not nullish.
+
 **Core Signal APIs:**
 
 - `createSignal(value)`, `computed(fn)`, `$(fn)` - Creating signals

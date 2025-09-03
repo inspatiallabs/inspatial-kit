@@ -1,7 +1,7 @@
 import { createStyle } from "@in/style";
 
-/*################################(INPUT STYLE)################################*/
-export const InputFieldStyle = createStyle({
+/*################################(TEXT INPUT STYLE)################################*/
+export const TextInputStyle = createStyle({
   /*******************************(Base)********************************/
   base: [
     "flex w-full rounded-md px-3 py-2 text-sm outline-none focus:outline-none",

@@ -1,19 +1,17 @@
-import type { InputFieldProps } from "../type.ts";
-import { TextField } from "../textfield/textfield.native.tsx";
+import type { InputFieldProps } from "./type.ts";
 import { iss } from "@in/style/variant/index.ts";
-import { SearchField } from "../searchfield/searchfield.native.tsx";
-import { EmailField } from "../emailfield/emailfield.native.tsx";
-import { PasswordField } from "../passwordfield/passwordfield.native.tsx";
+import * as TextInput from "./text-input/index.ts";
 
 /*################################(TEXTFIELD)################################*/
 export function InputField(props: InputFieldProps) {
+
   /***************************(Props)***************************/
 
   const { variant, format, state, className, placeholder, ...rest } = props;
 
   const prop = {
     // Temporary base shadow fallback as ISS has a shadow bug at runtime
-    className: iss("shadow-(--shadow-hollow)", className),
+    className: iss("var(--shadow-hollow)", className),
     state,
     format,
     placeholder,
@@ -25,15 +23,15 @@ export function InputField(props: InputFieldProps) {
       {(() => {
         switch (variant) {
           case "textfield":
-            return <TextField {...prop} {...rest} />;
+            return <TextInput.TextField {...prop} {...rest} />;
           case "emailfield":
-            return <EmailField {...prop} {...rest} />;
+            return <TextInput.EmailField {...prop} {...rest} />;
           case "passwordfield":
-            return <PasswordField {...prop} {...rest} />;
+            return <TextInput.PasswordField {...prop} {...rest} />;
           case "searchfield":
-            return <SearchField {...prop} {...rest} />;
+            return <TextInput.SearchField {...prop} {...rest} />;
           default:
-            return <TextField {...prop} {...rest} />;
+            return <TextInput.TextField {...prop} {...rest} />;
         }
       })()}
     </>

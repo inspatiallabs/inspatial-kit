@@ -47,7 +47,20 @@ Before you start:
 
 ### 🎮 Usage
 
-#### 📦 Installation (Framework Authors)
+#### Basic Import
+
+```typescript
+// ✅ Recommended: Direct import from kit
+import { createSignal, computed, watch } from "@inspatial/kit/signal";
+
+// ❌ Avoid: Package-level import
+import { createSignal } from "@inspatial/kit";
+```
+
+<details>
+<summary>📦 Installation for Framework Authors</summary>
+
+If you're building a framework or library that needs to include signals:
 
 ```bash
 deno install jsr:@in/teract
@@ -77,15 +90,7 @@ pnpm dlx jsr add @in/teract
 bunx jsr add @in/teract
 ```
 
-#### Basic Import
-
-```typescript
-// ✅ Recommended: Direct file import for better tree shaking
-import { createSignal, computed, watch } from "@inspatial/kit/signal";
-
-// ❌ Avoid: Module-level import
-import { createSignal } from "@inspatial/kit";
-```
+</details>
 
 ### Core Functions
 
@@ -137,11 +142,25 @@ roomTemperature.value = 25; // 25°C
 console.log(tempInFahrenheit.value); // 77°F (automatically updated!)
 ```
 
-#### `computed(fn)`
+#### `computed(fn) and/or $()`
 
 ##### Creates values that automatically update when their dependencies change
 
-The `computed` function is like having a smart calculator that automatically recalculates whenever its inputs change. Think of it like a spreadsheet cell with a formula - when the referenced cells change, the formula result updates automatically.
+The `computed` function is like having a smart assistant that watches your data and automatically updates calculations for you. Think of it like a personal finance app that shows your total spending - whenever you add a new expense, it instantly updates your total without you having to manually recalculate anything.
+
+> **Note:** `$()` is an alias for `computed()` - they do exactly the same thing!
+
+🔍 **In a nutshell Computed/$:**
+
+- Reads existing signal values
+- Transforms them into new values  
+- Memoizes the result (only recalculates when dependencies change)
+- Updates automatically when dependencies change
+
+It's basically a smart getter that:
+- Only runs when its inputs change
+- Caches the result between changes
+- Automatically tracks what signals it depends on
 
 ### Example 1: Eli's Shopping Cart Total
 

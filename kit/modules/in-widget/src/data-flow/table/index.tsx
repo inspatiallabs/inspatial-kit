@@ -40,8 +40,7 @@ import { Modal } from "@in/widget/presentation/modal/index.tsx";
 import { Drawer } from "@in/widget/presentation/drawer/index.tsx";
 import { SecurityKeyIcon } from "@in/widget/icon/security-key-icon.tsx";
 import { DirectionRightIcon } from "@in/widget/icon/direction-right-icon.tsx";
-import { Checkbox } from "@in/widget/input/checkbox/index.ts";
-import { Switch } from "@in/widget/input/switch/index.native.tsx"
+import { Switch, Checkbox } from "@in/widget/input/index.ts"
 
 // import { DropdownMenu } from "../../navigation/dropdown-menu/index.tsx";
 
