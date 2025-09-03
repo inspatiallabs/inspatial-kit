@@ -32,7 +32,7 @@ async function main() {
     console.log("Generating Google Font declarations...");
     console.log(`Loading font map from ${fontMapPath}`);
 
-    const fontMapText = await Deno.readTextFile(fontMapPath);
+    const fontMapText = await InZero.readTextFile(fontMapPath);
     const rawFontMap = JSON.parse(fontMapText);
 
     // Transform the font map to include the family property that the generator expects
@@ -78,7 +78,7 @@ async function main() {
     const output = generateGoogleFontTypes(fontMap, outputPath);
 
     // Write output using Deno API
-    await Deno.writeTextFile(outputPath, output);
+    await InZero.writeTextFile(outputPath, output);
 
     console.log(`Successfully generated declarations at ${outputPath}`);
   } catch (error) {
@@ -86,7 +86,7 @@ async function main() {
     if (error instanceof Error) {
       console.error(error.stack);
     }
-    Deno.exit(1);
+    InZero.exit(1);
   }
 }
 

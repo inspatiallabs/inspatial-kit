@@ -10,7 +10,7 @@ export const globalSanitizersState = {
 const assertionState = getAssertionState();
 
 /** The options for creating a test suite with the describe function. */
-export interface DescribeDefinition<T> extends Omit<Deno.TestDefinition, "fn"> {
+export interface DescribeDefinition<T> extends Omit<InZero.TestDefinition, "fn"> {
   /** The body of the test suite */
   fn?: () => void | undefined;
   /**
@@ -38,9 +38,9 @@ export interface DescribeDefinition<T> extends Omit<Deno.TestDefinition, "fn"> {
 }
 
 /** The options for creating an individual test case with the it function. */
-export interface ItDefinition<T> extends Omit<Deno.TestDefinition, "fn"> {
+export interface ItDefinition<T> extends Omit<InZero.TestDefinition, "fn"> {
   /** The body of the test case */
-  fn: (this: T, t: Deno.TestContext) => void | Promise<void>;
+  fn: (this: T, t: InZero.TestContext) => void | Promise<void>;
   /**
    * The `describe` function returns a `TestSuite` representing the group of tests.
    * If `it` is called within a `describe` calls `fn`, the suite will default to that parent `describe` calls returned `TestSuite`.
@@ -96,7 +96,7 @@ export class TestSuiteInternal<T> implements TestSuite<T> {
         sanitizeOps = globalSanitizersState.sanitizeOps,
         sanitizeResources = globalSanitizersState.sanitizeResources,
       } = describe;
-      const options: Deno.TestDefinition = {
+      const options: InZero.TestDefinition = {
         name,
         fn: async () => {},
         ignore: true,
@@ -151,7 +151,7 @@ export class TestSuiteInternal<T> implements TestSuite<T> {
       if (!ignore && this.hasOnlyStep) {
         only = true;
       }
-      const options: Deno.TestDefinition = {
+      const options: InZero.TestDefinition = {
         name,
         fn: async (t) => {
           TestSuiteInternal.runningCount++;
@@ -232,7 +232,7 @@ export class TestSuiteInternal<T> implements TestSuite<T> {
   }
 
   /** This is used internally to register tests. */
-  static registerTest(options: Deno.TestDefinition) {
+  static registerTest(options: InZero.TestDefinition) {
     options = { ...options };
     if (options.only === undefined) {
       delete options.only;
@@ -252,7 +252,7 @@ export class TestSuiteInternal<T> implements TestSuite<T> {
     if (options.sanitizeResources === undefined) {
       delete options.sanitizeResources;
     }
-    Deno.test(options);
+    InZero.test(options);
   }
 
   /** Updates all steps within top level suite to have ignore set to true if only is not set to true on step. */
@@ -319,7 +319,7 @@ export class TestSuiteInternal<T> implements TestSuite<T> {
   static async run<T>(
     suite: TestSuiteInternal<T>,
     context: T,
-    t: Deno.TestContext
+    t: InZero.TestContext
   ) {
     const hasOnly = suite.hasOnlyStep || suite.describe.only || false;
     for (const step of suite.steps) {
@@ -341,7 +341,7 @@ export class TestSuiteInternal<T> implements TestSuite<T> {
         sanitizeResources = globalSanitizersState.sanitizeResources,
       } = step instanceof TestSuiteInternal ? step.describe : step;
 
-      const options: Deno.TestStepDefinition = {
+      const options: InZero.TestStepDefinition = {
         name,
         fn: async (t) => {
           if (permissions) {
@@ -395,8 +395,8 @@ export class TestSuiteInternal<T> implements TestSuite<T> {
   }
 
   static async runTest<T>(
-    t: Deno.TestContext,
-    fn: (this: T, t: Deno.TestContext) => void | Promise<void>,
+    t: InZero.TestContext,
+    fn: (this: T, t: InZero.TestContext) => void | Promise<void>,
     context: T,
     activeIndex = 0
   ) {

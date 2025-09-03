@@ -59,6 +59,9 @@ export const useCounter = createState({
     { id: 3, name: "✨ One function, three patterns!" },
     { id: 4, name: "🎯 Simple mental model!" },
   ] as EntryProps[],
+  // UI visibility controls
+  showTableBox: true,
+  showTriggerPropsBox: false,
 });
 
 // Built-in convenience functions using unified createAction

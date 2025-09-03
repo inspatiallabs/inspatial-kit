@@ -45,7 +45,7 @@ async function ensureGoogleFontStubs() {
           stubGeneratorPath,
         ];
 
-        const p = new Deno.Command(cmd[0], {
+        const p = new InZero.Command(cmd[0], {
           args: cmd.slice(1),
         });
 
@@ -74,7 +74,7 @@ async function ensureGoogleFontStubs() {
     if (error instanceof Error) {
       console.error(error.stack);
     }
-    Deno.exit(1);
+    InZero.exit(1);
   }
 }
 

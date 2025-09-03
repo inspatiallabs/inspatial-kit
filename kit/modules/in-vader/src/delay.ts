@@ -134,7 +134,7 @@ export function delay(
     if (persistent === false) {
       try {
         // @ts-ignore For browser compatibility
-        Deno.unrefTimer(i);
+        InZero.unrefTimer(i);
       } catch (error) {
         if (!(error instanceof ReferenceError)) {
           throw error;

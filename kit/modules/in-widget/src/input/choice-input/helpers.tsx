@@ -10,6 +10,12 @@ export function getChoiceInputIcon(
   icon: ChoiceInputProps["icon"],
   isChosen?: boolean
 ) {
+  // If icon is not a string (i.e., it's a JSX element), return it directly
+  if (typeof icon !== "string" && icon != null) {
+    return icon;
+  }
+
+  // Handle string icon types
   switch (icon) {
     case "brand":
       return <Icon size="8xs" />;

@@ -9,7 +9,7 @@
  * // Only logs if DEBUG=1 is set
  */
 export function debug(...anies: unknown[]): void {
-  if (Deno.env.get(`DEBUG`) === "1") console.log(...anies);
+  if (InZero.env.get(`DEBUG`) === "1") console.log(...anies);
 }
 
 /*##############################################(TRACK)##############################################*/

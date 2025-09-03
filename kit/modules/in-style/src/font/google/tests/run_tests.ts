@@ -35,7 +35,7 @@ async function runTests() {
     try {
       console.log(`\n📁 Running tests in ${testFile}`);
 
-      // In a real implementation, we would use Deno.test with a proper test runner
+      // In a real implementation, we would use InZero.test with a proper test runner
       // For now, we'll simulate the test run with dummy success
       console.log(`  ✅ Tests passed: ${Math.floor(Math.random() * 5) + 1}`);
 
@@ -57,10 +57,10 @@ async function runTests() {
   // Exit with appropriate code
   if (failedTests > 0) {
     console.error("\n❌ Some tests failed");
-    Deno.exit(1);
+    InZero.exit(1);
   } else {
     console.log("\n✅ All tests passed");
-    Deno.exit(0);
+    InZero.exit(0);
   }
 }
 

@@ -119,7 +119,7 @@ export function format(v: unknown): string {
   // deno-lint-ignore no-explicit-any
   const { Deno } = globalThis as any;
   return typeof Deno?.inspect === "function"
-    ? Deno.inspect(v, {
+    ? InZero.inspect(v, {
         depth: Infinity,
         sorted: true,
         trailingComma: true,

@@ -113,7 +113,7 @@ export function getRuntimeInfo(): RuntimeInfo | undefined {
       if (denoPermissions) {
         try {
           info.permissions = {
-            env: true, // We'll assume env access since we're using Deno.env
+            env: true, // We'll assume env access since we're using InZero.env
           };
         } catch {
           info.permissions = { env: false };

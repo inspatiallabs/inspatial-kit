@@ -1959,7 +1959,7 @@ export function resolvesNext<
  * ```ts
  * import { fn, expect } from "@std/expect";
  *
- * Deno.test("example", () => {
+ * InZero.test("example", () => {
  *   const mockFn = fn((a: number, b: number) => a + b);
  *   const result = mockFn(1, 2);
  *   expect(result).toEqual(3);

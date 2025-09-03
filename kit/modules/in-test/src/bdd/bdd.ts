@@ -178,20 +178,20 @@ export type { DescribeDefinition, ItDefinition, TestSuite };
 export type ItArgs<T> =
   | [options: ItDefinition<T>]
   | [name: string, options: Omit<ItDefinition<T>, "name">]
-  | [name: string, fn: (this: T, t: Deno.TestContext) => void | Promise<void>]
-  | [fn: (this: T, t: Deno.TestContext) => void | Promise<void>]
+  | [name: string, fn: (this: T, t: InZero.TestContext) => void | Promise<void>]
+  | [fn: (this: T, t: InZero.TestContext) => void | Promise<void>]
   | [
       name: string,
       options: Omit<ItDefinition<T>, "fn" | "name">,
-      fn: (this: T, t: Deno.TestContext) => void | Promise<void>
+      fn: (this: T, t: InZero.TestContext) => void | Promise<void>
     ]
   | [
       options: Omit<ItDefinition<T>, "fn">,
-      fn: (this: T, t: Deno.TestContext) => void | Promise<void>
+      fn: (this: T, t: InZero.TestContext) => void | Promise<void>
     ]
   | [
       options: Omit<ItDefinition<T>, "fn" | "name">,
-      fn: (this: T, t: Deno.TestContext) => void | Promise<void>
+      fn: (this: T, t: InZero.TestContext) => void | Promise<void>
     ]
   | [
       suite: TestSuite<T>,
@@ -201,27 +201,27 @@ export type ItArgs<T> =
   | [
       suite: TestSuite<T>,
       name: string,
-      fn: (this: T, t: Deno.TestContext) => void | Promise<void>
+      fn: (this: T, t: InZero.TestContext) => void | Promise<void>
     ]
   | [
       suite: TestSuite<T>,
-      fn: (this: T, t: Deno.TestContext) => void | Promise<void>
+      fn: (this: T, t: InZero.TestContext) => void | Promise<void>
     ]
   | [
       suite: TestSuite<T>,
       name: string,
       options: Omit<ItDefinition<T>, "fn" | "name" | "suite">,
-      fn: (this: T, t: Deno.TestContext) => void | Promise<void>
+      fn: (this: T, t: InZero.TestContext) => void | Promise<void>
     ]
   | [
       suite: TestSuite<T>,
       options: Omit<ItDefinition<T>, "fn" | "suite">,
-      fn: (this: T, t: Deno.TestContext) => void | Promise<void>
+      fn: (this: T, t: InZero.TestContext) => void | Promise<void>
     ]
   | [
       suite: TestSuite<T>,
       options: Omit<ItDefinition<T>, "fn" | "name" | "suite">,
-      fn: (this: T, t: Deno.TestContext) => void | Promise<void>
+      fn: (this: T, t: InZero.TestContext) => void | Promise<void>
     ];
 
 /** Generates an ItDefinition from ItArgs. */
@@ -511,7 +511,7 @@ export function it<T>(...args: ItArgs<T>) {
       sanitizeOps = globalSanitizersState.sanitizeOps,
       sanitizeResources = globalSanitizersState.sanitizeResources,
     } = options;
-    const opts: Deno.TestDefinition = {
+    const opts: InZero.TestDefinition = {
       name,
       async fn(t) {
         TestSuiteInternal.runningCount++;

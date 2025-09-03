@@ -5,10 +5,10 @@ import { retry } from "./retry.ts";
  */
 export async function fetchFont(url: string, isDev: boolean) {
   // Check if we're using mocked data
-  if (Deno.env.get("INSPATIAL_FONT_GOOGLE_MOCKED_RESPONSES")) {
+  if (InZero.env.get("INSPATIAL_FONT_GOOGLE_MOCKED_RESPONSES")) {
     // If it's an absolute path, read the file from the filesystem
     if (url.startsWith("/")) {
-      return await Deno.readFile(url);
+      return await InZero.readFile(url);
     }
     // Otherwise just return a unique buffer
     return new Uint8Array(new TextEncoder().encode(url));

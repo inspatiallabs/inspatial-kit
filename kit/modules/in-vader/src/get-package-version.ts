@@ -5,12 +5,12 @@
 export async function getPackageVersion(): Promise<string> {
   try {
     // Try deno.json first
-    const denoConfig = await Deno.readTextFile("deno.json");
+    const denoConfig = await InZero.readTextFile("deno.json");
     const denoJson = JSON.parse(denoConfig);
     if (denoJson.version) return denoJson.version;
 
     // Fallback to package.json
-    const packageConfig = await Deno.readTextFile("package.json");
+    const packageConfig = await InZero.readTextFile("package.json");
     const packageJson = JSON.parse(packageConfig);
     if (packageJson.version) return packageJson.version;
   } catch (error) {

@@ -167,7 +167,7 @@ function getErrorMessage(message: string, options: SnapshotOptions) {
 }
 
 export function serialize(actual: unknown): string {
-  return Deno.inspect(actual, {
+  return InZero.inspect(actual, {
     depth: Infinity,
     sorted: true,
     trailingComma: true,
@@ -200,7 +200,7 @@ function getMode(options: SnapshotOptions) {
   } else if (_mode) {
     return _mode;
   } else {
-    _mode = Deno.args.some((arg) => arg === "--update" || arg === "-u")
+    _mode = InZero.args.some((arg) => arg === "--update" || arg === "-u")
       ? "update"
       : "assert";
     return _mode;
@@ -222,7 +222,7 @@ class AssertSnapshotContext {
    * a cache if an instance was already created for a given snapshot file path.
    */
   static fromOptions(
-    testContext: Deno.TestContext,
+    testContext: InZero.TestContext,
     options: SnapshotOptions
   ): AssertSnapshotContext {
     let path: string;
@@ -305,7 +305,7 @@ class AssertSnapshotContext {
     });
     const snapshotFilePath = fromFileUrl(this.#snapshotFileUrl);
     ensureFileSync(snapshotFilePath);
-    Deno.writeTextFileSync(snapshotFilePath, buf.join("\n") + "\n");
+    InZero.writeTextFileSync(snapshotFilePath, buf.join("\n") + "\n");
 
     const updated = this.getUpdatedCount();
     if (updated > 0) {
@@ -394,12 +394,12 @@ class AssertSnapshotContext {
    */
   async registerTeardown() {
     if (!this.#teardownRegistered) {
-      const permission = await Deno.permissions.query({
+      const permission = await InZero.permissions.query({
         name: "write",
         path: this.#snapshotFileUrl,
       });
       if (permission.state !== "granted") {
-        throw new Deno.errors.PermissionDenied(
+        throw new InZero.errors.PermissionDenied(
           `Missing write access to snapshot file (${
             this.#snapshotFileUrl
           }). This is required because assertSnapshot was called in update mode. Please pass the --allow-write flag.`
@@ -546,7 +546,7 @@ class AssertSnapshotContext {
  * });
  * ```
  *
- * @param {Deno.TestContext} context - Manages your test's information and helps organize snapshots
+ * @param {InZero.TestContext} context - Manages your test's information and helps organize snapshots
  * @param {T} actual - The data you want to verify (can be any type)
  * @param {SnapshotOptions<T> | string} options - Configure how the snapshot works or provide an error message
  *
@@ -557,17 +557,17 @@ class AssertSnapshotContext {
  * Succeeds silently if snapshots match, or updates the snapshot if in update mode
  */
 export async function assertSnapshot<T>(
-  context: Deno.TestContext,
+  context: InZero.TestContext,
   actual: T,
   options: SnapshotOptions<T>
 ): Promise<void>;
 export async function assertSnapshot<T>(
-  context: Deno.TestContext,
+  context: InZero.TestContext,
   actual: T,
   message?: string
 ): Promise<void>;
 export async function assertSnapshot(
-  context: Deno.TestContext,
+  context: InZero.TestContext,
   actual: unknown,
   msgOrOpts?: string | SnapshotOptions<unknown>
 ) {
@@ -620,7 +620,7 @@ export async function assertSnapshot(
     };
   }
   function getTestName(
-    context: Deno.TestContext,
+    context: InZero.TestContext,
     options?: SnapshotOptions
   ): string {
     if (options && options.name) {
@@ -709,7 +709,7 @@ export function createAssertSnapshot<T>(
   baseAssertSnapshot: typeof assertSnapshot = assertSnapshot
 ): typeof assertSnapshot {
   return async function _assertSnapshot(
-    context: Deno.TestContext,
+    context: InZero.TestContext,
     actual: T,
     messageOrOptions?: string | SnapshotOptions<T>
   ) {

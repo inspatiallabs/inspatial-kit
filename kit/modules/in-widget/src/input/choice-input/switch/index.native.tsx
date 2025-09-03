@@ -67,7 +67,7 @@ export function Switch(props: SwitchProps) {
             )}
             data-checked={isChosen}
           >
-            <Slot className={iss(SwitchStyle.icon.getStyle({ className }))}>
+            <Slot className={iss(SwitchStyle.icon.getStyle({ className}))}>
               {getChoiceInputIcon(icon, isChosen)}
             </Slot>
           </Slot>

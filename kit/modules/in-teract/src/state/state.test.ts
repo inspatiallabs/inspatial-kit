@@ -11,7 +11,7 @@ import { createAction } from "./action.ts";
 import { createStorage, createMemoryStorage } from "./storage.ts";
 import { isSignal, $ } from "@in/teract/signal";
 
-Deno.test("State V2 Tests", async (t) => {
+InZero.test("State V2 Tests", async (t) => {
   await t.step("createState creates signals for each property", () => {
     const state = createState({ count: 0, name: "test" });
 

@@ -19,17 +19,17 @@ import { mockFn } from "./mock.ts";
  * Collection of mock file system functions
  */
 export interface FsMocks {
-  /** Mock for Deno.readTextFile */
+  /** Mock for InZero.readTextFile */
   readTextFile: ReturnType<typeof mockFn>;
-  /** Mock for Deno.writeTextFile */
+  /** Mock for InZero.writeTextFile */
   writeTextFile: ReturnType<typeof mockFn>;
-  /** Mock for Deno.copyFile */
+  /** Mock for InZero.copyFile */
   copyFile: ReturnType<typeof mockFn>;
-  /** Mock for Deno.remove */
+  /** Mock for InZero.remove */
   remove: ReturnType<typeof mockFn>;
-  /** Mock for Deno.exists */
+  /** Mock for InZero.exists */
   exists: ReturnType<typeof mockFn>;
-  /** Mock for Deno.exit */
+  /** Mock for InZero.exit */
   exit: ReturnType<typeof mockFn>;
   /** Restore original console functions */
   restore(): void;
@@ -57,7 +57,7 @@ export interface ConsoleMocks {
   restore(): void;
 }
 
-// Define RemoveOptions interface to match Deno.RemoveOptions
+// Define RemoveOptions interface to match InZero.RemoveOptions
 interface RemoveOptions {
   recursive?: boolean;
 }
@@ -85,7 +85,7 @@ interface DenoNamespace {
  *   }
  * });
  *
- * // Test code that uses Deno.readTextFile, etc.
+ * // Test code that uses InZero.readTextFile, etc.
  *
  * // Verify calls
  * assertEquals(mocks.readTextFile.calls.length, 1);
@@ -301,7 +301,7 @@ export function setupConsoleMocks(): ConsoleMocks {
  *
  * const mocks = setupMocks();
  *
- * // Test code that uses Deno.readTextFile and console.log
+ * // Test code that uses InZero.readTextFile and console.log
  *
  * // Verify calls
  * assertEquals(mocks.fs.readTextFile.calls.length, 1);

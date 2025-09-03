@@ -1,4 +1,4 @@
-import type { Promisable, OptionProp, Runner, TestProps } from "./shared.ts";
+import type { OptionProp, Runner, TestProps } from "./shared.ts";
 
 /**
  * A no-operation test runner that implements the Runner interface but performs no actual testing.
@@ -16,7 +16,7 @@ export const noop: Runner = Object.assign(
    */
   async function (
     _nameOrConfig: string | TestProps,
-    _fnOrUndefined?: () => Promisable<void>,
+    _fnOrUndefined?: () => JSX.Promisable<void>,
     _options?: OptionProp
   ): Promise<void> {
     // No operation
@@ -31,7 +31,7 @@ export const noop: Runner = Object.assign(
      */
     only: async function (
       _nameOrConfig: string | TestProps,
-      _fnOrUndefined?: () => Promisable<void>,
+      _fnOrUndefined?: () => JSX.Promisable<void>,
       _options?: OptionProp
     ): Promise<void> {
       // No operation
@@ -46,7 +46,7 @@ export const noop: Runner = Object.assign(
      */
     skip: async function (
       _nameOrConfig: string | TestProps,
-      _fnOrUndefined?: () => Promisable<void>,
+      _fnOrUndefined?: () => JSX.Promisable<void>,
       _options?: OptionProp
     ): Promise<void> {
       // No operation
@@ -61,7 +61,7 @@ export const noop: Runner = Object.assign(
      */
     todo: async function (
       _nameOrConfig: string | TestProps,
-      _fnOrUndefined?: () => Promisable<void>,
+      _fnOrUndefined?: () => JSX.Promisable<void>,
       _options?: OptionProp
     ): Promise<void> {
       // No operation

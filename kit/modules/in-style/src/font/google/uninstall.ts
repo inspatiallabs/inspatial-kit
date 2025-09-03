@@ -30,17 +30,17 @@ async function uninstallGoogleFonts(options: { force?: boolean } = {}) {
 
     if (stubBackupExists) {
       console.log("🔄 Restoring stub implementation from backup...");
-      await Deno.copyFile(stubBackupPath, fontsPath);
+      await InZero.copyFile(stubBackupPath, fontsPath);
 
       // Clean up backup file
-      await Deno.remove(stubBackupPath);
+      await InZero.remove(stubBackupPath);
     } else {
       // If no backup exists, generate a fresh stub using our generator
       console.log("🔄 Generating fresh stub implementation...");
       await generateGoogleFontStubs();
 
       // Copy the generated stub to fonts.ts
-      await Deno.copyFile(stubPath, fontsPath);
+      await InZero.copyFile(stubPath, fontsPath);
     }
 
     console.log("✅ Successfully uninstalled Google Fonts!");
@@ -53,13 +53,13 @@ async function uninstallGoogleFonts(options: { force?: boolean } = {}) {
     if (error instanceof Error) {
       console.error(error.stack);
     }
-    Deno.exit(1);
+    InZero.exit(1);
   }
 }
 
 // Run when script is executed directly
 if (import.meta.main) {
-  const args = Deno.args;
+  const args = InZero.args;
   const options: { force?: boolean } = {};
 
   // Simple argument parsing
@@ -78,7 +78,7 @@ if (import.meta.main) {
         "  --force    Force uninstallation even if fonts are not detected"
       );
       console.log("  --help     Show this help message");
-      Deno.exit(0);
+      InZero.exit(0);
     }
   }
 

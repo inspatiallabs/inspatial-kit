@@ -35,7 +35,7 @@ export interface TestProps {
    * @property {boolean} only - When true, only this test will be run
    * @property {boolean} skip - When true, this test will be skipped
    * @property {boolean} todo - When true, marks this test as planned for future implementation
-   * @property {Deno.TestDefinition["permissions"]} permissions - Controls what system features the test can access
+   * @property {InZero.TestDefinition["permissions"]} permissions - Controls what system features the test can access
    * @property {boolean} sanitizeResources - Checks if test properly closes resources like files and connections
    * @property {boolean} sanitizeOps - Checks if test completes all async operations
    * @property {boolean} sanitizeExit - Checks if test tries to exit unexpectedly
@@ -59,16 +59,16 @@ export interface TestProps {
  */
 export type OptionProp = {
   /** Controls what system features the test can access */
-  permissions?: Deno.TestDefinition["permissions"];
+  permissions?: InZero.TestDefinition["permissions"];
 
   /** Checks if the test properly closes all resources it opens (like files or network connections) */
-  sanitizeResources?: Deno.TestDefinition["sanitizeResources"];
+  sanitizeResources?: InZero.TestDefinition["sanitizeResources"];
 
   /** Checks if the test properly completes all async operations it starts */
-  sanitizeOps?: Deno.TestDefinition["sanitizeOps"];
+  sanitizeOps?: InZero.TestDefinition["sanitizeOps"];
 
   /** Checks if the test tries to exit the process unexpectedly */
-  sanitizeExit?: Deno.TestDefinition["sanitizeExit"];
+  sanitizeExit?: InZero.TestDefinition["sanitizeExit"];
 
   /** Custom environment variables to use while running the test */
   env?: Record<string, string>;

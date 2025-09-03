@@ -109,20 +109,6 @@ export function Table<TData, TValue>({
             onAllChecked?.(!!checked);
           }}
         />
-        {/* <Switch
-          className="print:hidden"
-          aria-label="Select all"
-          checked={
-            typeof allChecked === "object" && "get" in allChecked
-              ? (allChecked as any).get()
-              : (allChecked as any)
-          }
-          on:input={(e: any) => {
-            const checked = e?.target?.checked ?? e;
-            onAllChecked?.(!!checked);
-          }}
-        />
-         */}
       </Slot>
     ),
     cell: ({ row }) => {
@@ -142,16 +128,7 @@ export function Table<TData, TValue>({
             },
           }}
         >
-          {/* <Checkbox
-            className="print:hidden"
-            aria-label="Select row"
-            checked={isChecked}
-            on:input={(e: any) => {
-              const checked = e?.target?.checked ?? e;
-              onRowChecked?.(row.original, !!checked);
-            }}
-          /> */}
-          <Switch
+          <Checkbox
             className="print:hidden"
             aria-label="Select row"
             checked={isChecked}

@@ -1,10 +1,13 @@
 // Imports
-import type { OptionProp, Promisable, Runner, TestProps } from "./shared.ts";
+import type { OptionProp, Runner, TestProps } from "./shared.ts";
 import { format } from "./shared.ts";
 import { noop } from "./noop.ts";
 let node: any = null;
 
 /*#########################################(RUNTIME)#########################################*/
+// Ensure InZero global is available in test runtime (fallback to Deno)
+// This is a no-op if another layer already initialized it.
+(globalThis as any).InZero ??= (globalThis as any).Deno;
 
 /**
  * InSpatial Test can run in different environments, which are like different places where your code can execute.
@@ -38,12 +41,12 @@ export { runtime };
 export function createDenoTest(): Runner {
   const test = (
     nameOrConfig: string | TestProps,
-    fnOrUndefined?: () => Promisable<void>,
+    fnOrUndefined?: () => JSX.Promisable<void>,
     options?: OptionProp
   ): Promise<void> => {
     if (typeof nameOrConfig === "object") {
       return Promise.resolve(
-        globalThis.Deno.test({
+        (globalThis as any).InZero.test({
           name: format(nameOrConfig.name),
           fn: nameOrConfig.fn,
           ...nameOrConfig.options,
@@ -51,7 +54,7 @@ export function createDenoTest(): Runner {
       );
     }
     return Promise.resolve(
-      globalThis.Deno.test({
+      (globalThis as any).InZero.test({
         name: format(nameOrConfig),
         fn: fnOrUndefined!,
         ...options,
@@ -61,7 +64,7 @@ export function createDenoTest(): Runner {
 
   test.only = (
     nameOrConfig: string | TestProps,
-    fnOrUndefined?: () => Promisable<void>,
+    fnOrUndefined?: () => JSX.Promisable<void>,
     options?: OptionProp
   ): Promise<void> => {
     if (typeof nameOrConfig === "object") {
@@ -86,7 +89,7 @@ export function createDenoTest(): Runner {
 
   test.skip = (
     nameOrConfig: string | TestProps,
-    fnOrUndefined?: () => Promisable<void>,
+    fnOrUndefined?: () => JSX.Promisable<void>,
     options?: OptionProp
   ): Promise<void> => {
     if (typeof nameOrConfig === "object") {
@@ -111,7 +114,7 @@ export function createDenoTest(): Runner {
 
   test.todo = (
     nameOrConfig: string | TestProps,
-    _fnOrUndefined?: () => Promisable<void>,
+    _fnOrUndefined?: () => JSX.Promisable<void>,
     options?: OptionProp
   ): Promise<void> => {
     const todoFn = () => Promise.resolve();
@@ -148,7 +151,7 @@ const bun = (globalThis as any).Bun;
 export function createBunTest(): Runner {
   const test = (
     nameOrConfig: string | TestProps,
-    fnOrUndefined?: () => Promisable<void>,
+    fnOrUndefined?: () => JSX.Promisable<void>,
     options?: OptionProp
   ): Promise<void> => {
     if (typeof nameOrConfig === "object") {
@@ -169,7 +172,7 @@ export function createBunTest(): Runner {
 
   test.only = (
     nameOrConfig: string | TestProps,
-    fnOrUndefined?: () => Promisable<void>,
+    fnOrUndefined?: () => JSX.Promisable<void>,
     options?: OptionProp
   ): Promise<void> => {
     if (typeof nameOrConfig === "object") {
@@ -192,7 +195,7 @@ export function createBunTest(): Runner {
 
   test.skip = (
     nameOrConfig: string | TestProps,
-    fnOrUndefined?: () => Promisable<void>,
+    fnOrUndefined?: () => JSX.Promisable<void>,
     options?: OptionProp
   ): Promise<void> => {
     if (typeof nameOrConfig === "object") {
@@ -215,7 +218,7 @@ export function createBunTest(): Runner {
 
   test.todo = (
     nameOrConfig: string | TestProps,
-    _fnOrUndefined?: () => Promisable<void>,
+    _fnOrUndefined?: () => JSX.Promisable<void>,
     options?: OptionProp
   ): Promise<void> => {
     const todoFn = () => Promise.resolve();
@@ -263,7 +266,7 @@ type CallSite = { getFileName: () => string };
 export function createNodeTest(): Runner {
   const test = (
     nameOrConfig: string | TestProps,
-    fnOrUndefined?: () => Promisable<void>
+    fnOrUndefined?: () => JSX.Promisable<void>
   ): Promise<void> => {
     if (typeof nameOrConfig === "object") {
       // Converts test function to Node's expected format
@@ -289,7 +292,7 @@ export function createNodeTest(): Runner {
 
   test.skip = (
     nameOrConfig: string | TestProps,
-    fnOrUndefined?: () => Promisable<void>
+    fnOrUndefined?: () => JSX.Promisable<void>
   ): Promise<void> => {
     if (typeof nameOrConfig === "object") {
       const testFn = (_t: any) => nameOrConfig.fn();
@@ -301,7 +304,7 @@ export function createNodeTest(): Runner {
 
   test.todo = (
     nameOrConfig: string | TestProps,
-    _fnOrUndefined?: () => Promisable<void>,
+    _fnOrUndefined?: () => JSX.Promisable<void>,
     _options?: OptionProp
   ): Promise<void> => {
     const todoFn = (_t: any) => Promise.resolve();

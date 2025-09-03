@@ -59,9 +59,9 @@ export const POPULAR_FONTS = [
  * Interface for dependencies
  */
 interface Dependencies {
-  readTextFile?: typeof Deno.readTextFile;
-  writeTextFile?: typeof Deno.writeTextFile;
-  exit?: typeof Deno.exit;
+  readTextFile?: typeof InZero.readTextFile;
+  writeTextFile?: typeof InZero.writeTextFile;
+  exit?: typeof InZero.exit;
   dirname?: typeof dirname;
   resolve?: typeof resolve;
   fromFileUrl?: typeof fromFileUrl;
@@ -73,9 +73,9 @@ interface Dependencies {
 export async function generateGoogleFontStubs(deps: Dependencies = {}) {
   try {
     // Get or use injected dependencies (for testing)
-    const readTextFile = deps.readTextFile || Deno.readTextFile;
-    const writeTextFile = deps.writeTextFile || Deno.writeTextFile;
-    const exit = deps.exit || Deno.exit;
+    const readTextFile = deps.readTextFile || InZero.readTextFile;
+    const writeTextFile = deps.writeTextFile || InZero.writeTextFile;
+    const exit = deps.exit || InZero.exit;
     const resolveFunc = deps.resolve || resolve;
     const dirnameFunc = deps.dirname || dirname;
     const fromFileUrlFunc = deps.fromFileUrl || fromFileUrl;
@@ -107,7 +107,7 @@ export async function generateGoogleFontStubs(deps: Dependencies = {}) {
     if (error instanceof Error) {
       console.error(error.stack);
     }
-    Deno.exit(1);
+    InZero.exit(1);
   }
 }
 

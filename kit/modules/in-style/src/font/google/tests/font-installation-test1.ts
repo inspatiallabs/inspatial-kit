@@ -94,7 +94,7 @@ test("installGoogleFonts should install all fonts by default", async () => {
 
     // Create a safe container for Deno mocks
     const tempGlobal = globalThis as any;
-    tempGlobal._mockDeno = {
+    tempGlobal._mockInZero = {
       readTextFile: mockReadTextFile,
       writeTextFile: mockWriteTextFile,
       copyFile: mockCopyFile,
@@ -104,10 +104,10 @@ test("installGoogleFonts should install all fonts by default", async () => {
     // Override installation function (simplify to just track calls)
     const mockInstall = async (options: any) => {
       // Call the mocked functions directly to simulate what would happen in the real function
-      await tempGlobal._mockDeno.exists("test");
-      await tempGlobal._mockDeno.readTextFile("test");
-      await tempGlobal._mockDeno.writeTextFile("test", "content");
-      await tempGlobal._mockDeno.copyFile("src", "dest");
+      await tempGlobal._mockInZero.exists("test");
+      await tempGlobal._mockInZero.readTextFile("test");
+      await tempGlobal._mockInZero.writeTextFile("test", "content");
+      await tempGlobal._mockInZero.copyFile("src", "dest");
       fontsInstalled = true;
       return Promise.resolve();
     };
@@ -123,6 +123,6 @@ test("installGoogleFonts should install all fonts by default", async () => {
   } finally {
     // Clean up
     cleanup();
-    delete (globalThis as any)._mockDeno;
+    delete (globalThis as any)._mockInZero;
   }
 });

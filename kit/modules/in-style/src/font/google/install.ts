@@ -47,7 +47,7 @@ async function installGoogleFonts(options: InstallOptions = { all: true }) {
     }
 
     console.log("🔍 Loading font map data...");
-    const fontMapText = await Deno.readTextFile(fontMapPath);
+    const fontMapText = await InZero.readTextFile(fontMapPath);
     let rawFontMap = JSON.parse(fontMapText);
 
     // Filter font map based on options
@@ -136,11 +136,11 @@ async function installGoogleFonts(options: InstallOptions = { all: true }) {
     const output = generateGoogleFontTypes(fontMap, outputPath);
 
     // Write output
-    await Deno.writeTextFile(outputPath, output);
+    await InZero.writeTextFile(outputPath, output);
 
     // Backup the stub if needed for future uninstallation
     if (!(await exists(resolve(currentDir, "./stub.backup.ts")))) {
-      await Deno.copyFile(stubPath, resolve(currentDir, "./stub.backup.ts"));
+      await InZero.copyFile(stubPath, resolve(currentDir, "./stub.backup.ts"));
     }
 
     console.log(`✅ Successfully installed ${fontCount} Google Font families!`);
@@ -160,13 +160,13 @@ async function installGoogleFonts(options: InstallOptions = { all: true }) {
     if (error instanceof Error) {
       console.error(error.stack);
     }
-    Deno.exit(1);
+    InZero.exit(1);
   }
 }
 
 // Parse command line arguments when run directly
 if (import.meta.main) {
-  const args = Deno.args;
+  const args = InZero.args;
   const options: InstallOptions = { all: true };
 
   // Simple argument parsing
@@ -206,7 +206,7 @@ if (import.meta.main) {
       console.log(
         "  deno task fonts:google:install --families=Roboto,Open+Sans,Lato"
       );
-      Deno.exit(0);
+      InZero.exit(0);
     }
   }
 

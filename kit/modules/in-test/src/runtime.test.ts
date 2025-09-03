@@ -600,17 +600,17 @@ test("test environment is properly set up and torn down", async () => {
 //   const testContent = "Test content";
 
 //   // Test file writing
-//   await Deno.writeTextFile(testFileName, testContent);
+//   await InZero.writeTextFile(testFileName, testContent);
 
 //   // Test file reading
-//   const readContent = await Deno.readTextFile(testFileName);
+//   const readContent = await InZero.readTextFile(testFileName);
 //   expect(readContent).toBe(testContent);
 
 //   // Test file deletion
-//   await Deno.remove(testFileName);
+//   await InZero.remove(testFileName);
 
 //   // Verify file was deleted
-//   await expect(Deno.stat(testFileName)).rejects.toThrow();
+//   await expect(InZero.stat(testFileName)).rejects.toThrow();
 // });
 
 // Concurrent Test Execution

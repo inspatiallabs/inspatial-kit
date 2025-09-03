@@ -13,6 +13,8 @@ import { Show } from "@inspatial/kit/control-flow";
 import { View, Slot, XStack, YStack } from "@inspatial/kit/structure";
 import { Button } from "@inspatial/kit/ornament";
 import { Modal, Drawer, Dock } from "@inspatial/kit/presentation";
+import { Switch, Checkbox } from "@inspatial/kit/input";
+import { SecurityKeyIcon, CheckIcon, ArrowSwapIcon } from "@inspatial/kit/icon";
 import {
   useCounter,
   useCounterExplicit,
@@ -183,31 +185,68 @@ export function CounterView() {
       </Drawer>
 
       <View scrollable>
-        <div className="flex flex-col justify-center items-center gap-10">
+        <Slot className="flex flex-col justify-center items-center gap-10">
           <h1 className="text-yellow-500 text-8xl">🚀 Counter</h1>
-          <div className="max-w-2xl w-full">
-            <TableWrapper>
-              <TableHeader>
-                <TableRow>
-                  <TableHeaderColumn>ID</TableHeaderColumn>
-                  <TableHeaderColumn>Name</TableHeaderColumn>
-                </TableRow>
-              </TableHeader>
-              <TableList each={useCounter.entries} track="id">
-                {(entry: EntryProps) => (
-                  <TableRow key={entry.id}>
-                    <TableCell>{entry.id}</TableCell>
-                    <TableCell>{entry.name}</TableCell>
+
+          {/* Switch & Checkbox Controls */}
+          <Slot className="bg-(--surface) p-6 rounded-lg text-center max-w-md">
+            <h3 className="text-white text-lg mb-4">🎛️ UI Controls</h3>
+
+            <YStack className="gap-4">
+              {/* Switch with custom icon */}
+              <XStack className="items-center justify-between gap-2">
+                <Text className="text-white">Show Table</Text>
+                <Switch
+                  checked={useCounter.showTableBox.get()}
+                  icon={<ArrowSwapIcon size="4xs" />}
+                  size="lg"
+                  radius="squared"
+                  onChange={(checked) => useCounter.showTableBox.set(checked)}
+                />
+              </XStack>
+
+              {/* Checkbox with predefined icon */}
+              <XStack className="items-center justify-between">
+                <Text className="text-white">Show Trigger Props</Text>
+                <Checkbox
+                  checked={useCounter.showTriggerPropsBox.get()}
+                  icon="tick"
+                  on:input={(e: any) =>
+                    useCounter.showTriggerPropsBox.set(
+                      !!(e?.target?.checked ?? e)
+                    )
+                  }
+                />
+              </XStack>
+            </YStack>
+          </Slot>
+
+          {/* Conditionally show table */}
+          <Show when={useCounter.showTableBox}>
+            <Slot className="max-w-2xl w-full">
+              <TableWrapper>
+                <TableHeader>
+                  <TableRow>
+                    <TableHeaderColumn>ID</TableHeaderColumn>
+                    <TableHeaderColumn>Name</TableHeaderColumn>
                   </TableRow>
-                )}
-              </TableList>
-            </TableWrapper>
-          </div>
+                </TableHeader>
+                <TableList each={useCounter.entries} track="id">
+                  {(entry: EntryProps) => (
+                    <TableRow key={entry.id}>
+                      <TableCell>{entry.id}</TableCell>
+                      <TableCell>{entry.name}</TableCell>
+                    </TableRow>
+                  )}
+                </TableList>
+              </TableWrapper>
+            </Slot>
+          </Show>
 
           {/* Simple Input */}
           <input
             type="number"
-            className="bg-gray-800 p-3 rounded-lg outline-none text-white text-2xl"
+            className="bg-(--muted) shadow-hollow p-3 rounded-lg outline-none text-white text-2xl"
             value={useCounter.count}
             on:input={(event: any) => {
               useCounter.count.set(Number(event.target.value));
@@ -216,59 +255,63 @@ export function CounterView() {
           />
 
           {/* Current Count Display */}
-          <div className="bg-gray-800 p-6 rounded-lg text-center">
+          <Slot 
+        
+          className="bg-(--brand) p-6 rounded-lg text-center">
             <Text className="text-white text-2xl mb-2">Current </Text>
-            <div className="text-6xl font-bold text-yellow-400">
+            <Slot className="text-6xl font-bold text-white">
               {useCounter.count}
-            </div>
-          </div>
+            </Slot>
+          </Slot>
 
           {/* ✅ TRIGGER PROPS TEST SECTION */}
-          <div className="bg-gray-900 p-6 rounded-lg text-center border-2 border-green-500">
-            <h2 className="text-green-400 text-xl mb-4">
-              🎯 Trigger Props Test
-            </h2>
+          <Show when={useCounter.showTriggerPropsBox}>
+            <Slot className="bg-(--muted) p-6 rounded-lg text-center border-2 border-green-500">
+              <h2 className="text-green-400 text-xl mb-4">
+                🎯 Trigger Props Test
+              </h2>
 
-            {/* Test style: trigger props */}
-            <div
-              className="p-4 rounded-lg mb-4 transition-all duration-300"
-              style={{
-                web: {
-                  backgroundColor: testSignals.backgroundColor,
-                  color: testSignals.textColor,
-                  borderWidth: testSignals.borderWidth,
-                  fontSize: testSignals.fontSize,
-                },
-              }}
-            >
-              Dynamic Styles! Count: {useCounter.count}
-            </div>
+              {/* Test style: trigger props */}
+              <Slot
+                className="p-4 rounded-lg mb-4 transition-all duration-300"
+                style={{
+                  web: {
+                    backgroundColor: testSignals.backgroundColor,
+                    color: testSignals.textColor,
+                    borderWidth: testSignals.borderWidth,
+                    fontSize: testSignals.fontSize,
+                  },
+                }}
+              >
+                Dynamic Styles! Count: {useCounter.count}
+              </Slot>
 
-            {/* Test className: trigger props */}
-            <div
-              className={{
-                "p-4": true,
-                "rounded-lg": true,
-                "mb-4": true,
-                "transition-all": true,
-                "duration-300": true,
-                "animate-pulse": testSignals.isPulseActive,
-                "scale-110 bg-gradient-to-r from-purple-500 to-pink-500":
-                  testSignals.isHighCount,
-              }}
-            />
-          </div>
+              {/* Test className: trigger props */}
+              <Slot
+                className={{
+                  "p-4": true,
+                  "rounded-lg": true,
+                  "mb-4": true,
+                  "transition-all": true,
+                  "duration-300": true,
+                  "animate-pulse": testSignals.isPulseActive,
+                  "scale-110 bg-gradient-to-r from-purple-500 to-pink-500":
+                    testSignals.isHighCount,
+                }}
+              />
+            </Slot>
+          </Show>
 
           {/* Explicit Pattern Demo */}
-          <div className="bg-blue-900 p-4 rounded-lg text-center max-w-md">
+          <Slot className="bg-blue-900 p-4 rounded-lg text-center max-w-md">
             <h3 className="text-white text-lg mb-2">Explicit Pattern Demo</h3>
-            <div className="text-2xl font-bold text-blue-300 mb-2">
+            <Slot className="text-2xl font-bold text-blue-300 mb-2">
               {useCounterExplicit.count}
-            </div>
-            <div className="text-sm text-blue-200 mb-3">
+            </Slot>
+            <Slot className="text-sm text-blue-200 mb-3">
               {useCounterExplicit.message}
-            </div>
-            <div className="flex gap-2 justify-center">
+            </Slot>
+            <Slot className="flex gap-2 justify-center">
               <Button
                 className="bg-blue-600 px-3 py-1 rounded text-white text-sm hover:bg-blue-700"
                 on:tap={() => useCounterExplicit.action.setIncrement()}
@@ -283,8 +326,8 @@ export function CounterView() {
               >
                 Update Msg
               </Button>
-            </div>
-          </div>
+            </Slot>
+          </Slot>
 
           <Show
             when={$(() => useCounter.count >= 10)}
@@ -295,7 +338,7 @@ export function CounterView() {
             <p className="text-white text-4xl">Count is 10 or greater! 🎉</p>
           </Show>
           {/* Action Buttons */}
-          <div className="flex gap-4 flex-wrap justify-center">
+          <Slot className="flex gap-4 flex-wrap justify-center">
             {/* Dock presentation test */}
             <Button
               className="bg-brand p-4 rounded-full text-white font-bold text-lg hover:brightness-110 transition-colors"
@@ -399,52 +442,52 @@ export function CounterView() {
             >
               Force Re-render
             </Button>
-          </div>
+          </Slot>
 
           {/* API Showcase */}
-          <div className="bg-gray-800 p-4 rounded-lg text-white max-w-2xl">
+          <Slot className="bg-(--window) p-4 rounded-lg text-white max-w-2xl">
             <h3 className="text-lg font-bold mb-2">
               🚀 Unified createAction API
             </h3>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="bg-green-900 p-3 rounded">
+            <Slot className="grid grid-cols-2 gap-4 text-sm">
+              <Slot className="bg-green-900 p-3 rounded">
                 <h4 className="font-bold text-green-300">Batch Trigger</h4>
                 <code className="text-xs text-green-200 block mt-1">
                   handleCounter.setIncrement()
                 </code>
                 <p className="text-xs mt-1">Organized, type-safe, convenient</p>
-              </div>
-              <div className="bg-teal-900 p-3 rounded">
+              </Slot>
+              <Slot className="bg-teal-900 p-3 rounded">
                 <h4 className="font-bold text-teal-300">Direct Signal</h4>
                 <code className="text-xs text-teal-200 block mt-1">
                   handleDirectIncrement() // throttled
                 </code>
                 <p className="text-xs mt-1">Simple, powerful, optimized</p>
-              </div>
-            </div>
-            <div className="mt-3 text-xs text-gray-300">
+              </Slot>
+            </Slot>
+            <Slot className="mt-3 text-xs text-(--primary)">
               🎯 <strong>ONE FUNCTION</strong> - Three patterns with{" "}
               <code>createAction()</code>
               <br />✅ Direct:{" "}
               <code>createAction(signal, action, options)</code>
               <br />✅ Tuple: <code>createAction([state, 'key'], action)</code>
               <br />✅ Batch: <code>createAction(state, definition)</code>
-            </div>
-          </div>
+            </Slot>
+          </Slot>
 
           {/* ✅ COMPREHENSIVE UNIFIED TRIGGER TEST */}
-          <div className="bg-gradient-to-r from-emerald-900 to-teal-900 p-6 rounded-lg text-center max-w-4xl">
+          <Slot className="bg-gradient-to-r from-emerald-900 to-teal-900 p-6 rounded-lg text-center max-w-4xl">
             <h2 className="text-emerald-300 text-2xl mb-4">
               🚀 Unified Trigger System Demo
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <Slot className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               {/* Built-in Trigger Props */}
-              <div className="bg-emerald-800 p-4 rounded">
+              <Slot className="bg-emerald-800 p-4 rounded">
                 <h3 className="text-emerald-200 font-bold mb-2">
                   Built-in Props
                 </h3>
-                <div
+                <Slot
                   className={{
                     "p-2": true,
                     rounded: true,
@@ -463,16 +506,16 @@ export function CounterView() {
                   }}
                 >
                   Count: {useCounter.count}
-                </div>
-                <div className="text-xs text-emerald-300">
+                </Slot>
+                <Slot className="text-xs text-emerald-300">
                   ✅ structured style prop
                   <br />✅ className via computed string
                   <br />✅ Dynamic reactivity
-                </div>
-              </div>
+                </Slot>
+              </Slot>
 
               {/* Standard Event Triggers */}
-              <div className="bg-teal-800 p-4 rounded">
+              <Slot className="bg-teal-800 p-4 rounded">
                 <h3 className="text-teal-200 font-bold mb-2">
                   Standard Events
                 </h3>
@@ -496,50 +539,50 @@ export function CounterView() {
                     );
                   }}
                 />
-                <div className="text-xs text-teal-300 mt-1">
+                <Slot className="text-xs text-teal-300 mt-1">
                   ✅ on:tap events
                   <br />
                   ✅ on:input events
                   <br />✅ DOM integration
-                </div>
-              </div>
+                </Slot>
+              </Slot>
 
               {/* Extensible Registry */}
-              <div className="bg-cyan-800 p-4 rounded">
+              <Slot className="bg-cyan-800 p-4 rounded">
                 <h3 className="text-cyan-200 font-bold mb-2">
                   Extensible Registry
                 </h3>
-                <div className="bg-cyan-700 px-3 py-2 rounded mb-2 text-white text-sm">
+                <Slot className="bg-cyan-700 px-3 py-2 rounded mb-2 text-white text-sm">
                   <code>createTrigger()</code>
-                </div>
-                <div className="text-xs text-cyan-300">
+                </Slot>
+                <Slot className="text-xs text-cyan-300">
                   ✅ Custom trigger registration
                   <br />
                   ✅ Platform-specific handlers
                   <br />
                   ✅ Automatic fallbacks
                   <br />✅ See JSDoc for examples
-                </div>
-              </div>
-            </div>
-          </div>
+                </Slot>
+              </Slot>
+            </Slot>
+          </Slot>
 
           {/* Enhanced Explicit Pattern Test */}
-          <div className="bg-purple-900 p-6 rounded-lg text-center max-w-md">
+          <Slot className="bg-purple-900 p-6 rounded-lg text-center max-w-md">
             <h3 className="text-white text-lg mb-4">
               🚀 Enhanced Explicit Pattern
             </h3>
 
-            <div className="bg-purple-800 p-3 rounded mb-4">
-              <div className="text-2xl font-bold text-purple-200 mb-2">
+            <Slot className="bg-purple-800 p-3 rounded mb-4">
+              <Slot className="text-2xl font-bold text-purple-200 mb-2">
                 {useEnhancedExplicit.advancedCount}
-              </div>
-              <div className="text-sm text-purple-300">
+              </Slot>
+              <Slot className="text-sm text-purple-300">
                 {useEnhancedExplicit.status}
-              </div>
-            </div>
+              </Slot>
+            </Slot>
 
-            <div className="grid grid-cols-2 gap-2 text-xs">
+            <Slot className="grid grid-cols-2 gap-2 text-xs">
               {/* Traditional trigger */}
               <Button
                 className="bg-purple-600 px-2 py-2 rounded text-white hover:bg-purple-700"
@@ -593,17 +636,17 @@ export function CounterView() {
               >
                 🔥 Add & Use Dynamic Trigger (+50)
               </Button>
-            </div>
+            </Slot>
 
-            <div className="mt-4 text-xs text-purple-300 border-t border-purple-700 pt-3">
+            <Slot className="mt-4 text-xs text-purple-300 border-t border-purple-700 pt-3">
               <strong>Enhanced Features:</strong>
               <br />✅ Cross-state operations
               <br />✅ External state targeting
               <br />✅ Dynamic trigger management
               <br />✅ Same power as separation pattern!
-            </div>
-          </div>
-        </div>
+            </Slot>
+          </Slot>
+        </Slot>
       </View>
     </>
   );

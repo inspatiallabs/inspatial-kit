@@ -1,6 +1,6 @@
-/** Compute deno permissions flag from a `Deno.PermissionOptions`-like object. */
+/** Compute deno permissions flag from a `InZero.PermissionOptions`-like object. */
 export function flags(
-  permissions: Deno.PermissionOptions | boolean | null
+  permissions: InZero.PermissionOptions | boolean | null
 ): string {
   const flags = [];
   if (permissions === true || permissions === "inherit") {

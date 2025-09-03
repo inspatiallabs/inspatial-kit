@@ -1,11 +1,11 @@
 export interface ChoiceInputProps extends JSX.SharedProps {
-  icon?:
+  icon?: 
     | "ball"
-    | "tick"
+    | "tick" 
     | "cross"
     | "brand"
     | "dash"
-    | JSX.SharedProps["children"];
+    | JSX.Element; // Specific JSX element type
   type:
     | "switch"
     | "checkbox"

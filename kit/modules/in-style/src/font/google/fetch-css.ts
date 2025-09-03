@@ -6,7 +6,7 @@ import { retry } from "./retry.ts";
  */
 async function getMockedResponse(path: string, url: string): Promise<string> {
   try {
-    const mockData = await Deno.readTextFile(path);
+    const mockData = await InZero.readTextFile(path);
     const mockResponses = JSON.parse(mockData);
     if (!mockResponses[url]) {
       throw new Error("Missing mocked response for URL: " + url);

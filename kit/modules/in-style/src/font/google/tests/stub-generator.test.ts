@@ -90,7 +90,7 @@ test("generateGoogleFontStubs should generate stub content correctly", async () 
 
   try {
     // Mock Deno namespace
-    const mockDeno = {
+    const mockInZero = {
       readTextFile: mockReadTextFile,
       writeTextFile: mockWriteTextFile,
     };
@@ -114,12 +114,12 @@ test("generateGoogleFontStubs should generate stub content correctly", async () 
 
     // Temporarily attach mock Deno functions to a safely mutable object
     const tempGlobal = globalThis as any;
-    tempGlobal._mockDeno = mockDeno;
+    tempGlobal._mockInZero = mockInZero;
 
     // Use the mock functions from our safe container
     await generateGoogleFontStubs({
-      readTextFile: tempGlobal._mockDeno.readTextFile,
-      writeTextFile: tempGlobal._mockDeno.writeTextFile,
+      readTextFile: tempGlobal._mockInZero.readTextFile,
+      writeTextFile: tempGlobal._mockInZero.writeTextFile,
     });
 
     // Verify file operations were called
@@ -158,7 +158,7 @@ test("generateGoogleFontStubs should generate stub content correctly", async () 
     assertEquals(stubContentArg.includes("export default {"), true);
 
     // Clean up
-    delete tempGlobal._mockDeno;
+    delete tempGlobal._mockInZero;
   } finally {
     // Restore console
     console.log = originalConsoleLog;
@@ -207,7 +207,7 @@ test("Generated stub should handle errors gracefully", async () => {
 
     // Set up tempGlobal
     const tempGlobal = globalThis as any;
-    tempGlobal._mockDeno = {
+    tempGlobal._mockInZero = {
       readTextFile: mockReadTextFile,
       writeTextFile: mockWriteTextFile,
       exit: mockExit,
@@ -221,16 +221,16 @@ test("Generated stub should handle errors gracefully", async () => {
     // Run the stub generator with mocked dependencies that will fail
     try {
       // Modify generateGoogleFontStubs to use our mocked exit
-      const originalExit = Deno.exit;
-      Deno.exit = mockExit as any;
+      const originalExit = InZero.exit;
+      InZero.exit = mockExit as any;
 
       await generateGoogleFontStubs({
-        readTextFile: tempGlobal._mockDeno.readTextFile,
-        writeTextFile: tempGlobal._mockDeno.writeTextFile,
+        readTextFile: tempGlobal._mockInZero.readTextFile,
+        writeTextFile: tempGlobal._mockInZero.writeTextFile,
       });
 
       // Restore original exit
-      Deno.exit = originalExit;
+      InZero.exit = originalExit;
     } catch (e) {
       // Expected to throw, but will fail the test if we don't catch
     }
@@ -239,7 +239,7 @@ test("Generated stub should handle errors gracefully", async () => {
     assertEquals(errorCalled, true);
 
     // Clean up
-    delete tempGlobal._mockDeno;
+    delete tempGlobal._mockInZero;
   } finally {
     // Restore console
     console.log = originalConsoleLog;

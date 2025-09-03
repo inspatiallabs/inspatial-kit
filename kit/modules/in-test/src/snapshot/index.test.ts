@@ -5,7 +5,7 @@
  */
 
 import { stripAnsiCode } from "@in/style/color";
-import { dirname, fromFileUrl, join, toFileUrl } from "@std/path";
+import { dirname, fromFileUrl, join, toFileUrl } from "jsr:@std/path";
 import {
   assert,
   assertInstanceOf,
@@ -15,7 +15,7 @@ import {
 } from "../assert.ts";
 import { test } from "../runtime.ts";
 import { assertSnapshot, createAssertSnapshot, serialize } from "./index.ts";
-import { ensureDir } from "@std/fs/ensure-dir";
+import { ensureDir } from "jsr:@std/fs/ensure-dir";
 
 // Define the testContext type for Deno
 interface testContext {
@@ -246,7 +246,7 @@ test(
     ): Promise<AssertionError> {
       const snapshotFilePath = join(tempDir, `snapshot_file_${++count}.snap`);
 
-      // We can't mock the snapshot file directly since we can't override Deno.readTextFile
+      // We can't mock the snapshot file directly since we can't override InZero.readTextFile
       // Just force the error we expect
 
       try {
@@ -293,7 +293,7 @@ test("assertSnapshot() - options", async () => {
 
     await dirContext.step("absolute", async (absoluteContext) => {
       await assertSnapshot(absoluteContext, VALUE, {
-        dir: join(Deno.cwd(), "testing/__snapshots__/options_tests/"),
+        dir: join(InZero.cwd(), "testing/__snapshots__/options_tests/"),
         mode: "update", // Set to update so we don't need existing snapshots
       });
     });
@@ -310,7 +310,7 @@ test("assertSnapshot() - options", async () => {
     await pathContext.step("absolute", async (absoluteContext) => {
       await assertSnapshot(absoluteContext, VALUE, {
         path: join(
-          Deno.cwd(),
+          InZero.cwd(),
           "testing/__snapshots__/options_tests/custom_path.snap"
         ),
         mode: "update", // Set to update so we don't need existing snapshots

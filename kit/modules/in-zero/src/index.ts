@@ -5,5 +5,9 @@
  * @version 1.0.0
  * @since 1.0.0
  */
+// Initialize global InZero once, aliasing to Deno at runtime
+// Safe in browsers without Deno (remains undefined)
 // @ts-ignore
-export const InZero = (globalThis as any).Deno as typeof Deno;
+(globalThis as any).InZero ??= (globalThis as any).Deno;
+// @ts-ignore
+export const InZero = (globalThis as any).InZero as typeof Deno;

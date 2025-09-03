@@ -35,7 +35,7 @@ async function runCommand(cmd: string[]): Promise<boolean> {
   console.log(colorText(`> ${cmd.join(" ")}`, "cyan"));
 
   try {
-    const process = new Deno.Command(cmd[0], {
+    const process = new InZero.Command(cmd[0], {
       args: cmd.slice(1),
       stdout: "inherit",
       stderr: "inherit",
@@ -88,7 +88,7 @@ async function main() {
     console.error(
       colorText("Failed to generate stubs. Please try again.", "red")
     );
-    Deno.exit(1);
+    InZero.exit(1);
   }
 
   // If the user selected option 2, install popular Google Fonts
@@ -117,7 +117,7 @@ async function main() {
       console.log(
         colorText("  deno task fonts:google:install -- --popular", "yellow")
       );
-      Deno.exit(1);
+      InZero.exit(1);
     }
   }
 
