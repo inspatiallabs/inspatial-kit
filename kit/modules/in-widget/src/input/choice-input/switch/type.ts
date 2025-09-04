@@ -22,5 +22,9 @@ export type SwitchProps = StyleProps<typeof SwitchStyle.wrapper> &
      * Available icons: "ball", "tick", "cross", "brand", "dash"
      */
     icon?: ChoiceInputProps["icon"];
-    children?: JSX.SharedProps["children"]; // Do not remove manual passing of children
+    children?: {
+      track?: SwitchTrackProps;
+      handle?: SwitchHandleProps;
+      icon?: SwitchIconProps;
+    };
   };

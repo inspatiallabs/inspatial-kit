@@ -280,7 +280,7 @@ export function createNodeTest(): Runner {
 
   test.only = (
     nameOrConfig: string | TestProps,
-    fnOrUndefined?: () => Promisable<void>
+    fnOrUndefined?: () => JSX.Promisable<void>
   ): Promise<void> => {
     if (typeof nameOrConfig === "object") {
       const testFn = (_t: any) => nameOrConfig.fn();

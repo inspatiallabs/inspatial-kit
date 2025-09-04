@@ -195,29 +195,53 @@ export const Text = ({
 
   return (
     <>
-      <p
-        id={state.domId.get()}
-        on:mount={() => {
+      {(() => {
+        const controlId = (props as any)?.id;
+        const { id: _ignoredId, ...restProps } = (props as any) || {};
+
+        const commonId = state.domId.get();
+        const commonOnMount = () => {
           const root = document.getElementById(state.domId.peek());
           if (!root) return;
           if (animate === "fadeInContainer") {
-            // Animate the whole container for a visible test of Motion
-            try { root.style.opacity = "0"; } catch {}
+            try {
+              (root as HTMLElement).style.opacity = "0";
+            } catch {}
             createMotion(root, {
               opacity: { from: 0, to: 1, duration: 700 },
               ease: eases.inOutQuad,
-              onComplete: () => { try { root.style.opacity = ""; } catch {} },
+              onComplete: () => {
+                try {
+                  (root as HTMLElement).style.opacity = "";
+                } catch {}
+              },
             } as any);
-            setTimeout(() => { try { if (getComputedStyle(root).opacity === "0") root.style.opacity = "1"; } catch {} }, 750);
+            setTimeout(() => {
+              try {
+                if (getComputedStyle(root).opacity === "0")
+                  (root as HTMLElement).style.opacity = "1";
+              } catch {}
+            }, 750);
           } else if (animate === "fadeUpContainer") {
-            try { root.style.opacity = "0"; } catch {}
+            try {
+              (root as HTMLElement).style.opacity = "0";
+            } catch {}
             createMotion(root, {
               opacity: { from: 0, to: 1, duration: 700 },
               translateY: { from: 12, to: 0, duration: 700 },
               ease: eases.inOutQuad,
-              onComplete: () => { try { root.style.opacity = ""; } catch {} },
+              onComplete: () => {
+                try {
+                  (root as HTMLElement).style.opacity = "";
+                } catch {}
+              },
             } as any);
-            setTimeout(() => { try { if (getComputedStyle(root).opacity === "0") root.style.opacity = "1"; } catch {} }, 750);
+            setTimeout(() => {
+              try {
+                if (getComputedStyle(root).opacity === "0")
+                  (root as HTMLElement).style.opacity = "1";
+              } catch {}
+            }, 750);
           } else if (
             animate === "fadeUp" ||
             animate === "fadeIn" ||
@@ -225,8 +249,9 @@ export const Text = ({
           ) {
             animateLetters(root as HTMLElement, animate, 600, delay || 0);
           }
-        }}
-        className={
+        };
+
+        const commonClass =
           typeof iss === "function"
             ? iss(
                 typographyClasses.get(),
@@ -235,17 +260,41 @@ export const Text = ({
               )
             : `${typographyClasses.get()} overflow-hidden flex w-full ${
                 className || ""
-              }`
-        }
-        style={{
+              }`;
+
+        const commonStyle = {
           lineHeight: lineHeight,
           ...(font?.heading && { fontFamily: font.heading }),
           ...(font?.body && { fontFamily: font.body }),
-        }}
-        {...props}
-      >
-        {animate !== "none" ? renderContent() : children}
-      </p>
+        } as const;
+
+        if (typeof controlId === "string" && controlId.length > 0) {
+          return (
+            <label
+              id={commonId}
+              htmlFor={controlId}
+              on:mount={commonOnMount}
+              className={commonClass}
+              style={commonStyle}
+              {...restProps}
+            >
+              {animate !== "none" ? renderContent() : children}
+            </label>
+          );
+        }
+
+        return (
+          <p
+            id={commonId}
+            on:mount={commonOnMount}
+            className={commonClass}
+            style={commonStyle}
+            {...props}
+          >
+            {animate !== "none" ? renderContent() : children}
+          </p>
+        );
+      })()}
     </>
   );
 };

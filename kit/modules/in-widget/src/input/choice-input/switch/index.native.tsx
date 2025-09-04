@@ -24,6 +24,7 @@ export function Switch(props: SwitchProps) {
     onChange,
     icon,
     $ref,
+    children,
     ...rest
   } = props;
 
@@ -57,21 +58,45 @@ export function Switch(props: SwitchProps) {
           $ref={$ref}
           {...rest}
         />
-        <Slot
-          className={iss(SwitchStyle.track.getStyle(trackProps))}
-          data-checked={isChosen}
-        >
-          <Slot
-            className={iss(
-              composedSwitchStyle({ ...trackProps, ...handleProps })
-            )}
-            data-checked={isChosen}
-          >
-            <Slot className={iss(SwitchStyle.icon.getStyle({ className}))}>
-              {getChoiceInputIcon(icon, isChosen)}
+        {(() => {
+          const { className: trackClassName, ...trackRest } = children?.track ?? {};
+          const { className: handleClassName, ...handleRest } = children?.handle ?? {};
+          const { className: iconClassName, ...iconRest } = children?.icon ?? {};
+
+          return (
+            <Slot
+              className={iss(
+                SwitchStyle.track.getStyle({
+                  ...trackProps,
+                  className: trackClassName,
+                })
+              )}
+              data-checked={isChosen}
+              {...trackRest}
+            >
+              <Slot
+                className={iss(
+                  composedSwitchStyle({
+                    ...trackProps,
+                    ...handleProps,
+                    className: handleClassName,
+                  })
+                )}
+                data-checked={isChosen}
+                {...handleRest}
+              >
+                <Slot
+                  className={iss(
+                    SwitchStyle.icon.getStyle({ className: iconClassName })
+                  )}
+                  {...iconRest}
+                >
+                  {getChoiceInputIcon(icon, isChosen)}
+                </Slot>
+              </Slot>
             </Slot>
-          </Slot>
-        </Slot>
+          );
+        })()}
       </label>
     </>
   );

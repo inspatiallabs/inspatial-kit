@@ -1,5 +1,5 @@
 // deno-lint-ignore-file
-import { $ } from "@inspatial/kit/state";
+import { $, createState } from "@inspatial/kit/state";
 import {
   List,
   TableWrapper,
@@ -13,8 +13,8 @@ import { Show } from "@inspatial/kit/control-flow";
 import { View, Slot, XStack, YStack } from "@inspatial/kit/structure";
 import { Button } from "@inspatial/kit/ornament";
 import { Modal, Drawer, Dock } from "@inspatial/kit/presentation";
-import { Switch, Checkbox } from "@inspatial/kit/input";
-import { SecurityKeyIcon, CheckIcon, ArrowSwapIcon } from "@inspatial/kit/icon";
+import { Switch, Checkbox, Radio } from "@inspatial/kit/input";
+import { SecurityKeyIcon, ArrowSwapIcon } from "@inspatial/kit/icon";
 import {
   useCounter,
   useCounterExplicit,
@@ -57,6 +57,11 @@ export function CounterView() {
     borderWidth: $(() => Math.max(1, Math.floor(useCounter.count / 3))),
     fontSize: $(() => Math.max(16, 16 + useCounter.count)),
   };
+
+  // Local view state for unified section toggle (trigger | action)
+  const unifiedState = createState({
+    unifiedSection: "trigger" as "trigger" | "action",
+  });
 
   /*******************************(Render)*************************************/
 
@@ -195,27 +200,58 @@ export function CounterView() {
             <YStack className="gap-4">
               {/* Switch with custom icon */}
               <XStack className="items-center justify-between gap-2">
-                <Text className="text-white">Show Table</Text>
+                <Text id="show-table" className="text-white">
+                  Show Table
+                </Text>
                 <Switch
+                  id="show-table"
                   checked={useCounter.showTableBox.get()}
                   icon={<ArrowSwapIcon size="4xs" />}
-                  size="lg"
+                  size="md"
                   radius="squared"
-                  onChange={(checked) => useCounter.showTableBox.set(checked)}
+                  on:input={(e: any) =>
+                    useCounter.showTableBox.set(!!(e?.target?.checked ?? e))
+                  }
                 />
               </XStack>
 
-              {/* Checkbox with predefined icon */}
+              {/* Checkbox with custom styles */}
               <XStack className="items-center justify-between">
-                <Text className="text-white">Show Trigger Props</Text>
+                <Text id="show-trigger-props" className="text-white">
+                  Show Trigger Props
+                </Text>
                 <Checkbox
+                  id="show-trigger-props"
                   checked={useCounter.showTriggerPropsBox.get()}
+                  format="flat"
+                  size="sm"
+                  radius="sm"
+                  className="peer-checked:ring-white-500 peer-checked:ring-4"
                   icon="tick"
                   on:input={(e: any) =>
                     useCounter.showTriggerPropsBox.set(
                       !!(e?.target?.checked ?? e)
                     )
                   }
+                />
+              </XStack>
+
+              {/* Radio with custom styles */}
+              <XStack className="items-center justify-between">
+                <Text className="text-white">Show Unified Trigger/Action</Text>
+                <Radio
+                  name="unified-section"
+                  value="trigger"
+                  checked={unifiedState.unifiedSection.get() === "trigger"}
+                  on:input={() => unifiedState.unifiedSection.set("trigger")}
+                  icon="ball"
+                />
+                <Radio
+                  name="unified-section"
+                  value="action"
+                  checked={unifiedState.unifiedSection.get() === "action"}
+                  on:input={() => unifiedState.unifiedSection.set("action")}
+                  icon="ball"
                 />
               </XStack>
             </YStack>
@@ -255,9 +291,7 @@ export function CounterView() {
           />
 
           {/* Current Count Display */}
-          <Slot 
-        
-          className="bg-(--brand) p-6 rounded-lg text-center">
+          <Slot className="bg-(--brand) p-6 rounded-lg text-center">
             <Text className="text-white text-2xl mb-2">Current </Text>
             <Slot className="text-6xl font-bold text-white">
               {useCounter.count}
@@ -444,128 +478,135 @@ export function CounterView() {
             </Button>
           </Slot>
 
-          {/* API Showcase */}
-          <Slot className="bg-(--window) p-4 rounded-lg text-white max-w-2xl">
-            <h3 className="text-lg font-bold mb-2">
-              🚀 Unified createAction API
-            </h3>
-            <Slot className="grid grid-cols-2 gap-4 text-sm">
-              <Slot className="bg-green-900 p-3 rounded">
-                <h4 className="font-bold text-green-300">Batch Trigger</h4>
-                <code className="text-xs text-green-200 block mt-1">
-                  handleCounter.setIncrement()
-                </code>
-                <p className="text-xs mt-1">Organized, type-safe, convenient</p>
-              </Slot>
-              <Slot className="bg-teal-900 p-3 rounded">
-                <h4 className="font-bold text-teal-300">Direct Signal</h4>
-                <code className="text-xs text-teal-200 block mt-1">
-                  handleDirectIncrement() // throttled
-                </code>
-                <p className="text-xs mt-1">Simple, powerful, optimized</p>
-              </Slot>
-            </Slot>
-            <Slot className="mt-3 text-xs text-(--primary)">
-              🎯 <strong>ONE FUNCTION</strong> - Three patterns with{" "}
-              <code>createAction()</code>
-              <br />✅ Direct:{" "}
-              <code>createAction(signal, action, options)</code>
-              <br />✅ Tuple: <code>createAction([state, 'key'], action)</code>
-              <br />✅ Batch: <code>createAction(state, definition)</code>
-            </Slot>
-          </Slot>
-
-          {/* ✅ COMPREHENSIVE UNIFIED TRIGGER TEST */}
-          <Slot className="bg-gradient-to-r from-emerald-900 to-teal-900 p-6 rounded-lg text-center max-w-4xl">
-            <h2 className="text-emerald-300 text-2xl mb-4">
-              🚀 Unified Trigger System Demo
-            </h2>
-
-            <Slot className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              {/* Built-in Trigger Props */}
-              <Slot className="bg-emerald-800 p-4 rounded">
-                <h3 className="text-emerald-200 font-bold mb-2">
-                  Built-in Props
-                </h3>
-                <Slot
-                  className={{
-                    "p-2": true,
-                    rounded: true,
-                    "mb-2": true,
-                    "transition-all": true,
-                    "duration-300": true,
-                    "animate-bounce": $(() => useCounter.count % 10 === 0),
-                  }}
-                  style={{
-                    web: {
-                      backgroundColor: testSignals.backgroundColor,
-                      transform: $(
-                        () => `scale(${1 + useCounter.count * 0.01})`
-                      ),
-                    },
-                  }}
-                >
-                  Count: {useCounter.count}
+          {/* API Showcase (shown when unifiedSection === 'action') */}
+          <Show when={$(() => unifiedState.unifiedSection.get() === "action")}>
+            <Slot className="bg-(--window) p-4 rounded-lg text-white max-w-2xl">
+              <h3 className="text-lg font-bold mb-2">
+                🚀 Unified createAction API
+              </h3>
+              <Slot className="grid grid-cols-2 gap-4 text-sm">
+                <Slot className="bg-green-900 p-3 rounded">
+                  <h4 className="font-bold text-green-300">Batch Trigger</h4>
+                  <code className="text-xs text-green-200 block mt-1">
+                    handleCounter.setIncrement()
+                  </code>
+                  <p className="text-xs mt-1">
+                    Organized, type-safe, convenient
+                  </p>
                 </Slot>
-                <Slot className="text-xs text-emerald-300">
-                  ✅ structured style prop
-                  <br />✅ className via computed string
-                  <br />✅ Dynamic reactivity
+                <Slot className="bg-teal-900 p-3 rounded">
+                  <h4 className="font-bold text-teal-300">Direct Signal</h4>
+                  <code className="text-xs text-teal-200 block mt-1">
+                    handleDirectIncrement() // throttled
+                  </code>
+                  <p className="text-xs mt-1">Simple, powerful, optimized</p>
                 </Slot>
               </Slot>
-
-              {/* Standard Event Triggers */}
-              <Slot className="bg-teal-800 p-4 rounded">
-                <h3 className="text-teal-200 font-bold mb-2">
-                  Standard Events
-                </h3>
-                <Button
-                  size="auto"
-                  className="bg-teal-600 px-3 py-1 rounded mb-1 text-white w-full"
-                  on:tap={() => {
-                    console.log("✅ Standard on:tap working!");
-                    handleCounter.setIncrement();
-                  }}
-                >
-                  on:tap
-                </Button>
-                <input
-                  className="bg-teal-700 px-2 py-1 rounded text-white w-full text-sm"
-                  placeholder="on:input test"
-                  on:input={(e: any) => {
-                    console.log(
-                      "✅ Standard on:input working!",
-                      e.target.value
-                    );
-                  }}
-                />
-                <Slot className="text-xs text-teal-300 mt-1">
-                  ✅ on:tap events
-                  <br />
-                  ✅ on:input events
-                  <br />✅ DOM integration
-                </Slot>
-              </Slot>
-
-              {/* Extensible Registry */}
-              <Slot className="bg-cyan-800 p-4 rounded">
-                <h3 className="text-cyan-200 font-bold mb-2">
-                  Extensible Registry
-                </h3>
-                <Slot className="bg-cyan-700 px-3 py-2 rounded mb-2 text-white text-sm">
-                  <code>createTrigger()</code>
-                </Slot>
-                <Slot className="text-xs text-cyan-300">
-                  ✅ Custom trigger registration
-                  <br />
-                  ✅ Platform-specific handlers
-                  <br />
-                  ✅ Automatic fallbacks
-                  <br />✅ See JSDoc for examples
-                </Slot>
+              <Slot className="mt-3 text-xs text-(--primary)">
+                🎯 <strong>ONE FUNCTION</strong> - Three patterns with{" "}
+                <code>createAction()</code>
+                <br />✅ Direct:{" "}
+                <code>createAction(signal, action, options)</code>
+                <br />✅ Tuple:{" "}
+                <code>createAction([state, 'key'], action)</code>
+                <br />✅ Batch: <code>createAction(state, definition)</code>
               </Slot>
             </Slot>
-          </Slot>
+          </Show>
+
+          {/* ✅ COMPREHENSIVE UNIFIED TRIGGER TEST (shown when unifiedSection === 'trigger') */}
+          <Show when={$(() => unifiedState.unifiedSection.get() === "trigger")}>
+            <Slot className="bg-gradient-to-r from-emerald-900 to-teal-900 p-6 rounded-lg text-center max-w-4xl">
+              <h2 className="text-emerald-300 text-2xl mb-4">
+                🚀 Unified Trigger System Demo
+              </h2>
+
+              <Slot className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                {/* Built-in Trigger Props */}
+                <Slot className="bg-emerald-800 p-4 rounded">
+                  <h3 className="text-emerald-200 font-bold mb-2">
+                    Built-in Props
+                  </h3>
+                  <Slot
+                    className={{
+                      "p-2": true,
+                      rounded: true,
+                      "mb-2": true,
+                      "transition-all": true,
+                      "duration-300": true,
+                      "animate-bounce": $(() => useCounter.count % 10 === 0),
+                    }}
+                    style={{
+                      web: {
+                        backgroundColor: testSignals.backgroundColor,
+                        transform: $(
+                          () => `scale(${1 + useCounter.count * 0.01})`
+                        ),
+                      },
+                    }}
+                  >
+                    Count: {useCounter.count}
+                  </Slot>
+                  <Slot className="text-xs text-emerald-300">
+                    ✅ structured style prop
+                    <br />✅ className via computed string
+                    <br />✅ Dynamic reactivity
+                  </Slot>
+                </Slot>
+
+                {/* Standard Event Triggers */}
+                <Slot className="bg-teal-800 p-4 rounded">
+                  <h3 className="text-teal-200 font-bold mb-2">
+                    Standard Events
+                  </h3>
+                  <Button
+                    size="auto"
+                    className="bg-teal-600 px-3 py-1 rounded mb-1 text-white w-full"
+                    on:tap={() => {
+                      console.log("✅ Standard on:tap working!");
+                      handleCounter.setIncrement();
+                    }}
+                  >
+                    on:tap
+                  </Button>
+                  <input
+                    className="bg-teal-700 px-2 py-1 rounded text-white w-full text-sm"
+                    placeholder="on:input test"
+                    on:input={(e: any) => {
+                      console.log(
+                        "✅ Standard on:input working!",
+                        e.target.value
+                      );
+                    }}
+                  />
+                  <Slot className="text-xs text-teal-300 mt-1">
+                    ✅ on:tap events
+                    <br />
+                    ✅ on:input events
+                    <br />✅ DOM integration
+                  </Slot>
+                </Slot>
+
+                {/* Extensible Registry */}
+                <Slot className="bg-cyan-800 p-4 rounded">
+                  <h3 className="text-cyan-200 font-bold mb-2">
+                    Extensible Registry
+                  </h3>
+                  <Slot className="bg-cyan-700 px-3 py-2 rounded mb-2 text-white text-sm">
+                    <code>createTrigger()</code>
+                  </Slot>
+                  <Slot className="text-xs text-cyan-300">
+                    ✅ Custom trigger registration
+                    <br />
+                    ✅ Platform-specific handlers
+                    <br />
+                    ✅ Automatic fallbacks
+                    <br />✅ See JSDoc for examples
+                  </Slot>
+                </Slot>
+              </Slot>
+            </Slot>
+          </Show>
 
           {/* Enhanced Explicit Pattern Test */}
           <Slot className="bg-purple-900 p-6 rounded-lg text-center max-w-md">
