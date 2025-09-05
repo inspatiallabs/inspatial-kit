@@ -7,7 +7,7 @@ type CheckboxIndicatorProps = StyleProps<typeof CheckboxStyle.indicator>;
 
 export type CheckboxProps = StyleProps<typeof CheckboxStyle.wrapper> &
   JSX.SharedProps & {
-    checked?: boolean | "indeterminate";
+    selected?: boolean | "indeterminate";
     format?: CheckboxIndicatorProps["format"];
     size?: CheckboxIndicatorProps["size"];
     radius?: CheckboxIndicatorProps["radius"];

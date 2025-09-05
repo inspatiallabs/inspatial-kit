@@ -13,8 +13,8 @@ export type SwitchIconProps = StyleProps<typeof SwitchStyle.icon>;
 export type SwitchProps = StyleProps<typeof SwitchStyle.wrapper> &
   // NOTE: Omiting children from JSX.SharedProps to prevent icon type inaccessibility
   Omit<JSX.SharedProps, "children"> & {
-    checked?: boolean;
-    defaultChecked?: boolean;
+    selected?: boolean;
+    defaultSelected?: boolean;
     size?: SwitchTrackProps["size"];
     radius?: SwitchTrackProps["radius"];
     /**

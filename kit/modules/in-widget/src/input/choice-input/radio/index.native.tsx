@@ -14,8 +14,8 @@ export function Radio(props: RadioProps) {
     size,
     radius,
     disabled,
-    checked = false,
-    defaultChecked,
+    selected = false,
+    defaultSelected,
     name,
     value,
     icon,
@@ -32,17 +32,20 @@ export function Radio(props: RadioProps) {
   } as const;
 
   /**************************(State)**************************/
-  const isChosen = checked === true;
+  const isSelected = selected === true;
 
   /**************************(Render)**************************/
   return (
     <>
-      <label className={iss(RadioStyle.wrapper.getStyle(styleProps))} aria-checked={isChosen}>
+      <label
+        className={iss(RadioStyle.wrapper.getStyle(styleProps))}
+        aria-checked={isSelected}
+      >
         <input
           type="radio"
           className={iss(RadioStyle.input.getStyle(styleProps))}
-          checked={isChosen}
-          defaultChecked={defaultChecked}
+          checked={isSelected}
+          defaultChecked={defaultSelected}
           name={name}
           value={value as any}
           disabled={disabled}
@@ -51,9 +54,9 @@ export function Radio(props: RadioProps) {
         />
         <Slot
           className={iss(RadioStyle.indicator.getStyle(styleProps))}
-          data-checked={isChosen}
+          data-checked={isSelected}
         >
-          {getChoiceInputIcon(icon, isChosen)}
+          {getChoiceInputIcon(icon, isSelected)}
         </Slot>
       </label>
     </>

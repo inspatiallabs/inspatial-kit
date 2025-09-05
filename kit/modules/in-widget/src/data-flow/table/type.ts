@@ -114,7 +114,7 @@ export type TableProps<TData, TValue> = TablePrimitiveProps & {
   onRowChecked?: (row: TData, checked: boolean) => void;
   allChecked?: boolean;
   onAllChecked?: (checked: boolean) => void;
-  checkedRows: Set<string>;
+  checkedRows: Set<string> | { get(): Set<string> };
   contextMenuActions?: ContextMenuActionProps<TData>[];
   dockMenuActions?: DockProps[];
 

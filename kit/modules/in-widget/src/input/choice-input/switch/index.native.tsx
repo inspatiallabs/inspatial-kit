@@ -19,8 +19,8 @@ export function Switch(props: SwitchProps) {
     size,
     radius,
     disabled,
-    checked = false,
-    defaultChecked,
+    selected = false,
+    defaultSelected,
     onChange,
     icon,
     $ref,
@@ -34,12 +34,12 @@ export function Switch(props: SwitchProps) {
   const wrapperProps = { disabled, className } as const;
 
   /**************************(State)**************************/
-  const isChosen = checked === true;
+  const isSelected = selected === true;
 
   /**************************(Handlers)**************************/
   const handleChange = (event: any) => {
-    const newChecked = event?.target?.checked ?? !isChosen;
-    onChange?.(newChecked);
+    const newSelected = event?.target?.checked ?? !isSelected;
+    onChange?.(newSelected);
   };
 
   /**************************(Render)**************************/
@@ -50,18 +50,21 @@ export function Switch(props: SwitchProps) {
         <input
           type="checkbox"
           className={iss(SwitchStyle.input.getStyle({}))}
-          checked={isChosen}
+          checked={isSelected}
           disabled={disabled}
-          defaultChecked={defaultChecked}
+          defaultChecked={defaultSelected}
           on:input={handleChange}
           on:change={handleChange}
           $ref={$ref}
           {...rest}
         />
         {(() => {
-          const { className: trackClassName, ...trackRest } = children?.track ?? {};
-          const { className: handleClassName, ...handleRest } = children?.handle ?? {};
-          const { className: iconClassName, ...iconRest } = children?.icon ?? {};
+          const { className: trackClassName, ...trackRest } =
+            children?.track ?? {};
+          const { className: handleClassName, ...handleRest } =
+            children?.handle ?? {};
+          const { className: iconClassName, ...iconRest } =
+            children?.icon ?? {};
 
           return (
             <Slot
@@ -71,7 +74,7 @@ export function Switch(props: SwitchProps) {
                   className: trackClassName,
                 })
               )}
-              data-checked={isChosen}
+              data-checked={isSelected}
               {...trackRest}
             >
               <Slot
@@ -82,7 +85,7 @@ export function Switch(props: SwitchProps) {
                     className: handleClassName,
                   })
                 )}
-                data-checked={isChosen}
+                data-checked={isSelected}
                 {...handleRest}
               >
                 <Slot
@@ -91,7 +94,7 @@ export function Switch(props: SwitchProps) {
                   )}
                   {...iconRest}
                 >
-                  {getChoiceInputIcon(icon, isChosen)}
+                  {getChoiceInputIcon(icon, isSelected)}
                 </Slot>
               </Slot>
             </Slot>

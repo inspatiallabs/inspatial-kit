@@ -85,6 +85,10 @@ export function Table<TData, TValue>({
 
   const inputChoiceColumn: ColumnDef<TData, any> = {
     id: "select",
+    size: 56,
+    minSize: 32,
+    maxSize: 56,
+    enableResizing: false as any,
     header: ({ table }) => (
       <Slot
         style={{
@@ -105,6 +109,7 @@ export function Table<TData, TValue>({
               : (allChecked as any)
           }
           on:input={(e: any) => {
+            alert("allChecked");
             const checked = e?.target?.checked ?? e;
             onAllChecked?.(!!checked);
           }}
@@ -125,6 +130,8 @@ export function Table<TData, TValue>({
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              width: "56px",
+              maxWidth: "56px",
             },
           }}
         >
@@ -271,7 +278,11 @@ export function Table<TData, TValue>({
           <Choose
             cases={[
               {
-                when: () => headerState.hover.get(),
+                when: () =>
+                  headerState.hover.get() &&
+                  String(col?.id ?? "")
+                    .trim()
+                    .toLowerCase() !== "id",
                 children: () => (
                   <XStack
                     gap={1}
@@ -437,7 +448,19 @@ export function Table<TData, TValue>({
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
                     /*********************************(Table Header Columns)*********************************/
-                    <TableHeaderColumn key={header.id}>
+                    <TableHeaderColumn
+                      key={header.id}
+                      style={{
+                        web:
+                          String(header?.column?.id ?? "") === "select"
+                            ? { width: "56px", maxWidth: "56px", padding: "0" }
+                            : String(header?.column?.id ?? "")
+                                .trim()
+                                .toLowerCase() === "id"
+                            ? { width: "70px", maxWidth: "70px" }
+                            : {},
+                      }}
+                    >
                       {header.isPlaceholder ? null : typeof header.column
                           .columnDef.header === "function" ? (
                         cellRender(
@@ -494,7 +517,19 @@ export function Table<TData, TValue>({
                   }}
                 >
                   {row.getVisibleCells().map((cell: any, hover: boolean) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      style={{
+                        web:
+                          String((cell?.column?.id ?? "") as any) === "select"
+                            ? { width: "56px", maxWidth: "56px", padding: "0" }
+                            : String((cell?.column?.id ?? "") as any)
+                                .trim()
+                                .toLowerCase() === "id"
+                            ? { width: "70px", maxWidth: "70px" }
+                            : {},
+                      }}
+                    >
                       {(() => {
                         const isIdCol =
                           String(cell.column?.id ?? "")

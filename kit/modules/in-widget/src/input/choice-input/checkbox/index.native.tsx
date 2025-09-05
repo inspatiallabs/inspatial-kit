@@ -14,7 +14,7 @@ export function Checkbox(props: CheckboxProps) {
     size,
     radius,
     disabled,
-    checked = false,
+    selected = false,
     icon,
     $ref,
     ...rest
@@ -29,8 +29,8 @@ export function Checkbox(props: CheckboxProps) {
   } as const;
 
   /**************************(State)**************************/
-  const isChosen = checked === true;
-  const isIndeterminate = checked === "indeterminate";
+  const isSelected = selected === true;
+  const isIndeterminate = selected === "indeterminate";
 
   /**************************(Render)**************************/
   return (
@@ -39,17 +39,17 @@ export function Checkbox(props: CheckboxProps) {
         <input
           type="checkbox"
           className={iss(CheckboxStyle.input.getStyle(styleProps))}
-          checked={isChosen}
+          checked={isSelected}
           disabled={disabled}
           $ref={$ref}
           {...rest}
         />
         <Slot
           className={iss(CheckboxStyle.indicator.getStyle(styleProps))}
-          data-checked={isChosen}
+          data-checked={isSelected}
           data-indeterminate={isIndeterminate}
         >
-          {getChoiceInputIcon(icon, isChosen)}
+          {getChoiceInputIcon(icon, isSelected)}
         </Slot>
       </label>
     </>

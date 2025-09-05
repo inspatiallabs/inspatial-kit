@@ -7,8 +7,8 @@ type RadioIndicatorProps = StyleProps<typeof RadioStyle.indicator>;
 
 export type RadioProps = StyleProps<typeof RadioStyle.wrapper> &
   JSX.SharedProps & {
-    checked?: boolean;
-    defaultChecked?: boolean;
+    selected?: boolean;
+    defaultSelected?: boolean;
     name?: string;
     value?: string | number;
     format?: RadioIndicatorProps["format"];

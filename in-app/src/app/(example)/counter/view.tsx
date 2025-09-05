@@ -11,7 +11,7 @@ import {
 } from "@inspatial/kit/data-flow";
 import { Show } from "@inspatial/kit/control-flow";
 import { View, Slot, XStack, YStack } from "@inspatial/kit/structure";
-import { Button } from "@inspatial/kit/ornament";
+import { Button, TabWrapper, TabTrigger } from "@inspatial/kit/ornament";
 import { Modal, Drawer, Dock } from "@inspatial/kit/presentation";
 import { Switch, Checkbox, Radio } from "@inspatial/kit/input";
 import { SecurityKeyIcon, ArrowSwapIcon } from "@inspatial/kit/icon";
@@ -19,6 +19,7 @@ import {
   useCounter,
   useCounterExplicit,
   useEnhancedExplicit,
+  useStorageEnhanced,
   handleCounter,
   handleDirectIncrement,
   handleTupleDouble,
@@ -61,6 +62,11 @@ export function CounterView() {
   // Local view state for unified section toggle (trigger | action)
   const unifiedState = createState({
     unifiedSection: "trigger" as "trigger" | "action",
+  });
+
+  // Explicit pattern demo state
+  const explicitDemoState = createState({
+    activeDemo: "config" as "config" | "enhanced" | "storage",
   });
 
   /*******************************(Render)*************************************/
@@ -205,7 +211,7 @@ export function CounterView() {
                 </Text>
                 <Switch
                   id="show-table"
-                  checked={useCounter.showTableBox.get()}
+                  selected={useCounter.showTableBox.get()}
                   icon={<ArrowSwapIcon size="4xs" />}
                   size="md"
                   radius="squared"
@@ -222,7 +228,7 @@ export function CounterView() {
                 </Text>
                 <Checkbox
                   id="show-trigger-props"
-                  checked={useCounter.showTriggerPropsBox.get()}
+                  selected={useCounter.showTriggerPropsBox.get()}
                   format="flat"
                   size="sm"
                   radius="sm"
@@ -242,18 +248,48 @@ export function CounterView() {
                 <Radio
                   name="unified-section"
                   value="trigger"
-                  checked={unifiedState.unifiedSection.get() === "trigger"}
+                  selected={unifiedState.unifiedSection.get() === "trigger"}
                   on:input={() => unifiedState.unifiedSection.set("trigger")}
                   icon="ball"
                 />
                 <Radio
                   name="unified-section"
                   value="action"
-                  checked={unifiedState.unifiedSection.get() === "action"}
+                  selected={unifiedState.unifiedSection.get() === "action"}
                   on:input={() => unifiedState.unifiedSection.set("action")}
                   icon="ball"
                 />
               </XStack>
+
+              {/* Tab Demo controlling Explicit Pattern Demo */}
+              <YStack className="gap-2">
+                <Text className="text-white text-sm">
+                  Explicit Pattern Demo Control
+                </Text>
+                <TabWrapper>
+                  <TabTrigger
+                    value="config"
+                    selected={explicitDemoState.activeDemo.get() === "config"}
+                    on:input={() => explicitDemoState.activeDemo.set("config")}
+                  >
+                    Config
+                  </TabTrigger>
+                  <TabTrigger
+                    value="enhanced"
+                    selected={explicitDemoState.activeDemo.get() === "enhanced"}
+                    on:input={() => explicitDemoState.activeDemo.set("enhanced")}
+                  >
+                    Enhanced
+                  </TabTrigger>
+                  <TabTrigger
+                    value="storage"
+                    selected={explicitDemoState.activeDemo.get() === "storage"}
+                    on:input={() => explicitDemoState.activeDemo.set("storage")}
+                  >
+                    Storage
+                  </TabTrigger>
+                </TabWrapper>
+              </YStack>
             </YStack>
           </Slot>
 
@@ -336,32 +372,47 @@ export function CounterView() {
             </Slot>
           </Show>
 
-          {/* Explicit Pattern Demo */}
-          <Slot className="bg-blue-900 p-4 rounded-lg text-center max-w-md">
-            <h3 className="text-white text-lg mb-2">Explicit Pattern Demo</h3>
-            <Slot className="text-2xl font-bold text-blue-300 mb-2">
-              {useCounterExplicit.count}
+          {/* Dynamic Explicit Pattern Demo controlled by tabs */}
+          <Show when={explicitDemoState.activeDemo.get() === "config"}>
+            <Slot className="bg-blue-900 p-4 rounded-lg text-center max-w-md">
+              <h3 className="text-white text-lg mb-2">
+                📋 Config Pattern Demo
+              </h3>
+              <Slot className="text-2xl font-bold text-blue-300 mb-2">
+                {useCounterExplicit.count}
+              </Slot>
+              <Slot className="text-sm text-blue-200 mb-3">
+                {useCounterExplicit.message}
+              </Slot>
+              <Slot className="flex gap-2 justify-center">
+                <Button
+                  className="bg-blue-600 px-3 py-1 rounded text-white text-sm hover:bg-blue-700"
+                  on:tap={() => useCounterExplicit.action.setIncrement()}
+                >
+                  +1 Config
+                </Button>
+                <Button
+                  className="bg-blue-600 px-3 py-1 rounded text-white text-sm hover:bg-blue-700"
+                  on:tap={() =>
+                    useCounterExplicit.action.setMessage(
+                      "Config pattern works!"
+                    )
+                  }
+                >
+                  Update Msg
+                </Button>
+                <Button
+                  className="bg-red-600 px-3 py-1 rounded text-white text-sm hover:bg-red-700"
+                  on:tap={() => {
+                    useCounterExplicit.action.setReset();
+                    useCounterExplicit.action.setResetMessage();
+                  }}
+                >
+                  Reset
+                </Button>
+              </Slot>
             </Slot>
-            <Slot className="text-sm text-blue-200 mb-3">
-              {useCounterExplicit.message}
-            </Slot>
-            <Slot className="flex gap-2 justify-center">
-              <Button
-                className="bg-blue-600 px-3 py-1 rounded text-white text-sm hover:bg-blue-700"
-                on:tap={() => useCounterExplicit.action.setIncrement()}
-              >
-                +1 Config
-              </Button>
-              <Button
-                className="bg-blue-600 px-3 py-1 rounded text-white text-sm hover:bg-blue-700"
-                on:tap={() =>
-                  useCounterExplicit.action.setMessage("Explicit works!")
-                }
-              >
-                Update Msg
-              </Button>
-            </Slot>
-          </Slot>
+          </Show>
 
           <Show
             when={$(() => useCounter.count >= 10)}
@@ -608,85 +659,146 @@ export function CounterView() {
             </Slot>
           </Show>
 
-          {/* Enhanced Explicit Pattern Test */}
-          <Slot className="bg-purple-900 p-6 rounded-lg text-center max-w-md">
-            <h3 className="text-white text-lg mb-4">
-              🚀 Enhanced Explicit Pattern
-            </h3>
+          {/* Enhanced Explicit Pattern - shown when enhanced tab is selected */}
+          <Show when={explicitDemoState.activeDemo.get() === "enhanced"}>
+            <Slot className="bg-purple-900 p-6 rounded-lg text-center max-w-md">
+              <h3 className="text-white text-lg mb-4">
+                🚀 Enhanced Explicit Pattern
+              </h3>
 
-            <Slot className="bg-purple-800 p-3 rounded mb-4">
-              <Slot className="text-2xl font-bold text-purple-200 mb-2">
-                {useEnhancedExplicit.advancedCount}
+              <Slot className="bg-purple-800 p-3 rounded mb-4">
+                <Slot className="text-2xl font-bold text-purple-200 mb-2">
+                  {useEnhancedExplicit.advancedCount}
+                </Slot>
+                <Slot className="text-sm text-purple-300">
+                  {useEnhancedExplicit.status}
+                </Slot>
               </Slot>
-              <Slot className="text-sm text-purple-300">
-                {useEnhancedExplicit.status}
+
+              <Slot className="grid grid-cols-2 gap-2 text-xs">
+                {/* Traditional trigger */}
+                <Button
+                  className="bg-purple-600 px-2 py-2 rounded text-white hover:bg-purple-700"
+                  on:tap={() => useEnhancedExplicit.action.setIncrement(1)}
+                >
+                  +1 Traditional
+                </Button>
+
+                {/* Cross-state sync */}
+                <Button
+                  className="bg-indigo-600 px-2 py-2 rounded text-white hover:bg-indigo-700"
+                  on:tap={() =>
+                    useEnhancedExplicit.action.setSyncWithOtherStates()
+                  }
+                >
+                  🌐 Sync States
+                </Button>
+
+                {/* External state targeting */}
+                <Button
+                  className="bg-pink-600 px-2 py-2 rounded text-white hover:bg-pink-700"
+                  on:tap={() =>
+                    useEnhancedExplicit.action.setIncrementExternalState()
+                  }
+                >
+                  📍 +10 External
+                </Button>
+
+                {/* Update status */}
+                <Button
+                  className="bg-cyan-600 px-2 py-2 rounded text-white hover:bg-cyan-700"
+                  on:tap={() =>
+                    useEnhancedExplicit.action.setUpdateStatus(
+                      "Enhanced works!"
+                    )
+                  }
+                >
+                  💬 Update Status
+                </Button>
+
+                {/* Dynamic trigger test */}
+                <Button
+                  className="bg-yellow-600 px-2 py-2 rounded text-white hover:bg-yellow-700 col-span-2"
+                  on:tap={() => {
+                    useEnhancedExplicit.addAction?.("testTrigger", {
+                      key: "advancedCount",
+                      fn: (current: number) => current + 50,
+                      options: { name: "test-runtime-trigger" },
+                    });
+                    // Use the newly added trigger
+                    (useEnhancedExplicit.action as any).testTrigger?.();
+                  }}
+                >
+                  🔥 Add & Use Dynamic Trigger (+50)
+                </Button>
+              </Slot>
+
+              <Slot className="mt-4 text-xs text-purple-300 border-t border-purple-700 pt-3">
+                <strong>Enhanced Features:</strong>
+                <br />✅ Cross-state operations
+                <br />✅ External state targeting
+                <br />✅ Dynamic trigger management
+                <br />✅ Same power as separation pattern!
               </Slot>
             </Slot>
+          </Show>
 
-            <Slot className="grid grid-cols-2 gap-2 text-xs">
-              {/* Traditional trigger */}
-              <Button
-                className="bg-purple-600 px-2 py-2 rounded text-white hover:bg-purple-700"
-                on:tap={() => useEnhancedExplicit.action.setIncrement(1)}
-              >
-                +1 Traditional
-              </Button>
+          {/* Storage Pattern Demo - shown when storage tab is selected */}
+          <Show when={explicitDemoState.activeDemo.get() === "storage"}>
+            <Slot className="bg-green-900 p-6 rounded-lg text-center max-w-md">
+              <h3 className="text-white text-lg mb-4">
+                💾 Storage Enhanced Pattern
+              </h3>
 
-              {/* Cross-state sync */}
-              <Button
-                className="bg-indigo-600 px-2 py-2 rounded text-white hover:bg-indigo-700"
-                on:tap={() =>
-                  useEnhancedExplicit.action.setSyncWithOtherStates()
-                }
-              >
-                🌐 Sync States
-              </Button>
+              <Slot className="bg-green-800 p-3 rounded mb-4">
+                <Slot className="text-2xl font-bold text-green-200 mb-2">
+                  {useStorageEnhanced.count}
+                </Slot>
+                <Slot className="text-sm text-green-300 mb-1">
+                  Data: {useStorageEnhanced.data}
+                </Slot>
+                <Slot className="text-xs text-green-400">
+                  Temp: {useStorageEnhanced.temp}
+                </Slot>
+              </Slot>
 
-              {/* External state targeting */}
-              <Button
-                className="bg-pink-600 px-2 py-2 rounded text-white hover:bg-pink-700"
-                on:tap={() =>
-                  useEnhancedExplicit.action.setIncrementExternalState()
-                }
-              >
-                📍 +10 External
-              </Button>
+              <Slot className="grid grid-cols-2 gap-2 text-xs">
+                <Button
+                  className="bg-green-600 px-2 py-2 rounded text-white hover:bg-green-700"
+                  on:tap={() => useStorageEnhanced.action.setIncrementCount()}
+                >
+                  +1 Count
+                </Button>
+                <Button
+                  className="bg-teal-600 px-2 py-2 rounded text-white hover:bg-teal-700"
+                  on:tap={() =>
+                    useStorageEnhanced.action.setUpdateData("Updated!")
+                  }
+                >
+                  Update Data
+                </Button>
+                <Button
+                  className="bg-cyan-600 px-2 py-2 rounded text-white hover:bg-cyan-700 col-span-2"
+                  on:tap={() =>
+                    useStorageEnhanced.action.setUpdateTemp("Session temp!")
+                  }
+                >
+                  Update Temp (Session Only)
+                </Button>
+              </Slot>
 
-              {/* Update status */}
-              <Button
-                className="bg-cyan-600 px-2 py-2 rounded text-white hover:bg-cyan-700"
-                on:tap={() =>
-                  useEnhancedExplicit.action.setUpdateStatus("Testing!")
-                }
-              >
-                💬 Update Status
-              </Button>
-
-              {/* Dynamic trigger test */}
-              <Button
-                className="bg-yellow-600 px-2 py-2 rounded text-white hover:bg-yellow-700 col-span-2"
-                on:tap={() => {
-                  useEnhancedExplicit.addAction?.("testTrigger", {
-                    key: "advancedCount",
-                    fn: (current: number) => current + 50,
-                    options: { name: "test-runtime-trigger" },
-                  });
-                  // Use the newly added trigger
-                  (useEnhancedExplicit.action as any).testTrigger?.();
-                }}
-              >
-                🔥 Add & Use Dynamic Trigger (+50)
-              </Button>
+              <Slot className="mt-4 text-xs text-green-300 border-t border-green-700 pt-3">
+                <strong>Storage Features:</strong>
+                <br />
+                💾 Multiple storage backends
+                <br />
+                🎯 Selective persistence
+                <br />⚡ Runtime storage management
+                <br />
+                🔄 Automatic serialization
+              </Slot>
             </Slot>
-
-            <Slot className="mt-4 text-xs text-purple-300 border-t border-purple-700 pt-3">
-              <strong>Enhanced Features:</strong>
-              <br />✅ Cross-state operations
-              <br />✅ External state targeting
-              <br />✅ Dynamic trigger management
-              <br />✅ Same power as separation pattern!
-            </Slot>
-          </Slot>
+          </Show>
         </Slot>
       </View>
     </>

@@ -16,6 +16,7 @@ export function useTableState<TData>() {
       columnFilters: [] as ColumnFilter[],
       columnVisibility: {} as VisibilityState,
       pagination: { pageIndex: 0, pageSize: 13 } as PaginationState,
+      rowSelection: {} as Record<string, boolean>,
       contextMenu: null as { x: number; y: number; row: TData } | null,
     },
     action: {
@@ -35,9 +36,13 @@ export function useTableState<TData>() {
         key: "pagination",
         fn: (_: PaginationState, _v: PaginationState) => _v,
       },
+      setRowSelection: {
+        key: "rowSelection",
+        fn: (_: Record<string, boolean>, _v: Record<string, boolean>) => _v,
+      },
       openContextMenu: {
         key: "contextMenu",
-        fn: (
+        fn: (    
           _: { x: number; y: number; row: TData } | null,
           _p: { x: number; y: number; row: TData }
         ) => _p,
