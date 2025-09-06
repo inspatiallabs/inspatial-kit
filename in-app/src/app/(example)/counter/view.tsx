@@ -11,7 +11,7 @@ import {
 } from "@inspatial/kit/data-flow";
 import { Show } from "@inspatial/kit/control-flow";
 import { View, Slot, XStack, YStack } from "@inspatial/kit/structure";
-import { Button, TabWrapper, TabTrigger } from "@inspatial/kit/ornament";
+import { Button, Tab } from "@inspatial/kit/ornament";
 import { Modal, Drawer, Dock } from "@inspatial/kit/presentation";
 import { Switch, Checkbox, Radio } from "@inspatial/kit/input";
 import { SecurityKeyIcon, ArrowSwapIcon } from "@inspatial/kit/icon";
@@ -266,29 +266,17 @@ export function CounterView() {
                 <Text className="text-white text-sm">
                   Explicit Pattern Demo Control
                 </Text>
-                <TabWrapper>
-                  <TabTrigger
-                    value="config"
-                    selected={explicitDemoState.activeDemo.get() === "config"}
-                    on:input={() => explicitDemoState.activeDemo.set("config")}
-                  >
-                    Config
-                  </TabTrigger>
-                  <TabTrigger
-                    value="enhanced"
-                    selected={explicitDemoState.activeDemo.get() === "enhanced"}
-                    on:input={() => explicitDemoState.activeDemo.set("enhanced")}
-                  >
-                    Enhanced
-                  </TabTrigger>
-                  <TabTrigger
-                    value="storage"
-                    selected={explicitDemoState.activeDemo.get() === "storage"}
-                    on:input={() => explicitDemoState.activeDemo.set("storage")}
-                  >
-                    Storage
-                  </TabTrigger>
-                </TabWrapper>
+                <Tab
+                  selected={explicitDemoState.activeDemo.get()}
+                  on:input={(value: any) =>
+                    explicitDemoState.activeDemo.set(value)
+                  }
+                  children={[
+                    { label: "C", value: "config" },
+                    { label: "S", value: "storage" },
+                    { label: "E", value: "enhanced" },
+                  ]}
+                />
               </YStack>
             </YStack>
           </Slot>

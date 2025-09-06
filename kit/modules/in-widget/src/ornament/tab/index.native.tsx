@@ -1,81 +1,96 @@
-import { composeStyle, iss } from "@in/style";
+import { iss } from "@in/style";
 import { TabStyle } from "./style.ts";
-import type { TabWrapperProps, TabTriggerProps } from "./type.ts";
+import type { TabItemProps, TabProps } from "./type.ts";
 import { Slot } from "@in/widget/structure/index.ts";
 
-/*##############################(TAB WRAPPER)####################################*/
+/*##############################(TAB)####################################*/
 
-export function TabWrapper(props: TabWrapperProps) {
-  /**************************(Props)**************************/
-  const { className, children, $ref, ...rest } = props;
-
-  /**************************(Render)**************************/
-  return (
-    <Slot
-      className={iss(TabStyle.wrapper.getStyle({ className }))}
-      role="tablist"
-      $ref={$ref}
-      {...rest}
-    >
-      {children}
-    </Slot>
-  );
-}
-
-/*##############################(TAB TRIGGER)####################################*/
-
-// Create composed style for cross-references to work (like Switch)
-const composedTabStyle = composeStyle(
-  TabStyle.trigger.getStyle,
-  TabStyle.label.getStyle
-);
-
-export function TabTrigger(props: TabTriggerProps) {
+export function Tab(props: TabProps) {
   /**************************(Props)**************************/
   const {
     className,
-    value,
-    selected = false,
-    defaultSelected,
-    onChange,
     children,
+    selected,
+    format,
+    size,
+    radius,
+    disabled = false,
+    onChange,
     $ref,
     ...rest
   } = props;
 
-  /**************************(State)**************************/
-  const isSelected = selected === true;
-
   /**************************(Handlers)**************************/
-  const handleChange = (event: any) => {
-    const newChecked = event?.target?.checked ?? !isSelected;
-    onChange?.(newChecked);
+  const handleChange = (value: string) => {
+    onChange?.(value);
   };
 
   /**************************(Render)**************************/
+
+  // Pre-evaluate trigger style to register context BEFORE wrapper evaluates
+  // This ensures cross-style composition works
+  if (format) {
+    TabStyle.trigger.getStyle({ format });
+  }
+
   return (
-    <>
-      <label className={iss(TabStyle.trigger.getStyle({ className }))}>
-        <input
-          type="radio"
-          className={iss(TabStyle.input.getStyle({}))}
-          name="inspatial-tab"
-          value={value}
-          checked={isSelected}
-          defaultChecked={defaultSelected}
-          on:input={handleChange}
-          on:change={handleChange}
-          $ref={$ref}
-          {...rest}
-        />
-        {/* Label is the visual part, like handle in Switch */}
-        <Slot
-          className={iss(TabStyle.label.getStyle({}))}
-          data-checked={isSelected}
-        >
-          {children}
-        </Slot>
-      </label>
-    </>
+    <Slot
+      className={iss(
+        TabStyle.wrapper.getStyle({
+          disabled,
+          className,
+        })
+      )}
+      role="tablist"
+      $ref={$ref}
+      {...rest}
+    >
+      {children?.map((item: TabItemProps) => {
+        const isSelected = selected === item.value;
+
+        return (
+          <label
+            key={item.value}
+            style={{
+              web: {
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "100%",
+                width: "100%",
+              },
+            }}
+          >
+            <input
+              type="radio"
+              className={iss(TabStyle.input.getStyle())}
+              name="inspatial-tab"
+              value={item.value}
+              checked={isSelected}
+              disabled={disabled || item.disabled}
+              on:input={() => handleChange(item.value)}
+              on:change={() => handleChange(item.value)}
+              {...rest}
+            />
+
+            <Slot
+              className={iss(
+                TabStyle.trigger.getStyle({
+                  className,
+                  format,
+                  disabled: disabled || item.disabled,
+                })
+              )}
+              data-checked={isSelected}
+              {...rest}
+            >
+              {/* Trigger visual content */}
+              {item.icon && <Slot className="tab-icon">{item.icon}</Slot>}
+              {item.label}
+            </Slot>
+          </label>
+        );
+      })}
+    </Slot>
   );
 }

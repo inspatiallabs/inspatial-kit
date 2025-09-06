@@ -1,10 +1,11 @@
 import { createStyle } from "@in/style";
+import { ThemeDisabled, ThemeRadius } from "@in/widget/theme/style.ts";
 
 //##############################################( CREATE STYLE)##############################################//
 
 export const TabStyle = {
   /*******************************(Wrapper)********************************/
-  // Wrapper is the background container for all tabs
+  // Wrapper is the container and background for all tabs
   wrapper: createStyle({
     name: "tab-wrapper",
     base: [
@@ -12,85 +13,262 @@ export const TabStyle = {
         web: {
           display: "inline-flex",
           alignItems: "center",
-          justifyContent: "flex-start",
-          gap: "4px",
-          padding: "4px",
-          borderRadius: "12px",
-          backgroundColor: "rgba(255, 255, 255, 0.05)",
-          width: "fit-content",
+          cursor: "pointer",
+          userSelect: "none",
+          overflow: "hidden",
+        },
+      },
+    ],
+    settings: {
+      radius: ThemeRadius,
+      disabled: ThemeDisabled,
+    },
+    defaultSettings: {
+      radius: "full",
+      disabled: false,
+    },
+    composition: [
+      {
+        style: {
+          web: {
+            backgroundColor: "var(--background)",
+          },
         },
       },
     ],
   }),
 
   /*******************************(Trigger)********************************/
-  // Trigger is the clickable button (label element)
+  // Trigger is the clickable tab button with visual content e.g label and icon
   trigger: createStyle({
     name: "tab-trigger",
     base: [
       {
         web: {
           position: "relative",
-          display: "inline-flex",
+          display: "flex",
           alignItems: "center",
           justifyContent: "center",
           cursor: "pointer",
           userSelect: "none",
-          transition: "all 200ms",
-          backgroundColor: "transparent",
-          border: "none",
-          outline: "none",
-          padding: "0",
-        //   width: "100%",
-        },
-      },
-    ],
-  }),
 
-  /*******************************(Label)********************************/
-  // Label is the visual content inside the trigger
-  label: createStyle({
-    name: "tab-label",
-    base: [
-      {
-        web: {
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          background: "inherit",
+
+          color: "var(--primary)",
           whiteSpace: "nowrap",
-          fontSize: "14px",
-          fontWeight: "500",
-          transition: "all 200ms",
-          position: "relative",
-          color: "rgba(255, 255, 255, 0.7)",
-          height: "32px",
-          paddingLeft: "16px",
-          paddingRight: "16px",
-          borderRadius: "8px",
-          backgroundColor: "transparent",
 
-          // Hover state
-          "&:hover": {
-            backgroundColor: "rgba(255, 255, 255, 0.08)",
-            color: "rgba(255, 255, 255, 0.9)",
+          fontSize: "12px",
+          fontWeight: "400",
+
+          flex: "1",
+          margin: "4px",
+        },
+      },
+    ],
+    settings: {
+      format: {
+        segmented: [
+          {
+            web: {
+              padding: "4px 8px",
+
+              // Hover state
+              //   "&:hover": {
+              //     backgroundColor: "rgba(255, 255, 255, 0.05)",
+              //   },
+
+              // Checked state - the tab is selected
+              ".peer:checked ~ &": {
+                backgroundColor: "var(--surface)",
+                color: "var(--primary)",
+                boxShadow: "var(--shadow-subtle)",
+              },
+            },
           },
+        ],
+      },
 
-          // Disabled state
-          ".peer:disabled ~ &": {
-            opacity: "0.5",
-            cursor: "not-allowed",
-            pointerEvents: "none",
+      size: {
+        "3xs": [
+          {
+            web: {
+              height: "24px",
+              minWidth: "24px",
+            },
           },
+        ],
+        "2xs": [
+          {
+            web: {
+              height: "28px",
+              minWidth: "28px",
+            },
+          },
+        ],
+        xs: [
+          {
+            web: {
+              height: "32px",
+              minWidth: "32px",
+            },
+          },
+        ],
+        sm: [
+          {
+            web: {
+              height: "36px",
+              minWidth: "36px",
+            },
+          },
+        ],
+        md: [
+          {
+            web: {
+              height: "40px",
+              minWidth: "40px",
+            },
+          },
+        ],
+        lg: [
+          {
+            web: {
+              height: "48px",
+              minWidth: "48px",
+            },
+          },
+        ],
+        xl: [
+          {
+            web: {
+              height: "52px",
+              minWidth: "52px",
+            },
+          },
+        ],
+        "2xl": [
+          {
+            web: {
+              height: "56px",
+              minWidth: "56px",
+            },
+          },
+        ],
+        "3xl": [
+          {
+            web: {
+              height: "64px",
+              minWidth: "64px",
+            },
+          },
+        ],
+      },
+      disabled: ThemeDisabled,
+    },
 
-          // Checked state - the tab is selected
-          ".peer:checked ~ &": {
-            backgroundColor: "rgba(255, 255, 255, 0.15)",
-            color: "white",
-            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.12)",
+    composition: [
+      {
+        "$tab-wrapper.radius": "none",
+        style: {
+          web: {
+            borderRadius: "var(--radius-none)",
+          },
+        },
+      },
+      {
+        "$tab-wrapper.radius": "xs",
+        style: {
+          web: {
+            borderRadius: "var(--radius-xs)",
+          },
+        },
+      },
+      {
+        "$tab-wrapper.radius": "sm",
+        style: {
+          web: {
+            borderRadius: "var(--radius-sm)",
+          },
+        },
+      },
+      {
+        "$tab-wrapper.radius": "md",
+        style: {
+          web: {
+            borderRadius: "var(--radius-md)",
+          },
+        },
+      },
+      {
+        "$tab-wrapper.radius": "base",
+        style: {
+          web: {
+            borderRadius: "var(--radius-base)",
+          },
+        },
+      },
+      {
+        "$tab-wrapper.radius": "lg",
+        style: {
+          web: {
+            borderRadius: "var(--radius-lg)",
+          },
+        },
+      },
+      {
+        "$tab-wrapper.radius": "xl",
+        style: {
+          web: {
+            borderRadius: "var(--radius-xl)",
+          },
+        },
+      },
+      {
+        "$tab-wrapper.radius": "2xl",
+        style: {
+          web: {
+            borderRadius: "var(--radius-2xl)",
+          },
+        },
+      },
+      {
+        "$tab-wrapper.radius": "3xl",
+        style: {
+          web: {
+            borderRadius: "var(--radius-3xl)",
+          },
+        },
+      },
+      {
+        "$tab-wrapper.radius": "4xl",
+        style: {
+          web: {
+            borderRadius: "var(--radius-4xl)",
+          },
+        },
+      },
+      {
+        "$tab-wrapper.radius": "5xl",
+        style: {
+          web: {
+            borderRadius: "var(--radius-5xl)",
+          },
+        },
+      },
+      {
+        "$tab-wrapper.radius": "full",
+        style: {
+          web: {
+            borderRadius: "var(--radius-full)",
           },
         },
       },
     ],
+
+    defaultSettings: {
+      format: "segmented",
+      size: "md",
+      disabled: false,
+    },
   }),
 
   /*******************************(Input)********************************/

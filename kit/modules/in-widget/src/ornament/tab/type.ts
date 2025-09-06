@@ -1,22 +1,25 @@
 import type { StyleProps } from "@in/style";
 import type { TabStyle } from "./style.ts";
 
-/*#################################(TAB WRAPPER)#################################*/
+/*#################################(TAB ITEM PROPS)#################################*/
 
-export type TabWrapperProps = StyleProps<typeof TabStyle.wrapper> &
-  JSX.SharedProps & {};
+export type TabItemProps = JSX.SharedProps & {
+  label: string;
+  value: string;
+  to?: string;
+  icon?: JSX.Element;
+};
 
-export type TabWrapperStyleProps = StyleProps<typeof TabStyle.wrapper>;
-export type TabTriggerStyleProps = StyleProps<typeof TabStyle.trigger>;
-export type TabLabelStyleProps = StyleProps<typeof TabStyle.label>;
-export type TabInputStyleProps = StyleProps<typeof TabStyle.input>;
+/*#################################(TAB PROPS)#################################*/
 
-/*#################################(TAB TRIGGER)#################################*/
+type TabWrapperProps = StyleProps<typeof TabStyle.wrapper>;
+type TabTriggerProps = StyleProps<typeof TabStyle.trigger>;
 
-export type TabTriggerProps = StyleProps<typeof TabStyle.trigger> &
+export type TabProps = TabWrapperProps &
   JSX.SharedProps & {
-    value: string;
-    selected?: boolean;
-    defaultSelected?: boolean;
-    onChange?: (selected: boolean) => void;
+    children?: TabItemProps[];
+    selected?: string;
+
+    // format?: TabTriggerProps["format"];
+    // size?: TabTriggerProps["size"];
   };

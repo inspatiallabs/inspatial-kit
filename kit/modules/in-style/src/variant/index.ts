@@ -1,3 +1,5 @@
+import { styleContextRegistry } from "./context.ts";
+
 /*##############################################(TYPES)##############################################*/
 
 type ClassValueProp =
@@ -986,6 +988,17 @@ function createStyleCore<V extends StyleShapeProp>(
   const style: StyleProp = (config) => (props) => {
     const result = computeProps(config as any, props);
 
+    // Always register this style's context if it has a name
+    if ((config as any).name) {
+      const usedSettings: Record<string, any> = {};
+      if ((config as any).settings) {
+        for (const key of Object.keys((config as any).settings)) {
+          usedSettings[key] = props?.[key] ?? (config as any).defaultSettings?.[key];
+        }
+      }
+      styleContextRegistry.register((config as any).name, usedSettings);
+    }
+
     // If no composition rules, return early
     if (!result.composition || !result.composition.length) {
       return result.className;
@@ -1004,6 +1017,23 @@ function createStyleCore<V extends StyleShapeProp>(
       } = rule || {};
 
       const matches = Object.entries(conds).every(([key, value]) => {
+        // Check for cross-references first (e.g., $tab-trigger.format)
+        if (key.startsWith("$")) {
+          const path = key.substring(1).split(".");
+          const styleName = path[0];
+          const propName = path[1];
+          
+          // Try to get from context registry first
+          const context = styleContextRegistry.getContext(styleName);
+          if (context) {
+            return context.settings[propName] === value;
+          }
+          
+          // Fallback: this might be in a composeStyle context
+          return false;
+        }
+        
+        // Regular composition check
         const pv = result.props?.[key] ?? result.defaultSettings?.[key as any];
         return Array.isArray(value) ? value.includes(pv) : pv === value;
       });
@@ -1035,8 +1065,15 @@ function createStyleCore<V extends StyleShapeProp>(
     (props) => {
       const { class: cls, className, ...styleProps } = props || {};
 
-      // Step 1: Build style context by evaluating each component
-      const styleContext: Record<string, any> = {};
+      // Enable context registry for composed styles
+      const wasActive = styleContextRegistry.isActive();
+      if (!wasActive) {
+        styleContextRegistry.beginEvaluation();
+      }
+
+      try {
+        // Step 1: Build style context by evaluating each component
+        const styleContext: Record<string, any> = {};
       const componentData: Array<{
         classes: string;
         config: any;
@@ -1127,7 +1164,12 @@ function createStyleCore<V extends StyleShapeProp>(
 
       // Use iss to apply intelligent conflict resolution
       return iss(...allClasses);
-    };
+    } finally {
+      if (!wasActive) {
+        styleContextRegistry.endEvaluation();
+      }
+    }
+  };
 
   // Define the placeholder getStyle function
   const getStyle = ((_props?: any) => "") as (
@@ -1203,6 +1245,33 @@ export const style = baseSystem.style;
 
 /** Utility for combining multiple style components */
 export const composeStyle = baseSystem.composeStyle;
+
+/** 
+ * Smart compose that only composes styles with cross-references
+ * This is more efficient than regular composeStyle when you have many styles
+ * but only some need cross-referencing
+ */
+export const composeStyleAuto: ComposeStyleProp = (...components) => {
+  // Check if any component has cross-references
+  const needsComposition = components.some((comp: any) => {
+    const config = comp.__styleConfig;
+    return config?.composition?.some((rule: any) => 
+      Object.keys(rule).some(key => key.startsWith('$'))
+    );
+  });
+
+  // If no cross-references, just combine classes without full composition
+  if (!needsComposition) {
+    return (props) => {
+      const { class: cls, className, ...styleProps } = props || {};
+      const classes = components.map(comp => comp(styleProps as any));
+      return iss(...classes, cls, className);
+    };
+  }
+
+  // Otherwise use full composition
+  return composeStyle(...components);
+};
 
 /*##############################################(CREATE-STYLE)##############################################*/
 /**
@@ -1305,8 +1374,11 @@ export function createStyle<V extends StyleShapeProp>(
     (styleFn as any).__styleName =
       (configOrOptions as InSpatialStyleConfig<V>).name || "self";
 
-    // Also tag the getStyle method
-    const getStyle = styleFn as (
+    // Create a wrapper for getStyle
+    const getStyle = ((props?: any) => {
+      // Simply call the style function - context is handled automatically
+      return styleFn(props);
+    }) as (
       props?: StyleSchemaProp<V> & {
         class?: ClassValueProp;
         className?: ClassValueProp;
@@ -1334,6 +1406,12 @@ export function createStyle<V extends StyleShapeProp>(
  * Used for documentation purposes
  */
 export type StyleReturnType<V extends StyleShapeProp> = StyleSystemReturn<V>;
+
+/** 
+ * Context registry for advanced cross-style composition scenarios
+ * Most users won't need this as it's handled automatically
+ */
+export { styleContextRegistry } from "./context.ts";
 
 export type {
   /** Type for InSpatial Style Sheet class values that can be used in the style system */
