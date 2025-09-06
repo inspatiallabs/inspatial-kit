@@ -31,12 +31,12 @@ export function Tab(props: TabProps) {
     <Slot
       className={iss(
         TabStyle.wrapper.getStyle({
-          radius,
           disabled,
           className,
           class: className,
           format,
           size,
+          radius,
         })
       )}
       role="tablist"
@@ -80,6 +80,8 @@ export function Tab(props: TabProps) {
                 TabStyle.trigger.getStyle({
                   className,
                   format,
+                  radius,
+                  size,
                   disabled: disabled || item.disabled,
                 })
               )}

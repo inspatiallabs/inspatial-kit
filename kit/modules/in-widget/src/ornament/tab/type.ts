@@ -20,6 +20,7 @@ export type TabProps = TabWrapperProps &
     children?: TabItemProps[];
     selected?: string;
 
-    // format?: TabTriggerProps["format"];
-    // size?: TabTriggerProps["size"];
+    format?: TabTriggerProps["format"];
+    size?: TabTriggerProps["size"];
+    radius?: TabTriggerProps["radius"];
   };

@@ -20,11 +20,9 @@ export const TabStyle = {
       },
     ],
     settings: {
-      radius: ThemeRadius,
       disabled: ThemeDisabled,
     },
     defaultSettings: {
-      radius: "full",
       disabled: false,
     },
     composition: [
@@ -41,6 +39,117 @@ export const TabStyle = {
         style: {
           web: {
             backgroundColor: "transparent",
+            borderBottom: "1px solid var(--muted)",
+            borderRadius: "0",
+          },
+        },
+      },
+      // Wrapper conforms to trigger radius
+      {
+        "$tab-trigger.radius": "none",
+        "$tab-trigger.format": "segmented",
+        style: {
+          web: {
+            borderRadius: "var(--radius-none)",
+          },
+        },
+      },
+      {
+        "$tab-trigger.radius": "xs",
+        "$tab-trigger.format": "segmented",
+        style: {
+          web: {
+            borderRadius: "var(--radius-xs)",
+          },
+        },
+      },
+      {
+        "$tab-trigger.radius": "sm",
+        "$tab-trigger.format": "segmented",
+        style: {
+          web: {
+            borderRadius: "var(--radius-sm)",
+          },
+        },
+      },
+      {
+        "$tab-trigger.radius": "md",
+        "$tab-trigger.format": "segmented",
+        style: {
+          web: {
+            borderRadius: "var(--radius-md)",
+          },
+        },
+      },
+      {
+        "$tab-trigger.radius": "base",
+        "$tab-trigger.format": "segmented",
+        style: {
+          web: {
+            borderRadius: "var(--radius-base)",
+          },
+        },
+      },
+      {
+        "$tab-trigger.radius": "lg",
+        "$tab-trigger.format": "segmented",
+        style: {
+          web: {
+            borderRadius: "var(--radius-lg)",
+          },
+        },
+      },
+      {
+        "$tab-trigger.radius": "xl",
+        "$tab-trigger.format": "segmented",
+        style: {
+          web: {
+            borderRadius: "var(--radius-xl)",
+          },
+        },
+      },
+      {
+        "$tab-trigger.radius": "2xl",
+        "$tab-trigger.format": "segmented",
+        style: {
+          web: {
+            borderRadius: "var(--radius-2xl)",
+          },
+        },
+      },
+      {
+        "$tab-trigger.radius": "3xl",
+        "$tab-trigger.format": "segmented",
+        style: {
+          web: {
+            borderRadius: "var(--radius-3xl)",
+          },
+        },
+      },
+      {
+        "$tab-trigger.radius": "4xl",
+        "$tab-trigger.format": "segmented",
+        style: {
+          web: {
+            borderRadius: "var(--radius-4xl)",
+          },
+        },
+      },
+      {
+        "$tab-trigger.radius": "5xl",
+        "$tab-trigger.format": "segmented",
+        style: {
+          web: {
+            borderRadius: "var(--radius-5xl)",
+          },
+        },
+      },
+      {
+        "$tab-trigger.radius": "full",
+        "$tab-trigger.format": "segmented",
+        style: {
+          web: {
+            borderRadius: "var(--radius-full)",
           },
         },
       },
@@ -70,7 +179,6 @@ export const TabStyle = {
           fontWeight: "400",
 
           flex: "1",
-          //   margin: "4px",
         },
       },
     ],
@@ -98,8 +206,6 @@ export const TabStyle = {
         underline: [
           {
             web: {
-              //   padding: "4px 8px",
-
               // Hover state
               //   "&:hover": {
               //     backgroundColor: "rgba(255, 255, 255, 0.05)",
@@ -108,12 +214,14 @@ export const TabStyle = {
               // Checked state - the tab is selected
               ".peer:checked ~ &": {
                 color: "var(--primary)",
-                borderBottom: "2px solid var(--primary)",
+                borderBottom: "4px solid var(--brand)",
               },
             },
           },
         ],
       },
+
+      radius: ThemeRadius,
 
       size: {
         "3xs": [
@@ -192,108 +300,10 @@ export const TabStyle = {
       disabled: ThemeDisabled,
     },
 
-    composition: [
-      {
-        "$tab-wrapper.radius": "none",
-        style: {
-          web: {
-            borderRadius: "var(--radius-none)",
-          },
-        },
-      },
-      {
-        "$tab-wrapper.radius": "xs",
-        style: {
-          web: {
-            borderRadius: "var(--radius-xs)",
-          },
-        },
-      },
-      {
-        "$tab-wrapper.radius": "sm",
-        style: {
-          web: {
-            borderRadius: "var(--radius-sm)",
-          },
-        },
-      },
-      {
-        "$tab-wrapper.radius": "md",
-        style: {
-          web: {
-            borderRadius: "var(--radius-md)",
-          },
-        },
-      },
-      {
-        "$tab-wrapper.radius": "base",
-        style: {
-          web: {
-            borderRadius: "var(--radius-base)",
-          },
-        },
-      },
-      {
-        "$tab-wrapper.radius": "lg",
-        style: {
-          web: {
-            borderRadius: "var(--radius-lg)",
-          },
-        },
-      },
-      {
-        "$tab-wrapper.radius": "xl",
-        style: {
-          web: {
-            borderRadius: "var(--radius-xl)",
-          },
-        },
-      },
-      {
-        "$tab-wrapper.radius": "2xl",
-        style: {
-          web: {
-            borderRadius: "var(--radius-2xl)",
-          },
-        },
-      },
-      {
-        "$tab-wrapper.radius": "3xl",
-        style: {
-          web: {
-            borderRadius: "var(--radius-3xl)",
-          },
-        },
-      },
-      {
-        "$tab-wrapper.radius": "4xl",
-        style: {
-          web: {
-            borderRadius: "var(--radius-4xl)",
-          },
-        },
-      },
-      {
-        "$tab-wrapper.radius": "5xl",
-        style: {
-          web: {
-            borderRadius: "var(--radius-5xl)",
-          },
-        },
-      },
-      {
-        "$tab-wrapper.radius": "full",
-        style: {
-          web: {
-            borderRadius: "var(--radius-full)",
-          },
-        },
-      },
-    ],
-
     defaultSettings: {
       format: "segmented",
       size: "md",
+      radius: "none",
       disabled: false,
     },
   }),
