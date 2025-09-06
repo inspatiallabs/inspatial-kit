@@ -1062,7 +1062,7 @@ Imagine you're building a switch component where the handle needs to position it
 
 This is especially powerful for complex UI components where child elements need to adapt based on parent or sibling configurations, like handles adjusting to track sizes, or icons changing based on button variants.
 
-> **Note:** Cross-style composition only works when styles are composed together using the `composeStyle` function. Individual styles called separately don't have access to each other's context.
+> **Note:** ✨ Cross-style composition now works **automatically** when styles have `name` properties! The system detects cross-references and handles composition transparently. You can still use `composeStyle` manually for advanced use cases.
 
 > **Terminology:** The `$` prefix in composition rules tells the system "look at another style's setting" rather than your own style's setting.
 
@@ -1076,15 +1076,15 @@ const handleStyle = createStyle({
   composition: [
     {
       trackSize: "sm", // This only looks at handle's own settings
-      style: { web: { left: "1px" } }
-    }
-  ]
+      style: { web: { left: "1px" } },
+    },
+  ],
 });
 ```
 
-##### The Solution: Named Styles and Cross-References
+##### The Solution: Named Styles and Automatic Cross-References
 
-First, give your styles names so they can reference each other:
+✨ **Just give your styles names** - the system handles the rest automatically:
 
 ```typescript
 import { createStyle } from "@inspatial/kit/style";
@@ -1096,9 +1096,9 @@ const track = createStyle({
     size: {
       sm: [{ web: { width: "36px", height: "20px" } }],
       lg: [{ web: { width: "90px", height: "48px" } }],
-    }
+    },
   },
-  defaultSettings: { size: "lg" }
+  defaultSettings: { size: "lg" },
 });
 
 // Handle style that reacts to track's settings
@@ -1114,23 +1114,23 @@ const handle = createStyle({
           width: "16px",
           height: "16px",
           ".peer:checked ~ * &": {
-            transform: "translateY(-50%) translateX(100%)"
-          }
-        }
-      }
+            transform: "translateY(-50%) translateX(100%)",
+          },
+        },
+      },
     },
     {
-      "$switch-track.size": "lg", // When track is large  
+      "$switch-track.size": "lg", // When track is large
       style: {
         web: {
           left: "2px",
           ".peer:checked ~ * &": {
-            transform: "translateY(-50%) translateX(90%)"
-          }
-        }
-      }
-    }
-  ]
+            transform: "translateY(-50%) translateX(90%)",
+          },
+        },
+      },
+    },
+  ],
 });
 ```
 
@@ -1147,52 +1147,91 @@ const handle = createStyle({
       "$switch-track.size": "sm",
       "$switch-track.radius": "squared",
       style: {
-        web: { borderRadius: "2px" } // Special case for small + squared
-      }
-    }
-  ]
+        web: { borderRadius: "2px" }, // Special case for small + squared
+      },
+    },
+  ],
 });
 ```
 
 ##### Using Cross-Style Composition in Components
 
-The magic happens when you use `composeStyle` to bring everything together:
+✨ **Automatic Cross-Reference** - InSpatial's style system automatically handles cross-style composition when styles have `name` properties and use `$style-name.prop` references:
 
 ```typescript
-import { composeStyle, iss } from "@inspatial/kit/style";
+import { iss } from "@inspatial/kit/style";
 
-// ❌ Without composeStyle - styles don't know about each other
-function SwitchBroken(props) {
+// ✅ Automatic composition - just works!
+function Switch(props) {
   return (
     <label>
       <input type="checkbox" />
       <div className={iss(SwitchStyle.track.getStyle(props))}>
         <div className={iss(SwitchStyle.handle.getStyle(props))}>
-          {/* Handle can't react to track's size */}
+          {/* Handle automatically reacts to track's size! */}
+          {/* No manual composition needed */}
         </div>
       </div>
     </label>
   );
 }
-
-// ✅ With composeStyle - styles can cross-reference each other
-function Switch(props) {
-  // Create composed style that knows about all related styles
-  const composedSwitchStyle = composeStyle(
-    SwitchStyle.track.getStyle,
-    SwitchStyle.handle.getStyle
-  );
-
-  return (
-    <label>
-      <input type="checkbox" />
-      <div className={iss(composedSwitchStyle(props))}>
-        {/* Now handle can react to track's size! */}
-      </div>
-    </label>
-  );
-}
 ```
+
+<details>
+<summary><strong>How Automatic Cross-Style Composition Works</strong></summary>
+
+InSpatial's style system uses a **Context API** and **Global Registry** to automatically handle cross-style dependencies:
+
+**1. Style Registration**
+When you create a style with a `name`, it's automatically registered:
+
+```typescript
+const SwitchHandle = createStyle({
+  name: "switch-handle", // ← Automatically registered
+  composition: [
+    {
+      "$switch-track.size": "lg", // ← Dependency detected
+      style: {
+        /* ... */
+      },
+    },
+  ],
+});
+```
+
+**2. Dependency Detection**
+The system scans composition rules for `$style-name.prop` patterns and tracks dependencies.
+
+**3. Automatic Composition**
+When `SwitchHandle.getStyle()` is called:
+
+- System detects cross-references to `switch-track`
+- Automatically finds and includes the `SwitchTrack` style
+- Composes them together transparently
+- Returns the fully composed className
+
+**4. Context Sharing**
+Styles share their settings through a reactive context registry, enabling real-time cross-references.
+
+**Manual Override (Optional)**
+If you need explicit control, you can still use `composeStyle`:
+
+```typescript
+// Manual composition for advanced use cases
+const composedStyle = composeStyle(
+  SwitchStyle.track.getStyle,
+  SwitchStyle.handle.getStyle
+);
+```
+
+**Performance**
+
+- Zero overhead when no cross-references exist
+- Lazy composition only when needed
+- Cached results for repeated calls
+- Reactive updates when dependencies change
+
+</details>
 
 ##### Real-World Example: Complete Switch Component
 
@@ -1207,18 +1246,18 @@ export const SwitchStyle = {
     settings: {
       size: {
         sm: [{ web: { width: "36px", height: "20px" } }],
-        lg: [{ web: { width: "90px", height: "48px" } }]
+        lg: [{ web: { width: "90px", height: "48px" } }],
       },
       radius: {
         rounded: [{ web: { borderRadius: "9999px" } }],
-        squared: [{ web: { borderRadius: "4px" } }]
-      }
+        squared: [{ web: { borderRadius: "4px" } }],
+      },
     },
-    defaultSettings: { size: "lg", radius: "rounded" }
+    defaultSettings: { size: "lg", radius: "rounded" },
   }),
 
   handle: createStyle({
-    name: "switch-handle", 
+    name: "switch-handle",
     base: [{ web: { position: "absolute", left: "2px", top: "50%" } }],
     composition: [
       // React to track size
@@ -1226,46 +1265,43 @@ export const SwitchStyle = {
         "$switch-track.size": "sm",
         style: {
           web: {
-            width: "16px", 
+            width: "16px",
             height: "16px",
             ".peer:checked ~ * &": {
-              transform: "translateY(-50%) translateX(100%)"
-            }
-          }
-        }
+              transform: "translateY(-50%) translateX(100%)",
+            },
+          },
+        },
       },
       // React to both size AND radius
       {
         "$switch-track.size": "sm",
-        "$switch-track.radius": "squared", 
+        "$switch-track.radius": "squared",
         style: {
-          web: { borderRadius: "2px" } // Override for this combination
-        }
-      }
-    ]
-  })
+          web: { borderRadius: "2px" }, // Override for this combination
+        },
+      },
+    ],
+  }),
 };
 
 // components/Switch.tsx
 export function Switch(props) {
   const { size, radius, checked, onChange } = props;
-  
-  // Compose styles so they can cross-reference
-  const composedStyle = composeStyle(
-    SwitchStyle.track.getStyle,
-    SwitchStyle.handle.getStyle
-  );
 
   return (
     <label className={iss(SwitchStyle.wrapper.getStyle(props))}>
-      <input 
+      <input
         type="checkbox"
         checked={checked}
         onChange={onChange}
         className="sr-only peer"
       />
-      <div className={iss(composedStyle({ size, radius }))}>
-        {/* Handle automatically adjusts based on track settings */}
+      <div className={iss(SwitchStyle.track.getStyle({ size, radius }))}>
+        <div className={iss(SwitchStyle.handle.getStyle({ size, radius }))}>
+          {/* Handle automatically adjusts based on track settings! */}
+          {/* Cross-style composition happens automatically */}
+        </div>
       </div>
     </label>
   );
@@ -1275,38 +1311,46 @@ export function Switch(props) {
 ##### Common Patterns
 
 **Size-based positioning:**
+
 ```typescript
 composition: [
   { "$parent.size": "sm", style: { web: { left: "1px" } } },
-  { "$parent.size": "lg", style: { web: { left: "3px" } } }
-]
+  { "$parent.size": "lg", style: { web: { left: "3px" } } },
+];
 ```
 
 **Theme-aware styling:**
+
 ```typescript
 composition: [
   { "$theme.mode": "dark", style: { web: { backgroundColor: "#333" } } },
-  { "$theme.mode": "light", style: { web: { backgroundColor: "#fff" } } }
-]
+  { "$theme.mode": "light", style: { web: { backgroundColor: "#fff" } } },
+];
 ```
 
 **Multi-condition rules:**
+
 ```typescript
 composition: [
   {
     "$button.size": "lg",
     "$button.variant": "primary",
-    style: { web: { padding: "16px 24px" } }
-  }
-]
+    style: { web: { padding: "16px 24px" } },
+  },
+];
 ```
 
 ##### Important Notes
 
 - **Naming is required:** Styles must have a `name` property to be referenced by others
-- **Use `composeStyle`:** Cross-references only work when styles are composed together
+- **✨ Automatic composition:** Cross-references work automatically - no manual `composeStyle` needed!
+- **Manual override available:** Use `composeStyle` for advanced control when needed
 - **Order matters:** Composition rules are applied in order, later rules can override earlier ones
+- **Zero overhead:** No performance cost when styles don't have cross-references
+
 - **All conditions must match:** When using multiple cross-references, ALL conditions must be true
+
+> **Migration:** Existing `composeStyle` usage continues to work - you can gradually remove manual composition as you add `name` properties to your styles.
 
 ##### Pseudo Selectors and Variable Utilities (in @variant)
 

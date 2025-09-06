@@ -27,26 +27,27 @@ export function Tab(props: TabProps) {
 
   /**************************(Render)**************************/
 
-  // Pre-evaluate trigger style to register context BEFORE wrapper evaluates
-  // This ensures cross-style composition works
-  if (format) {
-    TabStyle.trigger.getStyle({ format });
-  }
-
   return (
     <Slot
       className={iss(
         TabStyle.wrapper.getStyle({
+          radius,
           disabled,
           className,
+          class: className,
+          format,
+          size,
         })
       )}
       role="tablist"
+      aria-orientation="horizontal"
       $ref={$ref}
       {...rest}
     >
-      {children?.map((item: TabItemProps) => {
+      {children?.map((item: TabItemProps, index: number) => {
         const isSelected = selected === item.value;
+        const tabId = `tab-${item.value}`;
+        const panelId = `tabpanel-${item.value}`;
 
         return (
           <label
@@ -70,7 +71,8 @@ export function Tab(props: TabProps) {
               disabled={disabled || item.disabled}
               on:input={() => handleChange(item.value)}
               on:change={() => handleChange(item.value)}
-              {...rest}
+              aria-hidden="true"
+              tabIndex={-1}
             />
 
             <Slot
@@ -81,8 +83,13 @@ export function Tab(props: TabProps) {
                   disabled: disabled || item.disabled,
                 })
               )}
+              role="tab"
+              id={tabId}
+              aria-controls={panelId}
+              aria-selected={isSelected}
+              aria-disabled={disabled || item.disabled}
+              tabIndex={isSelected ? 0 : -1}
               data-checked={isSelected}
-              {...rest}
             >
               {/* Trigger visual content */}
               {item.icon && <Slot className="tab-icon">{item.icon}</Slot>}

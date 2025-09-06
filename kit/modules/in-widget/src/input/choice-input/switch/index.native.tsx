@@ -1,16 +1,10 @@
-import { iss, composeStyle } from "@in/style";
+import { iss } from "@in/style";
 import { SwitchStyle } from "./style.ts";
 import type { SwitchProps } from "./type.ts";
 import { Slot } from "@in/widget/structure/index.ts";
 import { getChoiceInputIcon } from "../helpers.tsx";
 
 /*##############################(SWITCH)####################################*/
-
-// Create composed style for cross-references to work
-const composedSwitchStyle = composeStyle(
-  SwitchStyle.track.getStyle,
-  SwitchStyle.handle.getStyle
-);
 
 export function Switch(props: SwitchProps) {
   /**************************(Props)**************************/
@@ -79,7 +73,7 @@ export function Switch(props: SwitchProps) {
             >
               <Slot
                 className={iss(
-                  composedSwitchStyle({
+                  SwitchStyle.handle.getStyle({
                     ...trackProps,
                     ...handleProps,
                     className: handleClassName,

@@ -1,4 +1,4 @@
-import { createState } from "@in/teract/state";
+import { createState } from "@in/teract/state/index.ts";
 
 /*################################(Types)################################*/
 

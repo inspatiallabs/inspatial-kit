@@ -29,9 +29,18 @@ export const TabStyle = {
     },
     composition: [
       {
+        "$tab-trigger.format": "segmented",
         style: {
           web: {
             backgroundColor: "var(--background)",
+          },
+        },
+      },
+      {
+        "$tab-trigger.format": "underline",
+        style: {
+          web: {
+            backgroundColor: "transparent",
           },
         },
       },
@@ -61,7 +70,7 @@ export const TabStyle = {
           fontWeight: "400",
 
           flex: "1",
-          margin: "4px",
+          //   margin: "4px",
         },
       },
     ],
@@ -70,7 +79,7 @@ export const TabStyle = {
         segmented: [
           {
             web: {
-              padding: "4px 8px",
+              padding: "4px 4px",
 
               // Hover state
               //   "&:hover": {
@@ -82,6 +91,24 @@ export const TabStyle = {
                 backgroundColor: "var(--surface)",
                 color: "var(--primary)",
                 boxShadow: "var(--shadow-subtle)",
+              },
+            },
+          },
+        ],
+        underline: [
+          {
+            web: {
+              //   padding: "4px 8px",
+
+              // Hover state
+              //   "&:hover": {
+              //     backgroundColor: "rgba(255, 255, 255, 0.05)",
+              //   },
+
+              // Checked state - the tab is selected
+              ".peer:checked ~ &": {
+                color: "var(--primary)",
+                borderBottom: "2px solid var(--primary)",
               },
             },
           },

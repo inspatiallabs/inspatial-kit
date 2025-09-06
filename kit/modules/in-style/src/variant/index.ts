@@ -1,4 +1,6 @@
 import { styleContextRegistry } from "./context.ts";
+import { signalStyleContextRegistry } from "./signal-context.ts";
+import { globalStyleRegistry } from "./global-registry.ts";
 
 /*##############################################(TYPES)##############################################*/
 
@@ -996,7 +998,9 @@ function createStyleCore<V extends StyleShapeProp>(
           usedSettings[key] = props?.[key] ?? (config as any).defaultSettings?.[key];
         }
       }
+      // Register in both registries for compatibility
       styleContextRegistry.register((config as any).name, usedSettings);
+      signalStyleContextRegistry.register((config as any).name, usedSettings);
     }
 
     // If no composition rules, return early
@@ -1023,7 +1027,13 @@ function createStyleCore<V extends StyleShapeProp>(
           const styleName = path[0];
           const propName = path[1];
           
-          // Try to get from context registry first
+          // Try signal registry first (reactive)
+          const signalContext = signalStyleContextRegistry.getContext(styleName);
+          if (signalContext) {
+            return signalContext.settings[propName] === value;
+          }
+          
+          // Fallback to regular registry
           const context = styleContextRegistry.getContext(styleName);
           if (context) {
             return context.settings[propName] === value;
@@ -1351,6 +1361,79 @@ export const composeStyleAuto: ComposeStyleProp = (...components) => {
  */
 
 /**
+ * Extract cross-reference dependencies from a style config
+ */
+function extractCrossReferences(config: InSpatialStyleConfig<any>): Set<string> {
+  const deps = new Set<string>();
+  
+  if (config.composition) {
+    for (const rule of config.composition) {
+      for (const key of Object.keys(rule)) {
+        if (key.startsWith('$')) {
+          // Extract style name from $style-name.prop
+          const styleName = key.substring(1).split('.')[0];
+          deps.add(styleName);
+        }
+      }
+    }
+  }
+  
+  return deps;
+}
+
+/**
+ * Smart compose that automatically includes dependencies
+ */
+function smartComposeWithDependencies(
+  primaryStyle: any,
+  primaryConfig: InSpatialStyleConfig<any>,
+  props: any
+): string {
+  const dependencies = extractCrossReferences(primaryConfig);
+  
+  // If no dependencies, just evaluate normally
+  if (dependencies.size === 0) {
+    return primaryStyle(props);
+  }
+  
+  // Collect all styles needed for composition
+  const stylesToCompose: any[] = [];
+  const styleConfigs: any[] = [];
+  
+  // Add all dependencies first (so they register their context)
+  for (const depName of dependencies) {
+    const depEntry = globalStyleRegistry.get(depName);
+    if (depEntry) {
+      stylesToCompose.push(depEntry.system.style(depEntry.config));
+      styleConfigs.push(depEntry.config);
+    }
+  }
+  
+  // Add the primary style last
+  stylesToCompose.push(primaryStyle);
+  styleConfigs.push(primaryConfig);
+  
+  // If we found dependencies, compose them all
+  if (stylesToCompose.length > 1) {
+    // Tag styles with their names for cross-reference
+    stylesToCompose.forEach((style, index) => {
+      const config = styleConfigs[index];
+      if (config.name) {
+        (style as any).__styleName = config.name;
+        (style as any).__styleConfig = config;
+      }
+    });
+    
+    // Compose all styles together
+    const composed = composeStyle(...stylesToCompose);
+    return composed(props);
+  }
+  
+  // Fallback to simple evaluation
+  return primaryStyle(props);
+}
+
+/**
  * Unified implementation of createStyle that handles both usage patterns
  */
 export function createStyle<V extends StyleShapeProp>(
@@ -1366,18 +1449,40 @@ export function createStyle<V extends StyleShapeProp>(
     configOrOptions &&
     ("settings" in configOrOptions || "base" in configOrOptions)
   ) {
-    const styleFn = system.style(configOrOptions as InSpatialStyleConfig<V>);
+    const config = configOrOptions as InSpatialStyleConfig<V>;
+    const styleName = config.name;
+    
+    // Extract dependencies
+    const dependencies = extractCrossReferences(config);
+    
+    // Create the base style function
+    const styleFn = system.style(config);
+    
+    // Register in global registry if named
+    if (styleName) {
+      globalStyleRegistry.register(styleName, {
+        name: styleName,
+        config,
+        system,
+        dependencies
+      });
+      
+      // Also track in signal registry for compatibility
+      if (dependencies.size > 0) {
+        for (const dep of dependencies) {
+          signalStyleContextRegistry.trackDependency(styleName, dep);
+        }
+      }
+    }
 
     // Tag the function with its config for cross-composition
-    (styleFn as any).__styleConfig = configOrOptions;
-    // Use the name from config if provided, otherwise default to "self"
-    (styleFn as any).__styleName =
-      (configOrOptions as InSpatialStyleConfig<V>).name || "self";
+    (styleFn as any).__styleConfig = config;
+    (styleFn as any).__styleName = styleName;
 
-    // Create a wrapper for getStyle
+    // Create an enhanced getStyle that handles auto-composition
     const getStyle = ((props?: any) => {
-      // Simply call the style function - context is handled automatically
-      return styleFn(props);
+      // Use smart composition that automatically includes dependencies
+      return smartComposeWithDependencies(styleFn, config, props);
     }) as (
       props?: StyleSchemaProp<V> & {
         class?: ClassValueProp;
@@ -1385,15 +1490,14 @@ export function createStyle<V extends StyleShapeProp>(
       }
     ) => string;
 
-    (getStyle as any).__styleConfig = configOrOptions;
-    (getStyle as any).__styleName =
-      (configOrOptions as InSpatialStyleConfig<V>).name || "self";
+    (getStyle as any).__styleConfig = config;
+    (getStyle as any).__styleName = styleName;
 
     // Return with strongly typed getStyle
     return {
       ...system,
       getStyle,
-      config: configOrOptions as InSpatialStyleConfig<V>,
+      config,
     };
   }
 

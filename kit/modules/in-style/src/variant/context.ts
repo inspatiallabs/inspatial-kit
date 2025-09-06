@@ -3,7 +3,11 @@
  * 
  * This module provides an implicit context system that allows styles to
  * reference each other without explicit composition at the component level.
+ * 
+ * Uses InSpatial's signal system for proper batching and reactivity.
  */
+
+import { tick } from "@in/teract/signal/index.ts";
 
 type StyleContext = {
   settings: Record<string, any>;
@@ -14,6 +18,7 @@ class StyleContextRegistry {
   private static instance: StyleContextRegistry;
   private contexts: Map<string, StyleContext> = new Map();
   private evaluationDepth: number = 0;
+  private cleanupScheduled: boolean = false;
 
   static getInstance(): StyleContextRegistry {
     if (!StyleContextRegistry.instance) {
@@ -57,10 +62,15 @@ class StyleContextRegistry {
     this.contexts.set(name, { name, settings });
     
     // Schedule cleanup if we auto-started
-    if (wasInactive) {
-      // Use microtask to clean up after current execution
-      queueMicrotask(() => {
-        this.endEvaluation();
+    if (wasInactive && !this.cleanupScheduled) {
+      this.cleanupScheduled = true;
+      // Use tick() for proper signal batching
+      // This ensures context survives the entire render cycle
+      tick().then(() => {
+        this.cleanupScheduled = false;
+        if (this.evaluationDepth === 1) {
+          this.endEvaluation();
+        }
       });
     }
   }
