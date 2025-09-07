@@ -18,7 +18,7 @@ export function APIIcon({
         viewBox={`0 0 24 24`}
         fill={format === "fill" ? "currentColor" : "none"}
         className={iss(
-          IconStyle.getStyle({ size, format, disabled }),
+          IconStyle.getStyle({ size, format, disabled, ...props }),
           className
         )}
         {...props}

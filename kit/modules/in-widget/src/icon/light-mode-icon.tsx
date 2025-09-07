@@ -18,7 +18,7 @@ export function LightModeIcon({
         viewBox={`0 0 26 26`}
         fill={format === "fill" ? "currentColor" : "none"}
         className={iss(
-          IconStyle.getStyle({ size, format, disabled }),
+          IconStyle.getStyle({ size, format, disabled, ...props }),
           className
         )}
         {...props}

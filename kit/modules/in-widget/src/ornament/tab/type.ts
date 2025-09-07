@@ -35,6 +35,7 @@ export type TabProps = TabRootProps &
     // name?: string; // Optional name for the tab group
 
     format?: TabTriggerProps["format"];
+    scale?: TabTriggerProps["scale"];
     size?: TabTriggerProps["size"];
     radius?: TabTriggerProps["radius"];
   };

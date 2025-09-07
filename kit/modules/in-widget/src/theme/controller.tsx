@@ -13,6 +13,7 @@ export function ThemeController({ className, ...rest }: ThemeProps) {
       <Button
         size="md"
         format="outlineSurface"
+        material="tilted"
         iconOnly={true}
         on:tap={() => useTheme.action.setToggle()}
         className={
@@ -23,9 +24,9 @@ export function ThemeController({ className, ...rest }: ThemeProps) {
         {/* @ts-ignore */}
         <Show
           when={$(() => String(useTheme.mode) === "dark")}
-          otherwise={<DarkModeIcon className="p-[2px]" />}
+          otherwise={<DarkModeIcon scale="10xs" />}
         >
-          <LightModeIcon className="p-[2px]" />
+          <LightModeIcon scale="10xs" />
         </Show>
       </Button>
     </>

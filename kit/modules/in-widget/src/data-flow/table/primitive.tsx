@@ -221,10 +221,10 @@ export function TableHeaderBar({
           >
             {/***********(Paginated Buttons)************/}
             <Button format="background" size="lg" {...(prev as any)}>
-              <CaretLeftPrimeIcon />
+              <CaretLeftPrimeIcon scale="10xs" />
             </Button>
             <Button format="background" size="lg" {...(next as any)}>
-              <CaretRightPrimeIcon />
+              <CaretRightPrimeIcon scale="10xs" />
             </Button>
 
             {/***********(Filter Button)************/}
@@ -253,7 +253,7 @@ export function TableHeaderBar({
                     }}
                   >
                     <FunnelIcon
-                      size="md"
+                      size="xs"
                       style={{
                         web: {
                           padding: "4px",

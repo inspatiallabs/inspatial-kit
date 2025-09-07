@@ -18,7 +18,7 @@ export function XPrimeIcon({
         viewBox={`0 0 16 16`}
         fill={format === "fill" ? "currentColor" : "none"}
         className={iss(
-          IconStyle.getStyle({ size, format, disabled }),
+          IconStyle.getStyle({ size, format, disabled, ...props }),
           className
         )}
         {...props}

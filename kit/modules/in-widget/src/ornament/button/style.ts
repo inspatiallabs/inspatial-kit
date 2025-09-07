@@ -4,7 +4,9 @@ import {
   ThemeDisabled,
   ThemeRadius,
   ThemeBoxSize,
+  ThemeScale,
 } from "@in/widget/theme/index.ts";
+import { ThemeMaterial } from "@in/widget/theme/style.ts"
 
 export const ButtonStyle = createStyle({
   /*******************************(Base)********************************/
@@ -165,9 +167,17 @@ export const ButtonStyle = createStyle({
       ],
     },
 
+    //##############################################(THEME MATERIAL)##############################################//
+
+    material: ThemeMaterial,
+
     //##############################################(SIZE PROP)##############################################//
     // Always set max and min values this restrains the size of the button especially when using InSpatial Widgets to keep them from mirroring the parent container sizing
     size: ThemeBoxSize,
+
+    //##############################################(THEME SCALE)##############################################//
+
+    scale: ThemeScale,
 
     //##############################################(RADIUS PROP)##############################################//
 
@@ -196,8 +206,10 @@ export const ButtonStyle = createStyle({
   defaultSettings: {
     variant: "base",
     format: "base",
+    material: "flat",
     size: "base",
     radius: "md",
+    scale: "none",
     axis: "x",
     disabled: false,
     iconOnly: false,

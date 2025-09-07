@@ -1,4 +1,3 @@
-
 # Styling
 
 InSpatial Style Sheet (ISS) or `@inspatial/style` is built on InSpatial's `@in/style`module a variant based styling engine largely inspired by Stiches.
@@ -141,9 +140,10 @@ The example above demonstrates how InSpatial Kit and Widgets support both CSS an
 
 You can style with both class utilities (`class`/`className`) and style props (`style`) and even mix them when a value is only accessible one way (e.g., a precise style declaration). However, for most components it’s more optimal to pick one approach per area to keep authority predictable and the mental model simple.
 
-The `style` prop will ALWAYS work and is considered the standard, but many cases are more ergonomic when handled with `classes`. It’s not really about choosing *Style vs. Classes*... the right mental model is one that embraces using both in harmony wherever the case calls for it. 
+The `style` prop will ALWAYS work and is considered the standard, but many cases are more ergonomic when handled with `classes`. It’s not really about choosing _Style vs. Classes_... the right mental model is one that embraces using both in harmony wherever the case calls for it.
 
 #### Rule of Thumb
+
 If you are unsure and want to reduce cognitive load. By taking a singular approach here is the general rule of thumb;
 
 - Use class utilities if tools like Tailwind or css-variables are your prefered means of stylingg;
@@ -351,7 +351,7 @@ const styleClass = HeaderWidgetStyle.getStyle({
 
 ```typescript
 // ✅ (Founders Choice)
-className={ButtonStyle.getStyle({ format, size, ...rest, className })}
+className={ButtonStyle.getStyle({ format, size, className, ...rest })}
 
 // or
 
@@ -402,31 +402,49 @@ const buttonStyle = createStyle({ ...config }); // Returns {getStyle, iss, style
 type ButtonStyleType = StyleProps<typeof ButtonStyle>;
 ```
 
-##### Using Factory Pattern
+##### Using Style Presets
 
-If you're using the factory pattern (creating your own style system):
+Style presets are named, reusable class strings produced by your styles.
+
+You pick a combination of props once (format/variant/size, etc.), call `*.getStyle(...)`, and export the result as a constant. Consumers then use a single constant instead of repeating the same prop object everywhere.
+
+**Advantages**
+- Consistent: the same preset name always yields the same look
+- Reusable: import and apply anywhere
+- Tree‑shakeable: direct file imports only pull what you use
+- Low‑cognitive load: tiny call sites, fewer variant props at usage points
+
+Tip: create a preset when a combo appears in 2+ places; give it a clear, intention‑revealing name.
 
 ```typescript
-// Create a custom style system
-const myStyleSystem = createStyle({
-  hooks: {
-    onComplete: (className) => `my-prefix-${className}`,
-  },
+// Direct file import (better tree-shaking)
+import { ButtonStyle } from "@in/widget/ornament/button/style.ts";
+
+// Base preset (good default)
+export const ButtonBaseStyle = ButtonStyle.getStyle({
+  format: "base",
+  variant: "base",
+  size: "base",
 });
 
-// Use the system to create styles
-const button = myStyleSystem.style({
-  base: "rounded",
-  settings: {
-    size: {
-      sm: "text-sm",
-      lg: "text-lg",
-    },
-  },
+// Outlined small preset
+export const ButtonOutlineSmStyle = ButtonStyle.getStyle({
+  format: "outline",
+  variant: "base",
+  size: "sm",
 });
 
-// Apply the style
-const className = button({ size: "sm" });
+// Background large preset
+export const ButtonBackgroundLgStyle = ButtonStyle.getStyle({
+  format: "background",
+  variant: "base",
+  size: "lg",
+});
+
+// Usage
+// <Button className={ButtonBaseStyle}>Primary</Button>
+// <Button className={ButtonOutlineSmStyle}>Outline</Button>
+// <Button className={ButtonBackgroundLgStyle}>Muted</Button>
 ```
 
 **FAQ - Variant Authority**
@@ -496,8 +514,6 @@ export const MyStyle = createStyle({
   base: ["bg-(--color-purple-500) text-(--color-white-500)"],
 });
 ```
-
-
 
 ##### Composition API
 

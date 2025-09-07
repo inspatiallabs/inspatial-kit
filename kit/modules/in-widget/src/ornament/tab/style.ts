@@ -1,5 +1,9 @@
 import { createStyle } from "@in/style";
-import { ThemeDisabled, ThemeRadius } from "@in/widget/theme/style.ts";
+import {
+  ThemeDisabled,
+  ThemeRadius,
+  ThemeScale,
+} from "@in/widget/theme/style.ts";
 
 //##############################################( CREATE STYLE)##############################################//
 
@@ -229,6 +233,8 @@ export const TabStyle = {
 
       radius: ThemeRadius,
 
+      scale: ThemeScale,
+
       size: {
         "3xs": [
           {
@@ -308,6 +314,7 @@ export const TabStyle = {
 
     defaultSettings: {
       format: "segmented",
+      scale: "none",
       size: "md",
       radius: "none",
       disabled: false,

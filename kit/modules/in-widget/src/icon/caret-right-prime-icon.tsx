@@ -18,7 +18,7 @@ export function CaretRightPrimeIcon({
         viewBox={`0 0 14 21`}
         fill={format === "fill" ? "currentColor" : "none"}
         className={iss(
-          IconStyle.getStyle({ size, format, disabled }),
+          IconStyle.getStyle({ size, format, disabled, ...props }),
           className
         )}
         {...props}

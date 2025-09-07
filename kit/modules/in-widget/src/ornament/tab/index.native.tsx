@@ -73,6 +73,7 @@ export function Tab(props: TabProps) {
           format,
           size,
           radius,
+          ...rest,
         })
       )}
       role="tablist"
@@ -123,6 +124,7 @@ export function Tab(props: TabProps) {
                   format,
                   radius,
                   size,
+                  scale: item.scale,
                   disabled: disabled || item.disabled,
                 }),
                 (item as any)?.class,

@@ -1,4 +1,5 @@
 import { createStyle } from "@in/style";
+import { ThemeScale } from "@in/widget/theme/style.ts";
 
 /*#####################################(CREATE STYLE)#####################################*/
 
@@ -30,6 +31,10 @@ export const StackStyle = createStyle({
       ],
     },
 
+    //##############################################(THEME SCALE)##############################################//
+
+    scale: ThemeScale,
+
     //##############################################(DISABLED PROP)##############################################//
 
     disabled: {
@@ -42,5 +47,6 @@ export const StackStyle = createStyle({
   defaultSettings: {
     variant: "xStack",
     disabled: false,
+    scale: "none",
   },
 });

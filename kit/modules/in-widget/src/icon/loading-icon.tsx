@@ -18,7 +18,7 @@ export function LoadingIcon({
         viewBox={`0 0 100 101`}
         fill={format === "fill" ? "currentColor" : "none"}
         className={iss(
-          IconStyle.getStyle({ size, format, disabled }),
+          IconStyle.getStyle({ size, format, disabled, ...props }),
           className
         )}
         {...props}

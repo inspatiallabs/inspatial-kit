@@ -217,14 +217,13 @@ export function Table<TData, TValue>({
       const Icon = isId ? SecurityKeyIcon : ArrowSwapIcon;
       return (
         <Icon
-          size="sm"
+          size="7xs"
           on:tap={handleSortTap}
           style={{
             web: hover
               ? {
                   transform: "rotate(90deg)",
                   borderRadius: "var(--radius-xl)",
-                  padding: "2px",
                   fontWeight: "bold",
                 }
               : {
@@ -508,6 +507,7 @@ export function Table<TData, TValue>({
                   ))}
                   <Button
                     size="md"
+                    scale="10xs"
                     format="background"
                     radius="none"
                     style={{
@@ -560,7 +560,14 @@ export function Table<TData, TValue>({
                             : String((cell?.column?.id ?? "") as any)
                                 .trim()
                                 .toLowerCase() === "id"
-                            ? { width: "70px", maxWidth: "70px" }
+                            ? {
+                                display: "flex",
+                                width: "70px",
+                                maxWidth: "70px",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                margin: "0 auto",
+                              }
                             : {},
                       }}
                     >
@@ -582,15 +589,17 @@ export function Table<TData, TValue>({
                                 color: "var(--secondary)",
                                 width: "fit-content",
                                 height: "auto",
-                                padding: "4px 10px",
                                 alignItems: "center",
-                                gap: "4px",
-                                minWidth: "68px",
+                                justifyContent: "center",
+                                // gap: "4px",
+                                minWidth: "60px",
+                                maxWidth: "60px",
                               },
                             }}
                           >
                             <DirectionRightIcon
                               size="sm"
+                              scale="10xs"
                               style={{
                                 web: {
                                   stroke: "var(--secondary)",

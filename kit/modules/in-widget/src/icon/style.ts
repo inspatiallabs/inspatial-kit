@@ -1,5 +1,5 @@
 import { createStyle } from "@in/style";
-import { ThemeBoxSize } from "@in/widget/theme/style.ts"
+import { ThemeBoxSize, ThemeScale } from "@in/widget/theme/style.ts"
 
 //##############################################(CREATE STYLE)##############################################//
 
@@ -15,6 +15,7 @@ export const IconStyle = createStyle({
     },
 
     size: ThemeBoxSize,
+    scale: ThemeScale,
 
     disabled: {
       true: [

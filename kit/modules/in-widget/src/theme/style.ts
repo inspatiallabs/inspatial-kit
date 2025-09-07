@@ -21,6 +21,7 @@ export const ThemeRadius = {
   full: ["rounded-full", { web: { borderRadius: "1000px" } }],
 } as const;
 
+
 //##############################################(THEME [BOX] SIZE)##############################################//
 
 export const ThemeBoxSize = {
@@ -495,7 +496,7 @@ export const ThemeMode = {
 export const ThemeMaterial = {
   tilted: ["material-tilted"],
   translucent: [""],
-  flat: [""],
+  flat: [""], // Default
 } as const;
 
 //##############################################(THEME TYPOGRAPHY)##############################################//
@@ -507,7 +508,91 @@ export const ThemeTypography = {
 //##############################################(THEME SCALE)##############################################//
 
 export const ThemeScale = {
-  base: [""],
+  none: [""],
+  "12xs": [
+    "p-[2px]",
+    { web: { padding: "2px" } },
+  ],
+  "11xs": [
+    "p-[4px]",
+    { web: { padding: "4px" } },
+  ],
+  "10xs": [
+    "p-[6px]",
+    { web: { padding: "6px" } },
+  ],
+  "9xs": [
+    "p-[8px]",
+    { web: { padding: "8px" } },
+  ],
+  "8xs": [
+    "p-[10px]",
+    { web: { padding: "10px" } },
+  ],
+  "7xs": [
+    "p-[12px]",
+    { web: { padding: "12px" } },
+  ],
+  "6xs": [
+    "p-[14px]",
+    { web: { padding: "14px" } },
+  ],
+  "5xs": [
+    "p-[16px]",
+    { web: { padding: "16px" } },
+  ],
+  "4xs": [
+    "p-[20px]",
+    { web: { padding: "20px" } },
+  ],
+  "3xs": [
+    "p-[24px]",
+    { web: { padding: "24px" } },
+  ],
+  "2xs": [
+    "p-[28px]",
+    { web: { padding: "28px" } },
+  ],
+  xs: [
+    "p-[32px]",
+    { web: { padding: "32px" } },
+  ],
+  sm: [
+    "p-[36px]",
+    { web: { padding: "36px" } },
+  ],
+  md: [
+    "p-[40px]",
+    { web: { padding: "40px" } },
+  ],
+  fit: [
+    "px-4",
+    { web: { paddingLeft: "1rem", paddingRight: "1rem" } },
+  ],
+  base: [
+    "px-5 py-3",
+    { web: { padding: "12px 20px" } },
+  ],
+  auto: [
+    "px-5 py-3",
+    { web: { padding: "12px 20px" } },
+  ],
+  lg: [
+    "p-[48px]",
+    { web: { padding: "48px" } },
+  ],
+  xl: [
+    "p-[52px]",
+    { web: { padding: "52px" } },
+  ],
+  "2xl": [
+    "p-[56px]",
+    { web: { padding: "56px" } },
+  ],
+  "3xl": [
+    "p-[64px]",
+    { web: { padding: "64px" } },
+  ],
 } as const;
 
 //##############################################(THEME AXIS)##############################################//
@@ -592,6 +677,7 @@ export const ThemeStyle = createStyle({
     cursor: "auto",
     radius: "base",
     size: "base",
+    scale: "none",
     typography: "base",
     disabled: false,
   },
