@@ -197,14 +197,14 @@ export function CounterView() {
 
       <View scrollable>
         <Slot className="flex flex-col justify-center items-center gap-10">
-          <h1 className="text-yellow-500 text-8xl">🚀 Counter</h1>
+          <h1 className="text-(--brand) text-8xl">InCounter</h1>
 
           {/* Switch & Checkbox Controls */}
           <Slot className="bg-(--surface) p-6 rounded-lg text-center max-w-md">
             <h3 className="text-white text-lg mb-4">🎛️ UI Controls</h3>
 
             <YStack className="gap-4">
-              {/* Switch with custom icon */}
+              {/* Switch with custom styles */}
               <XStack className="items-center justify-between gap-2">
                 <Text id="show-table" className="text-white">
                   Show Table
@@ -215,6 +215,32 @@ export function CounterView() {
                   icon={<ArrowSwapIcon size="4xs" />}
                   size="md"
                   radius="squared"
+                  style={{
+                    web: {
+                      border: "4px solid var(--muted)",
+                      borderRadius: "1000px",
+                    },
+                  }}
+                  children={{
+                    handle: {
+                      style: {
+                        web: {
+                          backgroundColor: "white",
+                          height: "30px",
+                        },
+                      },
+                    },
+                    track: {
+                      className: "peer-checked:!bg-purple-500",
+                      style: {
+                        web: {
+                          backgroundColor: "yellow",
+                          borderRadius: "1000px",
+                          height: "10px",
+                        },
+                      },
+                    },
+                  }}
                   on:input={(e: any) =>
                     useCounter.showTableBox.set(!!(e?.target?.checked ?? e))
                   }
@@ -267,17 +293,58 @@ export function CounterView() {
                   Explicit Pattern Demo Control
                 </Text>
                 <Tab
-                  selected={explicitDemoState.activeDemo.get()}
-                  on:input={(value: any) =>
-                    explicitDemoState.activeDemo.set(value)
-                  }
+                  defaultSelected="storage"
+                  on:input={(label: string) => {
+                    console.log("Main tab onChange:", label);
+                    explicitDemoState.activeDemo.set(label);
+                  }}
                   children={[
-                    { label: "C", value: "config" },
-                    { label: "S", value: "storage" },
-                    { label: "E", value: "enhanced" },
+                    { label: "config" },
+                    { label: "storage" },
+                    { label: "enhanced" },
                   ]}
                 />
               </YStack>
+
+              {/* #### Simple Debug: Tab -> Plain Text #### */}
+              {(() => {
+                const debugTabs = createState({
+                  current: "A" as "A" | "B" | "C",
+                });
+                console.log("Debug tab initial:", debugTabs.current.get());
+
+                return (
+                  <YStack className="gap-2 mt-4">
+                    <Text className="text-white text-sm">
+                      Debug Tabs (A/B/C)
+                    </Text>
+                    <Tab
+                      defaultSelected="A"
+                      on:input={(label: string) => {
+                        console.log("Tab on:input triggered with:", label);
+                        debugTabs.current.set(label);
+                      }}
+                      children={[
+                        { label: "A" },
+                        { label: "B" },
+                        { label: "C" },
+                      ]}
+                    />
+                    <Text className="text-yellow-300">
+                      Current value: {$(() => debugTabs.current.get())}
+                    </Text>
+                    <Show when={$(() => debugTabs.current.get() === "A")}>
+                      <Text className="text-emerald-300">A is selected</Text>
+                    </Show>
+                    <Show when={$(() => debugTabs.current.get() === "B")}>
+                      <Text className="text-emerald-300">B is selected</Text>
+                    </Show>
+                    <Show when={$(() => debugTabs.current.get() === "C")}>
+                      <Text className="text-emerald-300">C is selected</Text>
+                    </Show>
+                  </YStack>
+                );
+              })()}
             </YStack>
           </Slot>
 
@@ -361,7 +428,7 @@ export function CounterView() {
           </Show>
 
           {/* Dynamic Explicit Pattern Demo controlled by tabs */}
-          <Show when={explicitDemoState.activeDemo.get() === "config"}>
+          <Show when={$(() => explicitDemoState.activeDemo.get() === "config")}>
             <Slot className="bg-blue-900 p-4 rounded-lg text-center max-w-md">
               <h3 className="text-white text-lg mb-2">
                 📋 Config Pattern Demo
@@ -648,7 +715,9 @@ export function CounterView() {
           </Show>
 
           {/* Enhanced Explicit Pattern - shown when enhanced tab is selected */}
-          <Show when={explicitDemoState.activeDemo.get() === "enhanced"}>
+          <Show
+            when={$(() => explicitDemoState.activeDemo.get() === "enhanced")}
+          >
             <Slot className="bg-purple-900 p-6 rounded-lg text-center max-w-md">
               <h3 className="text-white text-lg mb-4">
                 🚀 Enhanced Explicit Pattern

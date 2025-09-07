@@ -94,6 +94,14 @@ Use `on:route` to trigger an action on navigation.
 </Link>
 ```
 
+###### Lifecycle Trigger Modifiers
+
+`on-once:`,
+`on-passive:`,
+`on-capture:`,
+`on-prevent:`,
+`on-stop:`
+
 ##### B. Input Triggers
 
 **on:tap**
@@ -126,6 +134,8 @@ Use `on:route` to trigger an action on navigation.
 ##### E. Physics Triggers
 
 ##### F. Key Triggers
+
+
 
 **on:escape**
 Allows you to close a presentation when the `ESC` Key is pressed

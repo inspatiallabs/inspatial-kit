@@ -1,3 +1,4 @@
+// deno-lint-ignore-file jsx-no-children-prop
 import {
   type ColumnDef,
   getCoreRowModel,
@@ -14,6 +15,7 @@ import {
   TableHeader,
   TableRow,
   TableHeaderBar,
+  TableHeaderRelations,
 } from "./primitive.tsx";
 import { $ } from "@in/teract/state";
 import { Button } from "@in/widget/ornament/button/index.ts";
@@ -41,6 +43,7 @@ import { Drawer } from "@in/widget/presentation/drawer/index.tsx";
 import { SecurityKeyIcon } from "@in/widget/icon/security-key-icon.tsx";
 import { DirectionRightIcon } from "@in/widget/icon/direction-right-icon.tsx";
 import { Switch, Checkbox } from "@in/widget/input/index.ts";
+import { Tab } from "@in/widget/ornament/index.ts";
 
 // import { DropdownMenu } from "../../navigation/dropdown-menu/index.tsx";
 
@@ -389,6 +392,37 @@ export function Table<TData, TValue>({
           <Drawer id="update-entry-drawer">
             <Text>Update Entry Form</Text>
           </Drawer>
+
+          {/*#################################(Table Header Navigator)#################################*/}
+
+          {/*#################################(Table Header Relations)#################################*/}
+
+          <Slot
+            style={{
+              web: {
+                width: "100%",
+                alignItems: "center",
+                padding: "10px",
+                backgroundColor: "var(--surface)",
+                marginBottom: "2px",
+              },
+            }}
+          >
+            <Tab
+              radius="sm"
+              format="segmented"
+              size="lg"
+              selected={"profiles"}
+              on:input={(label: any) => {}}
+              children={[
+                { label: "Profiles" },
+                { label: "Organizations" },
+                { label: "Sessions" },
+                { label: "Activity" },
+                { label: "Payments" },
+              ]}
+            />
+          </Slot>
 
           {/*#################################(Table Header Bar)#################################*/}
           <TableHeaderBar

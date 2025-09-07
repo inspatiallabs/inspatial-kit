@@ -1,372 +1,6 @@
-# Styling & UI
 
-## 1. InSpatial Renderer
+# Styling
 
-- **Extensible Architecture:** Decouples component logic from rendering environment.
-- **`createRenderer(nodeOps, rendererID?)`:** Creates a custom renderer.
-- **`DOMRenderer(InTrigger)` (`@inspatial/kit/dom-renderer`):** For interactive web applications.
-  _ **Triggers & Event Handling:** `on:eventName` (e.g., `on:click`). Supports modifiers like `on-once:`, `on-passive:`, `on-capture:`, `on-prevent:`, `on-stop:`.
-  _ **Browser Preset Directives:** `class:className={signal}` for conditional classes, `style:property={value}` for individual styling (CSS) properties.
-  \_ **Handling Dynamic HTML Content:** For inserting dynamic HTML (e.g., from APIs), prefer parsing the HTML into a `DocumentFragment` and rendering it directly within the component. This is more robust and integrates better with InSpatial's retained mode rendering than using `innerHTML` directly, which can have security implications and reconciliation challenges.
-
-- **`GPURenderer(InTrigger)` (`@inspatial/kit/gpu-renderer`):** For interactive 3D & XR applications. \* \*\*Soon...
-
-## 2. Templating & Runtime
-
-InSpatial ships with a JSX runtime by default, but you can also compose UI with our renderer primitives. Think of the runtime as one way to template your UI. The renderer primitives are a minimal, framework-agnostic alternative when you want explicit control or teaching-oriented examples.
-
-#### JSX Runtime
-
-- **Retained Mode:** JSX templates are evaluated once to build the initial UI.
-- **Pragma Transform::** Provides maximum flexibility. Requires configuring `jsxFactory: 'R.c'` and `jsxFragment: 'R.f'` in build tools (Vite, Babel). Components receive `R` as an argument.
-- **Automatic Runtime:** Easier setup, but less flexible. Configures `jsx: 'automatic'` and `jsxImportSource: 'InSpatial'`.
-- **Hot Reload:** Use `InVite` extension for vite-rollup/rolldown and `InPack` for webpack/rspack client development.
-
-#### Creating your own runtime?
-
-###### Composing components with renderer primitives
-
-So far you have been composing components using <Tag> widgets, but under the hood InSpatial also lets you compose UI with primitive render functions. The `Fn` control-flow returns a render function that receives a low-level renderer `R`. Using `R.c` (create element) and `R.text` (create text) keeps examples minimal. Below is an example of how to compose a component via renderer primitives
-
-```typescript
-import {
-  Fn,
-  useTable,
-  type ColumnDef,
-  getCoreRowModel,
-} from "@inspatial/kit/control-flow";
-
-export type PrimitiveTableProps<TData> = {
-  columns: ColumnDef<TData, any>[];
-  data: TData[];
-};
-
-export function PrimitiveTable<TData>({
-  columns,
-  data,
-}: PrimitiveTableProps<TData>) {
-  return Fn({ name: "PrimitiveTable" }, () => {
-    const { table } = useTable<TData>({
-      data,
-      columns,
-      getCoreRowModel: getCoreRowModel(),
-    });
-
-    return (R: any) => {
-      const headerGroups = table.getHeaderGroups();
-      const rows = table.getRowModel().rows;
-
-      return R.c(
-        "div",
-        { style: { width: "100%", padding: "8px" } },
-        R.c(
-          "div",
-          { style: { marginBottom: "8px", fontSize: "12px", color: "#667" } },
-          R.text(`PrimitiveTable • data: ${data.length} • rows: ${rows.length}`)
-        ),
-        R.c(
-          "table",
-          { style: { width: "100%", borderCollapse: "collapse" } },
-          R.c(
-            "thead",
-            {},
-            ...headerGroups.map((hg) =>
-              R.c(
-                "tr",
-                { key: hg.id },
-                ...hg.headers.map((h) =>
-                  R.c(
-                    "th",
-                    {
-                      key: h.id,
-                      style: {
-                        textAlign: "left",
-                        borderBottom: "2px solid var(--muted)",
-                        padding: "8px 12px",
-                      },
-                    },
-                    h.isPlaceholder
-                      ? null
-                      : R.text(
-                          String(
-                            (h.column.columnDef as any).header ?? h.column.id
-                          )
-                        )
-                  )
-                )
-              )
-            )
-          ),
-          R.c(
-            "tbody",
-            {},
-            ...rows.map((row, idx) =>
-              R.c(
-                "tr",
-                { key: String((row.original as any)?.id ?? row.id ?? idx) },
-                ...row.getVisibleCells().map((cell) =>
-                  R.c(
-                    "td",
-                    {
-                      key: cell.id,
-                      style: {
-                        padding: "8px 12px",
-                        borderBottom: "1px solid var(--muted)",
-                      },
-                    },
-                    (() => {
-                      const cellDef = cell.column.columnDef as any;
-                      if (typeof cellDef.cell === "function") {
-                        const result = cellDef.cell(cell.getContext());
-                        return R.text(String(result ?? cell.getValue()));
-                      }
-                      return R.text(String(cell.getValue()));
-                    })()
-                  )
-                )
-              )
-            )
-          )
-        )
-      );
-    };
-  });
-}
-```
-
-##### SFC Templates
-
-Single File Component - coming soon...
-
-Notes:
-
-- Use `!` prefixed utilities (e.g., `!bg-*`) to give class utilities authority over variant-generated background colors.
-- Prefer overriding at the row level (`<TableRow className="..." />`). Removing the conditional override restores the default zebra striping.
-
-#### Render targets - "Use Directives"
-
-InSpatial allows you to switch between renderers with directives, because all InSpatial Kit components and widgets are built for different platforms e.g `button.dom.tsx`, `button.gpu.tsx` etc... You can easily switch the render targets by declaring the following directive at the beginning of your `window.tsx` or `scene.tsx` files.
-
-##### For `window.tsx` Views
-
-- **"use native":** universal defaults this is the default directive and is what is auto attached to every .tsx file if no directive is declared. This will auto use the appropraite renderer based on detected environment.
-- **"use dom":**
-- **"use gpu":**
-- **"use ios:"**
-- **"use visionos:"**
-- **"use android:"**
-- **"use androidxr:"**
-- **"use horizonos:"**
-- **"use ssr:"**
-
-##### For `scene.tsx` Views
-
-- **"use volumentric":** for 3d scenes
-- **"use ar":** for augmented reality scenes
-- **"use vr":** for virtual reality scenes
-- **"use mr":** for mixed reality scenes
-
-## 3. Widgets & Components
-
-A Widget is a high-level primitive. It simple terms a widget contains multiple components. e.g an <InputField> has different variants of components i.e <TextField>, <NumberField> etc...
-
-NOTE: Only high-level primitives (such as Input, Ornament, Presentation, etc.) support `variants`. Each variant/children can have multiple `formats`, which act as sub-variants.
-
-### Control Flow
-
-Control flows allow you to...
-
-- **Structure & Control Flow Components:**
-  _ `<Show when={signal}>`: Conditional rendering. Supports `true` and `else` props. For one-off static conditions, you can use inline typescript to return the desired branch directly just like in React(but will not have reactivity).
-  _ `<List each={signalOfArray} track="key" indexed={true}>`: Efficiently renders lists with reconciliation by handling all list rendering scenarios. Automatically handles static arrays and signals, eliminates need for `derivedExtract`, provides direct item access in templates. Use `track` for stable keys when data changes completely. Exposes `getItem()`, `remove()`, `clear()` methods. View functions receive raw item data directly for clean, readable syntax.
-  _ `<Async future={promise}>`: Manages asynchronous operations (pending, resolved, rejected states). `async` components automatically get `fallback` and `catch` props.
-  _ **Error Handling in Asynchronous Components:** Implement robust error handling within `async` components. Utilize the `catch` prop of `<Async>` components or direct `fallback`/`catch` props on async components, and `try...catch` blocks for network requests to gracefully manage and display errors to the user.
-  _ `<Dynamic is={componentOrTag}>`: Renders a component or HTML tag that can change dynamically.
-  _ `<Fn ctx={value} catch={errorHandler}>`: Executes a function that returns a render function, useful for complex logic with error boundaries. \* **List Management:** Use `List` component's exposed methods (`getItem()`, `remove()`, `clear()`) for imperative list manipulation when needed.
-
-- **`$ref`:** Special prop to get a reference to a DOM element or component instance (as a signal or function). **Critical for hot reload in dev mode:** always use `$ref` for component references, not `createComponent()` return values.
-- **`expose()`:** Allows child components to expose properties/methods to their parent via `$ref`.
-- **`capture()`:** Captures the current rendering context, useful for running functions (e.g., `expose()`) after `await` calls in async components.
-- **Importing:** All built-in components can be imported directly from package `InSpatial`
-- **`createComponent(template, props?, ...children)`:** Creates component instances
-  **`renderer.render(container, component, props, ...children)`:** Renders a component into a container, with optional props and children.
-  **`dispose(instance)`:** Cleans up component resources
-  **`getCurrentSelf()`:** Gets current component instance
-  **`snapshot()`:** Creates context snapshots for async operations
-- **JSX Children in Control Flow Components:** When using components like `<Show>` and `<List>`, ensure their render function children return either a _single root element_ or a `Fragment` (`<>...</>`) if rendering multiple sibling elements. This prevents unexpected rendering issues.
-- `**Fn`\*\* provides a render closure; inside it, you can read the table header groups and row model.
-- **`R.c(tag, props, ...children)`** creates elements; `R.text(string)` creates text nodes.
-
-### Structure
-
-When you build anything, a house, a painting, or an app, you need **a frame**.
-
-- In a house, it’s the walls and floors.
-- In a painting, it’s the canvas.
-- In Spatial, it’s the **Structure** widget.
-
-Without structure, you have chaos. Elements float around without clear boundaries or rules. The Structure Widget gives **shape** and **intent** to everything that comes after.
-
-**Structure** is the skeleton of your app → gives layout meaning.
-
----
-
-#### `<View>`
-
-`View` is a variant of the Structure Widget. Its generally the entry-point to building a component. It’s the surface where everything else in your component gets painted or placed.
-
-- That’s why you only need **one `<View>`** at the root of your component, just like you only need **one canvas** for a single painting.
-- Having multiple `<View>`s at the same level is like starting several canvases for one artwork: confusing, fragmented, and difficult to manage.
-
-**Why It Fills the Whole Screen**
-
-By default, `<View>` expands to the **maximum width and height of the viewport**.
-
-- This ensures your “canvas” is **complete**, no cutoff edges.
-- But since it covers the whole space, it doesn’t scroll automatically. Why? Because if your canvas is already infinite, you don’t need scroll until your content overflows.
-
-So scroll is **opt-in**, not forced. That’s where the `View`’s scrollbar settings come in.
-
-**Scrolling In Views**
-
-The `<View>` component is not just a passive box. It’s your **stage**.
-
-- Sometimes the stage needs to allow the audience (users) to move around → **scrollbars**.
-- Sometimes the stage needs to shift moods, pace, or transitions → **motion and animation**.
-
-Because `View` is the stage, it controls these high-level experiences. You don’t sprinkle scroll or motion randomly across elements; you anchor them at the structural level.
-
-**Example Usage**
-
-```typescript
-<View>
-  <Stack variant="yStack" className="space-y-2 p-2 bg-(--brand) w-full">
-    {Array.from({ length: 30 }).map((_, i) => (
-      <YStack key={i} className="p-3 rounded bg-(--surface) text-(--primary)">
-        Item {i + 1}
-      </YStack>
-    ))}
-  </Stack>
-</View>
-```
-
-**View `ScrollBar`Themes & Properties**
-
-```typescript
-// Thin (default)
-<View scrollbar scrollbarTheme="thin">...</View>
-
-// Minimal (thumb appears on hover)
-<View scrollbar scrollbarTheme="minimal">...</View>
-
-// Rounded
-<View scrollbar scrollbarTheme="rounded">...</View>
-
-// Pill
-<View scrollbar scrollbarTheme="pill">...</View>
-
-// Gradient
-<View scrollbar scrollbarTheme="gradient">...</View>
-```
-
-#### `<Table>`
-
-##### Zebra Table
-
-A zebra table is just a table where every other row has a different background color—like light, then slightly darker, then light again. This striping makes it easier for your eyes to follow a row across the page, especially in wide or crowded tables.
-
-Tables are zebra-striped by default. Striping is applied in `TableStyle.body` using nested selectors (`& > tr:nth-child(odd|even)`) generated by the `@in/style` variant system, not Tailwind `odd:` utilities. Background colors use theme variables: `var(--background)` for odd rows and `var(--surface)` for even rows. No per-row logic is needed in views.
-
-**Manual Overide of `Zebra` Table Row**
-
-```typescript
-import {
-  TableList,
-  TableCell,
-  TableHeaderColumn,
-  TableHeader,
-  TableRow,
-  TableWrapper,
-} from "@inspatial/kit/control-flow";
-
-<TableWrapper>
-  <TableHeader>
-    <TableRow>
-      <TableHeaderColumn>ID</TableHeaderColumn>
-      <TableHeaderColumn>Name</TableHeaderColumn>
-    </TableRow>
-  </TableHeader>
-  <TableList>
-    {entries.get().map((entry: EntryProps, idx: number) => (
-      <TableRow
-        key={entry.id}
-        className={idx % 2 === 0 ? "!bg-black-500" : "!bg-yellow-500"}
-      >
-        <TableCell>{entry.id}</TableCell>
-        <TableCell>{entry.name}</TableCell>
-      </TableRow>
-    ))}
-  </TableList>
-</TableWrapper>;
-```
-
-### Presentation
-
-#### Modal
-
-```typescript
-import { Modal } from "@inspatial/kit/presentation";
-import { YStack } from "@inspatial/kit/structure";
-import { Text } from "@inspatial/kit/typography";
-import { Button } from "@inspatial/kit/ornament";
-
-<Modal
-  id="counter-modal"
-  closeOnEsc
-  closeOnScrim
-  className="flex justify-center items-center h-screen w-screen m-auto"
->
-  <YStack className="p-6 gap-3 w-[500px] h-[500px] bg-(--brand) rounded-3xl shadow-effect">
-    <Text className="text-xl font-semibold">Title</Text>
-    <Text>
-      Use the buttons to adjust the counter and explore trigger props. This
-      modal is controlled via on:presentation.
-    </Text>
-    <Button
-      format="outline"
-      on:presentation={{ id: "counter-modal", action: "close" }}
-    >
-      Close
-    </Button>
-  </YStack>
-</Modal>;
-```
-
-#### Portals
-
-Uses the Presentation Portals `Inlet/Outlet` to render components outside their original DOM hierarchy.
-
-```typescript
-import {
-  PresentationInlet,
-  PresentationOutlet,
-  Modal,
-} from "@inspatial/kit/presentation";
-
-<Modal>
-  {/* The Presentation Outlet displays content provided by the Inlet */}
-  <PresentationOutlet fallback={() => <Text>Hello World</Text>} />
-</Modal>;
-
-{
-  /* The Presentation Inlet sends its children to be rendered by the Outlet */
-}
-<PresentationInlet>
-  <Text>Render on the modal</Text>
-</PresentationInlet>;
-```
-
-**6. InSpatial Styling:**
 InSpatial Style Sheet (ISS) or `@inspatial/style` is built on InSpatial's `@in/style`module a variant based styling engine largely inspired by Stiches.
 
 Don’t use peek()/get() inside style objects. Pass the Signals directly so the renderer can subscribe.
@@ -452,7 +86,7 @@ While this approach is available, it should mainly be used as an "escape hatch" 
 
 - **Styling Dynamic Elements:** For dynamically styled elements, leverage InSpatial's browser preset capabilities for conditional classes (`class:active={signal}`) and inline styles (`style:property={value}`) to ensure styles update correctly with state changes. \* \*\*Soon...
 
-## 4. Style Composition: (Variant Authority)
+## Style Creation: (Variant Authority)
 
 `@in/style/variant` enables object/web style injection, compiling all style keys into unique CSS classes (e.g., .in-abc123) that are injected once into a `<style data-in-variant>` tag. With the `createStyle()` API, you can write both CSS and Tailwind-like styles directly in TypeScript, not in `.css` files. InSpatial Kit Widgets & Components use these utilities, but they are not traditional CSS or Tailwind—they are compiled and applied at runtime based on your platform and render target. If TailwindCSS is installed, InSpatial will use its utilities; otherwise, it falls back to standard CSS. The styles you write look like Tailwind or CSS, but are managed by the InSpatial Style Sheet (ISS) system, which handles platform-specific transpilation for you.
 
@@ -505,9 +139,12 @@ The example above demonstrates how InSpatial Kit and Widgets support both CSS an
 
 ### `Class` utilities vs `Style` Properties
 
-You can style with both class utilities (`class`/`className`) and style props (`style.web`) and even mix them when a value is only accessible one way (e.g., a precise style declaration). However, for most components it’s more optimal to pick one approach per area to keep authority predictable and the mental model simple.
+You can style with both class utilities (`class`/`className`) and style props (`style`) and even mix them when a value is only accessible one way (e.g., a precise style declaration). However, for most components it’s more optimal to pick one approach per area to keep authority predictable and the mental model simple.
+
+The `style` prop will ALWAYS work and is considered the standard, but many cases are more ergonomic when handled with `classes`. It’s not really about choosing *Style vs. Classes*... the right mental model is one that embraces using both in harmony wherever the case calls for it. 
 
 #### Rule of Thumb
+If you are unsure and want to reduce cognitive load. By taking a singular approach here is the general rule of thumb;
 
 - Use class utilities if tools like Tailwind or css-variables are your prefered means of stylingg;
 - Use `style` prop when you need exact CSS, nested selectors, or portability without relying on third-parties like TailwindCSS.
@@ -809,7 +446,7 @@ When both `style` and `class`/`className` are used to compose the same style pro
 ```
 
 **Switching Variant Authority**
-You can switch the variant authority to from `style` to `class/className` utilities by simiply prefixing your class value with `!` notation.
+You can switch the variant authority from `style` to `class/className` utilities by simiply prefixing your class value with `!` notation.
 
 ```typescript
 <Slot
@@ -859,6 +496,8 @@ export const MyStyle = createStyle({
   base: ["bg-(--color-purple-500) text-(--color-white-500)"],
 });
 ```
+
+
 
 ##### Composition API
 

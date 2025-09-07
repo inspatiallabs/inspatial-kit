@@ -28,7 +28,7 @@ export type ComponentTemplate<P = any> = ComponentFunction<P>;
 export type ComponentProps = Record<string, any> & {
   $ref?: Signal<any> | ((instance: any) => void);
 };
-export type { RenderFunction } from "../control-flow/render/index.ts";
+export type { RenderFunction } from "@in/widget/control-flow/render/index.ts";
 
 export interface ComponentContext {
   run:

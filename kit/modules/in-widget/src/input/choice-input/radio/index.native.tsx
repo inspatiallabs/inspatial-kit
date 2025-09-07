@@ -10,6 +10,7 @@ export function Radio(props: RadioProps) {
   /**************************(Props)**************************/
   const {
     className,
+    class: cls,
     format,
     size,
     radius,
@@ -29,9 +30,11 @@ export function Radio(props: RadioProps) {
     radius,
     disabled,
     className,
+    class: cls,
   } as const;
 
   /**************************(State)**************************/
+
   const isSelected = selected === true;
 
   /**************************(Render)**************************/
@@ -43,6 +46,7 @@ export function Radio(props: RadioProps) {
       >
         <input
           type="radio"
+          // @ts-ignore
           className={iss(RadioStyle.input.getStyle(styleProps))}
           checked={isSelected}
           defaultChecked={defaultSelected}
@@ -56,7 +60,7 @@ export function Radio(props: RadioProps) {
           className={iss(RadioStyle.indicator.getStyle(styleProps))}
           data-checked={isSelected}
         >
-          {getChoiceInputIcon(icon, isSelected)}
+          {getChoiceInputIcon(icon)}
         </Slot>
       </label>
     </>

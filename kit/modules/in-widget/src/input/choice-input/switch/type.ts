@@ -11,7 +11,6 @@ export type SwitchHandleProps = StyleProps<typeof SwitchStyle.handle>;
 export type SwitchIconProps = StyleProps<typeof SwitchStyle.icon>;
 
 export type SwitchProps = StyleProps<typeof SwitchStyle.wrapper> &
-  // NOTE: Omiting children from JSX.SharedProps to prevent icon type inaccessibility
   Omit<JSX.SharedProps, "children"> & {
     selected?: boolean;
     defaultSelected?: boolean;
@@ -23,7 +22,13 @@ export type SwitchProps = StyleProps<typeof SwitchStyle.wrapper> &
      */
     icon?: ChoiceInputProps["icon"];
     children?: {
+      /**
+       * Track is the part that the handle moves on
+       */
       track?: SwitchTrackProps;
+      /**
+       * Handle is the part that moves when the switch is toggled
+       */
       handle?: SwitchHandleProps;
       icon?: SwitchIconProps;
     };

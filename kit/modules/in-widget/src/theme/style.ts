@@ -531,13 +531,13 @@ export const ThemeDisabled = {
     "opacity-disabled opacity-50",
     "text-(--muted)",
     "pointer-events-none",
-    "cursor-disabled",
+    "cursor-not-allowed",
     {
       web: {
         opacity: 0.5,
         color: "var(--muted)",
         pointerEvents: "none",
-        cursor: "disabled",
+        cursor: "not-allowed",
       },
     },
   ],

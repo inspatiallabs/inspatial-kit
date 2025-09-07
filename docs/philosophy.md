@@ -17,7 +17,7 @@ We're sold "frameworks," but what we get are:
 
 ### The Universal Rendering Vision
 
-InSpatial Run's core DNA is universal rendering. We asked a simple but revolutionary question: _What if React Native and React were one unified standard instead of two separate ecosystems?_
+InSpatial Kit's core DNA is universal rendering. We asked a simple but revolutionary question: _What if React Native and React were one unified standard instead of two separate ecosystems?_
 
 What if you could write JSX once and deploy everywhere web, mobile, embedded devices (Apple Watch, Google Watch), spatial platforms (Vision Pro, Meta Quest, AndroidXR) without rewriting for react-dom here and react-native there?
 
@@ -87,7 +87,7 @@ It's about **choice without complexity, portability without rewriting, runtime w
 
 ## Composition Over Monoliths
 
-InSpatial Run isn't a traditional monolithic framework it's a carefully orchestrated symphony of single-purpose, replaceable abstractions. Each @in module follows one core principle: **easy to add, easy to remove from any existing program**.
+InSpatial Kit isn't a traditional monolithic framework it's a carefully orchestrated symphony of single-purpose, replaceable abstractions. Each @in module follows one core principle: **easy to add, easy to remove from any existing program**.
 
 ### The Composability Mandate
 
@@ -117,9 +117,9 @@ This architecture means:
 - **Mix and match** - Combine InSpatial modules with your existing tools
 - **Future-proof your code** - New versions won't break your specific module combination
 
-### Why This Matters for InSpatial Run
+### Why This Matters for InSpatial Kit
 
-InSpatial Run demonstrates the power of this approach it's not a framework that owns you, it's a curated collection of the best @in modules working in harmony. You get the power of a complete system with the flexibility of individual components.
+InSpatial Kit demonstrates the power of this approach it's not a framework that owns you, it's a curated collection of the best @in modules working in harmony. You get the power of a complete system with the flexibility of individual components.
 
 It's the difference between buying a house (take it or leave it) and having an architect who can build exactly what you need from proven, interchangeable components. It is the difference between building a tool for app creators and building a tool for framework creators. But now you get both! This is what makes it universal serving creators at every layer of the stack.
 
@@ -143,7 +143,7 @@ Traditional development traps you in a local bubble:
 
 ### The Universal Development Reality
 
-With InSpatial Run, your development environment lives at a clean, memorable URL. No ports, no localhost, no local setup friction.
+With InSpatial Kit, your development environment lives at a clean, memorable URL. No ports, no localhost, no local setup friction.
 
 ### Why This Changes Everything
 
@@ -455,7 +455,7 @@ We didn't build this to win framework beauty contests or collect GitHub stars. W
 
 ### We're Not Playing That Game
 
-InSpatial Run isn't "React but faster" or "Vue but smaller." We're not competing in the framework beauty contest because **we're solving a fundamentally different problem**.
+InSpatial Kit isn't "React but faster" or "Vue but smaller." We're not competing in the framework beauty contest because **we're solving a fundamentally different problem**.
 
 ### The Real Question
 
@@ -473,11 +473,11 @@ Remember Backbone? JQuery, Ember? Knockout? Angular 1? CoffeeScript? The framewo
 
 ### We're Building Infrastructure, Not Fashion
 
-InSpatial Run is to frameworks what the internet is to individual websites. It's not another option in the framework dropdown it's the universal platform that makes the framework choice completely irrelevant.
+InSpatial Kit is to frameworks what the internet is to individual websites. It's not another option in the framework dropdown it's the universal platform that makes the framework choice completely irrelevant.
 
 ### So just another framework?
 
-Yes, by definition anything that ships with a renderer and a runtime in the same bundle is technically a framework. `InSpatial Run` is a framework. But calling `InSpatial` "just another framework" is like calling the iPhone "just another phone" or the internet "just another network."
+Yes, by definition anything that ships with a renderer and a runtime in the same bundle is technically a framework. `InSpatial Kit` is a framework. But calling `InSpatial` "just another framework" is like calling the iPhone "just another phone" or the internet "just another network."
 
 The web doesn't need another framework. It needs a universal development environment, a stable foundation that works everywhere, with everything, for everyone all at once. That's not a framework. That's an evolution.
 

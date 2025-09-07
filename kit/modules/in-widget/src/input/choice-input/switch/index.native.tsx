@@ -10,6 +10,8 @@ export function Switch(props: SwitchProps) {
   /**************************(Props)**************************/
   const {
     className,
+    class: cls,
+    style,
     size,
     radius,
     disabled,
@@ -25,12 +27,14 @@ export function Switch(props: SwitchProps) {
   // Track gets size, radius, disabled - handle only gets disabled
   const trackProps = { size, radius, disabled } as const;
   const handleProps = { disabled } as const;
-  const wrapperProps = { disabled, className } as const;
+  const wrapperProps = { disabled, className, class: cls } as const;
 
   /**************************(State)**************************/
+  
   const isSelected = selected === true;
 
   /**************************(Handlers)**************************/
+
   const handleChange = (event: any) => {
     const newSelected = event?.target?.checked ?? !isSelected;
     onChange?.(newSelected);
@@ -40,7 +44,10 @@ export function Switch(props: SwitchProps) {
 
   return (
     <>
-      <label className={iss(SwitchStyle.wrapper.getStyle(wrapperProps))}>
+      <label
+        className={iss(SwitchStyle.wrapper.getStyle(wrapperProps))}
+        style={style}
+      >
         <input
           type="checkbox"
           className={iss(SwitchStyle.input.getStyle({}))}
@@ -53,12 +60,24 @@ export function Switch(props: SwitchProps) {
           {...rest}
         />
         {(() => {
-          const { className: trackClassName, ...trackRest } =
-            children?.track ?? {};
-          const { className: handleClassName, ...handleRest } =
-            children?.handle ?? {};
-          const { className: iconClassName, ...iconRest } =
-            children?.icon ?? {};
+          const {
+            className: trackClassName,
+            class: trackClass,
+            style: trackStyle,
+            ...trackRest
+          } = children?.track ?? ({} as any);
+          const {
+            className: handleClassName,
+            class: handleClass,
+            style: handleStyle,
+            ...handleRest
+          } = children?.handle ?? ({} as any);
+          const {
+            className: iconClassName,
+            class: iconClass,
+            style: iconStyle,
+            ...iconRest
+          } = children?.icon ?? ({} as any);
 
           return (
             <Slot
@@ -66,9 +85,11 @@ export function Switch(props: SwitchProps) {
                 SwitchStyle.track.getStyle({
                   ...trackProps,
                   className: trackClassName,
+                  class: trackClass,
                 })
               )}
               data-checked={isSelected}
+              style={trackStyle}
               {...trackRest}
             >
               <Slot
@@ -77,15 +98,21 @@ export function Switch(props: SwitchProps) {
                     ...trackProps,
                     ...handleProps,
                     className: handleClassName,
+                    class: handleClass,
                   })
                 )}
                 data-checked={isSelected}
+                style={handleStyle}
                 {...handleRest}
               >
                 <Slot
                   className={iss(
-                    SwitchStyle.icon.getStyle({ className: iconClassName })
+                    SwitchStyle.icon.getStyle({
+                      className: iconClassName,
+                      class: iconClass,
+                    })
                   )}
+                  style={iconStyle}
                   {...iconRest}
                 >
                   {getChoiceInputIcon(icon, isSelected)}

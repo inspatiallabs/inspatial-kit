@@ -4,13 +4,15 @@ import { ThemeDisabled, ThemeRadius } from "@in/widget/theme/style.ts";
 //##############################################( CREATE STYLE)##############################################//
 
 export const TabStyle = {
-  /*******************************(Wrapper)********************************/
-  // Wrapper is the container and background for all tabs
-  wrapper: createStyle({
-    name: "tab-wrapper",
+  /*******************************(Root)********************************/
+  // Root is the container and background for all tabs
+  root: createStyle({
+    name: "tab-root",
     base: [
       {
         web: {
+          height: "100%",
+          width: "100%",
           display: "inline-flex",
           alignItems: "center",
           cursor: "pointer",
@@ -163,10 +165,14 @@ export const TabStyle = {
     base: [
       {
         web: {
+          height: "100%",
+          width: "100%",
+
           position: "relative",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          gap: "4px",
           cursor: "pointer",
           userSelect: "none",
 
@@ -214,7 +220,7 @@ export const TabStyle = {
               // Checked state - the tab is selected
               ".peer:checked ~ &": {
                 color: "var(--primary)",
-                borderBottom: "4px solid var(--brand)",
+                borderBottom: "4px solid var(--primary)",
               },
             },
           },
@@ -306,6 +312,39 @@ export const TabStyle = {
       radius: "none",
       disabled: false,
     },
+  }),
+
+  /*******************************(Wrapper)********************************/
+  // Wrapper is the secondary container incharge of proper positioning of the items inside it
+  wrapper: createStyle({
+    name: "tab-wrapper",
+    base: [
+      {
+        web: {
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100%",
+          width: "100%",
+        },
+      },
+    ],
+  }),
+
+  /*******************************(Icon)********************************/
+  // Icon is the icon for the tab 😂
+  icon: createStyle({
+    name: "tab-icon",
+    base: [
+      {
+        web: {
+          display: "flex",
+          height: "100%",
+          alignItems: "center",
+          justifyContent: "center",
+        },
+      },
+    ],
   }),
 
   /*******************************(Input)********************************/

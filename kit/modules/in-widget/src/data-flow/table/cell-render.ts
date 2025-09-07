@@ -16,7 +16,7 @@ function toErgonomicCellProps(ctx: any): any | null {
   }
 
   if (row || value !== undefined) {
-    // Merge ergonomic aliases with the original TanStack context.
+    // Merge ergonomic aliases with the original Table context.
     // Important: do NOT overwrite ctx.row. Keep Row<TData> intact for native usage.
     return {
       ...ctx,
@@ -36,7 +36,7 @@ export function cellRender<TProps>(
   if (!Comp) return null;
 
   if (typeof Comp === "function") {
-    // Map TanStack CellContext to merged props (native + ergonomic aliases)
+    // Map Table CellContext to merged props (native + ergonomic aliases)
     const merged = toErgonomicCellProps(props) ?? props;
     const result = Comp(merged as TProps);
     // If the result is a plain value (string, number, etc), return it directly

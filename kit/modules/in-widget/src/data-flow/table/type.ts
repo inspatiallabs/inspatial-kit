@@ -6,6 +6,7 @@ import type { DockProps } from "@in/widget/presentation/dock/type.ts";
 import type { ButtonProps } from "@in/widget/ornament/button/type.ts";
 import type { InputFieldProps } from "@in/widget/input/type.ts";
 import type { ListProps } from "@in/widget/data-flow/list/type.ts";
+import { TabProps } from "@in/widget/ornament/index.ts";
 
 /*####################################(TABLE WRAPPER PROPS)####################################*/
 
@@ -21,6 +22,11 @@ export type TableHeaderProps = StyleProps<typeof TableStyle.header> &
 
 export type TableHeaderColumnProps = StyleProps<typeof TableStyle.head> &
   JSX.SharedProps;
+
+/*####################################(TABLE HEADER RELATIONS PROPS)####################################*/
+
+export type TableHeaderRelationsProps = StyleProps<typeof TableStyle.head> &
+  TabProps;
 
 /*####################################(TABLE HEADER BAR PROPS)####################################*/
 

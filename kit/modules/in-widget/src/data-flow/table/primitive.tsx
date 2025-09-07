@@ -9,6 +9,7 @@ import type {
   TableHeaderBarProps,
   TableRowProps,
   TableWrapperProps,
+  TableHeaderRelationsProps,
 } from "./type.ts";
 import { Button, type ButtonProps } from "@in/widget/ornament/button/index.ts";
 import { Slot, XStack } from "@in/widget/structure/index.ts";
@@ -18,6 +19,7 @@ import { CaretRightPrimeIcon } from "@in/widget/icon/caret-right-prime-icon.tsx"
 import { FunnelIcon } from "@in/widget/icon/funnel-icon.tsx";
 import { ShareIIIcon } from "@in/widget/icon/share-ii-icon.tsx";
 import { InputField } from "@in/widget/input/index.ts";
+import { Tab, TabProps } from "@in/widget/ornament/index.ts"
 
 /*####################################(TABLE HEADER)####################################*/
 export function TableHeader({
@@ -55,7 +57,7 @@ export function TableList({
 }: TableListProps) {
   if (each) {
     const { lazy } = require("@in/widget/performance/lazy/index.ts");
-    const List = lazy(() => import("../list/core.ts"), "List");
+    const List = lazy(() => import("@in/widget/data-flow/list/core.ts"), "List");
     return (
       <tbody
         $ref={$ref}
@@ -363,6 +365,23 @@ export function TableCaption({
     >
       {children}
     </caption>
+  );
+}
+
+/*####################################(TABLE HEADER RELATIONS)####################################*/
+export function TableHeaderRelations({
+  className,
+  format,
+  $ref,
+  children,
+  ...rest
+}: TableHeaderRelationsProps) {
+  return (
+    <Slot>
+      <Tab {...(rest as TabProps)}>
+        {children}
+      </Tab>
+    </Slot>
   );
 }
 
