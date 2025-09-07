@@ -6,7 +6,7 @@ import type { DockProps } from "@in/widget/presentation/dock/type.ts";
 import type { ButtonProps } from "@in/widget/ornament/button/type.ts";
 import type { InputFieldProps } from "@in/widget/input/type.ts";
 import type { ListProps } from "@in/widget/data-flow/list/type.ts";
-import { TabProps } from "@in/widget/ornament/index.ts";
+import type { TabProps } from "@in/widget/ornament/index.ts";
 
 /*####################################(TABLE WRAPPER PROPS)####################################*/
 
@@ -25,8 +25,19 @@ export type TableHeaderColumnProps = StyleProps<typeof TableStyle.head> &
 
 /*####################################(TABLE HEADER RELATIONS PROPS)####################################*/
 
-export type TableHeaderRelationsProps = StyleProps<typeof TableStyle.head> &
-  TabProps;
+export type TableHeaderRelationsProps = TabProps &
+  JSX.SharedProps & {
+    wrapper?: JSX.SharedProps;
+    children?: TabProps["children"];
+    cta?: ButtonProps | ButtonProps[];
+  };
+
+export type TableHeaderNavigatorProps = TabProps &
+  JSX.SharedProps & {
+    wrapper?: JSX.SharedProps;
+    children?: TabProps["children"];
+    cta?: ButtonProps | ButtonProps[];
+  };
 
 /*####################################(TABLE HEADER BAR PROPS)####################################*/
 
@@ -46,7 +57,7 @@ export interface TableHeaderBarSearchProps extends InputFieldProps {
 
 export interface TableHeaderBarActionsProps {
   display?: boolean;
-  customActions?: ButtonProps[];
+  actions?: (ButtonProps | JSX.Element)[];
   importExport?: ButtonProps | boolean;
   newEntry?: ButtonProps | boolean;
 }
@@ -131,4 +142,16 @@ export type TableProps<TData, TValue> = TablePrimitiveProps & {
   // cell?: TableCellProps;
   // caption?: TableCaptionProps;
   // footer?: TableFooterProps;
+  navigator?: TableHeaderNavigatorProps;
+  relations?: TableHeaderRelationsProps;
+  headerBar?: {
+    display?: boolean;
+    cta?: TableHeaderBarProps["actions"];
+  };
+  
+  // Presentation Components
+  presentations?: {
+    modals?: JSX.Element[];
+    drawers?: JSX.Element[];
+  };
 };

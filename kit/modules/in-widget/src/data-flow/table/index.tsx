@@ -16,6 +16,7 @@ import {
   TableRow,
   TableHeaderBar,
   TableHeaderRelations,
+  TableHeaderNavigator,
 } from "./primitive.tsx";
 import { $ } from "@in/teract/state";
 import { Button } from "@in/widget/ornament/button/index.ts";
@@ -44,6 +45,7 @@ import { SecurityKeyIcon } from "@in/widget/icon/security-key-icon.tsx";
 import { DirectionRightIcon } from "@in/widget/icon/direction-right-icon.tsx";
 import { Switch, Checkbox } from "@in/widget/input/index.ts";
 import { Tab } from "@in/widget/ornament/index.ts";
+import { PlusIcon } from "@in/widget/icon/plus-icon.tsx";
 
 // import { DropdownMenu } from "../../navigation/dropdown-menu/index.tsx";
 
@@ -64,6 +66,10 @@ export function Table<TData, TValue>({
   checkedRows,
   contextMenuActions,
   dockMenuActions,
+  navigator,
+  relations,
+  headerBar,
+  presentations,
 }: TableProps<TData, TValue>) {
   if (!data || !columns) {
     return <Text>No data or columns provided to table</Text>;
@@ -347,131 +353,58 @@ export function Table<TData, TValue>({
           }}
         >
           {/*#################################(Table Presentations)#################################*/}
-
-          <Modal id="import-export-modal" className="p-8">
-            <Text className="text-2xl mb-4">Import/Export Entries</Text>
-          </Modal>
-
-          <Modal
-            id="create-new-field-modal"
-            children={{
-              view: [
-                {
-                  children: (
-                    <YStack className="p-6 gap-3">
-                      <Text className="text-xl font-semibold">New Field</Text>
-                    </YStack>
-                  ),
-                },
-              ],
-            }}
-          />
-
-          <Modal
-            id="update-field-modal"
-            children={{
-              view: [
-                {
-                  children: (
-                    <YStack className="p-6 gap-3">
-                      <Text className="text-xl font-semibold">
-                        Update Field
-                      </Text>
-                    </YStack>
-                  ),
-                },
-              ],
-            }}
-          />
-
-          <Drawer id="create-new-entry-drawer">
-            <Text>New Entry Form</Text>
-          </Drawer>
-
-          <Drawer id="update-entry-drawer">
-            <Text>Update Entry Form</Text>
-          </Drawer>
+          {presentations?.modals?.map((modal, index) => (
+            <>{modal}</>
+          ))}
+          {presentations?.drawers?.map((drawer, index) => (
+            <>{drawer}</>
+          ))}
 
           {/*#################################(Table Header Navigator)#################################*/}
-
+          {navigator && (
+            <TableHeaderNavigator {...navigator} />
+          )}
+          
           {/*#################################(Table Header Relations)#################################*/}
-
-          <Slot
-            style={{
-              web: {
-                width: "100%",
-                alignItems: "center",
-                padding: "10px",
-                backgroundColor: "var(--surface)",
-                marginBottom: "2px",
-              },
-            }}
-          >
-            <Tab
-              radius="sm"
-              format="segmented"
-              size="lg"
-              selected={"profiles"}
-              on:input={(label: any) => {}}
-              children={[
-                { label: "Profiles" },
-                { label: "Organizations" },
-                { label: "Sessions" },
-                { label: "Activity" },
-                { label: "Payments" },
-              ]}
-            />
-          </Slot>
+          {relations && (
+            <TableHeaderRelations {...relations} />
+          )}
 
           {/*#################################(Table Header Bar)#################################*/}
-          <TableHeaderBar
-            pagination={{
-              display: true,
-              prev: { "on:tap": () => table.previousPage() } as any,
-              next: { "on:tap": () => table.nextPage() } as any,
-            }}
-            filter={{ display: true }}
-            search={
-              {
-                display: Boolean(filterColumn),
-                placeholder: filterColumn
-                  ? `Search by ${formatColumnName(filterColumn)}...`
-                  : "Search...",
-                value:
-                  (filterColumn &&
-                    (table
+          {headerBar?.display !== false && (
+            <TableHeaderBar
+              pagination={{
+                display: true,
+                prev: { "on:tap": () => table.previousPage() } as any,
+                next: { "on:tap": () => table.nextPage() } as any,
+              }}
+              filter={{ display: true }}
+              search={
+                {
+                  display: Boolean(filterColumn),
+                  placeholder: filterColumn
+                    ? `Search by ${formatColumnName(filterColumn)}...`
+                    : "Search...",
+                  value:
+                    (filterColumn &&
+                      (table
+                        .getColumn(filterColumn)
+                        ?.getFilterValue() as string)) ||
+                    "",
+                  "on:input": (event: any) => {
+                    if (!filterColumn) return;
+                    const raw =
+                      typeof event === "string" ? event : event?.target?.value;
+                    const next = typeof raw === "string" ? raw.trim() : raw;
+                    table
                       .getColumn(filterColumn)
-                      ?.getFilterValue() as string)) ||
-                  "",
-                "on:input": (event: any) => {
-                  if (!filterColumn) return;
-                  const raw =
-                    typeof event === "string" ? event : event?.target?.value;
-                  const next = typeof raw === "string" ? raw.trim() : raw;
-                  table
-                    .getColumn(filterColumn)
-                    ?.setFilterValue(next ? next : undefined);
-                },
-              } as any
-            }
-            actions={{
-              display: true,
-
-              importExport: {
-                "on:presentation": {
-                  id: "import-export-modal",
-                  action: "toggle",
-                },
-              },
-
-              newEntry: {
-                "on:presentation": {
-                  id: "create-new-entry-drawer",
-                  action: "toggle",
-                },
-              },
-            }}
-          />
+                      ?.setFilterValue(next ? next : undefined);
+                  },
+                } as any
+              }
+              actions={headerBar?.cta}
+            />
+          )}
 
           {/* Table Wrapper */}
           <TableWrapper>

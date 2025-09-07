@@ -7,6 +7,8 @@ export type TabItemProps = JSX.SharedProps & {
   label: string;
   /**
    * Optional explicit value. If omitted, the component derives a deterministic value from label.
+   * Use when you need to distinguish between tabs with the same label.
+   * e.g when your tab item is an icon and you need to distinguish between tabs with the same icon.
    */
   value?: string;
   to?: string;

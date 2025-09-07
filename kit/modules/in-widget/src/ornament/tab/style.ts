@@ -229,6 +229,24 @@ export const TabStyle = {
             },
           },
         ],
+        rabi: [
+          {
+            web: {
+              borderRight: "1px solid var(--background)",
+              
+              // Hover state
+              //   "&:hover": {
+              //     backgroundColor: "rgba(255, 255, 255, 0.05)",
+              //   },
+
+              // Checked state - the tab is selected
+              ".peer:checked ~ &": {
+                backgroundColor: "var(--background)",
+                color: "var(--primary)",
+              },
+            },
+          },
+        ],
       },
 
       radius: ThemeRadius,

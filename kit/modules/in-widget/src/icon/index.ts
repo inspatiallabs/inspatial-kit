@@ -16,6 +16,7 @@ export * from "./x-prime-icon.tsx";
 export * from "./plus-prime-icon.tsx";
 export * from "./minimize-icon.tsx";
 export * from "./maximize-icon.tsx";
+export * from "./api-icon.tsx";
 export * from "./share-ii-icon.tsx";
 export * from "./settings-icon.tsx";
 export * from "./pencil-icon.tsx";

@@ -1,4 +1,5 @@
 import { TableStyle } from "./style.ts";
+import { ensureArray } from "@in/vader";
 import type {
   TableListProps,
   TableCaptionProps,
@@ -10,6 +11,7 @@ import type {
   TableRowProps,
   TableWrapperProps,
   TableHeaderRelationsProps,
+  TableHeaderNavigatorProps,
 } from "./type.ts";
 import { Button, type ButtonProps } from "@in/widget/ornament/button/index.ts";
 import { Slot, XStack } from "@in/widget/structure/index.ts";
@@ -19,7 +21,8 @@ import { CaretRightPrimeIcon } from "@in/widget/icon/caret-right-prime-icon.tsx"
 import { FunnelIcon } from "@in/widget/icon/funnel-icon.tsx";
 import { ShareIIIcon } from "@in/widget/icon/share-ii-icon.tsx";
 import { InputField } from "@in/widget/input/index.ts";
-import { Tab, TabProps } from "@in/widget/ornament/index.ts"
+import { Tab, TabProps } from "@in/widget/ornament/index.ts";
+import { PlusIcon } from "@in/widget/icon/plus-icon.tsx";
 
 /*####################################(TABLE HEADER)####################################*/
 export function TableHeader({
@@ -57,7 +60,10 @@ export function TableList({
 }: TableListProps) {
   if (each) {
     const { lazy } = require("@in/widget/performance/lazy/index.ts");
-    const List = lazy(() => import("@in/widget/data-flow/list/core.ts"), "List");
+    const List = lazy(
+      () => import("@in/widget/data-flow/list/core.ts"),
+      "List"
+    );
     return (
       <tbody
         $ref={$ref}
@@ -172,8 +178,10 @@ export function TableHeaderBar({
   const showFilter = filter?.display ?? true;
   const showSearch = search?.display ?? true;
   const showActions = actions?.display ?? true;
-  const importExport = actions?.importExport ?? true;
-  const newEntry = actions?.newEntry ?? true;
+  
+  // Check if importExport and newEntry should be displayed
+  const showImportExport = actions?.importExport && actions.importExport !== false;
+  const showNewEntry = actions?.newEntry && actions.newEntry !== false;
 
   // Strip display before spreading into elements
   const {
@@ -187,6 +195,8 @@ export function TableHeaderBar({
   const {
     display: _aDisp,
     actions: customActions = [],
+    importExport,
+    newEntry,
     ...actionsRest
   } = actions || ({} as any);
 
@@ -287,7 +297,7 @@ export function TableHeaderBar({
           <>
             <XStack gap={10}>
               {/***********(Import/Export Button)************/}
-              {importExport && (
+              {showImportExport && (
                 <Button
                   format="outlineBackground"
                   size="lg"
@@ -298,23 +308,32 @@ export function TableHeaderBar({
                       padding: "4px",
                     },
                   }}
-                  {...(importExport as ButtonProps)}
+                  {...(typeof importExport === 'object' ? importExport : {})}
                 >
-                  {importExport && <ShareIIIcon />}
+                  {(typeof importExport === 'object' && importExport.children) ? 
+                    importExport.children : <ShareIIIcon />}
                 </Button>
               )}
 
               {/***********(New Entry (Row) Button)************/}
-              {newEntry && (
-                <Button {...(newEntry as ButtonProps)}>
-                  {newEntry.label ?? "New Entry"} 
+              {showNewEntry && (
+                <Button 
+                  {...(typeof newEntry === 'object' ? newEntry : {})}
+                >
+                  {(typeof newEntry === 'object' && (newEntry.children || newEntry.label)) ? 
+                    (newEntry.children || newEntry.label) : "New Entry"}
                 </Button>
               )}
 
               {/* Custom user actions */}
-              {(customActions as any[]).map((btnProps: any, idx: number) => (
-                <Button key={idx} {...btnProps} />
-              ))}
+              {ensureArray(customActions).map((action: any, idx: number) => {
+                // If it's a JSX element (has $$typeof or type property), render it directly
+                if (action && typeof action === 'object' && (action.$$typeof || action.type)) {
+                  return action;
+                }
+                // Otherwise treat it as ButtonProps
+                return <Button key={idx} {...action} />;
+              })}
               {children}
             </XStack>
           </>
@@ -369,18 +388,88 @@ export function TableCaption({
 }
 
 /*####################################(TABLE HEADER RELATIONS)####################################*/
-export function TableHeaderRelations({
-  className,
-  format,
-  $ref,
-  children,
-  ...rest
-}: TableHeaderRelationsProps) {
+export function TableHeaderRelations(props: TableHeaderRelationsProps) {
+  const { wrapper, children, cta, ...tabProps } = props;
+  
   return (
-    <Slot>
-      <Tab {...(rest as TabProps)}>
-        {children}
-      </Tab>
+    <Slot
+      {...wrapper}
+      style={{
+        web: {
+          width: "100%",
+          alignItems: "center",
+          padding: "10px",
+          backgroundColor: "var(--surface)",
+          marginBottom: "2px",
+          ...(wrapper?.style?.web || {}),
+        },
+      }}
+    >
+      <Tab
+        radius="sm"
+        format="segmented"
+        size="lg"
+        {...tabProps}
+        children={children}
+      />
+      {cta && Array.isArray(cta) ? (
+        cta.map((button, index) => (
+          <Button key={index} {...button}>
+            {button.children}
+          </Button>
+        ))
+      ) : cta ? (
+        <Button {...cta}>
+          {cta.children}
+        </Button>
+      ) : null}
+    </Slot>
+  );
+}
+
+/*####################################(TABLE HEADER NAVIGATOR)####################################*/
+export function TableHeaderNavigator(props: TableHeaderNavigatorProps) {
+  const { wrapper, children, cta, ...tabProps } = props;
+
+  return (
+    <Slot
+      {...wrapper}
+      style={{
+        web: {
+          width: "100%",
+          backgroundColor: "var(--surface)",
+          ...(wrapper?.style?.web || {}),
+        },
+      }}
+    >
+      <XStack
+        style={{
+          web: {
+            display: "flex",
+            width: "fit-content",
+            alignItems: "center",
+            marginBottom: "2px",
+          },
+        }}
+      >
+        <Tab
+          radius="none"
+          format="rabi"
+          size="lg"
+          {...tabProps}
+          children={children}
+        />
+        {cta && (
+          <Button
+            size="lg"
+            format="ghost"
+            radius="none"
+            {...(cta as ButtonProps)}
+          >
+            {(cta as ButtonProps).children || <PlusIcon scale="9xs" />}
+          </Button>
+        )}
+      </XStack>
     </Slot>
   );
 }

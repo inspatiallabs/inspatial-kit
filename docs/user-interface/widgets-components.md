@@ -113,35 +113,36 @@ Tables are zebra-striped by default. Striping is applied in `TableStyle.body` us
 
 **Manual Overide of `Zebra` Table Row**
 
-```typescript
-import {
-  TableList,
-  TableCell,
-  TableHeaderColumn,
-  TableHeader,
-  TableRow,
-  TableWrapper,
-} from "@inspatial/kit/control-flow";
+```jsx
+import { Table } from "@inspatial/kit/data-flow";
 
-<TableWrapper>
-  <TableHeader>
-    <TableRow>
-      <TableHeaderColumn>ID</TableHeaderColumn>
-      <TableHeaderColumn>Name</TableHeaderColumn>
-    </TableRow>
-  </TableHeader>
-  <TableList>
-    {entries.get().map((entry: EntryProps, idx: number) => (
-      <TableRow
-        key={entry.id}
-        className={idx % 2 === 0 ? "!bg-black-500" : "!bg-yellow-500"}
-      >
-        <TableCell>{entry.id}</TableCell>
-        <TableCell>{entry.name}</TableCell>
-      </TableRow>
-    ))}
-  </TableList>
-</TableWrapper>;
+<Table
+  columns={fields}
+  data={entries.get()}
+  filterColumn="name" // Table handles search/filter internally
+  headerBar={{
+    display: true, // Show/hide header bar
+    cta: {
+      // Only actions are customizable
+      display: true,
+      importExport: {
+        "on:presentation": {
+          /* ... */
+        },
+      },
+      newEntry: {
+        label: "Add Entry",
+        "on:presentation": {
+          /* ... */
+        },
+      },
+      actions: [
+        /* custom buttons */
+      ],
+    },
+  }}
+  presentations={{ modals, drawers }}
+/>;
 ```
 
 ### Presentation
