@@ -88,10 +88,8 @@ declare global {
     type NamespacePropKey = `${string}:${string}`;
     type EventHandler = (...args: any[]) => any;
     type ExtensionTriggerKeys = keyof GeneratedTriggers;
-    type AllTriggerKeys =
-      | InUniversalTriggerPropsType
-      | ExtensionTriggerKeys
-      | string;
+    // Restrict known keys to enable IntelliSense. 
+    type AllTriggerKeys = InUniversalTriggerPropsType | ExtensionTriggerKeys;
     type TriggerPropKey = `on:${AllTriggerKeys}`;
     type UniversalTriggerProps = AllTriggerKeys;
     type KnownOnPropKey = `on:${
@@ -168,7 +166,8 @@ declare global {
       } & {
         [K in ClassPropKey]?: boolean | string | number | null | undefined;
       } & {
-        [K in TriggerPropKey]?: EventHandler | any;
+        // Known, strongly-typed on: props
+        [K in KnownOnPropKey]?: KnownOnProps[K];
       } & { [K in NamespacePropKey]?: unknown }; // Fallback for other namespaced directives (e.g., svg:xlink)
 
     // Default: All elements will default to InSpatial's shared props

@@ -6,7 +6,7 @@
     "js:watch": "deno bundle --platform=browser --output=dist/bundle.js --sourcemap --watch src/config/render.ts",
     "build": "deno task setup && deno bundle --platform=browser --output=dist/bundle.js --sourcemap --minify src/config/render.ts",
     "serve": "deno run --allow-net --allow-read --allow-write --allow-env --allow-run src/config/render.ts",
-    "clean": "rm -rf dist && rm -rf node_modules && rm -rf deno.lock && rm -rf src/app/.inroute"
+    "clean": "rm -rf dist && rm -rf node_modules && rm -rf deno.lock && rm -rf src/app/.inroute && rm -f src/types/extension-trigger-types.generated.d.ts"
   },
   "compilerOptions": {
     "lib": ["ES2022", "DOM", "DOM.Iterable", "deno.ns"],

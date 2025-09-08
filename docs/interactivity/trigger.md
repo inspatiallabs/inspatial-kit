@@ -136,13 +136,23 @@ This lets you react to a connected gamepad’s state as it changes (polled ~ever
 // Read button/axis state
 <View
   on:gamepad={(gp: {
-    connected: boolean;
-    buttonA: boolean; buttonB: boolean; buttonX: boolean; buttonY: boolean;
-    joystick: [number, number]; // left stick: [x,y]
-    joystickRight: [number, number]; // right stick: [x,y]
-    RB: boolean; LB: boolean; RT: boolean; LT: boolean;
-    start: boolean; select: boolean;
-    up: boolean; down: boolean; left: boolean; right: boolean;
+    connected: boolean,
+    buttonA: boolean,
+    buttonB: boolean,
+    buttonX: boolean,
+    buttonY: boolean,
+    joystick: [number, number], // left stick: [x,y]
+    joystickRight: [number, number], // right stick: [x,y]
+    RB: boolean,
+    LB: boolean,
+    RT: boolean,
+    LT: boolean,
+    start: boolean,
+    select: boolean,
+    up: boolean,
+    down: boolean,
+    left: boolean,
+    right: boolean,
   }) => {
     if (!gp.connected) return;
     if (gp.buttonA) action.jump();
@@ -162,7 +172,11 @@ Fires when the browser reports a gamepad was connected.
 
 ```tsx
 <View
-  on:gamepadconnect={(e: { type: "gamepadconnect"; index?: number; id?: string }) => {
+  on:gamepadconnect={(e: {
+    type: "gamepadconnect";
+    index?: number;
+    id?: string;
+  }) => {
     console.log("Gamepad connected", e.index, e.id);
   }}
 />
@@ -173,7 +187,11 @@ Fires when a gamepad disconnects.
 
 ```tsx
 <View
-  on:gamepaddisconnect={(e: { type: "gamepaddisconnect"; index?: number; id?: string }) => {
+  on:gamepaddisconnect={(e: {
+    type: "gamepaddisconnect";
+    index?: number;
+    id?: string;
+  }) => {
     console.log("Gamepad disconnected", e.index, e.id);
   }}
 />
@@ -197,8 +215,8 @@ This is the unified keyboard trigger. It emits for both key down and key up with
 ```jsx
 <View
   on:key={(e) => {
-    if (e.key === 'Enter' && e.phase === 'down') submit();
-    if (e.key === 'Escape' && e.phase === 'down') close();
+    if (e.key === "Enter" && e.phase === "down") submit();
+    if (e.key === "Escape" && e.phase === "down") close();
   }}
 />
 ```
@@ -218,6 +236,7 @@ Phase-specific sugars for the same event. They carry the same payload.
 ```
 
 ###### Key Trigger Helpers
+
 InSpatial Kit also provides direct key triggers, allowing you to handle keyboard events more easily and with less code.
 
 **on:escape**
@@ -230,7 +249,7 @@ Convenience sugar for a very common case. Internally built on the same keyboard 
 <View on:key={(e) => e.key === 'Escape' && e.phase === 'down' && close()} />
 ```
 
-NOTE: Direct key triggers (like on:enter or on:space) will be available soon, making it as easy as using on:escape for every sing Key available. 
+NOTE: Direct key triggers (like on:enter or on:space) will be available soon, making it as easy as using on:escape for every sing Key available.
 
 ##### G. Extension/Custom Triggers
 
@@ -242,12 +261,12 @@ Extensions can add their own trigger props through the `capabilities.triggers` A
 Fires when navigation occurs in your application. This trigger is provided by the InRoute extension.
 
 ```tsx
-<View 
-  on:route={(e: { 
-    path: string; 
-    params?: Record<string, string>; 
-    query?: Record<string, string>; 
-    name?: string 
+<View
+  on:route={(e: {
+    path: string;
+    params?: Record<string, string>;
+    query?: Record<string, string>;
+    name?: string;
   }) => {
     console.log("Navigated to:", e.path);
   }}
@@ -262,10 +281,10 @@ Fires when navigation occurs in your application. This trigger is provided by th
 Controls modals, drawers, and other presentation components. Provided by the InPresentation extension.
 
 ```tsx
-<Button 
-  on:presentation={{ 
-    id: "my-modal", 
-    action: "toggle" 
+<Button
+  on:presentation={{
+    id: "my-modal",
+    action: "toggle",
   }}
 >
   Open Modal
@@ -280,10 +299,10 @@ The InCloud extension provides three triggers for cloud connectivity:
 Monitors the real-time connection status with the cloud backend.
 
 ```tsx
-<View 
-  on:cloudStatus={(e: { 
-    type: "cloudStatus"; 
-    status: "connecting" | "open" | "closed" | "error" | "reconnected" 
+<View
+  on:cloudStatus={(e: {
+    type: "cloudStatus";
+    status: "connecting" | "open" | "closed" | "error" | "reconnected";
   }) => {
     updateConnectionIndicator(e.status);
   }}
@@ -294,7 +313,7 @@ Monitors the real-time connection status with the cloud backend.
 Fires specifically when the cloud connection is re-established after a disconnect.
 
 ```tsx
-<View 
+<View
   on:cloudReconnected={() => {
     // Refresh data after reconnection
     fetchLatestData();
@@ -306,12 +325,8 @@ Fires specifically when the cloud connection is re-established after a disconnec
 Receives notifications from the cloud backend.
 
 ```tsx
-<View 
-  on:cloudNotify={(e: { 
-    type: string; 
-    title?: string; 
-    message: string 
-  }) => {
+<View
+  on:cloudNotify={(e: { type: string; title?: string; message: string }) => {
     showToast(e.message);
   }}
 />
@@ -364,31 +379,39 @@ createTrigger("hover", (node, cb?: (e: Event) => void) => {
 });
 
 // Example: swipe with pointer events
-createTrigger("swipe", (node, cb?: (e: { type: string; dx: number }) => void) => {
-  if (!cb) return;
-  let startX = 0;
-  const down = (e: PointerEvent) => (startX = e.clientX);
-  const up = (e: PointerEvent) => {
-    const dx = e.clientX - startX;
-    if (Math.abs(dx) > 50) { // Minimum swipe distance
-      cb({ type: "swipe", direction: dx > 0 ? "right" : "left", distance: Math.abs(dx) });
-    }
-  };
-  node.addEventListener("pointerdown", down);
-  node.addEventListener("pointerup", up);
-  
-  // Return cleanup function (optional)
-  return () => {
-    node.removeEventListener("pointerdown", down);
-    node.removeEventListener("pointerup", up);
-  };
-});
+createTrigger(
+  "swipe",
+  (node, cb?: (e: { type: string; dx: number }) => void) => {
+    if (!cb) return;
+    let startX = 0;
+    const down = (e: PointerEvent) => (startX = e.clientX);
+    const up = (e: PointerEvent) => {
+      const dx = e.clientX - startX;
+      if (Math.abs(dx) > 50) {
+        // Minimum swipe distance
+        cb({
+          type: "swipe",
+          direction: dx > 0 ? "right" : "left",
+          distance: Math.abs(dx),
+        });
+      }
+    };
+    node.addEventListener("pointerdown", down);
+    node.addEventListener("pointerup", up);
+
+    // Return cleanup function (optional)
+    return () => {
+      node.removeEventListener("pointerdown", down);
+      node.removeEventListener("pointerup", up);
+    };
+  }
+);
 ```
 
 Once registered, you can use your custom triggers anywhere in your app:
 
 ```tsx
-<View 
+<View
   on:hover={(e) => console.log("Hover state:", e.type)}
   on:swipe={(e) => console.log("Swiped:", e.direction)}
 >
@@ -412,10 +435,10 @@ import { createExtension } from "@inspatial/kit/extension";
 
 export function MyExtension() {
   return createExtension({
-    meta: { 
+    meta: {
       key: "MyExtension",
       name: "My Custom Extension",
-      description: "Adds custom interaction triggers"
+      description: "Adds custom interaction triggers",
     },
     lifecycle: {
       setup() {
@@ -424,20 +447,23 @@ export function MyExtension() {
           if (!cb) return;
           let timeoutId: number;
           const enter = (e: Event) => {
-            timeoutId = setTimeout(() => cb({ type: "longHover", event: e }), 1000);
+            timeoutId = setTimeout(
+              () => cb({ type: "longHover", event: e }),
+              1000
+            );
           };
           const leave = () => clearTimeout(timeoutId);
           node.addEventListener("mouseenter", enter);
           node.addEventListener("mouseleave", leave);
-          
+
           return () => {
             node.removeEventListener("mouseenter", enter);
             node.removeEventListener("mouseleave", leave);
             clearTimeout(timeoutId);
           };
         });
-      }
-    }
+      },
+    },
   });
 }
 ```
@@ -458,7 +484,7 @@ export function SwipeExtension() {
     meta: {
       key: "SwipeExtension",
       name: "Swipe Gestures",
-      description: "Adds swipe gesture support"
+      description: "Adds swipe gesture support",
     },
     capabilities: {
       triggers: {
@@ -470,23 +496,27 @@ export function SwipeExtension() {
             const up = (e: PointerEvent) => {
               const dx = e.clientX - startX;
               if (Math.abs(dx) > 50) {
-                cb({ 
-                  type: "swipe", 
-                  direction: dx > 0 ? "right" : "left", 
-                  distance: Math.abs(dx) 
+                cb({
+                  type: "swipe",
+                  direction: dx > 0 ? "right" : "left",
+                  distance: Math.abs(dx),
                 });
               }
             };
             node.addEventListener("pointerdown", down);
             node.addEventListener("pointerup", up);
-            
+
             return () => {
               node.removeEventListener("pointerdown", down);
               node.removeEventListener("pointerup", up);
             };
           },
-          type: {} as { type: "swipe"; direction: "left" | "right"; distance: number },
-          description: "Detects horizontal swipe gestures"
+          type: {} as {
+            type: "swipe";
+            direction: "left" | "right";
+            distance: number;
+          },
+          description: "Detects horizontal swipe gestures",
         },
         pinch: {
           handler: (node, cb) => {
@@ -494,58 +524,71 @@ export function SwipeExtension() {
             if (!cb) return;
             // ... implementation details
           },
-          type: {} as { type: "pinch"; scale: number; center: { x: number; y: number } },
-          description: "Detects pinch/zoom gestures"
-        }
-      }
-    }
+          type: {} as {
+            type: "pinch";
+            scale: number;
+            center: { x: number; y: number };
+          },
+          description: "Detects pinch/zoom gestures",
+        },
+      },
+    },
   });
 }
 ```
 
-**Step 2: Create Type Declarations (Optional)**
+**Step 2: Create Type Declarations (Optional, for IntelliSense)**
 
-If you want TypeScript completion for your triggers, create a `types.d.ts` file in your extension:
+If you want TypeScript completion for your triggers in JSX, add a `types.d.ts` file to your extension and export an interface named `ExtensionTriggerTypes` that maps trigger names to payload types.
 
 ```typescript
 // src/types.d.ts
-declare global {
-  namespace InSpatial {
-    interface ExtensionTriggers {
-      swipe: { type: "swipe"; direction: "left" | "right"; distance: number };
-      pinch: { type: "pinch"; scale: number; center: { x: number; y: number } };
-    }
-  }
-}
+// You may import types you reference
+// import type { SomeExternalType } from "somewhere";
 
-export {};
+export interface ExtensionTriggerTypes {
+  swipe: { type: "swipe"; direction: "left" | "right"; distance: number };
+  pinch: { type: "pinch"; scale: number; center: { x: number; y: number } };
+}
 ```
 
-**Step 3: Import Types in Your Extension Entry Point (If Created)**
+> Note: Type declarations are optional. Triggers work at runtime without them; adding this file only improves IntelliSense for `on:` props.
 
-If you created the `types.d.ts` file, import it in your extension's entry point:
+**Step 3: No manual import needed inside the extension**
 
-```typescript
-// src/index.ts
-export { SwipeExtension } from "./extension.ts";
+You don’t need to import your `types.d.ts` in the extension entry. InSpatial Serve discovers it and generates an app-level extension trigger types automatically.
 
-// Import type declarations to ensure they're available
-import "./types.ts";
+**How IntelliSense for extension triggers works**
+
+1. Your extension exposes triggers via `capabilities.triggers` (or `createTrigger()` in `lifecycle.setup()`).
+2. If you provide `export interface ExtensionTriggerTypes` in `src/types.d.ts` (or `types.d.ts`), InSpatial will Serve it as a `on:` prop.
+3. The dev server scans your app’s `render.ts` for `createRenderer({ extensions: [...] })` and resolves only the registered extensions.
+4. It generates a single file in your app: `src/types/extension-trigger-types.generated.d.ts` that imports each extension’s `ExtensionTriggerTypes` and extends `InSpatial.ExtensionTriggers`.
+5. IntelliSense for `on:` props is conditional: it appears only when the extension is registered in `createRenderer`. This included commented out extensions.
+
+Advanced: You can explicitly point Serve to your type files by adding `inspatial.triggerTypes` in your extension’s `deno.json` or `package.json`:
+
+```json
+{
+  "inspatial": {
+    "triggerTypes": ["src/types.d.ts"]
+  }
+}
 ```
 
 > **When to use:** When you prefer declarative trigger definitions and want to avoid manual `createTrigger()` calls.
 
 ##### Key Differences for Extension Developers
 
-| Aspect | `createTrigger()` in Lifecycle | `capabilities.triggers` |
-|--------|--------------------------------|------------------------|
-| **Registration** | Manual `createTrigger()` calls | Automatic by extension system |
-| **TypeScript Completion** | Optional `types.d.ts` file | Optional `types.d.ts` file |
-| **Code Style** | Imperative (function calls) | Declarative (object definition) |
-| **Discoverability** | Not listed in capabilities | Listed in extension capabilities |
-| **Build Integration** | Not scanned | Can be scanned by build tools |
-| **Use Case** | Complex initialization logic | Simple trigger definitions |
-| **Type Declaration** | **Optional:** For TypeScript completion | **Optional:** For TypeScript completion |
+| Aspect                    | `createTrigger()` in Lifecycle          | `capabilities.triggers`                 |
+| ------------------------- | --------------------------------------- | --------------------------------------- |
+| **Registration**          | Manual `createTrigger()` calls          | Automatic by extension system           |
+| **TypeScript Completion** | Optional `types.d.ts` file              | Optional `types.d.ts` file              |
+| **Code Style**            | Imperative (function calls)             | Declarative (object definition)         |
+| **Discoverability**       | Not listed in capabilities              | Listed in extension capabilities        |
+| **Build Integration**     | Not scanned                             | Can be scanned by build tools           |
+| **Use Case**              | Complex initialization logic            | Simple trigger definitions              |
+| **Type Declaration**      | **Optional:** For TypeScript completion | **Optional:** For TypeScript completion |
 
 > **Note:** The InTrigger extension uses `lifecycle.setup()` because it registers many standard DOM triggers at once as part of a larger initialization process. Extensions like InCloud and InRoute use `capabilities.triggers` for cleaner, declarative trigger definitions.
 
