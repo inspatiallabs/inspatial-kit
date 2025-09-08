@@ -12,12 +12,12 @@ import { InRoute } from "@inspatial/kit/route";
 
 createRenderer({
   mode: "auto",
-  debug: "minimal",
+  debug: "normal",
   extensions: [
     InServe(),
     InTrigger(), // exposes universal and standard triggers
     InTheme(),
-    InRoute(), 
+    InRoute(),
     InPresentation(), // exposes triggers like on:presentation
     InCloud({ reconnect: "reload" }), // exposes triggers like on:cloudStatus / on:cloudReconnected
   ],

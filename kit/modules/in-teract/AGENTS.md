@@ -30,7 +30,7 @@ All core utilities, actions and APIs are encapsulated into simpler functions and
 
 - **Definition:** Reactive containers (`createSignal()`) that notify observers on value changes.
 - **Computed Signals:** Derive values from other signals (`computed()`, or `$(...)` alias) and update automatically.
-- **Effects:** Functions (`watch()` or `createEffect()`) that re-run when their signal dependencies change.
+- **Effects:** Functions (`watch()` or `createSideEffect()`) that re-run when their signal dependencies change.
 - **Access:** Use `.value` for read/write. `peek()` reads without creating dependencies.
 - **Signal Batching:** Updates are automatically batched - effects only run once per tick.
 - **Important:** In JSX, dynamic expressions depending on signals _must_ be wrapped in `$(...)` to be reactive (e.g., `$(() => \`Count: ${count.value}\`)`). Simple signal references like `{count}` are automatically handled.
@@ -54,7 +54,7 @@ Use the extensive signal operation methods (`.and()`, `.eq()`, `.gt()`, etc.) fo
 - Updates are automatically batched.
 - Use `untrack()` for non-reactive operations.
 - Use `watch()` for effects without returning cleanup functions.
-- `createEffect()` handles cleanup automatically and passes additional arguments to the effect.
+- `createSideEffect()` handles cleanup automatically and passes additional arguments to the effect.
 - Always use `$ref` for component references in development with Hot Reaload.
 - **State Management:** For complex applications, consider managing state outside of your components and passing it down as props. This promotes better separation of concerns.
 - **Manual Triggering:** When mutating arrays or objects directly, use `.trigger()` to notify InSpatial of the change.
@@ -70,7 +70,7 @@ NOTE: hasValue returns plain boolean. Returns true when the value of the signal 
 **Core Signal APIs:**
 
 - `createSignal(value)`, `computed(fn)`, `$(fn)` - Creating signals
-- `watch(effect)`, `createEffect(effect, ...args)` - Effects with lifecycle
+- `watch(effect)`, `createSideEffect(effect, ...args)` - Effects with lifecycle
 - `read(value)`, `write(signal, value)`, `peek(value)`, `poke(signal, value)` - Utilities
 - Signal methods: `.and()`, `.or()`, `.eq()`, `.gt()`, `.inverse()`, `.nullishThen()`, `.hasValue()`
 - Advanced: `merge()`, `derive()`, `extract()`, `tpl\`...\``, `not()`, `onCondition()`
@@ -139,7 +139,7 @@ Now, any `.jsx` or `.tsx` file will be automatically transformed to use the init
 | React                                                       | InSpatial                                                        |
 | ----------------------------------------------------------- | ---------------------------------------------------------------- |
 | `useState(0)`                                               | `createState({count: 0 })`                                       |
-| `createEffect(() => {}, [deps])`                            | `watch(() => {})` or `createEffect(() => {})`                    |
+| `createSideEffect(() => {}, [deps])`                            | `watch(() => {})` or `createSideEffect(() => {})`                    |
 | `{count}`                                                   | `{count}` (same for signals)                                     |
 | `{`Count: ${count}`}`                                       | `{$(() => \`Count: ${count.value}\`)}`or`{t\`Count: ${count}\`}` |
 | `className={isActive ? 'active' : ''}`                      | `class:active={isActive}`                                        |
@@ -246,7 +246,7 @@ useEffect(() => {
 }, []);
 
 // ✅ The InSpatial way - DO THIS
-createEffect(() => {
+createSideEffect(() => {
   createTrigger("swipe", createResizeHandler(), {
     platforms: ["dom", "native:ios", "native:android"],
     fallback: "resize",
@@ -344,7 +344,7 @@ const templateUrl = t`https://inspatial.store/template?id=${s.templateId}`;
 2. **State**: `const state = createState({ initialState })`
 3. **Computed Values**: `const computed = $(() => state.value * 2)`
 4. **Effects**: `watch(() => { /* reactive code */ })`
-5. **Cleanup**: `createEffect(() => { /* setup */; return () => { /* cleanup */ } })`
+5. **Cleanup**: `createSideEffect(() => { /* setup */; return () => { /* cleanup */ } })`
 6. **Conditional Classes**: `class:active={isActive}`
 7. **Lists**: `<List each={entries}>{(entry) => <Entry data={entry}/>}</List>`
 8. **Conditions**: `<Show when={isVisible}>{() => <>Visible content</>}</Show>`

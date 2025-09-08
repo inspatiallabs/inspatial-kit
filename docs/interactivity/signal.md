@@ -12,7 +12,7 @@ Signals provide three essential building blocks for reactive programming:
 
 - **Signals**: Smart containers for values that automatically notify listeners when they change
 - **Computed Signals**: Values that automatically derive from other signals and stay in sync
-- **Effects**: Functions that automatically run whenever their signal dependencies change
+- **Side effects**: Functions that automatically run whenever their signal dependencies change
 
 The beauty of signals is that they handle all the complexity of tracking dependencies and scheduling updates for you. You just focus on describing what your data should look like and how it should behave.
 
@@ -27,10 +27,10 @@ Before you start:
 ### ⚠️ Important Notes
 
 > [!NOTE]
-> Signal effects are batched and processed asynchronously. This means no matter how many times you change a signal's value in the same tick, its effects will only run once at the end. If you need to access updated computed values immediately after making changes, use `nextTick()` or `await tick()`.
+> Signal side effects are batched and processed asynchronously. This means no matter how many times you change a signal's value in the same tick, side effects will only run once at the end. If you need to access updated computed values immediately after making changes, use `nextTick()` or `await tick()`.
 
 > [!NOTE]  
-> All signal updates are automatically batched for optimal performance. Multiple changes to the same signal or related signals in the same execution cycle will trigger effects only once with the final values.
+> All signal updates are automatically batched for optimal performance. Multiple changes to the same signal or related signals in the same execution cycle will trigger side effects only once with the final values.
 
 > [!NOTE]  
 > Signals are the lowest-level interactive primitives you should only ever use `createSignal()` API from `@in/teract/signal` directly only when building frameworks. Otherwise application development MUST use `createState()` api from `@inspatial/kit/state` which builds upon signals.
@@ -41,7 +41,7 @@ Before you start:
 > **Computed Signal**: A signal whose value is automatically calculated from other signals
 > **Effect**: A function that runs automatically when its signal dependencies change
 > **Dependency Tracking**: The automatic process of figuring out which signals an effect depends on
-> **Batching**: Grouping multiple updates together to run effects only once per update cycle
+> **Batching**: Grouping multiple updates together to run side effects only once per update cycle
 
 ## API Reference
 
@@ -153,11 +153,12 @@ The `computed` function is like having a smart assistant that watches your data 
 🔍 **In a nutshell Computed/$:**
 
 - Reads existing signal values
-- Transforms them into new values  
+- Transforms them into new values
 - Memoizes the result (only recalculates when dependencies change)
 - Updates automatically when dependencies change
 
 It's basically a smart getter that:
+
 - Only runs when its inputs change
 - Caches the result between changes
 - Automatically tracks what signals it depends on
@@ -317,7 +318,7 @@ benScore.value = 150; // Logs: "Ben's current score: 150"
 
 ##### Updates the signal's value and notifies all listeners
 
-The `.set()` method updates a signal's value and automatically triggers all connected effects. Think of it like updating a status board - everyone watching gets notified of the change.
+The `.set()` method updates a signal's value and automatically triggers all connected side effects. Think of it like updating a status board - everyone watching gets notified of the change.
 
 @returns {void}
 
@@ -395,9 +396,9 @@ mikeHealth.value = 80; // Logs: "Mike's health: 80"
 
 #### `.trigger()`
 
-##### Manually triggers all connected effects
+##### Manually triggers all connected side effects
 
-The `.trigger()` method manually forces all effects connected to this signal to run, even if the value hasn't changed. Think of it like hitting a refresh button - everyone gets notified regardless.
+The `.trigger()` method manually forces all side effects connected to this signal to run, even if the value hasn't changed. Think of it like hitting a refresh button - everyone gets notified regardless.
 
 @returns {void}
 
@@ -595,7 +596,7 @@ console.log(eliPoints.value); // 125
 
 ##### Indicates if the signal has active listeners
 
-The `.connected` property tells you whether any effects or subscriptions are currently listening to this signal. Think of it like checking if anyone is subscribed to your newsletter.
+The `.connected` property tells you whether any side effects or subscriptions are currently listening to this signal. Think of it like checking if anyone is subscribed to your newsletter.
 
 ### Example 1: Mike's Connection Status
 
@@ -1028,9 +1029,9 @@ console.log(health); // 85 (from signal)
 
 #### `poke(signal, newValue)`
 
-##### Silently updates a signal without triggering effects
+##### Silently updates a signal without triggering side effects
 
-The `poke` function updates a signal's value quietly, without notifying any connected effects. Think of it like making a stealth update.
+The `poke` function updates a signal's value quietly, without notifying any connected side effects. Think of it like making a stealth update.
 
 ### Example 1: Mike's Background Update
 
@@ -1083,7 +1084,7 @@ charlotteY.value = 25; // Logs: "Charlotte's position changed!"
 
 #### `watch(effect)`
 
-##### Creates reactive effects that run when dependencies change
+##### Creates reactive side effects that run when dependencies change
 
 The `watch` function creates an effect that automatically runs whenever its signal dependencies change. Think of it like setting up a smart observer that watches for changes and reacts accordingly.
 
@@ -1475,21 +1476,21 @@ const dispose = watch(() => {
 dispose(); // Logs: "Cleaning up Charlotte's timer"
 ```
 
-#### `createEffect(effect, ...args)`
+#### `createSideEffect(effect, ...args)`
 
-##### Creates self-managing effects with automatic cleanup
+##### Creates self-managing side effects with automatic cleanup
 
-The `createEffect` function creates an effect that runs automatically and handles its own cleanup. Think of it like a smart worker that knows how to clean up after itself.
+The `createSideEffect` function creates a side effect that runs automatically and handles its own cleanup. Think of it like a smart worker that knows how to clean up after itself.
 
 ### Example 1: Ben's Auto-Cleanup Timer
 
 ```typescript
-import { createSignal, createEffect } from "@inspatial/kit/signal";
+import { createSignal, createSideEffect } from "@inspatial/kit/signal";
 
 const benInterval = createSignal(1000);
 
-// Create an effect with automatic cleanup
-const cancelEffect = createEffect(() => {
+// Create a side effect with automatic cleanup
+const cancelSideEffect = createSideEffect(() => {
   console.log(`Setting up timer with ${benInterval.value}ms interval`);
 
   const timer = setInterval(() => {
@@ -1509,7 +1510,7 @@ benInterval.value = 2000;
 // Logs: "Setting up timer with 2000ms interval"
 
 // Manual cleanup
-cancelEffect();
+cancelSideEffect();
 ```
 
 ### Control Flow
@@ -1594,7 +1595,7 @@ tick().then(() => {
 
 ##### Waits for the next update cycle before executing code
 
-The `nextTick` function waits for all pending signal updates and effects to complete, then executes your callback. Think of it like waiting for all the dust to settle before taking action.
+The `nextTick` function waits for all pending signal updates and side effects to complete, then executes your callback. Think of it like waiting for all the dust to settle before taking action.
 
 ### Example 1: Ben's Update Synchronization
 
@@ -1729,7 +1730,7 @@ const withNewItem = [...eliInventory, "bow"]; // ["sword", "shield", "potion", "
    });
    ```
 
-2. **Always dispose of effects when they're no longer needed**:
+2. **Always dispose of side effects when they're no longer needed**:
 
    ```typescript
    const dispose = watch(() => {
@@ -1757,7 +1758,7 @@ const withNewItem = [...eliInventory, "bow"]; // ["sword", "shield", "potion", "
    firstName.value = "Mike";
    lastName.value = "Anderson";
    age.value = 30;
-   // All dependent effects run only once with final values
+   // All dependent side effects run only once with final values
    ```
 
 5. **Use `untrack()` for operations that shouldn't be reactive**:
@@ -1885,7 +1886,8 @@ const playerSummary = computed(
 
 ### 🔧 Runtime Support
 
-- ✅ Node.js
+- ✅ InZero
 - ✅ Deno
 - ✅ Bun
-- ✅ Modern Browsers (ES2020+)
+- ✅ Node.js
+- ✅ Modern Browsers (ES2022+)

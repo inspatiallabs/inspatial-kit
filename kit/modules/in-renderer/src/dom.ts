@@ -2,7 +2,6 @@ import { isSignal, peek, bind } from "@in/teract/signal";
 import { createRenderer } from "./create-renderer.ts";
 import { cachedStrKeyNoFalsy, splitFirst } from "@in/vader";
 import { env } from "@in/vader/env/index.ts";
-import { wrap } from "@in/jsx-runtime";
 import { composeExtensions, type RendererExtensions } from "@in/extension";
 import { applyWebStyle, computeClassString } from "./helpers.ts";
 
@@ -33,10 +32,10 @@ export function DOMRenderer(options: DOMOptions = {}): any {
         for (const [name, declaration] of triggers) {
           createTrigger(name, declaration.handler);
         }
-        console.log(`[DOM] Registered ${triggers.size} extension triggers`);
+        console.log(`🌐 InSpatial:[DOM Renderer] Registered ${triggers.size} extension triggers`);
       })
       .catch((err) => {
-        console.warn("[DOM] Failed to register extension triggers:", err);
+        console.warn("🌐 InSpatial:[DOM Renderer] Failed to register extension triggers:", err);
       });
   }
 
@@ -332,8 +331,20 @@ export function DOMRenderer(options: DOMOptions = {}): any {
 
   const renderer = createRenderer(nodeOps, rendererID);
 
-  // Automatically wrap JSX runtime with this renderer
-  wrap(renderer);
+  // if DOMRenderer is used directly (without implicitly choosing a runtimeTemplate)
+  // and no global renderer is present, defer a microtask to apply JSX wrap.
+  try {
+    const maybeGlobal = (globalThis as any).R;
+    if (!maybeGlobal) {
+      queueMicrotask(async function () {
+        try {
+          const mod = await import("@in/runtime/index.ts");
+          const fn = (mod as any).jsxRuntimeWrap;
+          if (typeof fn === "function") fn(renderer);
+        } catch {}
+      });
+    }
+  } catch {}
 
   // Run extension setup hooks
   setups.forEach((fn) => {

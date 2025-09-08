@@ -1,7 +1,7 @@
 "use client";
 
 import { iss } from "@in/style";
-import { createState, createEffect, $ } from "@in/teract/state";
+import { createState, createSideEffect, $ } from "@in/teract/state";
 import { createMotion, eases } from "@in/motion";
 import { XStack } from "@in/widget/structure/index.ts";
 import {
@@ -125,7 +125,7 @@ export const Text = ({
   });
 
   /*##############################################(EFFECTS)##############################################*/
-  createEffect(() => {
+  createSideEffect(() => {
     if (Array.isArray(words) && animate !== "typing") {
       const id = setInterval(rotateWords, duration);
       return () => clearInterval(id as unknown as number);
@@ -133,7 +133,7 @@ export const Text = ({
   });
 
   // Typing effect
-  createEffect(() => {
+  createSideEffect(() => {
     if (animate === "typing") {
       let i = 0;
       const text = state.currentWord.peek() || (children as string);

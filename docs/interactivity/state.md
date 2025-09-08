@@ -203,7 +203,7 @@ const TodoList = () => {
 
 ```javascript
 // ✅ The InSpatial Way
-createEffect(() => {
+createSideEffect(() => {
   createTrigger("swipe", createResizeHandler(), {
     platforms: ["dom", "native:ios", "native:android"],
     fallback: "resize",
@@ -211,11 +211,11 @@ createEffect(() => {
 });
 ```
 
-#### You Might Not Need Effect
+#### You Might Not Need Side Effects
 
-Most “do something when the view appears/changes” use‑cases don’t need `createEffect`. Prefer lifecycle trigger props and reactive control‑flow.
+Most “do something when the view appears/changes” use‑cases don’t need `createSideEffect`. Prefer lifecycle trigger props and reactive control‑flow.
 
-- **Probability**: You're most likely to gravitate towards lifecycle trigger props (on:beforeMount/on:mount) alongside a Control Flow component i.e <Show> or <Choose> ~85% of your use cases, and most likely less than ~15% `createEffect` (subscriptions, timers, explicit side‑effects).
+- **Probability**: You're most likely to gravitate towards lifecycle trigger props (on:beforeMount/on:mount) alongside a Control Flow component i.e <Show> or <Choose> ~85% of your use cases, and most likely less than ~15% `createSideEffect` (subscriptions, timers, explicit side‑effects).
 
 - What to reach for first
 
@@ -229,7 +229,7 @@ Most “do something when the view appears/changes” use‑cases don’t need `
   - `on:mount`: next tick after first paint. Use when you want post‑paint work.
   - Nuance: whether the first paint includes a `beforeMount` change depends on renderer timing; it runs during directive setup (synchronously), not deferred.
 
-- When you actually want `createEffect`
+- When you actually want `createSideEffect`
 
   - Subscriptions to signals (e.g., logging, analytics, cross‑state reactions)
   - Timers/intervals tied to state, with cleanup via `onDispose`
@@ -237,7 +237,7 @@ Most “do something when the view appears/changes” use‑cases don’t need `
 
 - Anti‑pattern to avoid
 
-  - Using `createEffect` as a surrogate for lifecycle: it runs immediately on setup and on subsequent signal changes, but it isn’t lifecycle‑bound and may run before mount. Prefer trigger props for mount timing.
+  - Using `createSideEffect` as a surrogate for lifecycle: it runs immediately on setup and on subsequent signal changes, but it isn’t lifecycle‑bound and may run before mount. Prefer trigger props for mount timing.
 
 - Recipes
   - Show content after lifecycle without effects
@@ -271,19 +271,19 @@ import { useTheme } from "@inspatial/kit/theme";
 </Show>;
 ```
 
-- Side‑effect from data (this is where `createEffect` shines)
+- Side‑effect from data (this is where `createSideEffect` shines)
 
 ```jsx
-import { createEffect } from "@inspatial/kit/state";
+import { createSideEffect } from "@inspatial/kit/state";
 
-createEffect(() => {
+createSideEffect(() => {
   const mode = useTheme.mode.get();
   console.log("theme:", mode);
   // Return optional cleanup with onDispose inside, if needed
 });
 ```
 
-Bottom line: lifecycle → trigger props; reactivity → `$`/`Show`; subscriptions/side‑effects → `createEffect`.
+Bottom line: lifecycle → trigger props; reactivity → `$`/`Show`; subscriptions/side‑effects → `createSideEffect`.
 
 ### 5. Conditional Classes
 
@@ -456,7 +456,7 @@ States are abstractions of signals. Here's how they differ:
 | **Size**             | Minimal (small bundle)                                       | Full-featured (larger)              |
 | **API**              | Simpler, focused                                             | Comprehensive                       |
 | **Performance**      | Good for basic needs                                         | Optimized for complex scenarios     |
-| **Callbacks**        | createEffectLite & onDisposeLite \* onConditionLite triggers | Full integrated trigger system      |
+| **Callbacks**        | createSideEffectLite & onDisposeLite \* onConditionLite triggers | Full integrated trigger system      |
 | **State Management** | Local                                                        | Local X Global X Server (Universal) |
 | **Developer Tools**  | Minimal                                                      | Advanced debugging tools            |
 | **StateQL**          | Not supported                                                | Full support                        |

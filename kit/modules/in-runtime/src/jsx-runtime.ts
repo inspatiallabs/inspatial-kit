@@ -101,7 +101,6 @@ function createElementWithGlobalRenderer(
 }
 
 interface JSXRuntime {
-  wrap: typeof wrap;
   setGlobalRenderer: typeof setGlobalRenderer;
   getGlobalRenderer: typeof getGlobalRenderer;
   default: JSXRuntime;
@@ -112,7 +111,6 @@ interface JSXRuntime {
 }
 
 const _default: JSXRuntime = {
-  wrap,
   setGlobalRenderer,
   getGlobalRenderer,
   get default() {
@@ -134,7 +132,6 @@ const _default: JSXRuntime = {
 
 export default _default;
 export {
-  wrap,
   setGlobalRenderer,
   getGlobalRenderer,
   createElementWithGlobalRenderer as c,
@@ -142,3 +139,5 @@ export {
   jsxs,
   Fragment,
 };
+// Explicit alias for clarity when selecting runtime templates
+export { wrap as jsxRuntimeWrap };

@@ -132,7 +132,7 @@
 // //      }
 // //   })
 
-// //   createEffect(() => {
+// //   createSideEffect(() => {
 // //     let highlightedStars: number[] = [];
 
 // //     const interval = setInterval(() => {

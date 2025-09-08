@@ -3,6 +3,45 @@
 
 InSpatial ships with a JSX runtime by default, but you can also compose UI with our renderer primitives. Think of the runtime as one way to template your UI. The renderer primitives are a minimal, framework-agnostic alternative when you want explicit control or teaching-oriented examples.
 
+### Runtime templates (configurable)
+
+- The renderer can be paired with a "runtime template". By default, interactive browser mode uses the JSX runtime automatically.
+- You can explicitly choose or provide a custom runtime via `createRenderer({ runtimeTemplate })`.
+- Built-in name: `"jsx"`.
+- Custom templates can be created with `createRuntimeTemplate(name, apply)`.
+
+#### Selecting a runtime template
+
+```ts
+import { createRenderer } from "@in/renderer";
+
+// Default (interactive browser): JSX is applied automatically
+await createRenderer({ mode: "auto" });
+
+// Explicit JSX selection
+await createRenderer({ runtimeTemplate: "jsx" });
+
+// Provide an inline applier
+await createRenderer({ runtimeTemplate: (renderer) => {
+  // connect your custom runtime to the renderer here
+} });
+```
+
+#### Creating a custom runtime template
+
+```ts
+import { createRuntimeTemplate } from "@in/renderer";
+
+createRuntimeTemplate("sfc", (renderer) => {
+  // install your SFC runtime hooks with the renderer
+});
+
+// later
+await createRenderer({ runtimeTemplate: "sfc" });
+```
+
+> **Note:** Server/static renderers do not apply a runtime template by default. Pass `runtimeTemplate` explicitly if you need one in those modes.
+
 #### JSX Templates
 
 According to Meta, the authors of the JSX concept:
@@ -28,3 +67,5 @@ Notes:
 
 
 #### Creating your own runtime?
+
+You can wire your own runtime by creating a template and applying it through `createRenderer({ runtimeTemplate })`. For JSX, the explicit wrapper is `jsxRuntimeWrap(renderer)` from `@in/jsx-runtime`.

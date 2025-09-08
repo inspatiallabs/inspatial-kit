@@ -27,7 +27,7 @@ export {
   collectDisposers,
   onCondition,
   onDispose,
-  createEffect,
+  createSideEffect,
   untrack,
   freeze,
   setSignalDebugContext,

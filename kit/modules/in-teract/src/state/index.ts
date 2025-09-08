@@ -6,7 +6,7 @@ export {
   type StoragePropsFor,
 } from "./storage.ts";
 
-export { $ as $, createEffect } from "@in/teract/signal";
+export { $ as $, createSideEffect } from "@in/teract/signal";
 
 // #####################(Action Trigger)#####################
 export { createAction, type ActionTriggerProps } from "./action.ts";

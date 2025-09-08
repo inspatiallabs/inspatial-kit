@@ -283,6 +283,7 @@ export class InSpatialServe {
   private httpServer: any | null = null;
   private wsServer: any | null = null;
   private extensionTriggers: Map<string, any> = new Map();
+  private generatingTypes = false;
 
   /**
    * Runs the InSpatial Development Server
@@ -334,6 +335,8 @@ export class InSpatialServe {
     console.log("🔍 Scanning extensions for trigger declarations...");
 
     try {
+      if (this.generatingTypes) return; // prevent re-entrancy
+      this.generatingTypes = true;
       // Scan for render.ts file (can be at InSpatial Recommended location)
       let renderPath: string | null = null;
       const possiblePaths = [
@@ -586,18 +589,27 @@ ${imports ? imports + "\n\n" : ""}declare global {
 export {};
 `;
 
-        await InZero.writeTextFile(
-          `${outDir}/extension-trigger-types.generated.d.ts`,
-          extensionTriggerTypes
-        );
-        console.log(
-          `✅ Generated global extension trigger types with ${discoveredTypeFiles.length} source file(s)`
-        );
+        const outFile = `${outDir}/extension-trigger-types.generated.d.ts`;
+        let shouldWrite = true;
+        try {
+          const prev = await InZero.readTextFile(outFile);
+          if (prev === extensionTriggerTypes) shouldWrite = false;
+        } catch {}
+        if (shouldWrite) {
+          await InZero.writeTextFile(outFile, extensionTriggerTypes);
+          console.log(
+            `✅ Generated global extension trigger types with ${discoveredTypeFiles.length} source file(s)`
+          );
+        } else {
+          console.log("ℹ️ Extension trigger types unchanged (no write)");
+        }
       } catch (e) {
         console.warn("⚠️ Could not scan render.ts for extensions:", e);
       }
     } catch (error) {
       console.error("❌ Failed to generate trigger types:", error);
+    } finally {
+      this.generatingTypes = false;
     }
   }
 
@@ -764,17 +776,22 @@ export {};
   private async handleSourceChange(event: any) {
     if (event.kind !== "modify" && event.kind !== "create") return;
 
-    const relevantFiles = event.paths.filter(
+    const normalizedPaths: string[] = event.paths.map((p: string) =>
+      p.replace(/\\/g, "/")
+    );
+
+    const relevantFiles = normalizedPaths.filter(
       (path: string) =>
         /\.(ts|tsx|js|jsx|css|scss)$/.test(path) &&
+        !path.endsWith(".d.ts") &&
         !path.includes("node_modules") &&
         !path.includes(".git") &&
-        !path.includes("dist")
+        !path.includes("/dist/")
     );
 
     // Check if render.ts changed (extensions may have changed)
-    const renderChanged = event.paths.some(
-      (path: string) => path.endsWith("render.ts") || path.includes("extension")
+    const renderChanged = normalizedPaths.some((path: string) =>
+      path.endsWith("/render.ts")
     );
 
     if (renderChanged) {
@@ -785,22 +802,28 @@ export {};
     }
 
     // Detect asset file changes (images, etc.) under src
-    const assetFiles = event.paths.filter(
+    const assetFiles = normalizedPaths.filter(
       (path: string) =>
         /\.(png|jpe?g|gif|svg|webp|avif)$/i.test(path) &&
         path.includes("/src/") &&
-        !path.includes("dist")
+        !path.includes("/dist/")
     );
 
     if (relevantFiles.length === 0 && assetFiles.length === 0) return;
 
     console.log(
       `📝 Source files changed: ${[...relevantFiles, ...assetFiles]
-        .map((p: string) =>
-          p.replace((globalThis as any).Deno?.cwd?.() ?? "", ".")
-        )
+        .map((p: string) => p.replace((globalThis as any).Deno?.cwd?.() ?? "", "."))
         .join(", ")}`
     );
+
+    // If only the generated extension types changed, skip rebuilds to avoid loops
+    const onlyGeneratedTypesChanged =
+      relevantFiles.length === 1 &&
+      relevantFiles[0].endsWith("/src/types/extension-trigger-types.generated.d.ts");
+    if (onlyGeneratedTypesChanged) {
+      return;
+    }
 
     // Determine what needs to be rebuilt
     const needsJS = relevantFiles.some((file: string) =>

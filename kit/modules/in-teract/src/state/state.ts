@@ -10,7 +10,7 @@ import {
   createSignal,
   untrack,
   tick,
-  createEffect,
+  createSideEffect,
   type Signal,
 } from "@in/teract/signal";
 import { createStorage, type StorageProps } from "./storage.ts";
@@ -273,7 +273,7 @@ export function createState<T extends Record<string, any>>(
   // Watch all signals for changes
   let isInitializing = true;
   Object.values(signals).forEach((signal) => {
-    createEffect(() => {
+    createSideEffect(() => {
       signal.get(); // Track this signal
       if (!isInitializing) {
         notifySubscribers();

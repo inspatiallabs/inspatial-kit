@@ -7,6 +7,11 @@ export type {
   ComposedExtensions,
 } from "@in/extension";
 export { createExtension } from "@in/extension";
+export {
+  createRuntimeTemplate,
+  applyRuntimeTemplate,
+  type RuntimeTemplateApply,
+} from "./runtime-template.ts";
 
 // Base renderer factory (for advanced users)
 export { createRenderer as createBaseRenderer } from "./create-renderer.ts";

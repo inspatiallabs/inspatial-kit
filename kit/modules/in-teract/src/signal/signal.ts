@@ -235,7 +235,7 @@ function onDispose(
   return cb;
 }
 
-function createEffect<T extends any[]>(
+function createSideEffect<T extends any[]>(
   effect: (...args: T) => SignalCleanupFunctionType | void,
   ...args: T
 ): SignalDisposerFunctionType {
@@ -1104,7 +1104,7 @@ export {
   collectDisposers,
   onCondition,
   onDispose,
-  createEffect,
+  createSideEffect,
   untrack,
   freeze,
 };
