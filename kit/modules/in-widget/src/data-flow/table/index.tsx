@@ -39,13 +39,9 @@ import { Choose } from "@in/widget/control-flow/choose/index.ts";
 import { DotSixIcon } from "@in/widget/icon/dot-six-icon.tsx";
 import { PencilIcon } from "@in/widget/icon/pencil-icon.tsx";
 import { PlusPrimeIcon } from "@in/widget/icon/plus-prime-icon.tsx";
-import { Modal } from "@in/widget/presentation/modal/index.tsx";
-import { Drawer } from "@in/widget/presentation/drawer/index.tsx";
 import { SecurityKeyIcon } from "@in/widget/icon/security-key-icon.tsx";
 import { DirectionRightIcon } from "@in/widget/icon/direction-right-icon.tsx";
 import { Switch, Checkbox } from "@in/widget/input/index.ts";
-import { Tab } from "@in/widget/ornament/index.ts";
-import { PlusIcon } from "@in/widget/icon/plus-icon.tsx";
 
 // import { DropdownMenu } from "../../navigation/dropdown-menu/index.tsx";
 
@@ -361,14 +357,10 @@ export function Table<TData, TValue>({
           ))}
 
           {/*#################################(Table Header Navigator)#################################*/}
-          {navigator && (
-            <TableHeaderNavigator {...navigator} />
-          )}
-          
+          {navigator && <TableHeaderNavigator {...navigator} />}
+
           {/*#################################(Table Header Relations)#################################*/}
-          {relations && (
-            <TableHeaderRelations {...relations} />
-          )}
+          {relations && <TableHeaderRelations {...relations} />}
 
           {/*#################################(Table Header Bar)#################################*/}
           {headerBar?.display !== false && (

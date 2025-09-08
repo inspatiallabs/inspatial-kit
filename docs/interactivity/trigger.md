@@ -127,6 +127,60 @@ Use `on:route` to trigger an action on navigation.
 **on:rightclick**
 ...
 
+**on:gamepad**
+This lets you react to a connected gamepad’s state as it changes (polled ~every 100ms). It emits only when the state differs from the previous snapshot.
+
+> **Note:** Currently reads the first connected gamepad (`navigator.getGamepads()[0]`). If the Gamepad API is unavailable, this trigger is a no-op.
+
+```jsx
+// Read button/axis state
+<View
+  on:gamepad={(gp: {
+    connected: boolean;
+    buttonA: boolean; buttonB: boolean; buttonX: boolean; buttonY: boolean;
+    joystick: [number, number]; // left stick: [x,y]
+    joystickRight: [number, number]; // right stick: [x,y]
+    RB: boolean; LB: boolean; RT: boolean; LT: boolean;
+    start: boolean; select: boolean;
+    up: boolean; down: boolean; left: boolean; right: boolean;
+  }) => {
+    if (!gp.connected) return;
+    if (gp.buttonA) action.jump();
+    const [lx, ly] = gp.joystick;
+    const dead = 0.15;
+    const dx = Math.abs(lx) < dead ? 0 : lx;
+    const dy = Math.abs(ly) < dead ? 0 : ly;
+    move(dx, dy);
+  }}
+/>
+```
+
+> **Performance:** The poll runs once for all subscribers and only invokes handlers on change. When there are no listeners, polling stops automatically.
+
+**on:gamepadconnect**
+Fires when the browser reports a gamepad was connected.
+
+```tsx
+<View
+  on:gamepadconnect={(e: { type: "gamepadconnect"; index?: number; id?: string }) => {
+    console.log("Gamepad connected", e.index, e.id);
+  }}
+/>
+```
+
+**on:gamepaddisconnect**
+Fires when a gamepad disconnects.
+
+```tsx
+<View
+  on:gamepaddisconnect={(e: { type: "gamepaddisconnect"; index?: number; id?: string }) => {
+    console.log("Gamepad disconnected", e.index, e.id);
+  }}
+/>
+```
+
+> **Terminology:** The “Gamepad API” is a standard browser API that exposes connected controllers’ buttons and axes. Support varies by platform; on unsupported platforms these triggers do nothing.
+
 ##### C. Area Triggers
 
 ##### D. Gesture Triggers
@@ -135,10 +189,48 @@ Use `on:route` to trigger an action on navigation.
 
 ##### F. Key Triggers
 
+**on:key**
+This is the unified keyboard trigger. It emits for both key down and key up with a simple `phase` you can check.
 
+> **Note:** Payload shape is `{ type: 'keytap', phase: 'down' | 'up', key, code, repeat, event }`.
+
+```jsx
+<View
+  on:key={(e) => {
+    if (e.key === 'Enter' && e.phase === 'down') submit();
+    if (e.key === 'Escape' && e.phase === 'down') close();
+  }}
+/>
+```
+
+**on:key:down** / **on:key:up**
+Phase-specific sugars for the same event. They carry the same payload.
+
+```jsx
+<View
+  on:key:down={(e) => {
+    if (e.key === 'ArrowLeft') nudgeLeft();
+  }}
+  on:key:up={(e) => {
+    if (e.key === ' ') stopJump();
+  }}
+/>
+```
+
+###### Key Trigger Helpers
+InSpatial Kit also provides direct key triggers, allowing you to handle keyboard events more easily and with less code.
 
 **on:escape**
-Allows you to close a presentation when the `ESC` Key is pressed
+Convenience sugar for a very common case. Internally built on the same keyboard triggers as `on:key` and fires on key down of the Escape key.
+
+```jsx
+<View on:escape={() => close()} />
+
+// Equivalent with key
+<View on:key={(e) => e.key === 'Escape' && e.phase === 'down' && close()} />
+```
+
+NOTE: Direct key triggers (like on:enter or on:space) will be available soon, making it as easy as using on:escape for every sing Key available. 
 
 ##### G. Extension/Custom Triggers
 

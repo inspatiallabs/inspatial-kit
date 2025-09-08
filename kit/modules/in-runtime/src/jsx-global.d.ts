@@ -80,6 +80,10 @@ declare global {
     type EventHandler = (...args: any[]) => any;
     type TriggerPropKey = `on:${InUniversalTriggerPropsType | string}`;
     type UniversalTriggerProps = InUniversalTriggerPropsType | string;
+    type KnownOnPropKey = `on:${InUniversalTriggerPropsType}`
+    type KnownOnProps = {
+      [K in KnownOnPropKey]?: EventHandler | any;
+    };
 
     /**
      * SharedProps are a set of commonly used properties that can be applied to various widget or components across your application.
@@ -133,7 +137,7 @@ declare global {
 
       // Permissive catch-all so base JSX works without strict prop maps
       [prop: string]: any;
-    } & {
+    } & KnownOnProps & {
       // Specific directive groups with narrowed value types
       [K in StylePropKey]?:
         | string

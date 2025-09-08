@@ -118,7 +118,7 @@ export function Tab(props: TabProps) {
 
             <Slot
               className={iss(
-                TabStyle.trigger.getStyle({
+                TabStyle.anchor.getStyle({
                   className,
                   class: className,
                   format,
@@ -140,7 +140,7 @@ export function Tab(props: TabProps) {
               // @ts-ignore
               style={(item as any)?.style}
             >
-              {/* Trigger visual content */}
+              {/* Anchor visual content */}
               {item.icon && (
                 // @ts-ignore
                 <Slot

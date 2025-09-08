@@ -19,9 +19,9 @@ export type TabItemProps = JSX.SharedProps & {
 
 type TabRootProps = StyleProps<typeof TabStyle.root>;
 
-/*#################################(TAB TRIGGER PROPS)#################################*/
+/*#################################(TAB ANCHOR PROPS)#################################*/
 
-type TabTriggerProps = StyleProps<typeof TabStyle.trigger>;
+type TabAnchorProps = StyleProps<typeof TabStyle.anchor>;
 
 /*#################################(TAB PROPS)#################################*/
 
@@ -36,8 +36,8 @@ export type TabProps = TabRootProps &
     // onChange?: (value: string) => void;
     // name?: string; // Optional name for the tab group
 
-    format?: TabTriggerProps["format"];
-    scale?: TabTriggerProps["scale"];
-    size?: TabTriggerProps["size"];
-    radius?: TabTriggerProps["radius"];
+    format?: TabAnchorProps["format"];
+    scale?: TabAnchorProps["scale"];
+    size?: TabAnchorProps["size"];
+    radius?: TabAnchorProps["radius"];
   };

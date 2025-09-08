@@ -18,7 +18,7 @@ type KeyValsMap = Record<string, string[]>;
 export type TriggerPropHandler<Value = any> = (
   node: Element,
   value: Value
-) => void;
+) => void | (() => void);
 
 /** TriggerProp factory function type */
 export type TriggerPropFactory = (key: string) => TriggerPropHandler;
@@ -254,6 +254,13 @@ function onTriggerProp(
     mouseover: "hoverstart",
     mouseleave: "hoverend",
     mouseout: "hoverend",
+    // Gamepad aliases (DOM event names → universal trigger names)
+    gamepadconnected: "gamepadconnect",
+    gamepaddisconnected: "gamepaddisconnect",
+    // Key naming preference: map keytap* → key*
+    keytap: "key",
+    "keytap:down": "key:down",
+    "keytap:up": "key:up",
   };
   const canonicalKey = aliasMap[key] ?? key;
 
@@ -427,6 +434,9 @@ export type InUniversalTriggerPropsType =
   | "longpress"
   | "rightclick"
   | "escape"
+  | "key"
+  | "key:down"
+  | "key:up"
   | "mount"
   | "route"
   | "beforeMount"
@@ -437,6 +447,9 @@ export type InUniversalTriggerPropsType =
   | "hover"
   | "hoverstart"
   | "hoverend"
+  | "gamepad"
+  | "gamepadconnect"
+  | "gamepaddisconnect"
   // Capacitor app lifecycle and navigation
   | "back"
   | "resume"
@@ -558,9 +571,113 @@ function DOMRouteHandler(): TriggerPropHandler<MaybeSignalHandler> {
   };
 }
 
-// ========================= (Escape Global Listener) =========================
-let escapeDocListener: ((ev: KeyboardEvent) => void) | null = null;
+// ========================= (Keyboard: keytap base + escape sugar) =========================
+let keyDocDownListener: ((ev: KeyboardEvent) => void) | null = null;
+let keyDocUpListener: ((ev: KeyboardEvent) => void) | null = null;
+const keytapCallbacks = new Map<Element, AnyEventHandler>();
+const keytapDownCallbacks = new Map<Element, AnyEventHandler>();
+const keytapUpCallbacks = new Map<Element, AnyEventHandler>();
 const escapeCallbacks = new Map<Element, AnyEventHandler>();
+
+function ensureKeyListeners(): void {
+  if (keyDocDownListener && keyDocUpListener) return;
+  keyDocDownListener = function (ev: KeyboardEvent): void {
+    // keytap base (down phase)
+    for (const [el, cb] of Array.from(keytapCallbacks.entries())) {
+      if (!(el as any).isConnected) {
+        keytapCallbacks.delete(el);
+        continue;
+      }
+      try {
+        cb({
+          type: "keytap",
+          phase: "down",
+          key: ev.key,
+          code: ev.code,
+          repeat: ev.repeat,
+          event: ev,
+        });
+      } catch {
+        // ignore user handler errors
+      }
+    }
+    // keytap:down
+    for (const [el, cb] of Array.from(keytapDownCallbacks.entries())) {
+      if (!(el as any).isConnected) {
+        keytapDownCallbacks.delete(el);
+        continue;
+      }
+      try {
+        cb({
+          type: "keytap",
+          phase: "down",
+          key: ev.key,
+          code: ev.code,
+          repeat: ev.repeat,
+          event: ev,
+        });
+      } catch {
+        // ignore user handler errors
+      }
+    }
+    // escape sugar (down only)
+    if (ev.key === "Escape") {
+      for (const [el, cb] of Array.from(escapeCallbacks.entries())) {
+        if (!(el as any).isConnected) {
+          escapeCallbacks.delete(el);
+          continue;
+        }
+        try {
+          cb(ev);
+        } catch {
+          // ignore user handler errors
+        }
+      }
+    }
+  };
+  keyDocUpListener = function (ev: KeyboardEvent): void {
+    // keytap base (up phase)
+    for (const [el, cb] of Array.from(keytapCallbacks.entries())) {
+      if (!(el as any).isConnected) {
+        keytapCallbacks.delete(el);
+        continue;
+      }
+      try {
+        cb({
+          type: "keytap",
+          phase: "up",
+          key: ev.key,
+          code: ev.code,
+          repeat: ev.repeat,
+          event: ev,
+        });
+      } catch {
+        // ignore user handler errors
+      }
+    }
+    // keytap:up
+    for (const [el, cb] of Array.from(keytapUpCallbacks.entries())) {
+      if (!(el as any).isConnected) {
+        keytapUpCallbacks.delete(el);
+        continue;
+      }
+      try {
+        cb({
+          type: "keytap",
+          phase: "up",
+          key: ev.key,
+          code: ev.code,
+          repeat: ev.repeat,
+          event: ev,
+        });
+      } catch {
+        // ignore user handler errors
+      }
+    }
+  };
+  document.addEventListener("keydown", keyDocDownListener as any);
+  document.addEventListener("keyup", keyDocUpListener as any);
+}
 
 function DOMEscapeHandler(): TriggerPropHandler<MaybeSignalHandler> {
   return function (node: Element, val: MaybeSignalHandler): void {
@@ -582,23 +699,75 @@ function DOMEscapeHandler(): TriggerPropHandler<MaybeSignalHandler> {
       escapeCallbacks.set(node, currentHandler);
     }
 
-    if (!escapeDocListener) {
-      escapeDocListener = function (ev: KeyboardEvent): void {
-        if (ev.key !== "Escape") return;
-        // Snapshot to allow mutation during iteration
-        for (const [el, cb] of Array.from(escapeCallbacks.entries())) {
-          if (!(el as any).isConnected) {
-            escapeCallbacks.delete(el);
-            continue;
-          }
-          try {
-            cb(ev);
-          } catch {
-            // ignore user handler errors
-          }
+    ensureKeyListeners();
+  };
+}
+
+function DOMKeyTapBaseHandler(): TriggerPropHandler<MaybeSignalHandler> {
+  return function (node: Element, val: MaybeSignalHandler): void {
+    if (!node || !val) return;
+    let cb: AnyEventHandler | null = null;
+    if (isSignal(val)) {
+      val.connect(function () {
+        const v = val.peek();
+        if (typeof v === "function") {
+          cb = v as AnyEventHandler;
+          keytapCallbacks.set(node, cb);
+          ensureKeyListeners();
+        } else {
+          keytapCallbacks.delete(node);
         }
-      };
-      document.addEventListener("keydown", escapeDocListener as any);
+      });
+    } else if (typeof val === "function") {
+      cb = val as AnyEventHandler;
+      keytapCallbacks.set(node, cb);
+      ensureKeyListeners();
+    }
+  };
+}
+
+function DOMKeyTapDownHandler(): TriggerPropHandler<MaybeSignalHandler> {
+  return function (node: Element, val: MaybeSignalHandler): void {
+    if (!node || !val) return;
+    let cb: AnyEventHandler | null = null;
+    if (isSignal(val)) {
+      val.connect(function () {
+        const v = val.peek();
+        if (typeof v === "function") {
+          cb = v as AnyEventHandler;
+          keytapDownCallbacks.set(node, cb);
+          ensureKeyListeners();
+        } else {
+          keytapDownCallbacks.delete(node);
+        }
+      });
+    } else if (typeof val === "function") {
+      cb = val as AnyEventHandler;
+      keytapDownCallbacks.set(node, cb);
+      ensureKeyListeners();
+    }
+  };
+}
+
+function DOMKeyTapUpHandler(): TriggerPropHandler<MaybeSignalHandler> {
+  return function (node: Element, val: MaybeSignalHandler): void {
+    if (!node || !val) return;
+    let cb: AnyEventHandler | null = null;
+    if (isSignal(val)) {
+      val.connect(function () {
+        const v = val.peek();
+        if (typeof v === "function") {
+          cb = v as AnyEventHandler;
+          keytapUpCallbacks.set(node, cb);
+          ensureKeyListeners();
+        } else {
+          keytapUpCallbacks.delete(node);
+        }
+      });
+    } else if (typeof val === "function") {
+      cb = val as AnyEventHandler;
+      keytapUpCallbacks.set(node, cb);
+      ensureKeyListeners();
     }
   };
 }
@@ -695,7 +864,10 @@ function DOMFrameChangeHandler(): TriggerPropHandler<MaybeSignalHandler> {
 
 // ========================= (Hover Handlers) =========================
 function DOMHoverHandler(): TriggerPropHandler<MaybeSignalHandler> {
-  return function (node: Element, val: MaybeSignalHandler): void {
+  return function (
+    node: Element,
+    val: MaybeSignalHandler
+  ): void | (() => void) {
     if (!node || !val) return;
 
     let isHovering = false;
@@ -713,14 +885,14 @@ function DOMHoverHandler(): TriggerPropHandler<MaybeSignalHandler> {
         const cb = val.peek();
         if (typeof cb !== "function") return;
 
-        const handleEnter = (e: Event) => {
+        const handleEnter = (_e: Event) => {
           if (!isHovering) {
             isHovering = true;
             cb(true);
           }
         };
 
-        const handleLeave = (e: Event) => {
+        const handleLeave = (_e: Event) => {
           if (isHovering) {
             isHovering = false;
             cb(false);
@@ -747,14 +919,14 @@ function DOMHoverHandler(): TriggerPropHandler<MaybeSignalHandler> {
     } else if (typeof val === "function") {
       const cb = val;
 
-      const handleEnter = (e: Event) => {
+      const handleEnter = (_e: Event) => {
         if (!isHovering) {
           isHovering = true;
           cb(true);
         }
       };
 
-      const handleLeave = (e: Event) => {
+      const handleLeave = (_e: Event) => {
         if (isHovering) {
           isHovering = false;
           cb(false);
@@ -785,7 +957,10 @@ function DOMHoverHandler(): TriggerPropHandler<MaybeSignalHandler> {
 }
 
 function DOMHoverStartHandler(): TriggerPropHandler<MaybeSignalHandler> {
-  return function (node: Element, val: MaybeSignalHandler): void {
+  return function (
+    node: Element,
+    val: MaybeSignalHandler
+  ): void | (() => void) {
     if (!node || !val) return;
 
     const cb = isSignal(val) ? val.peek() : val;
@@ -801,7 +976,10 @@ function DOMHoverStartHandler(): TriggerPropHandler<MaybeSignalHandler> {
 }
 
 function DOMHoverEndHandler(): TriggerPropHandler<MaybeSignalHandler> {
-  return function (node: Element, val: MaybeSignalHandler): void {
+  return function (
+    node: Element,
+    val: MaybeSignalHandler
+  ): void | (() => void) {
     if (!node || !val) return;
 
     const cb = isSignal(val) ? val.peek() : val;
@@ -818,7 +996,10 @@ function DOMHoverEndHandler(): TriggerPropHandler<MaybeSignalHandler> {
 
 // ========================= (RightClick / Context Menu) =========================
 function DOMRightClickHandler(): TriggerPropHandler<MaybeSignalHandler> {
-  return function (node: Element, val: MaybeSignalHandler): void {
+  return function (
+    node: Element,
+    val: MaybeSignalHandler
+  ): void | (() => void) {
     if (!node || !val) return;
 
     const cb = isSignal(val) ? val.peek() : val;
@@ -827,7 +1008,9 @@ function DOMRightClickHandler(): TriggerPropHandler<MaybeSignalHandler> {
     const handler = (e: MouseEvent) => {
       try {
         e.preventDefault();
-      } catch {}
+      } catch {
+        // ignore errors preventing default
+      }
       (cb as AnyEventHandler)({
         type: "rightclick",
         event: e,
@@ -841,6 +1024,248 @@ function DOMRightClickHandler(): TriggerPropHandler<MaybeSignalHandler> {
     return () => {
       node.removeEventListener("contextmenu", handler as AnyEventHandler);
     };
+  };
+}
+
+// ========================= (Gamepad Handlers) =========================
+type GamepadInfo = {
+  connected: boolean;
+  buttonA: boolean;
+  buttonB: boolean;
+  buttonX: boolean;
+  buttonY: boolean;
+  joystick: [number, number];
+  joystickRight: [number, number];
+  RB: boolean;
+  LB: boolean;
+  RT: boolean;
+  LT: boolean;
+  start: boolean;
+  select: boolean;
+  up: boolean;
+  down: boolean;
+  left: boolean;
+  right: boolean;
+};
+
+function createDisconnectedInfo(): GamepadInfo {
+  return {
+    connected: false,
+    buttonA: false,
+    buttonB: false,
+    buttonX: false,
+    buttonY: false,
+    joystick: [0, 0],
+    joystickRight: [0, 0],
+    RB: false,
+    LB: false,
+    RT: false,
+    LT: false,
+    start: false,
+    select: false,
+    up: false,
+    down: false,
+    left: false,
+    right: false,
+  };
+}
+
+function toGamepadInfo(gp: any): GamepadInfo {
+  if (!gp) return createDisconnectedInfo();
+  const buttons = gp.buttons || [];
+  const axes = gp.axes || [];
+  return {
+    connected: true,
+    buttonA: !!buttons[0]?.pressed,
+    buttonB: !!buttons[1]?.pressed,
+    buttonX: !!buttons[2]?.pressed,
+    buttonY: !!buttons[3]?.pressed,
+    joystickRight: [axes[2] ?? 0, axes[3] ?? 0],
+    LT: !!buttons[6]?.pressed,
+    RT: !!buttons[7]?.pressed,
+    LB: !!buttons[4]?.pressed,
+    RB: !!buttons[5]?.pressed,
+    start: !!buttons[9]?.pressed,
+    select: !!buttons[8]?.pressed,
+    up: !!buttons[12]?.pressed,
+    down: !!buttons[13]?.pressed,
+    left: !!buttons[14]?.pressed,
+    right: !!buttons[15]?.pressed,
+    joystick: [axes[0] ?? 0, axes[1] ?? 0],
+  };
+}
+
+let gamepadIntervalId: number | null = null;
+let lastSerializedGamepadInfo: string | null = null;
+const gamepadCallbacks = new Map<Element, AnyEventHandler>();
+
+function readFirstGamepad(): any | null {
+  try {
+    // deno-lint-ignore no-explicit-any
+    const n: any = typeof navigator !== "undefined" ? navigator : null;
+    if (!n || typeof n.getGamepads !== "function") return null;
+    const pads = n.getGamepads ? n.getGamepads() : [];
+    return pads && pads[0] ? pads[0] : null;
+  } catch {
+    return null;
+  }
+}
+
+function startGamepadPolling(): void {
+  if (gamepadIntervalId != null) return;
+  const w: any = typeof window !== "undefined" ? window : globalThis;
+  // Poll ~10Hz
+  gamepadIntervalId = (w?.setInterval || setInterval)(() => {
+    const gp = readFirstGamepad();
+    const info = toGamepadInfo(gp);
+    const serialized = JSON.stringify(info);
+    if (serialized === lastSerializedGamepadInfo) {
+      // No change; skip notify
+    } else {
+      lastSerializedGamepadInfo = serialized;
+      for (const [el, cb] of Array.from(gamepadCallbacks.entries())) {
+        if (!(el as any).isConnected) {
+          gamepadCallbacks.delete(el);
+          continue;
+        }
+        try {
+          cb(info);
+        } catch {
+          // ignore user callback errors
+        }
+      }
+    }
+
+    if (gamepadCallbacks.size === 0 && gamepadIntervalId != null) {
+      (w?.clearInterval || clearInterval)(gamepadIntervalId);
+      gamepadIntervalId = null;
+      lastSerializedGamepadInfo = null;
+    }
+  }, 100);
+}
+
+function DOMGamepadPollHandler(): TriggerPropHandler<MaybeSignalHandler> {
+  return function (node: Element, val: MaybeSignalHandler): void {
+    if (!node || !val) return;
+    let cb: AnyEventHandler | null = null;
+    if (isSignal(val)) {
+      val.connect(function () {
+        const v = val.peek();
+        if (typeof v === "function") {
+          cb = v as AnyEventHandler;
+          gamepadCallbacks.set(node, cb);
+          startGamepadPolling();
+        } else {
+          gamepadCallbacks.delete(node);
+        }
+      });
+    } else if (typeof val === "function") {
+      cb = val as AnyEventHandler;
+      gamepadCallbacks.set(node, cb);
+      startGamepadPolling();
+    }
+  };
+}
+
+let gpConnectListener: ((ev: any) => void) | null = null;
+let gpDisconnectListener: ((ev: any) => void) | null = null;
+const gamepadConnectCallbacks = new Map<Element, AnyEventHandler>();
+const gamepadDisconnectCallbacks = new Map<Element, AnyEventHandler>();
+
+function DOMGamepadConnectHandler(): TriggerPropHandler<MaybeSignalHandler> {
+  return function (node: Element, val: MaybeSignalHandler): void {
+    if (!node || !val) return;
+    let currentHandler: AnyEventHandler | null = null;
+    if (isSignal(val)) {
+      val.connect(function () {
+        const v = val.peek();
+        currentHandler =
+          typeof v === "function"
+            ? (d: any) => (v as AnyEventHandler)(d)
+            : null;
+        if (currentHandler) gamepadConnectCallbacks.set(node, currentHandler);
+        else gamepadConnectCallbacks.delete(node);
+      });
+    } else if (typeof val === "function") {
+      currentHandler = val as AnyEventHandler;
+      gamepadConnectCallbacks.set(node, currentHandler);
+    }
+
+    if (!gpConnectListener) {
+      gpConnectListener = function (ev: any): void {
+        for (const [el, cb] of Array.from(gamepadConnectCallbacks.entries())) {
+          if (!(el as any).isConnected) {
+            gamepadConnectCallbacks.delete(el);
+            continue;
+          }
+          try {
+            cb({
+              type: "gamepadconnect",
+              event: ev,
+              index: ev?.gamepad?.index,
+              id: ev?.gamepad?.id,
+            });
+          } catch {
+            // ignore user handler errors
+          }
+        }
+      };
+      const w: any = typeof window !== "undefined" ? window : globalThis;
+      w.addEventListener?.(
+        "gamepadconnected",
+        gpConnectListener as AnyEventHandler
+      );
+    }
+  };
+}
+
+function DOMGamepadDisconnectHandler(): TriggerPropHandler<MaybeSignalHandler> {
+  return function (node: Element, val: MaybeSignalHandler): void {
+    if (!node || !val) return;
+    let currentHandler: AnyEventHandler | null = null;
+    if (isSignal(val)) {
+      val.connect(function () {
+        const v = val.peek();
+        currentHandler =
+          typeof v === "function"
+            ? (d: any) => (v as AnyEventHandler)(d)
+            : null;
+        if (currentHandler)
+          gamepadDisconnectCallbacks.set(node, currentHandler);
+        else gamepadDisconnectCallbacks.delete(node);
+      });
+    } else if (typeof val === "function") {
+      currentHandler = val as AnyEventHandler;
+      gamepadDisconnectCallbacks.set(node, currentHandler);
+    }
+
+    if (!gpDisconnectListener) {
+      gpDisconnectListener = function (ev: any): void {
+        for (const [el, cb] of Array.from(
+          gamepadDisconnectCallbacks.entries()
+        )) {
+          if (!(el as any).isConnected) {
+            gamepadDisconnectCallbacks.delete(el);
+            continue;
+          }
+          try {
+            cb({
+              type: "gamepaddisconnect",
+              event: ev,
+              index: ev?.gamepad?.index,
+              id: ev?.gamepad?.id,
+            });
+          } catch {
+            // ignore user handler errors
+          }
+        }
+      };
+      const w: any = typeof window !== "undefined" ? window : globalThis;
+      w.addEventListener?.(
+        "gamepaddisconnected",
+        gpDisconnectListener as AnyEventHandler
+      );
+    }
   };
 }
 
@@ -880,6 +1305,14 @@ export function InUniversalTriggerProps(): void {
     createTrigger("hoverstart", DOMHoverStartHandler());
     // hoverend → pointerleave
     createTrigger("hoverend", DOMHoverEndHandler());
+    // key unified keyboard
+    createTrigger("key", DOMKeyTapBaseHandler());
+    createTrigger("key:down", DOMKeyTapDownHandler());
+    createTrigger("key:up", DOMKeyTapUpHandler());
+    // Gamepad triggers
+    createTrigger("gamepad", DOMGamepadPollHandler());
+    createTrigger("gamepadconnect", DOMGamepadConnectHandler());
+    createTrigger("gamepaddisconnect", DOMGamepadDisconnectHandler());
     return;
   }
   // Capacitor (WebView + native App bridge)
@@ -896,6 +1329,14 @@ export function InUniversalTriggerProps(): void {
     createTrigger("change", DOMEventHandler("change"));
     createTrigger("submit", DOMEventHandler("submit"));
     createTrigger("focus", DOMEventHandler("focus"));
+    // key unified keyboard
+    createTrigger("key", DOMKeyTapBaseHandler());
+    createTrigger("key:down", DOMKeyTapDownHandler());
+    createTrigger("key:up", DOMKeyTapUpHandler());
+    // Gamepad triggers (WebView)
+    createTrigger("gamepad", DOMGamepadPollHandler());
+    createTrigger("gamepadconnect", DOMGamepadConnectHandler());
+    createTrigger("gamepaddisconnect", DOMGamepadDisconnectHandler());
 
     // Dynamically attach Capacitor App event trigger props
     try {

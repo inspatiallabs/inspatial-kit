@@ -23,6 +23,7 @@ import { ShareIIIcon } from "@in/widget/icon/share-ii-icon.tsx";
 import { InputField } from "@in/widget/input/index.ts";
 import { Tab, TabProps } from "@in/widget/ornament/index.ts";
 import { PlusIcon } from "@in/widget/icon/plus-icon.tsx";
+import { iss } from "@in/style/index.ts";
 
 /*####################################(TABLE HEADER)####################################*/
 export function TableHeader({
@@ -36,10 +37,12 @@ export function TableHeader({
     <>
       <thead
         $ref={$ref}
-        className={TableStyle.header.getStyle({
-          class: className as JSX.SharedProps["className"],
-          format,
-        } as any)}
+        className={iss(
+          TableStyle.header.getStyle({
+            class: className as JSX.SharedProps["className"],
+            format,
+          } as any)
+        )}
         {...rest}
       >
         {children}
@@ -67,10 +70,12 @@ export function TableList({
     return (
       <tbody
         $ref={$ref}
-        className={TableStyle.list.getStyle({
-          class: className as JSX.SharedProps["className"],
-          format,
-        } as any)}
+        className={iss(
+          TableStyle.list.getStyle({
+            class: className as JSX.SharedProps["className"],
+            format,
+          } as any)
+        )}
         {...rest}
       >
         <List each={each} track={track}>
@@ -83,10 +88,12 @@ export function TableList({
   return (
     <tbody
       $ref={$ref}
-      className={TableStyle.list.getStyle({
-        class: className as JSX.SharedProps["className"],
-        format,
-      } as any)}
+      className={iss(
+        TableStyle.list.getStyle({
+          class: className as JSX.SharedProps["className"],
+          format,
+        } as any)
+      )}
       {...rest}
     >
       {children}
@@ -105,10 +112,12 @@ export function TableFooter({
   return (
     <tfoot
       $ref={$ref}
-      className={TableStyle.footer.getStyle({
-        class: className as JSX.SharedProps["className"],
-        format,
-      } as any)}
+      className={iss(
+        TableStyle.footer.getStyle({
+          class: className as JSX.SharedProps["className"],
+          format,
+        } as any)
+      )}
       {...rest}
     >
       {children}
@@ -127,10 +136,12 @@ export function TableRow({
   return (
     <tr
       $ref={$ref}
-      className={TableStyle.row.getStyle({
-        class: className as JSX.SharedProps["className"],
-        format,
-      } as any)}
+      className={iss(
+        TableStyle.row.getStyle({
+          class: className as JSX.SharedProps["className"],
+          format,
+        } as any)
+      )}
       {...rest}
     >
       {children}
@@ -150,10 +161,12 @@ export function TableHeaderColumn({
   return (
     <th
       $ref={$ref}
-      className={TableStyle.head.getStyle({
-        class: className as JSX.SharedProps["className"],
-        format,
-      } as any)}
+      className={iss(
+        TableStyle.head.getStyle({
+          class: className as JSX.SharedProps["className"],
+          format,
+        } as any)
+      )}
       {...rest}
     >
       {children}
@@ -178,9 +191,10 @@ export function TableHeaderBar({
   const showFilter = filter?.display ?? true;
   const showSearch = search?.display ?? true;
   const showActions = actions?.display ?? true;
-  
+
   // Check if importExport and newEntry should be displayed
-  const showImportExport = actions?.importExport && actions.importExport !== false;
+  const showImportExport =
+    actions?.importExport && actions.importExport !== false;
   const showNewEntry = actions?.newEntry && actions.newEntry !== false;
 
   // Strip display before spreading into elements
@@ -308,27 +322,34 @@ export function TableHeaderBar({
                       padding: "4px",
                     },
                   }}
-                  {...(typeof importExport === 'object' ? importExport : {})}
+                  {...(typeof importExport === "object" ? importExport : {})}
                 >
-                  {(typeof importExport === 'object' && importExport.children) ? 
-                    importExport.children : <ShareIIIcon />}
+                  {typeof importExport === "object" && importExport.children ? (
+                    importExport.children
+                  ) : (
+                    <ShareIIIcon />
+                  )}
                 </Button>
               )}
 
               {/***********(New Entry (Row) Button)************/}
               {showNewEntry && (
-                <Button 
-                  {...(typeof newEntry === 'object' ? newEntry : {})}
-                >
-                  {(typeof newEntry === 'object' && (newEntry.children || newEntry.label)) ? 
-                    (newEntry.children || newEntry.label) : "New Entry"}
+                <Button {...(typeof newEntry === "object" ? newEntry : {})}>
+                  {typeof newEntry === "object" &&
+                  (newEntry.children || newEntry.label)
+                    ? newEntry.children || newEntry.label
+                    : "New Entry"}
                 </Button>
               )}
 
               {/* Custom user actions */}
               {ensureArray(customActions).map((action: any, idx: number) => {
                 // If it's a JSX element (has $$typeof or type property), render it directly
-                if (action && typeof action === 'object' && (action.$$typeof || action.type)) {
+                if (
+                  action &&
+                  typeof action === "object" &&
+                  (action.$$typeof || action.type)
+                ) {
                   return action;
                 }
                 // Otherwise treat it as ButtonProps
@@ -354,10 +375,12 @@ export function TableCell({
   return (
     <td
       $ref={$ref}
-      className={TableStyle.cell.getStyle({
-        class: className as JSX.SharedProps["className"],
-        format,
-      } as any)}
+      className={iss(
+        TableStyle.cell.getStyle({
+          class: className as JSX.SharedProps["className"],
+          format,
+        } as any)
+      )}
       {...rest}
     >
       {children}
@@ -376,10 +399,12 @@ export function TableCaption({
   return (
     <caption
       $ref={$ref}
-      className={TableStyle.caption.getStyle({
-        class: className as JSX.SharedProps["className"],
-        format,
-      } as any)}
+      className={iss(
+        TableStyle.caption.getStyle({
+          class: className as JSX.SharedProps["className"],
+          format,
+        } as any)
+      )}
       {...rest}
     >
       {children}
@@ -389,8 +414,8 @@ export function TableCaption({
 
 /*####################################(TABLE HEADER RELATIONS)####################################*/
 export function TableHeaderRelations(props: TableHeaderRelationsProps) {
-  const { wrapper, children, cta, ...tabProps } = props;
-  
+  const { wrapper, children, cta, ...rest } = props;
+
   return (
     <Slot
       {...wrapper}
@@ -401,7 +426,7 @@ export function TableHeaderRelations(props: TableHeaderRelationsProps) {
           padding: "10px",
           backgroundColor: "var(--surface)",
           marginBottom: "2px",
-          ...(wrapper?.style?.web || {}),
+          ...(wrapper?.style || {}),
         },
       }}
     >
@@ -409,8 +434,8 @@ export function TableHeaderRelations(props: TableHeaderRelationsProps) {
         radius="sm"
         format="segmented"
         size="lg"
-        {...tabProps}
         children={children}
+        {...rest}
       />
       {cta && Array.isArray(cta) ? (
         cta.map((button, index) => (
@@ -419,9 +444,7 @@ export function TableHeaderRelations(props: TableHeaderRelationsProps) {
           </Button>
         ))
       ) : cta ? (
-        <Button {...cta}>
-          {cta.children}
-        </Button>
+        <Button {...cta}>{cta.children}</Button>
       ) : null}
     </Slot>
   );
@@ -429,7 +452,7 @@ export function TableHeaderRelations(props: TableHeaderRelationsProps) {
 
 /*####################################(TABLE HEADER NAVIGATOR)####################################*/
 export function TableHeaderNavigator(props: TableHeaderNavigatorProps) {
-  const { wrapper, children, cta, ...tabProps } = props;
+  const { wrapper, children, cta, ...rest } = props;
 
   return (
     <Slot
@@ -438,7 +461,7 @@ export function TableHeaderNavigator(props: TableHeaderNavigatorProps) {
         web: {
           width: "100%",
           backgroundColor: "var(--surface)",
-          ...(wrapper?.style?.web || {}),
+          ...(wrapper?.style || {}),
         },
       }}
     >
@@ -456,8 +479,8 @@ export function TableHeaderNavigator(props: TableHeaderNavigatorProps) {
           radius="none"
           format="rabi"
           size="lg"
-          {...tabProps}
           children={children}
+          {...rest}
         />
         {cta && (
           <Button
@@ -486,10 +509,12 @@ export function TableWrapper({
     <>
       <table
         $ref={$ref}
-        className={TableStyle.wrapper.getStyle({
-          class: className as JSX.SharedProps["className"],
-          format,
-        } as any)}
+        className={iss(
+          TableStyle.wrapper.getStyle({
+            class: className as JSX.SharedProps["className"],
+            format,
+          } as any)
+        )}
         {...rest}
       >
         {children}

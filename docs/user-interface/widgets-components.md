@@ -6,7 +6,7 @@ A Widget is a high-level primitive. It simple terms a widget contains multiple c
 
 NOTE: Only high-level primitives (such as Input, Ornament, Presentation, etc.) support `variants`. Each variant/children can have multiple `formats`, which act as sub-variants.
 
-### Control Flow
+## Control Flow
 
 Control flows allow you to...
 
@@ -31,7 +31,7 @@ Control flows allow you to...
 - `**Fn`\*\* provides a render closure; inside it, you can read the table header groups and row model.
 - **`R.c(tag, props, ...children)`** creates elements; `R.text(string)` creates text nodes.
 
-### Structure
+## Structure
 
 When you build anything, a house, a painting, or an app, you need **a frame**.
 
@@ -145,7 +145,7 @@ import { Table } from "@inspatial/kit/data-flow";
 />;
 ```
 
-### Presentation
+## Presentation
 
 #### Modal
 
@@ -200,3 +200,10 @@ import {
   <Text>Render on the modal</Text>
 </PresentationInlet>;
 ```
+
+## Ornament
+
+### `<Tab>`
+
+#### Anatomy
+Historically Tabs have been used as owners of a view. But this is merely the case because the anatomy of a tab warrants that a Tab is simply a controller of a view. 

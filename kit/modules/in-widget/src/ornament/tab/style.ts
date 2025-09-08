@@ -33,7 +33,7 @@ export const TabStyle = {
     },
     composition: [
       {
-        "$tab-trigger.format": "segmented",
+        "$tab-anchor.format": "segmented",
         style: {
           web: {
             backgroundColor: "var(--background)",
@@ -41,7 +41,7 @@ export const TabStyle = {
         },
       },
       {
-        "$tab-trigger.format": "underline",
+        "$tab-anchor.format": "underline",
         style: {
           web: {
             backgroundColor: "transparent",
@@ -50,10 +50,10 @@ export const TabStyle = {
           },
         },
       },
-      // Wrapper conforms to trigger radius
+      // Wrapper conforms to anchor radius
       {
-        "$tab-trigger.radius": "none",
-        "$tab-trigger.format": "segmented",
+        "$tab-anchor.radius": "none",
+        "$tab-anchor.format": "segmented",
         style: {
           web: {
             borderRadius: "var(--radius-none)",
@@ -61,8 +61,8 @@ export const TabStyle = {
         },
       },
       {
-        "$tab-trigger.radius": "xs",
-        "$tab-trigger.format": "segmented",
+        "$tab-anchor.radius": "xs",
+        "$tab-anchor.format": "segmented",
         style: {
           web: {
             borderRadius: "var(--radius-xs)",
@@ -70,8 +70,8 @@ export const TabStyle = {
         },
       },
       {
-        "$tab-trigger.radius": "sm",
-        "$tab-trigger.format": "segmented",
+        "$tab-anchor.radius": "sm",
+        "$tab-anchor.format": "segmented",
         style: {
           web: {
             borderRadius: "var(--radius-sm)",
@@ -79,8 +79,8 @@ export const TabStyle = {
         },
       },
       {
-        "$tab-trigger.radius": "md",
-        "$tab-trigger.format": "segmented",
+        "$tab-anchor.radius": "md",
+        "$tab-anchor.format": "segmented",
         style: {
           web: {
             borderRadius: "var(--radius-md)",
@@ -88,8 +88,8 @@ export const TabStyle = {
         },
       },
       {
-        "$tab-trigger.radius": "base",
-        "$tab-trigger.format": "segmented",
+        "$tab-anchor.radius": "base",
+        "$tab-anchor.format": "segmented",
         style: {
           web: {
             borderRadius: "var(--radius-base)",
@@ -97,8 +97,8 @@ export const TabStyle = {
         },
       },
       {
-        "$tab-trigger.radius": "lg",
-        "$tab-trigger.format": "segmented",
+        "$tab-anchor.radius": "lg",
+        "$tab-anchor.format": "segmented",
         style: {
           web: {
             borderRadius: "var(--radius-lg)",
@@ -106,8 +106,8 @@ export const TabStyle = {
         },
       },
       {
-        "$tab-trigger.radius": "xl",
-        "$tab-trigger.format": "segmented",
+        "$tab-anchor.radius": "xl",
+        "$tab-anchor.format": "segmented",
         style: {
           web: {
             borderRadius: "var(--radius-xl)",
@@ -115,8 +115,8 @@ export const TabStyle = {
         },
       },
       {
-        "$tab-trigger.radius": "2xl",
-        "$tab-trigger.format": "segmented",
+        "$tab-anchor.radius": "2xl",
+        "$tab-anchor.format": "segmented",
         style: {
           web: {
             borderRadius: "var(--radius-2xl)",
@@ -124,8 +124,8 @@ export const TabStyle = {
         },
       },
       {
-        "$tab-trigger.radius": "3xl",
-        "$tab-trigger.format": "segmented",
+        "$tab-anchor.radius": "3xl",
+        "$tab-anchor.format": "segmented",
         style: {
           web: {
             borderRadius: "var(--radius-3xl)",
@@ -133,8 +133,8 @@ export const TabStyle = {
         },
       },
       {
-        "$tab-trigger.radius": "4xl",
-        "$tab-trigger.format": "segmented",
+        "$tab-anchor.radius": "4xl",
+        "$tab-anchor.format": "segmented",
         style: {
           web: {
             borderRadius: "var(--radius-4xl)",
@@ -142,8 +142,8 @@ export const TabStyle = {
         },
       },
       {
-        "$tab-trigger.radius": "5xl",
-        "$tab-trigger.format": "segmented",
+        "$tab-anchor.radius": "5xl",
+        "$tab-anchor.format": "segmented",
         style: {
           web: {
             borderRadius: "var(--radius-5xl)",
@@ -151,8 +151,8 @@ export const TabStyle = {
         },
       },
       {
-        "$tab-trigger.radius": "full",
-        "$tab-trigger.format": "segmented",
+        "$tab-anchor.radius": "full",
+        "$tab-anchor.format": "segmented",
         style: {
           web: {
             borderRadius: "var(--radius-full)",
@@ -162,10 +162,50 @@ export const TabStyle = {
     ],
   }),
 
-  /*******************************(Trigger)********************************/
-  // Trigger is the clickable tab button with visual content e.g label and icon
-  trigger: createStyle({
-    name: "tab-trigger",
+  /*******************************(Wrapper)********************************/
+  // Wrapper is the secondary container incharge of proper positioning of the items inside it
+  wrapper: createStyle({
+    name: "tab-wrapper",
+    base: [
+      {
+        web: {
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100%",
+          width: "100%",
+        },
+      },
+    ],
+  }),
+
+  /*******************************(Input)********************************/
+  // Hidden radio input for state management
+  input: createStyle({
+    name: "tab-input",
+    base: [
+      "sr-only",
+      "peer", // Peer is the input that is hidden and used to manage the state of the tab
+      {
+        web: {
+          position: "absolute",
+          width: "1px",
+          height: "1px",
+          padding: "0",
+          margin: "-1px",
+          overflow: "hidden",
+          clip: "rect(0, 0, 0, 0)",
+          whiteSpace: "nowrap",
+          borderWidth: "0",
+        },
+      },
+    ],
+  }),
+
+  /*******************************(Anchor)********************************/
+  // Anchor is the clickable tab button with visual content e.g label and icon
+  anchor: createStyle({
+    name: "tab-anchor",
     base: [
       {
         web: {
@@ -233,7 +273,7 @@ export const TabStyle = {
           {
             web: {
               borderRight: "1px solid var(--background)",
-              
+
               // Hover state
               //   "&:hover": {
               //     backgroundColor: "rgba(255, 255, 255, 0.05)",
@@ -339,23 +379,6 @@ export const TabStyle = {
     },
   }),
 
-  /*******************************(Wrapper)********************************/
-  // Wrapper is the secondary container incharge of proper positioning of the items inside it
-  wrapper: createStyle({
-    name: "tab-wrapper",
-    base: [
-      {
-        web: {
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "100%",
-          width: "100%",
-        },
-      },
-    ],
-  }),
-
   /*******************************(Icon)********************************/
   // Icon is the icon for the tab 😂
   icon: createStyle({
@@ -367,29 +390,6 @@ export const TabStyle = {
           height: "100%",
           alignItems: "center",
           justifyContent: "center",
-        },
-      },
-    ],
-  }),
-
-  /*******************************(Input)********************************/
-  // Hidden radio input for state management
-  input: createStyle({
-    name: "tab-input",
-    base: [
-      "sr-only",
-      "peer",
-      {
-        web: {
-          position: "absolute",
-          width: "1px",
-          height: "1px",
-          padding: "0",
-          margin: "-1px",
-          overflow: "hidden",
-          clip: "rect(0, 0, 0, 0)",
-          whiteSpace: "nowrap",
-          borderWidth: "0",
         },
       },
     ],
