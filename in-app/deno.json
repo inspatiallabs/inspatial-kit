@@ -129,6 +129,7 @@
     "@inspatial/kit/motion": "../kit/modules/in-motion/src/index.ts",
     "@inspatial/kit/style": "../kit/modules/in-style/src/index.ts",
     "@inspatial/kit/route": "../kit/modules/in-route/src/index.ts",
+    "@inspatial/kit/route/": "../kit/modules/in-route/src/",
     "@inspatial/kit/build": "../kit/modules/in-build/src/index.ts",
     "@inspatial/kit/vader": "../kit/modules/in-vader/src/index.ts",
     "@inspatial/kit/vader/env": "../kit/modules/in-vader/src/env/index.ts",

@@ -71,6 +71,17 @@ export interface ExtensionPermissions {
   files?: { read?: string[]; write?: string[] };
 }
 
+/*################################(Extension Triggers)################################*/
+// Trigger declaration for extensions
+export interface TriggerDeclaration<T = any> {
+  handler: (node: Element, value: any) => void | (() => void);
+  type?: T; // Type hint for TypeScript
+  description?: string;
+  platforms?: string[]; // Optional platform restrictions
+}
+
+export type ExtensionTriggers = Record<string, TriggerDeclaration>;
+
 /*################################(Extension Capabilities)################################*/
 // Capability buckets
 export interface RendererPropsCaps {
@@ -83,7 +94,11 @@ export interface RendererPropsCaps {
 
 export interface ExtensionCapabilities {
   rendererProps?: RendererPropsCaps;
-  // triggers, uiSurfaces, serverHooks, settings, i18n can be added progressively
+  /**
+   * Create Triggers for Extension
+   */
+  triggers?: ExtensionTriggers; // Extension-defined triggers
+  // uiSurfaces, serverHooks, settings, i18n can be added progressively
 }
 
 /*################################(Extension Lifecycle)################################*/
@@ -136,6 +151,7 @@ export interface ComposedExtensions {
   tagNamespaceMap: Record<string, string>;
   tagAliases: Record<string, string>;
   setups: Array<(renderer: any) => void>;
+  triggers: Map<string, TriggerDeclaration>; // Collected triggers from all extensions
 }
 
 export function composeExtensions(
@@ -150,6 +166,7 @@ export function composeExtensions(
   const tagAliases: Record<string, string> = {};
   const resolvers: DirectiveResolver[] = [];
   const setups: Array<(renderer: any) => void> = [];
+  const triggers = new Map<string, TriggerDeclaration>();
 
   for (const ext of extArray) {
     // Global setup & validation from lifecycle
@@ -175,6 +192,14 @@ export function composeExtensions(
       if (Array.isArray(r)) resolvers.push(...r.filter(Boolean));
       else if (r) resolvers.push(r);
     }
+
+    // Collect triggers from extension
+    const extTriggers = ext?.capabilities?.triggers;
+    if (extTriggers) {
+      for (const [name, declaration] of Object.entries(extTriggers)) {
+        triggers.set(name, declaration);
+      }
+    }
   }
 
   let onDirective: DirectiveResolver | undefined;
@@ -194,6 +219,7 @@ export function composeExtensions(
     tagNamespaceMap,
     tagAliases,
     setups,
+    triggers,
   };
 }
 

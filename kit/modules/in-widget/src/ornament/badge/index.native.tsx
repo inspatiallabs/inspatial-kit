@@ -27,6 +27,7 @@ export function Badge({
         BadgeStyle.getStyle({ format, className, class: classname, ...props })
       )}
       {...props}
+      
     />
   );
 }

@@ -106,6 +106,8 @@
     "@in/renderer/": "./modules/in-renderer/src/",
     "@in/runtime/": "./modules/in-runtime/src/",
 
+    "@inspatial/kit": "./modules/",
+
     "@inspatial/kit/runtime": "./modules/in-runtime/src/index.ts",
     "@inspatial/kit/jsx-runtime": "./modules/in-runtime/src/jsx-runtime.ts",
     "@inspatial/kit/jsx-dev-runtime": "./modules/in-runtime/src/jsx-dev-runtime.ts",

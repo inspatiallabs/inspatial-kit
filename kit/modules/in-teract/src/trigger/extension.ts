@@ -10,7 +10,7 @@ import { createExtension } from "@in/extension/index.ts";
  * @description This extension is used to add trigger prop functionality to the InSpatial renderer. Without this extension, the trigger prop functionality will not be available so event listeners will not be triggered.
  * @example
  * ```tsx
- * import { InTrigger } from "@inspatial/state";
+ * import { InTrigger } from "@inspatial/trigger";
  * ```
  */
 export function InTrigger() {

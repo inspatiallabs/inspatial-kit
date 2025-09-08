@@ -52,7 +52,7 @@ export function ensureCloudStatusSubscription(): void {
   );
 }
 
-createTrigger("cloudStatus", (node: Element, val: any) => {
+export const cloudStatusHandler = (node: Element, val: any) => {
   if (!val) return;
   ensureCloudStatusSubscription();
   const cb = isSignal(val) ? val.peek() : val;
@@ -68,16 +68,22 @@ createTrigger("cloudStatus", (node: Element, val: any) => {
       // ignore
     }
   }
-});
+};
 
-createTrigger("cloudReconnected", (node: Element, val: any) => {
+// Extension Automatically register the triggers from capabilities.trigger
+// createTrigger("cloudStatus", cloudStatusHandler);
+
+export const cloudReconnectedHandler = (node: Element, val: any) => {
   if (!val) return;
   ensureCloudStatusSubscription();
   const original = isSignal(val) ? val.peek() : val;
   if (typeof original === "function") {
     cloudReconnectedCallbacks.set(node, original as () => void);
   }
-});
+};
+
+// Extension Automatically register the triggers from capabilities.trigger
+// createTrigger("cloudReconnected", cloudReconnectedHandler);
 
 // Notification trigger
 type NotifyCb = (info: {
@@ -86,10 +92,14 @@ type NotifyCb = (info: {
   message: string;
 }) => void;
 export const cloudNotifyCallbacks = new Map<Element, NotifyCb>();
-createTrigger("cloudNotify", (node: Element, val: any) => {
+
+export const cloudNotifyHandler = (node: Element, val: any) => {
   if (!val) return;
   const cb = isSignal(val) ? val.peek() : val;
   if (typeof cb === "function") {
     cloudNotifyCallbacks.set(node, cb as NotifyCb);
   }
-});
+};
+
+// Extension Automatically register the triggers from capabilities.trigger
+// createTrigger("cloudNotify", cloudNotifyHandler);

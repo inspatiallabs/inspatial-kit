@@ -9,6 +9,15 @@ import type { ISSProps as ISSPropsType } from "@in/style/iss/type/data-types.ts"
 // the need for `import type { ISSProps } from "@in/style";` in each app.
 /*########################################################################################*/
 
+// Extension trigger types - augmented by extensions at compile time
+declare global {
+  namespace InSpatial {
+    interface ExtensionTriggers {}
+  }
+}
+
+type GeneratedTriggers = InSpatial.ExtensionTriggers;
+
 export {};
 
 declare global {
@@ -78,11 +87,22 @@ declare global {
     type ClassPropKey = `class:${string}`;
     type NamespacePropKey = `${string}:${string}`;
     type EventHandler = (...args: any[]) => any;
-    type TriggerPropKey = `on:${InUniversalTriggerPropsType | string}`;
-    type UniversalTriggerProps = InUniversalTriggerPropsType | string;
-    type KnownOnPropKey = `on:${InUniversalTriggerPropsType}`
+    type ExtensionTriggerKeys = keyof GeneratedTriggers;
+    type AllTriggerKeys =
+      | InUniversalTriggerPropsType
+      | ExtensionTriggerKeys
+      | string;
+    type TriggerPropKey = `on:${AllTriggerKeys}`;
+    type UniversalTriggerProps = AllTriggerKeys;
+    type KnownOnPropKey = `on:${
+      | InUniversalTriggerPropsType
+      | ExtensionTriggerKeys}`;
     type KnownOnProps = {
-      [K in KnownOnPropKey]?: EventHandler | any;
+      [K in KnownOnPropKey]?: K extends `on:${infer T}`
+        ? T extends keyof GeneratedTriggers
+          ? ((payload: GeneratedTriggers[T]) => any) | any
+          : EventHandler | any
+        : EventHandler | any;
     };
 
     /**
@@ -138,18 +158,18 @@ declare global {
       // Permissive catch-all so base JSX works without strict prop maps
       [prop: string]: any;
     } & KnownOnProps & {
-      // Specific directive groups with narrowed value types
-      [K in StylePropKey]?:
-        | string
-        | number
-        | null
-        | undefined
-        | UniversalStyleProps;
-    } & {
-      [K in ClassPropKey]?: boolean | string | number | null | undefined;
-    } & {
-      [K in TriggerPropKey]?: EventHandler | any;
-    } & { [K in NamespacePropKey]?: unknown }; // Fallback for other namespaced directives (e.g., svg:xlink)
+        // Specific directive groups with narrowed value types
+        [K in StylePropKey]?:
+          | string
+          | number
+          | null
+          | undefined
+          | UniversalStyleProps;
+      } & {
+        [K in ClassPropKey]?: boolean | string | number | null | undefined;
+      } & {
+        [K in TriggerPropKey]?: EventHandler | any;
+      } & { [K in NamespacePropKey]?: unknown }; // Fallback for other namespaced directives (e.g., svg:xlink)
 
     // Default: All elements will default to InSpatial's shared props
     interface IntrinsicElements {

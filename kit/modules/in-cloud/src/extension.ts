@@ -1,6 +1,11 @@
 import { createExtension } from "@in/extension/index.ts";
 import { incloud } from "./cloud.ts";
 import type { SocketStatus } from "@inspatial/cloud-client/types";
+import {
+  cloudStatusHandler,
+  cloudReconnectedHandler,
+  cloudNotifyHandler,
+} from "./trigger.ts";
 
 type ReconnectPolicy = "reload" | { onReconnect: () => void };
 
@@ -18,8 +23,28 @@ export function InCloud(options?: { reconnect?: ReconnectPolicy }) {
       type: "Universal",
       version: "0.1.0",
     },
+    capabilities: {
+      triggers: {
+        cloudStatus: {
+          handler: cloudStatusHandler,
+          type: {} as { type: "cloudStatus"; status: SocketStatus | string },
+          description: "Fires when cloud connection status changes",
+        },
+        cloudReconnected: {
+          handler: cloudReconnectedHandler,
+          type: undefined as void,
+          description: "Fires when cloud connection is re-established",
+        },
+        cloudNotify: {
+          handler: cloudNotifyHandler,
+          type: {} as { type: string; title?: string; message: string },
+          description: "Fires when cloud sends a notification",
+        },
+      },
+    },
     lifecycle: {
       setup() {
+        // Triggers are automatically registered by the extension system
         if (options?.reconnect) {
           const policy = options.reconnect;
           incloud.live.onConnectionStatus((status: SocketStatus) => {

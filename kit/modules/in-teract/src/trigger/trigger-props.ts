@@ -150,7 +150,7 @@ const namespaceToTagsMap: NamespaceToTagsMap = {
 
 export const tagNamespaceMap: Record<string, string> =
   reverseMap(namespaceToTagsMap);
-// Removed attr:/prop: magic; keep only select aliases as plain attrs
+
 export const propAliases: Record<string, string> = Object.fromEntries(
   attributes.map((k) => [k, k])
 );
@@ -257,10 +257,10 @@ function onTriggerProp(
     // Gamepad aliases (DOM event names → universal trigger names)
     gamepadconnected: "gamepadconnect",
     gamepaddisconnected: "gamepaddisconnect",
-    // Key naming preference: map keytap* → key*
-    keytap: "key",
-    "keytap:down": "key:down",
-    "keytap:up": "key:up",
+    // Key naming preference: map key* → key*
+    key: "key",
+    "key:down": "key:down",
+    "key:up": "key:up",
   };
   const canonicalKey = aliasMap[key] ?? key;
 
@@ -438,7 +438,6 @@ export type InUniversalTriggerPropsType =
   | "key:down"
   | "key:up"
   | "mount"
-  | "route"
   | "beforeMount"
   | "frameChange"
   | "change"
@@ -521,76 +520,26 @@ function DOMBeforeMountHandler(): TriggerPropHandler<MaybeSignalHandler> {
   };
 }
 
-let ROUTE_EVENT_NAME: string | null = null;
-let routeDocListener: ((ev: Event) => void) | null = null;
-const routeCallbacks = new Map<Element, AnyEventHandler>();
-
-function DOMRouteHandler(): TriggerPropHandler<MaybeSignalHandler> {
-  return function (node: Element, val: MaybeSignalHandler): void {
-    if (!node || !val) return;
-    ROUTE_EVENT_NAME =
-      (globalThis as any).IN_ROUTE_EVENT_NAME || ROUTE_EVENT_NAME || "in-route";
-
-    let currentHandler: AnyEventHandler | null = null;
-    if (isSignal(val)) {
-      val.connect(function () {
-        const cb = val.peek();
-        currentHandler =
-          typeof cb === "function"
-            ? (detail: any) => (cb as AnyEventHandler)(detail)
-            : null;
-        if (currentHandler) routeCallbacks.set(node, currentHandler);
-        else routeCallbacks.delete(node);
-      });
-    } else if (typeof val === "function") {
-      currentHandler = val as AnyEventHandler;
-      routeCallbacks.set(node, currentHandler);
-    }
-
-    if (!routeDocListener) {
-      routeDocListener = function (ev: Event): void {
-        const detail = (ev as any).detail || ev;
-        // Iterate stable snapshot to allow mutation during iteration
-        for (const [el, cb] of Array.from(routeCallbacks.entries())) {
-          if (!(el as any).isConnected) {
-            routeCallbacks.delete(el);
-            continue;
-          }
-          try {
-            cb(detail);
-          } catch {
-            // ignore user handler errors
-          }
-        }
-      };
-      document.addEventListener(
-        ROUTE_EVENT_NAME || "in-route",
-        routeDocListener as AnyEventHandler
-      );
-    }
-  };
-}
-
-// ========================= (Keyboard: keytap base + escape sugar) =========================
+// ========================= (Keyboard: key base + escape sugar) =========================
 let keyDocDownListener: ((ev: KeyboardEvent) => void) | null = null;
 let keyDocUpListener: ((ev: KeyboardEvent) => void) | null = null;
-const keytapCallbacks = new Map<Element, AnyEventHandler>();
-const keytapDownCallbacks = new Map<Element, AnyEventHandler>();
-const keytapUpCallbacks = new Map<Element, AnyEventHandler>();
+const keyCallbacks = new Map<Element, AnyEventHandler>();
+const keyDownCallbacks = new Map<Element, AnyEventHandler>();
+const keyUpCallbacks = new Map<Element, AnyEventHandler>();
 const escapeCallbacks = new Map<Element, AnyEventHandler>();
 
 function ensureKeyListeners(): void {
   if (keyDocDownListener && keyDocUpListener) return;
   keyDocDownListener = function (ev: KeyboardEvent): void {
-    // keytap base (down phase)
-    for (const [el, cb] of Array.from(keytapCallbacks.entries())) {
+    // key base (down phase)
+    for (const [el, cb] of Array.from(keyCallbacks.entries())) {
       if (!(el as any).isConnected) {
-        keytapCallbacks.delete(el);
+        keyCallbacks.delete(el);
         continue;
       }
       try {
         cb({
-          type: "keytap",
+          type: "key",
           phase: "down",
           key: ev.key,
           code: ev.code,
@@ -601,15 +550,15 @@ function ensureKeyListeners(): void {
         // ignore user handler errors
       }
     }
-    // keytap:down
-    for (const [el, cb] of Array.from(keytapDownCallbacks.entries())) {
+    // key:down
+    for (const [el, cb] of Array.from(keyDownCallbacks.entries())) {
       if (!(el as any).isConnected) {
-        keytapDownCallbacks.delete(el);
+        keyDownCallbacks.delete(el);
         continue;
       }
       try {
         cb({
-          type: "keytap",
+          type: "key",
           phase: "down",
           key: ev.key,
           code: ev.code,
@@ -636,15 +585,15 @@ function ensureKeyListeners(): void {
     }
   };
   keyDocUpListener = function (ev: KeyboardEvent): void {
-    // keytap base (up phase)
-    for (const [el, cb] of Array.from(keytapCallbacks.entries())) {
+    // key base (up phase)
+    for (const [el, cb] of Array.from(keyCallbacks.entries())) {
       if (!(el as any).isConnected) {
-        keytapCallbacks.delete(el);
+        keyCallbacks.delete(el);
         continue;
       }
       try {
         cb({
-          type: "keytap",
+          type: "key",
           phase: "up",
           key: ev.key,
           code: ev.code,
@@ -655,15 +604,15 @@ function ensureKeyListeners(): void {
         // ignore user handler errors
       }
     }
-    // keytap:up
-    for (const [el, cb] of Array.from(keytapUpCallbacks.entries())) {
+    // key:up
+    for (const [el, cb] of Array.from(keyUpCallbacks.entries())) {
       if (!(el as any).isConnected) {
-        keytapUpCallbacks.delete(el);
+        keyUpCallbacks.delete(el);
         continue;
       }
       try {
         cb({
-          type: "keytap",
+          type: "key",
           phase: "up",
           key: ev.key,
           code: ev.code,
@@ -703,7 +652,7 @@ function DOMEscapeHandler(): TriggerPropHandler<MaybeSignalHandler> {
   };
 }
 
-function DOMKeyTapBaseHandler(): TriggerPropHandler<MaybeSignalHandler> {
+function DOMKeyBaseHandler(): TriggerPropHandler<MaybeSignalHandler> {
   return function (node: Element, val: MaybeSignalHandler): void {
     if (!node || !val) return;
     let cb: AnyEventHandler | null = null;
@@ -712,21 +661,21 @@ function DOMKeyTapBaseHandler(): TriggerPropHandler<MaybeSignalHandler> {
         const v = val.peek();
         if (typeof v === "function") {
           cb = v as AnyEventHandler;
-          keytapCallbacks.set(node, cb);
+          keyCallbacks.set(node, cb);
           ensureKeyListeners();
         } else {
-          keytapCallbacks.delete(node);
+          keyCallbacks.delete(node);
         }
       });
     } else if (typeof val === "function") {
       cb = val as AnyEventHandler;
-      keytapCallbacks.set(node, cb);
+      keyCallbacks.set(node, cb);
       ensureKeyListeners();
     }
   };
 }
 
-function DOMKeyTapDownHandler(): TriggerPropHandler<MaybeSignalHandler> {
+function DOMKeyDownHandler(): TriggerPropHandler<MaybeSignalHandler> {
   return function (node: Element, val: MaybeSignalHandler): void {
     if (!node || !val) return;
     let cb: AnyEventHandler | null = null;
@@ -735,21 +684,21 @@ function DOMKeyTapDownHandler(): TriggerPropHandler<MaybeSignalHandler> {
         const v = val.peek();
         if (typeof v === "function") {
           cb = v as AnyEventHandler;
-          keytapDownCallbacks.set(node, cb);
+          keyDownCallbacks.set(node, cb);
           ensureKeyListeners();
         } else {
-          keytapDownCallbacks.delete(node);
+          keyDownCallbacks.delete(node);
         }
       });
     } else if (typeof val === "function") {
       cb = val as AnyEventHandler;
-      keytapDownCallbacks.set(node, cb);
+      keyDownCallbacks.set(node, cb);
       ensureKeyListeners();
     }
   };
 }
 
-function DOMKeyTapUpHandler(): TriggerPropHandler<MaybeSignalHandler> {
+function DOMKeyUpHandler(): TriggerPropHandler<MaybeSignalHandler> {
   return function (node: Element, val: MaybeSignalHandler): void {
     if (!node || !val) return;
     let cb: AnyEventHandler | null = null;
@@ -758,15 +707,15 @@ function DOMKeyTapUpHandler(): TriggerPropHandler<MaybeSignalHandler> {
         const v = val.peek();
         if (typeof v === "function") {
           cb = v as AnyEventHandler;
-          keytapUpCallbacks.set(node, cb);
+          keyUpCallbacks.set(node, cb);
           ensureKeyListeners();
         } else {
-          keytapUpCallbacks.delete(node);
+          keyUpCallbacks.delete(node);
         }
       });
     } else if (typeof val === "function") {
       cb = val as AnyEventHandler;
-      keytapUpCallbacks.set(node, cb);
+      keyUpCallbacks.set(node, cb);
       ensureKeyListeners();
     }
   };
@@ -1281,8 +1230,6 @@ export function InUniversalTriggerProps(): void {
     createTrigger("mount", DOMMountHandler());
     // beforeMount → fire synchronously during directive setup
     createTrigger("beforeMount", DOMBeforeMountHandler());
-    // route → global route event
-    createTrigger("route", DOMRouteHandler());
     // frameChange → requestAnimationFrame loop
     createTrigger("frameChange", DOMFrameChangeHandler());
     // tap → click
@@ -1306,9 +1253,9 @@ export function InUniversalTriggerProps(): void {
     // hoverend → pointerleave
     createTrigger("hoverend", DOMHoverEndHandler());
     // key unified keyboard
-    createTrigger("key", DOMKeyTapBaseHandler());
-    createTrigger("key:down", DOMKeyTapDownHandler());
-    createTrigger("key:up", DOMKeyTapUpHandler());
+    createTrigger("key", DOMKeyBaseHandler());
+    createTrigger("key:down", DOMKeyDownHandler());
+    createTrigger("key:up", DOMKeyUpHandler());
     // Gamepad triggers
     createTrigger("gamepad", DOMGamepadPollHandler());
     createTrigger("gamepadconnect", DOMGamepadConnectHandler());
@@ -1320,7 +1267,6 @@ export function InUniversalTriggerProps(): void {
     // Base DOM mappings still apply
     createTrigger("mount", DOMMountHandler());
     createTrigger("beforeMount", DOMBeforeMountHandler());
-    createTrigger("route", DOMRouteHandler());
     createTrigger("frameChange", DOMFrameChangeHandler());
     createTrigger("tap", DOMEventHandler("click"));
     createTrigger("rightclick", DOMRightClickHandler());
@@ -1330,9 +1276,9 @@ export function InUniversalTriggerProps(): void {
     createTrigger("submit", DOMEventHandler("submit"));
     createTrigger("focus", DOMEventHandler("focus"));
     // key unified keyboard
-    createTrigger("key", DOMKeyTapBaseHandler());
-    createTrigger("key:down", DOMKeyTapDownHandler());
-    createTrigger("key:up", DOMKeyTapUpHandler());
+    createTrigger("key", DOMKeyBaseHandler());
+    createTrigger("key:down", DOMKeyDownHandler());
+    createTrigger("key:up", DOMKeyUpHandler());
     // Gamepad triggers (WebView)
     createTrigger("gamepad", DOMGamepadPollHandler());
     createTrigger("gamepadconnect", DOMGamepadConnectHandler());

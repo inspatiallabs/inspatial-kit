@@ -16,8 +16,29 @@ export interface DOMOptions {
 
 export function DOMRenderer(options: DOMOptions = {}): any {
   const { rendererID = defaultRendererID, doc = document } = options;
-  const { onDirective, namespaces, tagNamespaceMap, tagAliases, setups } =
-    composeExtensions(options.extensions);
+  const {
+    onDirective,
+    namespaces,
+    tagNamespaceMap,
+    tagAliases,
+    setups,
+    triggers,
+  } = composeExtensions(options.extensions);
+
+  // Register extension triggers
+  if (triggers && triggers.size > 0) {
+    // Dynamically import createTrigger to register extension triggers
+    import("@in/teract/trigger")
+      .then(({ createTrigger }) => {
+        for (const [name, declaration] of triggers) {
+          createTrigger(name, declaration.handler);
+        }
+        console.log(`[DOM] Registered ${triggers.size} extension triggers`);
+      })
+      .catch((err) => {
+        console.warn("[DOM] Failed to register extension triggers:", err);
+      });
+  }
 
   // Inject global CSS to hide scrollbars without disabling scrolling
   (function injectScrollbarHide() {
