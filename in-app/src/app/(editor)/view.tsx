@@ -16,7 +16,24 @@ import { Drawer } from "@in/widget/presentation/drawer/index.tsx";
 import { ShareIIIcon } from "@in/widget/icon/share-ii-icon.tsx";
 import { XStack } from "@inspatial/kit/structure";
 // @ts-types="@inspatial/kit"
-import { SettingsIcon, APIIcon } from "@inspatial/kit/icon";
+import { SettingsIcon, APIIcon, InSpatialIcon } from "@inspatial/kit/icon";
+import {
+  Sidebar,
+  SidebarHeader,
+  SidebarGroup,
+  SidebarItem,
+  SidebarFooter,
+  SidebarSection,
+  SidebarToggle,
+} from "@inspatial/kit/navigation";
+
+// Keep simple sidebar available for comparison
+// import {
+//   SimpleSidebar,
+//   SimpleSidebarHeader,
+//   SimpleSidebarItem,
+//   SimpleSidebarFooter,
+// } from "@in/widget/navigation/sidebar/index.simple.tsx";
 
 export function EditorView() {
   const entries = useCounter.entries;
@@ -130,96 +147,175 @@ export function EditorView() {
 
   return (
     <>
-      {/* <View className="mt-[64px]"> */}
-      <Table
-        columns={fields}
-        data={entries.get()}
-        filterColumn="name"
-        getRowId={(row: EntryProps) => String(row.id)}
-        // checkedRows={checkedRows.get()}
-        // allChecked={allChecked.get()}
-        // onAllChecked={handleAllChecked}
-        // onRowChecked={handleRowChecked}
-        // dockMenuActions={dockMenuActions}
-
-        navigator={{
-          selected: "user",
-          "on:input": (label: string) =>
-            console.log("Navigator changed:", label),
-          children: [{ label: "User" }, { label: "Post" }],
-          cta: {
-            children: <PlusIcon scale="9xs" />,
-            "on:presentation": {
-              id: "create-new-collection",
-              action: "toggle",
-            },
+      {/*#################################(SIDEBAR)#################################*/}
+      <XStack
+        style={{
+          web: {
+            minWidth: "100%",
+            maxWidth: "100%",
+            height: "100vh",
+            gap: "2px",
           },
         }}
-        relations={{
-          selected: "profiles",
-          "on:input": (label: string) =>
-            console.log("Relations changed:", label),
-          children: [
-            { label: "Profiles" },
-            { label: "Organizations" },
-            { label: "Sessions" },
-            { label: "Activity" },
-            { label: "Payments" },
-          ],
-        }}
-        headerBar={{
-          display: true,
-          cta: {
-            display: true,
+      >
+        <Sidebar showToggle={true}>
+          {/* Optional Header */}
+          <SidebarHeader logo={<InSpatialIcon />} title="My App" />
 
-            actions: [
-              {
-                children: <APIIcon scale="9xs" />,
-                format: "outlineBackground",
-                size: "lg",
+          {/* Home Group */}
+          <SidebarGroup
+            id="home"
+            title="Home"
+            icon={<InSpatialIcon />}
+            defaultExpanded={true}
+          >
+            <SidebarItem to="/dashboard" icon={<InSpatialIcon />}>
+              Dashboard
+            </SidebarItem>
+            <SidebarItem to="/analytics" icon={<InSpatialIcon />}>
+              Analytics
+            </SidebarItem>
+          </SidebarGroup>
+
+          {/* Plan Group */}
+          <SidebarGroup id="plan" title="Plan" icon={<InSpatialIcon />}>
+            <SidebarItem to="/schedule" icon={<InSpatialIcon />}>
+              Schedule
+            </SidebarItem>
+            <SidebarItem to="/todo-list" icon={<InSpatialIcon />}>
+              To Do List
+            </SidebarItem>
+          </SidebarGroup>
+
+          {/* Build Group */}
+          <SidebarGroup id="build" title="Build" icon={<InSpatialIcon />}>
+            <SidebarItem to="/form" icon={<InSpatialIcon />}>
+              Forms
+            </SidebarItem>
+            <SidebarItem to="/website" icon={<InSpatialIcon />} disabled={true}>
+              Website
+            </SidebarItem>
+          </SidebarGroup>
+
+          {/* Standalone Items */}
+          <SidebarItem to="/suppliers" icon={<InSpatialIcon />}>
+            Suppliers
+          </SidebarItem>
+
+          {/* Guests Group */}
+          <SidebarGroup id="guests" title="Guests" icon={<InSpatialIcon />}>
+            <SidebarItem to="/guest-list" icon={<InSpatialIcon />}>
+              List
+            </SidebarItem>
+            <SidebarItem to="/grouping" icon={<InSpatialIcon />}>
+              Grouping
+            </SidebarItem>
+            <SidebarItem to="/table-plan" icon={<InSpatialIcon />}>
+              Table Plan
+            </SidebarItem>
+          </SidebarGroup>
+
+          {/* More Standalone Items */}
+          <SidebarItem to="/catering" icon={<InSpatialIcon />}>
+            Catering
+          </SidebarItem>
+          <SidebarItem to="/budget" icon={<InSpatialIcon />}>
+            Budget
+          </SidebarItem>
+        </Sidebar>
+
+        {/*#################################(TABLE)#################################*/}
+        <YStack style={{ flex: 1, overflow: "auto" }}>
+          <Table
+            columns={fields}
+            data={entries.get()}
+            filterColumn="name"
+            getRowId={(row: EntryProps) => String(row.id)}
+            // checkedRows={checkedRows.get()}
+            // allChecked={allChecked.get()}
+            // onAllChecked={handleAllChecked}
+            // onRowChecked={handleRowChecked}
+            // dockMenuActions={dockMenuActions}
+
+            navigator={{
+              selected: "user",
+              "on:input": (label: string) =>
+                console.log("Navigator changed:", label),
+              children: [{ label: "User" }, { label: "Post" }],
+              cta: {
+                children: <PlusIcon scale="9xs" />,
                 "on:presentation": {
-                  id: "api-docs-drawer",
+                  id: "create-new-collection",
                   action: "toggle",
                 },
               },
+            }}
+            relations={{
+              selected: "profiles",
+              "on:input": (label: string) =>
+                console.log("Relations changed:", label),
+              children: [
+                { label: "Profiles" },
+                { label: "Organizations" },
+                { label: "Sessions" },
+                { label: "Activity" },
+                { label: "Payments" },
+              ],
+            }}
+            headerBar={{
+              display: true,
+              cta: {
+                display: true,
 
-              {
-                children: <SettingsIcon />,
-                format: "outlineBackground",
-                size: "lg",
-                "on:presentation": {
-                  id: "settings-drawer",
-                  action: "toggle",
-                },
-              },
+                actions: [
+                  {
+                    children: <APIIcon scale="9xs" />,
+                    format: "outlineBackground",
+                    size: "lg",
+                    "on:presentation": {
+                      id: "api-docs-drawer",
+                      action: "toggle",
+                    },
+                  },
 
-              {
-                children: <ShareIIIcon />,
-                format: "outlineBackground",
-                size: "lg",
-                "on:presentation": {
-                  id: "import-export-modal",
-                  action: "toggle",
-                },
-              },
+                  {
+                    children: <SettingsIcon />,
+                    format: "outlineBackground",
+                    size: "lg",
+                    "on:presentation": {
+                      id: "settings-drawer",
+                      action: "toggle",
+                    },
+                  },
 
-              {
-                children: "New Entry",
-                "on:presentation": {
-                  id: "create-new-entry-drawer",
-                  action: "toggle",
-                },
+                  {
+                    children: <ShareIIIcon />,
+                    format: "outlineBackground",
+                    size: "lg",
+                    "on:presentation": {
+                      id: "import-export-modal",
+                      action: "toggle",
+                    },
+                  },
+
+                  {
+                    children: "New Entry",
+                    "on:presentation": {
+                      id: "create-new-entry-drawer",
+                      action: "toggle",
+                    },
+                  },
+                  // Full JSX element approach
+                ],
               },
-              // Full JSX element approach
-            ],
-          },
-        }}
-        presentations={{
-          modals,
-          drawers,
-        }}
-      />
-      {/* </View> */}
+            }}
+            presentations={{
+              modals,
+              drawers,
+            }}
+          />
+        </YStack>
+      </XStack>
     </>
   );
 }

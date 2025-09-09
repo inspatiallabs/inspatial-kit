@@ -57,7 +57,7 @@ You can use InSpatial State in two ways:
 
 Key capabilities: batch, reset, snapshot, subscribe, derived values, and a unified trigger API.
 
-#### Explicit pattern (recommended)
+#### Explicit pattern 
 
 ```ts
 const counterState = createState.in({

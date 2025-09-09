@@ -2,9 +2,48 @@
 
 InSpatial Style Sheet (ISS) or `@inspatial/style` is built on InSpatial's `@in/style`module a variant based styling engine largely inspired by Stiches.
 
-Don’t use peek()/get() inside style objects. Pass the Signals directly so the renderer can subscribe.
+
+
+## Reactive Style
+So far you have been working with static, prop-driven styling. Nothing that required your style to be aware of a change i.e interactivity. Which is will be the case many of the time. However there are times where you want your component style to update when something triggers and respond in Realtime. 
+
+- In retrospect, cross-style composition says change a style when another style changes, (Style-to-Style)
+
+- Whereas reactive-style says change a style when a state changes (State-to-Style)
 
 Example
+
+```jsx
+// Create your styles as usual
+const ButtonStyle = createStyle({
+  settings: {
+    format: {
+      active: "bg-blue text-white",
+      inactive: "bg-gray text-black"
+    }
+  }
+});
+
+// For reactive styles, wrap getStyle in a computed signal
+const isActive = createSignal(false);
+
+// Option 1: Pass signal directly (getStyle auto-resolves it)
+const className = $(() => 
+  ButtonStyle.getStyle({
+    format: isActive  // Signal is automatically resolved
+  })
+);
+
+// Option 2: Compute the value inline
+const className = $(() => 
+  ButtonStyle.getStyle({
+    format: isActive.get() ? "active" : "inactive"
+  })
+);
+
+// In your component
+<Button className={className}>Click Me</Button>
+```
 
 ```typescript
 // Function

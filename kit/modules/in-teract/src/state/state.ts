@@ -12,7 +12,7 @@ import {
   tick,
   createSideEffect,
   type Signal,
-} from "@in/teract/signal";
+} from "@in/teract/signal/index.ts";
 import { createStorage, type StorageProps } from "./storage.ts";
 import {
   createAction,

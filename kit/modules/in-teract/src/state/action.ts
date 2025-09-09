@@ -2,7 +2,7 @@
  * Trigger Action System
  */
 
-import { type Signal, untrack, tick, isSignal } from "@in/teract/signal";
+import { type Signal, untrack, tick, isSignal } from "@in/teract/signal/index.ts";
 import type { State } from "./state.ts";
 
 export interface ActionTriggerProps {
