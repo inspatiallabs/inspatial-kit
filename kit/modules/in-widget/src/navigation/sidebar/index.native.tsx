@@ -15,12 +15,18 @@ import type {
   SidebarFooterProps,
   SidebarPluckProps,
 } from "./type.ts";
+import { XStack } from "@in/widget/structure/index.ts";
 
 /*################################(Active Indicator)################################*/
 
 function SidebarPluck(props: SidebarPluckProps) {
   const { className, ...rest } = props;
-  return <Slot className={className} {...rest} />;
+  return (
+    <Slot
+      className={iss(SidebarStyle.pluck.getStyle({ className }))}
+      {...rest}
+    />
+  );
 }
 
 /*################################(Toggle Button)################################*/
@@ -111,26 +117,28 @@ export function SidebarSection(props: SidebarSectionProps) {
 export function SidebarItem(props: SidebarItemProps) {
   const { icon, children, className, format, onClick } = props;
 
-  const showChildren = $(() => !useSidebar.isMinimized.get() && children);
+  const isExpanded = $(() => !useSidebar.isMinimized.get());
 
   return (
-    <Slot
-      className={SidebarStyle.item.getStyle({ format, className })}
+    <XStack
+      className={SidebarStyle.item.getStyle({ className })}
       on:tap={onClick}
     >
       {icon && <Slot className="flex-shrink-0">{icon}</Slot>}
-      {showChildren && <Slot className="text-gray-700">{children}</Slot>}
-    </Slot>
+      <Show when={isExpanded}>
+        <Slot>{children}</Slot>
+      </Show>
+    </XStack>
   );
 }
 
 /*################################(Collapsible Group)################################*/
 
-// We will use this for the complex tree structure 
+// We will use this for the complex tree structure
 export function SidebarGroup(props: SidebarGroupProps) {
   const { children, className, ...rest } = props;
   return (
-    <Slot className={className} {...rest}>
+    <Slot className={SidebarStyle.group.getStyle({ className })} {...rest}>
       {children}
     </Slot>
   );
@@ -168,10 +176,15 @@ export function Sidebar(props: SidebarProps) {
   return (
     <Slot
       className={$(() =>
-        SidebarStyle.wrapper.getStyle({
-          className,
-          format: useSidebar.isMinimized.get() ? "minimized" : "expanded",
-        })
+        iss(
+          SidebarStyle.wrapper.getStyle({
+            className,
+            size: useSidebar.isMinimized.get() ? "md" : "xl",
+          }),
+          useSidebar.isMinimized.get()
+            ? "sidebar-minimized"
+            : "sidebar-expanded"
+        )
       )}
       {...rest}
     >

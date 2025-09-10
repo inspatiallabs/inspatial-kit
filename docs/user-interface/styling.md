@@ -1,104 +1,15 @@
 # Styling
 
 InSpatial Style Sheet (ISS) or `@inspatial/style` is built on InSpatial's `@in/style`module a variant based styling engine largely inspired by Stiches.
+.....
 
+// Quick Create
 
+// Quick Use
 
-## Reactive Style
-So far you have been working with static, prop-driven styling. Nothing that required your style to be aware of a change i.e interactivity. Which is will be the case many of the time. However there are times where you want your component style to update when something triggers and respond in Realtime. 
+.....
 
-- In retrospect, cross-style composition says change a style when another style changes, (Style-to-Style)
-
-- Whereas reactive-style says change a style when a state changes (State-to-Style)
-
-Example
-
-```jsx
-// Create your styles as usual
-const ButtonStyle = createStyle({
-  settings: {
-    format: {
-      active: "bg-blue text-white",
-      inactive: "bg-gray text-black"
-    }
-  }
-});
-
-// For reactive styles, wrap getStyle in a computed signal
-const isActive = createSignal(false);
-
-// Option 1: Pass signal directly (getStyle auto-resolves it)
-const className = $(() => 
-  ButtonStyle.getStyle({
-    format: isActive  // Signal is automatically resolved
-  })
-);
-
-// Option 2: Compute the value inline
-const className = $(() => 
-  ButtonStyle.getStyle({
-    format: isActive.get() ? "active" : "inactive"
-  })
-);
-
-// In your component
-<Button className={className}>Click Me</Button>
-```
-
-```typescript
-// Function
-const my = {
-  textColor: $(() => {...}),
-}
-
-// Render
-<Component
- style={{
-    web: {
-      // ❌  DON'T DO THIS
-      color: my.textColor.get(), // this works too but auto-coercion already appends .get()
-
-      // ✅ DO THIS
-      color: my.textColor,
-    },
-  }}
-/>
-```
-
-You can style using two props `style` and `className` which is an alias for `class` (they both work just the same).
-
-NOTE:
-
-1. both `style` and (`className` or `class`) are reactive at the core. This means you don't have to parse computed/$ to...
-
-2. View strings are non-reactive. A plain backtick string evaluates once, so it can’t auto‑update. Use the object/array forms (or a Signal) for reactivity.
-
-```typescript
-// ❌  DON'T DO THIS
-<Component
-  className={`p-4 rounded-lg mb-4 transition-all duration-300 ${
-    signal.isPulseActive ? "animate-pulse" : ""
-  } ${
-    signal.isHighCount
-      ? "scale-110 bg-gradient-to-r from-purple-500 to-pink-500"
-      : ""
-  }`}
-/>
-
-// ✅ DO THIS
-<Component
-className={{
-    "p-4": true,
-    "rounded-lg": true,
-    "mb-4": true,
-    "transition-all": true,
-    "duration-300": true,
-    "animate-pulse": signal.isPulseActive,
-    "scale-110 bg-gradient-to-r from-purple-500 to-pink-500":
-      testSignals.isHighCount,
-  }}
-/>
-```
+## Concepts
 
 #### Lazy Styling (Anti-Pattern/Escape Hatch)
 
@@ -448,6 +359,7 @@ Style presets are named, reusable class strings produced by your styles.
 You pick a combination of props once (format/variant/size, etc.), call `*.getStyle(...)`, and export the result as a constant. Consumers then use a single constant instead of repeating the same prop object everywhere.
 
 **Advantages**
+
 - Consistent: the same preset name always yields the same look
 - Reusable: import and apply anywhere
 - Tree‑shakeable: direct file imports only pull what you use
@@ -1088,3 +1000,247 @@ export type CheckboxIndicatorStyleProps = StyleProps<
   typeof CheckboxStyle.indicator.getStyle
 >;
 ```
+
+## Reactive Style
+
+### This Makes Reactive Style Easy
+
+#### Change styles when your state changes
+
+Reactive Style simply means: when your component’s state flips, your styles flip with it. Start with a small idea—derive a value from state—and pass that value to your style. No magic, just a clear “state <to>→ style” connection.
+
+> **Terminology:** Reactive means “auto-updates.” If the underlying state changes, anything that depends on it updates too.
+
+### The First Principle: Derive a prop from state
+
+```tsx
+import { createStyle } from "@in/style";
+import { createState, $ } from "@inspatial/state";
+
+// 1) Define a simple style that switches on a prop
+const ButtonStyle = createStyle({
+  settings: {
+    format: {
+      active: "bg-(--brand) text-white",
+      inactive: "bg-(--background) text-(--primary)",
+    },
+  },
+  defaultSettings: { format: "inactive" },
+});
+
+// 2) Create state for your component
+const ui = createState({ isActive: false });
+
+// 3) Evaluate styles reactively with $(() => ...)
+const className = $(() =>
+  ButtonStyle.getStyle({ format: ui.isActive.get() ? "active" : "inactive" })
+);
+
+// 4) Use it in JSX
+<button
+  className={className}
+  on:tap={() => ui.isActive.set(!ui.isActive.get())}
+>
+  Toggle
+</button>;
+```
+
+> **Note:** The `$(() => ...)` wrapper makes the className recompute whenever `ui.isActive` changes.
+
+### The Second Step: Use the same derived prop everywhere
+
+One derived prop (like `format`) can drive all related parts of a component. Keep the mental model simple: compute once, pass everywhere.
+
+```jsx
+const format = $(() => (ui.isOpen.get() ? "open" : "closed"));
+
+<Slot className={$(() => PanelStyle.root.getStyle({ format }))}>
+  <Slot className={$(() => PanelStyle.header.getStyle({ format }))} />
+  <Slot className={$(() => PanelStyle.body.getStyle({ format }))} />
+  <Slot className={$(() => PanelStyle.footer.getStyle({ format }))} />
+</Slot>;
+```
+
+### Reactive Style (Patterns)
+
+```jsx
+// ✅ DO THIS: Reactive object form – className updates as state changes
+<Slot
+  className={$(() => ButtonStyle.getStyle({ format: ui.isActive.get() ? "active" : "inactive" }))}
+/>
+
+// ❌ DON’T DO THIS: Big template strings – they evaluate once and don’t auto‑update
+<Slot
+  className={`p-4 rounded transition ${ui.isActive.get() ? "bg-green" : "bg-gray"}`}
+/>
+
+// ✅ DO THIS: Reactive style object – pass the computed value directly
+<Slot
+  style={$(
+    () => ({ web: { color: ui.isActive.get() ? "var(--primary)" : "var(--muted)" } })
+  )}
+/>
+
+// ❌ DON’T DO THIS: Pull computed values out with .get() needlessly
+<Slot
+  style={{ web: { color: $(() => (ui.isActive.get() ? "var(--primary)" : "var(--muted)"))).get() } }}
+/>
+```
+
+**Conditional Controls**
+
+```jsx
+// ❌  DON'T DO THIS
+<Component
+  className={`p-4 rounded-lg mb-4 transition-all
+  duration-300 ${
+    ui.isActive ? "animate-pulse" : ""
+  } ${
+    ui.isHighCount
+      ? "scale-110 bg-gradient-to-r from-purple-500
+      to-pink-500"
+      : ""
+  }`}
+  }
+
+// ✅ DO THIS
+<Component
+className={{
+    "p-4": true,
+    "rounded-lg": true,
+    "mb-4": true,
+    "transition-all": true,
+    "duration-300": true,
+    "animate-pulse": ui.isActive,
+    "scale-110 bg-gradient-to-r from-purple-500
+    to-pink-500":
+      testSignals.isHighCount,
+  }}
+```
+
+### This Clarifies Reactive Style × Cross-Style × Component Composition
+
+#### How they work together and when to use each one
+
+Reactive Style, Cross-Style Composition, and Component Composition solve different problems that often show up together in real UI. Think of them like a team:
+
+- Reactive Style is “state → style”. When app state changes (like a toggle), your style should change too.
+- Cross-Style Composition is “style → style”. One style reacts to another style’s settings (e.g., wrapper informs child).
+- Component Composition is “component → components”. You combine style functions so they produce a single, coherent class.
+
+> **Terminology:** When we say “context registry,” we mean the internal mechanism that tracks style settings during an evaluation window so other styles can read them reactively.
+
+Key guidance:
+
+- Prefer props-led variants for interactivity: Derive a simple prop (e.g., `format: "minimized" | "expanded"`) from state and pass it to all relevant styles.
+- Use cross-style composition for structural or sibling/parent relationships where a style truly depends on another style’s setting — not on app state.
+- Avoid mixing: If a style already receives the driving prop (e.g., `format`), prefer prop-based composition over cross-style for that specific relationship to reduce coupling and reactive cycles.
+
+Patterns:
+
+- **Reactive Style (state → prop)**
+
+```tsx
+const className = $(() =>
+  PanelStyle.getStyle({ format: ui.isOpen.get() ? "open" : "closed" })
+);
+```
+
+- Cross-Style (style → style):
+
+```ts
+// Child reacts to named parent style settings
+createStyle({
+  name: "child",
+  composition: [
+    { "$parent.format": "segmented", style: { web: { padding: "4px" } } },
+  ],
+});
+```
+
+- Component Composition (compose multiple style functions):
+
+```ts
+const composed = composeStyle(HeaderStyle.getStyle, ToolbarStyle.getStyle);
+const headerToolbar = composed({ size: "md", theme: "light" });
+```
+
+> **Note:** Cross-style composition depends on a single evaluation window (the context registry). If a consumer doesn’t re-evaluate reactively, or if state changes outside that window, the dependent style won’t see updates. Reactive wrapping with `$(() => ...)` ensures re-evaluation when state changes.
+
+### This Explains a Real-World Problem and the Solution (Sidebar)
+
+#### Why the group didn’t change on minimize and how we fixed it
+
+In a Sidebar, we wanted the group to react to the minimized/expanded state. Initially, we tried to let the group style read the wrapper’s setting using cross-style composition:
+
+```ts
+// Before (cross-style dependency)
+group: createStyle({
+  name: "sidebar-group",
+  composition: [
+    {
+      "$sidebar-wrapper.format": "minimized",
+      style: { web: { display: "none" } },
+    },
+  ],
+});
+```
+
+Symptoms we saw:
+
+- The page could load forever due to a reactive feedback loop.
+- The group didn’t consistently update when toggling minimized/expanded.
+
+Root causes:
+
+- The group’s class was evaluated without a reactive wrapper, so it didn’t re-run when state changed.
+- Depending on the context registry for state-driven changes can be fragile; mixing app state and cross-style references may create evaluation timing issues or cycles.
+
+The solution (simple, reliable, prop-first):
+
+- Derive a single `format` prop from state.
+- Pass that `format` to both wrapper and group style evaluations.
+- Make the evaluations reactive with `$(() => ...)`.
+- Prefer prop-based composition in `group` over cross-style for this state‑driven case.
+
+```jsx
+// Component (reactive evaluation)
+<Slot
+  className={$(() =>
+    SidebarStyle.wrapper.getStyle({
+      format: useSidebar.isMinimized.get() ? "minimized" : "expanded",
+    })
+  )}
+>
+  <Slot
+    className={$(() =>
+      SidebarStyle.group.getStyle({
+        format: useSidebar.isMinimized.get() ? "minimized" : "expanded",
+      })
+    )}
+  />
+</Slot>
+```
+
+```ts
+// Style (prop-based composition instead of cross-style for this case)
+group: createStyle({
+  name: "sidebar-group",
+  composition: [
+    { format: "expanded", style: { web: { padding: "10px" } } },
+    { format: "minimized", style: { web: { display: "none" } } },
+  ],
+});
+```
+
+Why this works:
+
+- Reactive evaluation ensures re‑computation when a component state changes.
+- Prop‑based composition removes dependence on the context registry for state, eliminating timing/loop risks.
+- Cross‑style composition remains available for purely style‑to‑style needs (e.g., anchor/peer), while state remains a prop.
+
+Common pitfalls and best practices:
+
+- Don’t write to state inside computed render paths; only update state in user-triggered handlers.
+- Either pass a prop or use cross-style references — avoid mixing both for the same relationship if you see cycles.
+- Wrap any style evaluation that depends on state in `$(() => ...)` to keep it reactive.

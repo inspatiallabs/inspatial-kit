@@ -1,50 +1,117 @@
 import { createStyle } from "@in/style";
-import { ThemeDisabled } from "@in/widget/theme/style.ts";
+import { ThemeDisabled, ThemeScale } from "@in/widget/theme/style.ts";
 
 export const SidebarStyle = {
   /*################################(Main Wrapper)################################*/
   wrapper: createStyle({
+    /*===================(Name)===================*/
+
     name: "sidebar-wrapper",
+
+    /*===================(Base)===================*/
     base: [
       {
         web: {
           display: "flex",
           flexDirection: "column",
           flex: 1,
+          gap: "10px",
           height: "100%",
           backgroundColor: "var(--surface)",
           boxShadow: "var(--shadow-effect)",
           transition: "all 0.3s ease",
           position: "relative",
-          overflowY: "auto",
-          padding: "1rem",
+          overflow: "hidden",
+          paddingTop: "16px",
+          paddingBottom: "16px",
         },
       },
     ],
+    /***********************(Settings)************************/
     settings: {
-      format: {
-        minimized: [
+      size: {
+        xs: [
           {
             web: {
-              backgroundColor: "yellow",
-              minWidth: "60px",
-              maxWidth: "60px",
+              width: "52px",
+              minWidth: "52px",
+              maxWidth: "52px",
+              alignItems: "center",
             },
           },
         ],
-        expanded: [
+        sm: [
           {
             web: {
-              backgroundColor: "blue",
+              width: "56px",
+              minWidth: "56px",
+              maxWidth: "56px",
+              alignItems: "center",
+            },
+          },
+        ],
+        md: [
+          {
+            web: {
+              width: "64px",
+              minWidth: "64px",
+              maxWidth: "64px",
+              alignItems: "center",
+            },
+          },
+        ],
+        lg: [
+          {
+            web: {
+              width: "100px",
+              minWidth: "100px",
+              maxWidth: "100px",
+              alignItems: "center",
+            },
+          },
+        ],
+        xl: [
+          {
+            web: {
+              width: "228px",
               minWidth: "228px",
               maxWidth: "228px",
             },
           },
         ],
+        "2xl": [
+          {
+            web: {
+              width: "300px",
+              minWidth: "300px",
+              maxWidth: "300px",
+            },
+          },
+        ],
+        "3xl": [
+          {
+            web: {
+              width: "428px",
+              minWidth: "428px",
+              maxWidth: "428px",
+            },
+          },
+        ],
       },
+      /***********************(Disabled)************************/
+
+      scale: ThemeScale,
+
+      /***********************(Disabled)************************/
+
+      disabled: ThemeDisabled,
     },
+
+    /*===================(Default Settings)===================*/
     defaultSettings: {
-      format: "expanded",
+      size: "xl",
+      scale: "5xs",
+      disabled: false,
     },
   }),
 
@@ -97,11 +164,31 @@ export const SidebarStyle = {
         web: {
           display: "flex",
           flexDirection: "column",
+          gap: "10px",
           width: "100%",
           transition: "all 0.2s ease",
+          overflow: "hidden",
+
+          // Default expanded state
+          backgroundColor: "var(--background)",
+          borderRadius: "0 0 10px 10px",
+          padding: "10px",
+
+          // Minimized state using CSS selector - hide group when minimized
+          ".sidebar-minimized &": {
+            display: "none",
+          },
         },
       },
     ],
+
+    settings: {
+      disabled: ThemeDisabled,
+    },
+
+    defaultSettings: {
+      disabled: false,
+    },
   }),
 
   /*################################(Item)################################*/
@@ -111,13 +198,21 @@ export const SidebarStyle = {
       {
         web: {
           display: "flex",
-          alignItems: "center",
-          justifyContent: "start",
+          position: "relative",
           gap: "10px",
-          backgroundColor: "green",
           cursor: "pointer",
           transition: "all 0.2s ease",
-          position: "relative",
+
+          // Default expanded state
+          justifyContent: "start",
+          alignItems: "center",
+
+          // Minimized state using CSS selector
+          ".sidebar-minimized &": {
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "green",
+          },
         },
       },
     ],

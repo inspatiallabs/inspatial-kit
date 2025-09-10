@@ -1027,7 +1027,7 @@ function createStyleCore<V extends StyleShapeProp>(
           const styleName = path[0];
           const propName = path[1];
           
-          // Try signal registry first (reactive)
+          // Use reactive getContext to create dependencies for cross-style reactivity
           const signalContext = signalStyleContextRegistry.getContext(styleName);
           if (signalContext) {
             return signalContext.settings[propName] === value;
