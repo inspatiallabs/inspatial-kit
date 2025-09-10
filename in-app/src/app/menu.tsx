@@ -7,6 +7,7 @@ import { InSpatialIcon } from "@inspatial/kit/icon";
 export function AppMenu() {
   return (
     <>
+    {/*#################################(TOP NOTCH)#################################*/}
       <Notch className="pointer-events-none absolute w-full top-0 z-50 max-h-[56px] m-auto pr-8" />
 
       <XStack className="pointer-events-auto absolute inset-x-0 top-0 h-[56px] z-[51] flex justify-center items-center space-x-10">
@@ -35,6 +36,7 @@ export function AppMenu() {
           Store
         </Link>
       </XStack>
+      
     </>
   );
 }

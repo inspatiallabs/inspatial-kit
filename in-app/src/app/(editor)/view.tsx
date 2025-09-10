@@ -17,23 +17,7 @@ import { ShareIIIcon } from "@in/widget/icon/share-ii-icon.tsx";
 import { XStack } from "@inspatial/kit/structure";
 // @ts-types="@inspatial/kit"
 import { SettingsIcon, APIIcon, InSpatialIcon } from "@inspatial/kit/icon";
-import {
-  Sidebar,
-  SidebarHeader,
-  SidebarGroup,
-  SidebarItem,
-  SidebarFooter,
-  SidebarSection,
-  SidebarToggle,
-} from "@inspatial/kit/navigation";
-
-// Keep simple sidebar available for comparison
-// import {
-//   SimpleSidebar,
-//   SimpleSidebarHeader,
-//   SimpleSidebarItem,
-//   SimpleSidebarFooter,
-// } from "@in/widget/navigation/sidebar/index.simple.tsx";
+import { EditorNavigation } from "./menu.tsx";
 
 export function EditorView() {
   const entries = useCounter.entries;
@@ -158,71 +142,9 @@ export function EditorView() {
           },
         }}
       >
-        <Sidebar showToggle={true}>
-          {/* Optional Header */}
-          <SidebarHeader logo={<InSpatialIcon />} title="My App" />
+        {/*#################################(EDITOR NAVIGATION)#################################*/}
 
-          {/* Home Group */}
-          <SidebarGroup
-            id="home"
-            title="Home"
-            icon={<InSpatialIcon />}
-            defaultExpanded={true}
-          >
-            <SidebarItem to="/dashboard" icon={<InSpatialIcon />}>
-              Dashboard
-            </SidebarItem>
-            <SidebarItem to="/analytics" icon={<InSpatialIcon />}>
-              Analytics
-            </SidebarItem>
-          </SidebarGroup>
-
-          {/* Plan Group */}
-          <SidebarGroup id="plan" title="Plan" icon={<InSpatialIcon />}>
-            <SidebarItem to="/schedule" icon={<InSpatialIcon />}>
-              Schedule
-            </SidebarItem>
-            <SidebarItem to="/todo-list" icon={<InSpatialIcon />}>
-              To Do List
-            </SidebarItem>
-          </SidebarGroup>
-
-          {/* Build Group */}
-          <SidebarGroup id="build" title="Build" icon={<InSpatialIcon />}>
-            <SidebarItem to="/form" icon={<InSpatialIcon />}>
-              Forms
-            </SidebarItem>
-            <SidebarItem to="/website" icon={<InSpatialIcon />} disabled={true}>
-              Website
-            </SidebarItem>
-          </SidebarGroup>
-
-          {/* Standalone Items */}
-          <SidebarItem to="/suppliers" icon={<InSpatialIcon />}>
-            Suppliers
-          </SidebarItem>
-
-          {/* Guests Group */}
-          <SidebarGroup id="guests" title="Guests" icon={<InSpatialIcon />}>
-            <SidebarItem to="/guest-list" icon={<InSpatialIcon />}>
-              List
-            </SidebarItem>
-            <SidebarItem to="/grouping" icon={<InSpatialIcon />}>
-              Grouping
-            </SidebarItem>
-            <SidebarItem to="/table-plan" icon={<InSpatialIcon />}>
-              Table Plan
-            </SidebarItem>
-          </SidebarGroup>
-
-          {/* More Standalone Items */}
-          <SidebarItem to="/catering" icon={<InSpatialIcon />}>
-            Catering
-          </SidebarItem>
-          <SidebarItem to="/budget" icon={<InSpatialIcon />}>
-            Budget
-          </SidebarItem>
-        </Sidebar>
+        <EditorNavigation />
 
         {/*#################################(TABLE)#################################*/}
         <YStack style={{ flex: 1, overflow: "auto" }}>

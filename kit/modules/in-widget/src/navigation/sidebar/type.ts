@@ -1,5 +1,7 @@
 import type { StyleProps } from "@in/style";
 import type { SidebarStyle } from "./style.ts";
+import type { RadioProps } from "@in/widget/input/choice-input/radio/type.ts";
+import type { LinkProps } from "@in/widget/navigation/link/index.ts";
 
 /*################################(Base Types)################################*/
 
@@ -15,6 +17,8 @@ export interface SidebarMenuItem {
 
 /*################################(Component Props)################################*/
 
+type SidebarSizeProps = "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
+
 // Main Sidebar Props
 export type SidebarProps = JSX.SharedProps &
   StyleProps<typeof SidebarStyle.wrapper> & {
@@ -23,6 +27,10 @@ export type SidebarProps = JSX.SharedProps &
     onMinimizeChange?: (minimized: boolean) => void;
     children?: JSX.Element | JSX.Element[];
     showToggle?: boolean;
+
+    // Size configuration for different states
+    minimizedSize?: SidebarSizeProps;
+    expandedSize?: SidebarSizeProps;
   };
 
 // Sidebar Group Props (collapsible parent items)
@@ -36,19 +44,33 @@ export type SidebarGroupProps = JSX.SharedProps &
     onExpandChange?: (expanded: boolean) => void;
   };
 
-// Sidebar Item Props (individual menu items)
+// Radio props for selection items
+type SidebarRadioProps = Pick<RadioProps,
+  | "selected"
+  | "defaultSelected" 
+  | "name"
+  | "value"
+>;
+
+// Sidebar Item Props (unified API for Link and Radio anatomies)
 export type SidebarItemProps = JSX.SharedProps &
-  StyleProps<typeof SidebarStyle.item> & {
-    to: string;
+  StyleProps<typeof SidebarStyle.item> & 
+  Partial<LinkProps> &
+  Partial<SidebarRadioProps> & {
+    // Common props
     icon?: JSX.Element;
+    children?: JSX.Element | JSX.Element[];
     disabled?: boolean;
-    active?: boolean;
-    prefetch?: boolean;
-    replace?: boolean;
-    params?: Record<string, string>;
-    query?: Record<string, string>;
-    badge?: string | number;
-    tooltip?: string;
+    
+    // Navigation-specific
+    activeMatch?: "exact" | "prefix" | "custom";
+    isActive?: (currentRoute: string) => boolean;
+    
+    // Manual control (current behavior)
+    onClick?: () => void;
+    
+    // Event handlers (Tab/Radio pattern)
+    onChange?: (value: string | number | boolean) => void;
   };
 
 // Sidebar Toggle Button Props

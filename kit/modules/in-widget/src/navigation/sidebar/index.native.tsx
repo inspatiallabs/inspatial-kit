@@ -5,6 +5,8 @@ import { useSidebar } from "./state.ts";
 import { SidebarStyle } from "./style.ts";
 import { $ } from "@in/teract/signal/index.ts";
 import { Show } from "@in/widget/control-flow/show/index.ts";
+import { useActiveRoute } from "./helpers.ts";
+import { Link } from "@in/widget/navigation/link/index.ts";
 import type {
   SidebarProps,
   SidebarGroupProps,
@@ -115,21 +117,126 @@ export function SidebarSection(props: SidebarSectionProps) {
 /*################################(Menu Item)################################*/
 
 export function SidebarItem(props: SidebarItemProps) {
-  const { icon, children, className, format, onClick } = props;
+  const {
+    icon,
+    children,
+    className,
+    // Link props
+    to,
+    params,
+    query,
+    replace,
+    prefetch,
+    protect,
+    activeMatch = "exact",
+    isActive,
+    // Radio props
+    selected,
+    defaultSelected,
+    name,
+    value,
+    // Manual props
+    onClick,
+    onChange,
+    ...rest
+  } = props;
+
+  // Determine item type and behavior
+  const isNavigation = !!to;
+  const isSelection = selected !== undefined || name !== undefined;
+  const isManual = !!onClick && !isNavigation && !isSelection;
+
+  // Route-based active state for navigation items (reactive)
+  const routeActive = isNavigation
+    ? $(() => useActiveRoute(to, activeMatch, isActive))
+    : $(() => false);
+
+  // Selection state for radio items
+  const selectionActive = isSelection
+    ? selected ?? defaultSelected ?? false
+    : false;
+
+  // Final active state
+  const isItemActive = $(() => routeActive.get() || selectionActive);
 
   const isExpanded = $(() => !useSidebar.isMinimized.get());
 
-  return (
-    <XStack
-      className={SidebarStyle.item.getStyle({ className })}
-      on:tap={onClick}
-    >
+  // Sidebar item content
+  const itemContent = (
+    <>
       {icon && <Slot className="flex-shrink-0">{icon}</Slot>}
       <Show when={isExpanded}>
         <Slot>{children}</Slot>
       </Show>
-    </XStack>
+    </>
   );
+
+  const itemClassName = $(() =>
+    iss(
+      SidebarStyle.item.getStyle({
+        className,
+        active: isItemActive.get(),
+      }),
+      isItemActive.get() ? "sidebar-item-active" : "sidebar-item-inactive"
+    )
+  );
+
+  // Render function that updates reactively
+  const renderItem = $(() => {
+    const currentClassName = itemClassName.get();
+
+    // For navigation items, use Link component internally
+    if (isNavigation) {
+      return (
+        <Link
+          to={to}
+          params={params}
+          query={query}
+          replace={replace}
+          prefetch={prefetch}
+          protect={protect}
+          className={currentClassName}
+          {...rest}
+        >
+          {itemContent}
+        </Link>
+      );
+    }
+
+    // For non-navigation items, use XStack with manual handlers
+    function handleClick() {
+      if (isSelection && name && value !== undefined) {
+        // Radio selection handler
+        const newValue = !selected;
+        onChange?.(value);
+
+        // Tab/Radio pattern support
+        if (rest["on:input"] && typeof rest["on:input"] === "function") {
+          rest["on:input"](value);
+        }
+        if (rest["on:change"] && typeof rest["on:change"] === "function") {
+          rest["on:change"](value);
+        }
+
+        // Emit radio selection event
+        const event = new CustomEvent("sidebar-radio-change", {
+          detail: { name, value, selected: newValue },
+        });
+        globalThis.dispatchEvent?.(event);
+      } else if (onClick) {
+        // Manual click handler
+        onClick();
+      }
+    }
+
+    return (
+      <XStack className={currentClassName} on:tap={handleClick} {...rest}>
+        {itemContent}
+      </XStack>
+    );
+  });
+
+  return renderItem;
 }
 
 /*################################(Collapsible Group)################################*/
@@ -154,6 +261,10 @@ export function Sidebar(props: SidebarProps) {
     onMinimizeChange,
     children,
     showToggle = true,
+    size,
+    minimizedSize = "sm",
+    expandedSize = "xl",
+    scale,
     variant,
     ...rest
   } = props;
@@ -179,7 +290,10 @@ export function Sidebar(props: SidebarProps) {
         iss(
           SidebarStyle.wrapper.getStyle({
             className,
-            size: useSidebar.isMinimized.get() ? "md" : "xl",
+            size:
+              size ||
+              (useSidebar.isMinimized.get() ? minimizedSize : expandedSize),
+            scale,
           }),
           useSidebar.isMinimized.get()
             ? "sidebar-minimized"

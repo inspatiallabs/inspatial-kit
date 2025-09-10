@@ -1,5 +1,9 @@
 import { createStyle } from "@in/style";
-import { ThemeDisabled, ThemeScale } from "@in/widget/theme/style.ts";
+import {
+  ThemeDisabled,
+  ThemeRadius,
+  ThemeScale,
+} from "@in/widget/theme/style.ts";
 
 export const SidebarStyle = {
   /*################################(Main Wrapper)################################*/
@@ -15,7 +19,7 @@ export const SidebarStyle = {
           display: "flex",
           flexDirection: "column",
           flex: 1,
-          gap: "10px",
+          gap: "16px",
           height: "100%",
           backgroundColor: "var(--surface)",
           boxShadow: "var(--shadow-effect)",
@@ -164,7 +168,7 @@ export const SidebarStyle = {
         web: {
           display: "flex",
           flexDirection: "column",
-          gap: "10px",
+          gap: "16px",
           width: "100%",
           transition: "all 0.2s ease",
           overflow: "hidden",
@@ -174,7 +178,7 @@ export const SidebarStyle = {
           borderRadius: "0 0 10px 10px",
           padding: "10px",
 
-          // Minimized state using CSS selector - hide group when minimized
+          // Minimized state using selector - hide group when minimized
           ".sidebar-minimized &": {
             display: "none",
           },
@@ -199,23 +203,75 @@ export const SidebarStyle = {
         web: {
           display: "flex",
           position: "relative",
-          gap: "10px",
           cursor: "pointer",
           transition: "all 0.2s ease",
+          color: "var(--primary)",
 
           // Default expanded state
           justifyContent: "start",
           alignItems: "center",
+          gap: "8px",
 
-          // Minimized state using CSS selector
+          // Hover state
+          "&:hover": {
+            background:
+              "radial-gradient(101.08% 100% at 50% 100%, rgba(94, 94, 94, 0.14) 0%, rgba(94, 94, 94, 0.00) 73.85%), radial-gradient(100.02% 100% at 50% 100%, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.00) 55.59%), var(--color-inherit-default, var(--brand))",
+            backgroundBlendMode: "color-dodge, normal, normal",
+            opacity: "0.6",
+          },
+
+          // Minimized state using selector
           ".sidebar-minimized &": {
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: "green",
           },
         },
       },
     ],
+    settings: {
+      active: {
+        true: [
+          {
+            web: {
+              backgroundColor: "var(--brand)",
+              color: "var(--primary)",
+              fontWeight: "500",
+              "&:hover": {
+                background:
+                  "radial-gradient(101.08% 100% at 50% 100%, rgba(94, 94, 94, 0.14) 0%, rgba(94, 94, 94, 0.00) 73.85%), radial-gradient(100.02% 100% at 50% 100%, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.00) 55.59%), var(--color-inherit-default, var(--brand))",
+                backgroundBlendMode: "color-dodge, normal, normal",
+                opacity: "0.6",
+              },
+            },
+          },
+        ],
+        false: [
+          {
+            web: {
+              // Default styles already applied in base
+            },
+          },
+        ],
+      },
+
+      /***********************(Scale)************************/
+
+      scale: ThemeScale,
+
+      /***********************(Radius)************************/
+
+      radius: ThemeRadius,
+
+      /***********************(Disabled)************************/
+
+      disabled: ThemeDisabled,
+    },
+    defaultSettings: {
+      active: false,
+      scale: "10xs",
+      radius: "md",
+      disabled: false,
+    },
   }),
 
   /*################################(Toggle)################################*/

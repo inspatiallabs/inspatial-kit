@@ -1,25 +1,12 @@
 import type { Signal as _Signal } from "@in/teract/signal";
 import { sanitizeRoute } from "@in/route";
 import type { detectBrowserEngine as _detectBrowserEngine } from "@in/vader/env";
-import { getGlobalRenderer as _getGlobalRenderer } from "@in/runtime";
+import { getGlobalRenderer as _getGlobalRenderer } from "@in/runtime/index.ts";
+import type { LinkProps } from "./type.ts";
 
-/*################################(Props)################################*/
-
-interface LinkProps extends JSX.SharedProps {
-  to: string;
-  params?: Record<string, string>;
-  query?: Record<string, string>;
-  replace?: boolean;
-  prefetch?: boolean;
-  modeOverride?: "spa" | "mpa";
-  protect?: () => boolean | string | Promise<boolean | string>;
-  target?: "_blank" | "_self" | "_parent" | "_top";
-  rel?: "external" | "noopener" | "noreferrer";
-}
-
-/*################################(Render)################################*/
+/*################################(LINK COMPONENT)################################*/
 export function Link(props: LinkProps, ...children: any[]): any {
-  // Resolve the active renderer set by DOMRenderer.wrap
+  // Resolve the active renderer set by Renderer Runtime wrappers
   const R: any = _getGlobalRenderer?.() || (globalThis as any).R || null;
   const {
     to,
