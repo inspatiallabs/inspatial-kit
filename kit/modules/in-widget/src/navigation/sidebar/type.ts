@@ -102,12 +102,6 @@ export type SidebarToggleProps = JSX.SharedProps &
     };
   };
 
-// Sidebar Section Props (for grouping items without collapsibility)
-export type SidebarSectionProps = JSX.SharedProps &
-  StyleProps<typeof SidebarStyle.section> & {
-    title?: string;
-    divider?: boolean;
-  };
 
 // Sidebar Header Props
 export type SidebarHeaderProps = JSX.SharedProps &
@@ -124,8 +118,8 @@ export type SidebarFooterProps = JSX.SharedProps &
     minimized?: boolean;
   };
 
-// Active Indicator (Pluck) Props
-export type SidebarPluckProps = StyleProps<typeof SidebarStyle.pluck> & {
+// Active Indicator Props
+export type SidebarIndicatorProps = StyleProps<typeof SidebarStyle.indicator> & {
   active: boolean;
   minimized?: boolean;
   layoutId?: string;

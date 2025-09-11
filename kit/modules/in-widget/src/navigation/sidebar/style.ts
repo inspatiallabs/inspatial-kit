@@ -1,6 +1,8 @@
 import { createStyle } from "@in/style";
 import {
+  ThemeBoxSize,
   ThemeDisabled,
+  ThemeMaterial,
   ThemeRadius,
   ThemeScale,
 } from "@in/widget/theme/style.ts";
@@ -25,9 +27,7 @@ export const SidebarStyle = {
           boxShadow: "var(--shadow-effect)",
           transition: "all 0.3s ease",
           position: "relative",
-          overflow: "hidden",
-          paddingTop: "16px",
-          paddingBottom: "16px",
+          overflow: "visible",
         },
       },
     ],
@@ -128,7 +128,11 @@ export const SidebarStyle = {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: "red",
+          gap: "4px",
+          // Hide header title when sidebar is minimized (SSC)
+          ".sidebar-minimized & .sidebar-header-title": {
+            display: "none",
+          },
         },
       },
     ],
@@ -148,54 +152,133 @@ export const SidebarStyle = {
     ],
   }),
 
-  /*################################(Section)################################*/
-  section: createStyle({
-    name: "sidebar-section",
-    base: [
-      {
-        web: {
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-        },
-      },
-    ],
-  }),
-
   /*################################(Group)################################*/
-  group: createStyle({
-    name: "sidebar-group",
-    base: [
-      {
-        web: {
-          display: "flex",
-          flexDirection: "column",
-          gap: "16px",
-          width: "100%",
-          transition: "all 0.2s ease",
-          overflow: "hidden",
+  group: {
+    container: createStyle({
+      name: "sidebar-group",
+      base: [
+        {
+          web: {
+            display: "flex",
+            flexDirection: "column",
+            gap: "4px",
+            width: "100%",
+            transition: "all 0.2s ease",
+            overflow: "visible",
 
-          // Default expanded state
-          backgroundColor: "var(--background)",
-          borderRadius: "0 0 10px 10px",
-          padding: "10px",
-
-          // Minimized state using selector - hide group when minimized
-          ".sidebar-minimized &": {
-            display: "none",
+            ".sidebar-minimized &": {
+              justifyContent: "center",
+              alignItems: "center",
+              width: "100%",
+            },
           },
         },
+      ],
+      settings: {
+        disabled: ThemeDisabled,
       },
-    ],
+      defaultSettings: {
+        disabled: false,
+      },
+    }),
 
-    settings: {
-      disabled: ThemeDisabled,
+    header: {
+      head: createStyle({
+        name: "sidebar-group-header",
+        base: [
+          {
+            web: {
+              display: "flex",
+              position: "relative",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              color: "var(--primary)",
+              outline: "none",
+              ring: "none",
+
+              justifyContent: "start",
+              alignItems: "center",
+              gap: "8px",
+
+              "&:hover": {
+                background:
+                  "radial-gradient(101.08% 100% at 50% 100%, rgba(94, 94, 94, 0.14) 0%, rgba(94, 94, 94, 0.00) 73.85%), radial-gradient(100.02% 100% at 50% 100%, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.00) 55.59%), var(--color-inherit-default, var(--color-inherit))",
+                backgroundBlendMode: "color-dodge, normal, normal",
+                opacity: "0.6",
+              },
+
+              // Show header indicator ONLY when a child is active (independent of click state)
+              ".sidebar-group.sidebar-group-expanded:has(.sidebar-item-active) & .sidebar-indicator":
+                {
+                  display: "block",
+                },
+              ".sidebar-group & .sidebar-indicator": {
+                display: "none",
+              },
+
+              // When expanded and any child is active, tint header
+              ".sidebar-group.sidebar-group-expanded:has(.sidebar-item-active) &":
+                {
+                  backgroundColor: "var(--background)",
+                  borderRadius: "var(--radius-none)",
+                  borderTopLeftRadius: "var(--radius-lg)",
+                },
+            },
+          },
+        ],
+
+        settings: {
+          scale: ThemeScale,
+          radius: ThemeRadius,
+          disabled: ThemeDisabled,
+        },
+        defaultSettings: {
+          scale: "12xs",
+          radius: "md",
+          disabled: false,
+        },
+      }),
+      title: createStyle({
+        name: "sidebar-group-header-title",
+        base: [
+          {
+            web: {
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+              transition: "all 0.2s ease",
+
+              ".sidebar-minimized &": {
+                display: "none",
+              },
+            },
+          },
+        ],
+      }),
     },
 
-    defaultSettings: {
-      disabled: false,
-    },
-  }),
+    children: createStyle({
+      name: "sidebar-group-children",
+      base: [
+        {
+          web: {
+            display: "flex",
+            flexDirection: "column",
+            overflow: "hidden",
+            gap: "8px",
+            backgroundColor: "var(--background)",
+            borderRadius: "0 0 var(--radius-lg) var(--radius-lg)",
+            padding: "10px",
+
+            ".sidebar-minimized &": {
+              display: "none",
+            },
+          },
+        },
+      ],
+    }),
+  },
 
   /*################################(Item)################################*/
   item: createStyle({
@@ -219,7 +302,7 @@ export const SidebarStyle = {
           // Hover state
           "&:hover": {
             background:
-              "radial-gradient(101.08% 100% at 50% 100%, rgba(94, 94, 94, 0.14) 0%, rgba(94, 94, 94, 0.00) 73.85%), radial-gradient(100.02% 100% at 50% 100%, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.00) 55.59%), var(--color-inherit-default, var(--brand))",
+              "radial-gradient(101.08% 100% at 50% 100%, rgba(94, 94, 94, 0.14) 0%, rgba(94, 94, 94, 0.00) 73.85%), radial-gradient(100.02% 100% at 50% 100%, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.00) 55.59%), var(--color-inherit-default, var(--color-inherit))",
             backgroundBlendMode: "color-dodge, normal, normal",
             opacity: "0.6",
           },
@@ -230,13 +313,19 @@ export const SidebarStyle = {
             alignItems: "center",
           },
 
+          // Hide item title when minimized (SSC)
+          ".sidebar-minimized & .sidebar-item-title": {
+            display: "none",
+          },
+
           // Peer-checked (native radio inside item)
           '&:has(input[type="radio"]:checked)': {
             backgroundColor: "var(--brand)",
             color: "var(--primary)",
+            cursor: "pointer",
             "&:hover": {
               background:
-                "radial-gradient(101.08% 100% at 50% 100%, rgba(94, 94, 94, 0.14) 0%, rgba(94, 94, 94, 0.00) 73.85%), radial-gradient(100.02% 100% at 50% 100%, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.00) 55.59%), var(--color-inherit-default, var(--brand))",
+                "radial-gradient(101.08% 100% at 50% 100%, rgba(94, 94, 94, 0.14) 0%, rgba(94, 94, 94, 0.00) 73.85%), radial-gradient(100.02% 100% at 50% 100%, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.00) 55.59%), var(--color-inherit-default, var(--color-inherit))",
               backgroundBlendMode: "color-dodge, normal, normal",
               opacity: "0.6",
             },
@@ -251,10 +340,9 @@ export const SidebarStyle = {
             web: {
               backgroundColor: "var(--brand)",
               color: "var(--primary)",
-              fontWeight: "500",
               "&:hover": {
                 background:
-                  "radial-gradient(101.08% 100% at 50% 100%, rgba(94, 94, 94, 0.14) 0%, rgba(94, 94, 94, 0.00) 73.85%), radial-gradient(100.02% 100% at 50% 100%, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.00) 55.59%), var(--color-inherit-default, var(--brand))",
+                  "radial-gradient(101.08% 100% at 50% 100%, rgba(94, 94, 94, 0.14) 0%, rgba(94, 94, 94, 0.00) 73.85%), radial-gradient(100.02% 100% at 50% 100%, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.00) 55.59%), var(--color-inherit-default, var(--color-inherit))",
                 backgroundBlendMode: "color-dodge, normal, normal",
                 opacity: "0.6",
               },
@@ -284,8 +372,33 @@ export const SidebarStyle = {
     },
     defaultSettings: {
       active: false,
-      scale: "10xs",
+      scale: "12xs",
       radius: "md",
+      disabled: false,
+    },
+  }),
+
+  /*################################(Icon)################################*/
+  icon: createStyle({
+    name: "sidebar-icon",
+    base: [
+      {
+        web: {
+          backgroundColor: "inherit",
+          fontSize: "12px",
+
+          ".sidebar-minimized &": {},
+        },
+      },
+    ],
+    settings: {
+      size: ThemeBoxSize,
+      scale: ThemeScale,
+      disabled: ThemeDisabled,
+    },
+    defaultSettings: {
+      // size: "xs",
+      // scale: "12xs",
       disabled: false,
     },
   }),
@@ -297,31 +410,172 @@ export const SidebarStyle = {
     base: [
       {
         web: {
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: "2rem",
-          height: "2.5rem",
-          backgroundColor: "var(--background)",
           cursor: "pointer",
           transition: "transform 0.2s ease",
         },
       },
     ],
+    settings: {
+      /***********************(Format)************************/
+      format: {
+        base: [
+          {
+            web: {
+              backgroundColor: "var(--background)",
+              color: "var(--secondary)",
+              stroke: "var(--secondary)",
+              fill: "var(--secondary)",
+
+              "&:hover": {
+                backgroundColor: "var(--surface)",
+                color: "var(--primary)",
+                stroke: "var(--primary)",
+                fill: "var(--primary)",
+                border: "2px solid var(--muted)",
+              },
+            },
+          },
+        ],
+        modern: [
+          {
+            web: {
+              backgroundColor: "var(--surface)",
+              color: "var(--secondary)",
+              stroke: "var(--secondary)",
+              fill: "var(--secondary)",
+              border: "4px solid var(--background)",
+
+              "&:hover": {
+                backgroundColor: "var(--surface)",
+                color: "var(--primary)",
+                stroke: "var(--primary)",
+                fill: "var(--primary)",
+                shadow: "var(--shadow-prime)",
+              },
+            },
+          },
+        ],
+      },
+
+      /***********************(Position)************************/
+      position: {
+        inline: [
+          {
+            web: {
+              display: "flex",
+              position: "relative",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+            },
+          },
+        ],
+        top: [
+          {
+            web: {
+              position: "absolute",
+              right: "0",
+              top: "10%",
+
+              // ".sidebar-minimized &": {
+              //   right: "50%",
+              //   top: "50%",
+              //   transform: "translate(-50%, -50%)",
+              // },
+            },
+          },
+        ],
+        // center: [
+        //   {
+        //     web: {
+        //       position: "absolute",
+        //       right: "50%",
+        //       top: "50%",
+        //       transform: "translate(-50%, -50%)",
+        //     },
+        //   },
+        // ],
+      },
+
+      /***********************(Size)************************/
+      size: ThemeBoxSize,
+
+      /***********************(Scale)************************/
+
+      scale: ThemeScale,
+
+      /***********************(Radius)************************/
+      radius: ThemeRadius,
+
+      /***********************(Material)************************/
+
+      material: ThemeMaterial,
+
+      /***********************(Disabled)************************/
+      disabled: ThemeDisabled,
+    },
+
+    /*===================(Composition)===================*/
+    composition: [
+      {
+        format: "modern",
+        style: {
+          web: {
+            borderBottomLeftRadius: "var(--radius-none)",
+            borderTopLeftRadius: "var(--radius-none)",
+            borderTopRightRadius: "var(--radius-full)",
+            borderBottomRightRadius: "var(--radius-full)",
+          },
+        },
+      },
+      {
+        format: "modern",
+        size: "xs",
+        style: {
+          web: {
+            minWidth: "32px",
+            minHeight: "40px",
+          },
+        },
+      },
+    ],
+
+    /*===================(Default Settings)===================*/
+    defaultSettings: {
+      format: "modern",
+      position: "top",
+      size: "xs",
+      scale: "10xs",
+      radius: "md",
+      material: "flat",
+      disabled: false,
+    },
   }),
 
-  /*################################(Pluck)################################*/
-  pluck: createStyle({
-    name: "sidebar-pluck",
+  /*################################(Indicator)################################*/
+  indicator: createStyle({
+    name: "sidebar-indicator",
     base: [
       {
         web: {
+          display: "flex",
+          width: "8px",
+          height: "60%",
+          top: "50%",
+          transform: "translateY(-50%)",
           position: "absolute",
-          left: "0",
+          left: "-16px",
           backgroundColor: "var(--brand)",
-          borderTopRightRadius: "50%",
-          borderBottomRightRadius: "50%",
+          borderTopRightRadius: "var(--radius-full)",
+          borderBottomRightRadius: "var(--radius-full)",
           transition: "all 0.3s ease",
+
+          ".sidebar-minimized &": {
+            width: "4px",
+            left: "-2px",
+            borderTopRightRadius: "var(--radius-md)",
+            borderBottomRightRadius: "var(--radius-md)",
+          },
         },
       },
     ],

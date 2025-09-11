@@ -1,7 +1,7 @@
 import { $ } from "@inspatial/kit/state";
 import { route } from "../../routes.tsx";
-import { CreatorPortalNavigation } from "../../(creator-portal)/menu.tsx";
 import { XStack } from "@inspatial/kit/structure";
+import { Menu } from "../menu.tsx";
 
 export function RouteTestWindow() {
   const currentPath = $(() => route.get());
@@ -20,7 +20,7 @@ export function RouteTestWindow() {
       >
         {/*#################################(CREATOR PORTAL NAVIGATION)#################################*/}
 
-        <CreatorPortalNavigation />
+        <Menu />
 
         {/*#################################(ROUTE TEST VIEW)#################################*/}
         <div className="mt-3 p-3 border rounded">

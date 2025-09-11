@@ -1169,8 +1169,6 @@ const headerToolbar = composed({ size: "md", theme: "light" });
 
 ### This Explains a Real-World Problem and the Solution (Sidebar)
 
-#### Why the group didn’t change on minimize and how we fixed it
-
 In a Sidebar, we wanted the group to react to the minimized/expanded state. Initially, we tried to let the group style read the wrapper’s setting using cross-style composition:
 
 ```ts
@@ -1196,51 +1194,71 @@ Root causes:
 - The group’s class was evaluated without a reactive wrapper, so it didn’t re-run when state changed.
 - Depending on the context registry for state-driven changes can be fragile; mixing app state and cross-style references may create evaluation timing issues or cycles.
 
-The solution (simple, reliable, prop-first):
+**The Reactive Style solution:**
 
-- Derive a single `format` prop from state.
-- Pass that `format` to both wrapper and group style evaluations.
-- Make the evaluations reactive with `$(() => ...)`.
-- Prefer prop-based composition in `group` over cross-style for this state‑driven case.
+#### Stateful Shell Class (SSC)
+
+Stateful Shell Class (SSC) is a pattern where a container toggles one state‑driven class on itself so descendants change purely via style selectors.
+
+The Stateful Shell Class (SSC) is like using a room’s main light switch. Instead of re‑wiring every lamp (each child component), you flip one switch (a "class utility" on the shell) and all the lamps respond through simple selectors. It keeps state visible in DevTools, and scales well when a single container state (e.g., Sidebar minimized/expanded) needs to influence many descendants.
+
+> **Note:** Use this when a container’s state needs to “fan out” to multiple child elements.
+
+> **Terminology:** “Shell state” is high‑level UI state owned by a container (like a Sidebar) rather than a single element.
+
+##### Examples
+
+###### Component: Using Sidebar wrapper to create/add a reactive class
 
 ```jsx
-// Component (reactive evaluation)
-<Slot
-  className={$(() =>
+// index.tsx
+import { iss } from "@inspatial/kit/style";
+import { $ } from "@inspatial/kit/state/index.ts";
+import { SidebarStyle, useSidebar } from "@inspatial/kit/navigation/sidebar";
+
+// Your Very (Important) Reactive Class
+const sidebarStateClass = $(() =>
+  useSidebar.isMinimized.get() ? "sidebar-minimized" : "sidebar-expanded"
+);
+
+//
+const wrapperClass = $(() =>
+  iss(
+    sidebarStateClass.get()
     SidebarStyle.wrapper.getStyle({
-      format: useSidebar.isMinimized.get() ? "minimized" : "expanded",
-    })
-  )}
->
-  <Slot
-    className={$(() =>
-      SidebarStyle.group.getStyle({
-        format: useSidebar.isMinimized.get() ? "minimized" : "expanded",
-      })
-    )}
-  />
-</Slot>
+      size: useSidebar.isMinimized.get() ? "sm" : "xl",
+    }),
+  )
+);
+
+<Slot className={wrapperClass} />
 ```
 
-```ts
-// Style (prop-based composition instead of cross-style for this case)
-group: createStyle({
+###### Style: Children react with plain selectors
+
+```typescript
+//style.ts
+import { createStyle } from "@inspatial/kit/style";
+
+export const SidebarGroupStyle = createStyle({
   name: "sidebar-group",
-  composition: [
-    { format: "expanded", style: { web: { padding: "10px" } } },
-    { format: "minimized", style: { web: { display: "none" } } },
+  base: [
+    {
+      web: {
+        padding: "10px",
+        ".sidebar-minimized &": { display: "none" },
+      },
+    },
   ],
 });
 ```
 
-Why this works:
+##### What You Get Back
 
-- Reactive evaluation ensures re‑computation when a component state changes.
-- Prop‑based composition removes dependence on the context registry for state, eliminating timing/loop risks.
-- Cross‑style composition remains available for purely style‑to‑style needs (e.g., anchor/peer), while state remains a prop.
+- **Predictable fan‑out:** One reactive class controls many descendants.
+- **Easy debugging:** State is visible as `sidebar-minimized`/`sidebar-expanded` in DevTools.
 
-Common pitfalls and best practices:
+##### Common Mistakes to Avoid
 
-- Don’t write to state inside computed render paths; only update state in user-triggered handlers.
-- Either pass a prop or use cross-style references — avoid mixing both for the same relationship if you see cycles.
-- Wrap any style evaluation that depends on state in `$(() => ...)` to keep it reactive.
+- Forgetting to place the class on the shell element; children selectors won’t match.
+- Computing the class once without `$(() => ...)`; it won’t update when state changes.

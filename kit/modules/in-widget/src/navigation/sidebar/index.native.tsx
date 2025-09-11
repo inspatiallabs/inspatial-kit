@@ -12,20 +12,25 @@ import type {
   SidebarGroupProps,
   SidebarItemProps,
   SidebarToggleProps,
-  SidebarSectionProps,
   SidebarHeaderProps,
   SidebarFooterProps,
-  SidebarPluckProps,
+  SidebarIndicatorProps,
 } from "./type.ts";
-import { XStack } from "@in/widget/structure/index.ts";
+import { XStack, YStack } from "@in/widget/structure/index.ts";
+import { generateUniqueId } from "@in/vader";
+import { createState } from "@in/teract/state/index.ts";
+
+/*################################(STATE)################################*/
+
+const { isMinimized, action } = useSidebar;
 
 /*################################(Active Indicator)################################*/
 
-function SidebarPluck(props: SidebarPluckProps) {
-  const { className, ...rest } = props;
+function SidebarIndicator(props: SidebarIndicatorProps) {
+  const { className, class: cls, ...rest } = props;
   return (
     <Slot
-      className={iss(SidebarStyle.pluck.getStyle({ className }))}
+      className={iss(SidebarStyle.indicator.getStyle({ className }))}
       {...rest}
     />
   );
@@ -34,32 +39,57 @@ function SidebarPluck(props: SidebarPluckProps) {
 /*################################(Toggle Button)################################*/
 
 export function SidebarToggle(props: SidebarToggleProps) {
-  const { minimized, onToggle, icon, className: _className, ...rest } = props;
+  const {
+    minimized,
+    onToggle,
+    icon,
+    className,
+    class: cls,
+    format,
+    position,
+    size,
+    scale,
+    radius,
+    disabled,
+    ...rest
+  } = props;
 
   return (
     <Slot
       className={SidebarStyle.toggle.getStyle({
-        format: useSidebar.isMinimized.get() ? "minimized" : "expanded",
+        className,
+        format: minimized ?? isMinimized.get() ? "minimized" : "expanded",
       })}
       on:tap={() => {
-        useSidebar.action.setMinimized(!useSidebar.isMinimized.get());
-        onToggle?.();
+        if (onToggle) {
+          onToggle();
+        } else {
+          action.setMinimized(!isMinimized.get());
+        }
       }}
       {...rest}
     >
-      <Slot className={SidebarStyle.toggle.getStyle({ format: "inner" })}>
-        <Slot
-          style={$(() => ({
-            transform: useSidebar.isMinimized.get()
-              ? "rotate(0deg)"
-              : "rotate(180deg)",
-            transition: "transform 0.3s ease",
-          }))}
-        >
-          {icon?.collapse || (
-            <CaretRightPrimeIcon className="stroke-(--primary)" />
-          )}
-        </Slot>
+      <Slot
+        style={$(() => ({
+          transform:
+            minimized ?? isMinimized.get() ? "rotate(0deg)" : "rotate(180deg)",
+          transition: "transform 0.3s ease",
+        }))}
+      >
+        {icon?.collapse || (
+          <CaretRightPrimeIcon
+            className={SidebarStyle.toggle.getStyle({
+              className,
+              class: cls,
+              position,
+              size,
+              scale,
+              radius,
+              disabled,
+              format,
+            })}
+          />
+        )}
       </Slot>
     </Slot>
   );
@@ -68,12 +98,14 @@ export function SidebarToggle(props: SidebarToggleProps) {
 /*################################(Header)################################*/
 
 export function SidebarHeader(props: SidebarHeaderProps) {
-  const { children, className, ...rest } = props;
+  const { children, className, logo, title, ...rest } = props;
   return (
     <Slot
-      className={iss(SidebarStyle.header.getStyle({ className }))}
+      className={iss(SidebarStyle.header.getStyle({ className, ...rest }))}
       {...rest}
     >
+      {logo && <Slot>{logo}</Slot>}
+      {title && <Slot className="sidebar-header-title">{title}</Slot>}
       {children}
     </Slot>
   );
@@ -89,26 +121,6 @@ export function SidebarFooter(props: SidebarFooterProps) {
       className={iss(SidebarStyle.footer.getStyle({ className }))}
       {...rest}
     >
-      {children}
-    </Slot>
-  );
-}
-
-/*################################(Section)################################*/
-
-export function SidebarSection(props: SidebarSectionProps) {
-  const { title, children, className, ...rest } = props;
-
-  return (
-    <Slot
-      className={iss(
-        SidebarStyle.section.getStyle({
-          className,
-        })
-      )}
-      {...rest}
-    >
-      <Show when={title && !useSidebar.isMinimized.get()}>{title}</Show>
       {children}
     </Slot>
   );
@@ -150,7 +162,16 @@ export function SidebarItem(props: SidebarItemProps) {
 
   // Route-based active state for navigation items (reactive)
   const routeActive = isNavigation
-    ? $(() => getActiveRoute(to, activeMatch, isActive))
+    ? $(() => {
+        const current = useSidebar.activeRoute.get();
+        if (current) {
+          if (activeMatch === "custom" && isActive) return !!isActive(current);
+          if (activeMatch === "prefix")
+            return typeof to === "string" && current.startsWith(to);
+          return typeof to === "string" && current === to;
+        }
+        return getActiveRoute(to as any, activeMatch as any, isActive as any);
+      })
     : $(() => false);
 
   // Selection state for radio items (reactive)
@@ -168,18 +189,29 @@ export function SidebarItem(props: SidebarItemProps) {
       })
     : $(() => false);
 
-  // Final active state (navigation drives active here; radio uses peer-checked CSS)
-  const isItemActive = $(() => (isNavigation ? routeActive.get() : false));
-
-  const isExpanded = $(() => !useSidebar.isMinimized.get());
+  // Final active state (navigation or selection)
+  const isItemActive = $(() =>
+    isNavigation
+      ? routeActive.get()
+      : isSelection
+      ? (selectionActive.get() as any)
+      : false
+  );
 
   // Sidebar item content
   const itemContent = (
     <>
-      {icon && <Slot className="flex-shrink-0">{icon}</Slot>}
-      <Show when={isExpanded}>
-        <Slot>{children}</Slot>
+      <Show when={isItemActive}>
+        <SidebarIndicator
+          className={SidebarStyle.indicator.getStyle({ className })}
+        />
       </Show>
+      {icon && (
+        <Slot className={SidebarStyle.icon.getStyle({ className })}>
+          {icon}
+        </Slot>
+      )}
+      <Slot className="sidebar-item-title">{children}</Slot>
     </>
   );
 
@@ -296,10 +328,100 @@ export function SidebarItem(props: SidebarItemProps) {
 
 // We will use this for the complex tree structure
 export function SidebarGroup(props: SidebarGroupProps) {
-  const { children, className, ...rest } = props;
+  const {
+    children,
+    className,
+    disabled,
+    title,
+    icon,
+    defaultExpanded = false,
+    expanded,
+    onExpandChange,
+    ...rest
+  } = props;
+
+  const groupToggleStyle = SidebarStyle.toggle.getStyle({
+    format: "base",
+    position: "inline",
+    size: "2xs",
+    radius: "full",
+  });
+
+  const useGroup = createState({ isHovered: false, expanded: defaultExpanded });
+  const isGroupExpanded = $(() =>
+    expanded !== undefined ? expanded : useGroup.expanded.get()
+  );
+
   return (
-    <Slot className={SidebarStyle.group.getStyle({ className })} {...rest}>
-      {children}
+    <Slot
+      className={$(() =>
+        iss(
+          SidebarStyle.group.container.getStyle({ className, disabled }),
+          "sidebar-group", // IMPORTANT: For the group header to be active when any child item is active
+          isGroupExpanded.get()
+            ? "sidebar-group-expanded"
+            : "sidebar-group-collapsed"
+        )
+      )}
+      {...rest}
+    >
+      {(title || icon) && (
+        <XStack
+          className={SidebarStyle.group.header.head.getStyle({ className })}
+          on:mouseenter={() => useGroup.isHovered.set(true)}
+          on:mouseleave={() => useGroup.isHovered.set(false)}
+          on:tap={() => {
+            if (expanded !== undefined) {
+              onExpandChange?.(!expanded);
+            } else {
+              useGroup.expanded.set(!useGroup.expanded.get());
+              onExpandChange?.(useGroup.expanded.get());
+            }
+          }}
+        >
+          <SidebarIndicator
+            className={iss(
+              SidebarStyle.indicator.getStyle({ className }),
+              "sidebar-indicator"
+            )}
+          />
+          {icon && (
+            <Slot className={SidebarStyle.icon.getStyle({ className })}>
+              {icon}
+            </Slot>
+          )}
+          {title && (
+            <XStack
+              className={SidebarStyle.group.header.title.getStyle({
+                className,
+              })}
+            >
+              {title}
+              <Show
+                when={$(
+                  () => useGroup.isHovered.get() || isGroupExpanded.get()
+                )}
+              >
+                <Slot
+                  style={$(() => ({
+                    transform: isGroupExpanded.get()
+                      ? "rotate(90deg)"
+                      : "rotate(0deg)",
+                    transition: "transform 0.2s ease",
+                  }))}
+                >
+                  <CaretRightPrimeIcon className={groupToggleStyle} />
+                </Slot>
+              </Show>
+            </XStack>
+          )}
+        </XStack>
+      )}
+      <Show when={isGroupExpanded}>
+        <YStack className={SidebarStyle.group.children.getStyle({ className })}>
+          {children}
+        </YStack>
+      </Show>
     </Slot>
   );
 }
@@ -308,12 +430,13 @@ export function SidebarGroup(props: SidebarGroupProps) {
 
 export function Sidebar(props: SidebarProps) {
   const {
+    id,
     className,
     minimized: controlledMinimized,
     defaultMinimized: _defaultMinimized = false,
     onMinimizeChange,
     children,
-    showToggle = true,
+    showToggle = false,
     size,
     minimizedSize = "sm",
     expandedSize = "xl",
@@ -322,44 +445,61 @@ export function Sidebar(props: SidebarProps) {
     ...rest
   } = props;
 
-  // Get current state from global sidebar state
-  const currentMinimized = useSidebar.isMinimized;
+  // Instance id for per-sidebar state
+  const instanceId = id ?? generateUniqueId();
+
+  // Per-instance minimized signal (controlled > storeById > default)
+  const minimizedForInstance = $(() => {
+    if (controlledMinimized !== undefined) return controlledMinimized;
+    const byId = useSidebar.minimizedById.get()[instanceId];
+    return byId ?? _defaultMinimized;
+  });
 
   // Initialize state if needed
-  if (
-    controlledMinimized !== undefined &&
-    controlledMinimized !== currentMinimized.get()
-  ) {
-    useSidebar.action.setMinimized(controlledMinimized);
+  if (controlledMinimized !== undefined) {
+    // Keep store in sync for this instance when controlled
+    useSidebar.action.setMinimizedForId({
+      id: instanceId,
+      minimized: controlledMinimized,
+    });
   }
-
-  const minimized = controlledMinimized ?? currentMinimized.get();
 
   // Create reactive className using computed signal
 
+  // Hover state to reveal toggle only when hovering the sidebar container
+  const hover = createState({ over: false });
+
   return (
     <Slot
+      id={instanceId}
       className={$(() =>
         iss(
+          minimizedForInstance.get() ? "sidebar-minimized" : "sidebar-expanded",
           SidebarStyle.wrapper.getStyle({
             className,
             size:
-              size ||
-              (useSidebar.isMinimized.get() ? minimizedSize : expandedSize),
+              size ??
+              (minimizedForInstance.get() ? minimizedSize : expandedSize),
             scale,
-          }),
-          useSidebar.isMinimized.get()
-            ? "sidebar-minimized"
-            : "sidebar-expanded"
+          })
         )
       )}
+      on:mouseenter={() => hover.over.set(true)}
+      on:mouseleave={() => hover.over.set(false)}
       {...rest}
     >
       {children}
 
-      {/* Toggle Button */}
-      <Show when={showToggle}>
-        <SidebarToggle />
+      {/* Toggle Button: always visible when minimized; hover-only when expanded */}
+      <Show
+        when={$(
+          () => showToggle && (minimizedForInstance.get() || hover.over.get())
+        )}
+      >
+        <SidebarToggle
+          minimized={minimizedForInstance.get()}
+          onToggle={() => useSidebar.action.toggleMinimizedForId(instanceId)}
+        />
       </Show>
     </Slot>
   );

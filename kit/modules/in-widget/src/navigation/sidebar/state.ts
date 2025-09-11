@@ -3,9 +3,10 @@ import { createState } from "@in/teract/state/index.ts";
 /*################################(Sidebar State)################################*/
 
 export const useSidebar = createState.in({
-  id: "sidebar",
+  id: `sidebar`,
   initialState: {
     isMinimized: false,
+    minimizedById: {} as Record<string, boolean>,
     hoveredGroup: null as string | null,
     expandedGroups: {} as Record<string, boolean>,
     activeRoute: "",
@@ -14,6 +15,23 @@ export const useSidebar = createState.in({
     setMinimized: {
       key: "isMinimized",
       fn: (_: boolean, minimized: boolean) => minimized,
+    },
+    setMinimizedForId: {
+      key: "minimizedById",
+      fn: (
+        current: Record<string, boolean>,
+        payload: { id: string; minimized: boolean }
+      ) => ({
+        ...current,
+        [payload.id]: payload.minimized,
+      }),
+    },
+    toggleMinimizedForId: {
+      key: "minimizedById",
+      fn: (current: Record<string, boolean>, id: string) => ({
+        ...current,
+        [id]: !current[id],
+      }),
     },
     toggleGroup: {
       key: "expandedGroups",

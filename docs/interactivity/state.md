@@ -1,8 +1,8 @@
-# Interactivity
+# State
 
-## Signal (@inspatial/kit/signal) - (@in/teract/signal)
 
-InSpatial Kit is fundamentally reactive signal based system. The core signal primitives InSpatial State is that `@in/teract` is an signal based interactivity and state management system. It is subdivided into two types of reactive systems. There is Signal Core and Signal Lite each inspired by SolidJS and Preact respectively.
+
+
 
 #### First principles: keep it simple, make it reactive
 
@@ -57,7 +57,7 @@ You can use InSpatial State in two ways:
 
 Key capabilities: batch, reset, snapshot, subscribe, derived values, and a unified trigger API.
 
-#### Explicit pattern 
+#### Explicit pattern
 
 ```ts
 const counterState = createState.in({
@@ -319,7 +319,7 @@ Bottom line: lifecycle → trigger props; reactivity → `$`/`Show`; subscriptio
 
 ##### `Choose` - The InSpatial Switch Statement
 
-```javascript
+```jsx
 // ❌  DON'T DO THIS: It wont react
 export function InputField() {
   return (
@@ -451,17 +451,113 @@ const templateUrl = t`https://inspatial.store/template?id=${s.templateId}`;
 
 States are abstractions of signals. Here's how they differ:
 
-| Feature              | Signal-Lite                                                  | Signal/State Core                   |
-| -------------------- | ------------------------------------------------------------ | ----------------------------------- |
-| **Size**             | Minimal (small bundle)                                       | Full-featured (larger)              |
-| **API**              | Simpler, focused                                             | Comprehensive                       |
-| **Performance**      | Good for basic needs                                         | Optimized for complex scenarios     |
+| Feature              | Signal-Lite                                                      | Signal/State Core                   |
+| -------------------- | ---------------------------------------------------------------- | ----------------------------------- |
+| **Size**             | Minimal (small bundle)                                           | Full-featured (larger)              |
+| **API**              | Simpler, focused                                                 | Comprehensive                       |
+| **Performance**      | Good for basic needs                                             | Optimized for complex scenarios     |
 | **Callbacks**        | createSideEffectLite & onDisposeLite \* onConditionLite triggers | Full integrated trigger system      |
-| **State Management** | Local                                                        | Local X Global X Server (Universal) |
-| **Developer Tools**  | Minimal                                                      | Advanced debugging tools            |
-| **StateQL**          | Not supported                                                | Full support                        |
-| **Batched Updates**  | Automatic and Asynced                                        | Automatic and Asynced               |
+| **State Management** | Local                                                            | Local X Global X Server (Universal) |
+| **Developer Tools**  | Minimal                                                          | Advanced debugging tools            |
+| **StateQL**          | Not supported                                                    | Full support                        |
+| **Batched Updates**  | Automatic and Asynced                                            | Automatic and Asynced               |
 
 **When to choose Signal**: For simple state management needs or projects when you need minimal bundle size, automatic dependency tracking and efficient updates. It is the recommeded starting point for interactivity compared to its siblings.
 
 **When to choose State**: For most InSpatial applications, production apps, or when you need advanced features like triggers, optimized updates, or deep integration.
+
+## State Consolidation
+
+#### Hoist shared derived values and actions once; use them everywhere
+
+State Consolidation means you define commonly used derived states and actions in one place at the top of a module, then use those everywhere else. Think of it like preparing your ingredients on a tray before you cook—less reaching, fewer mistakes, and everything stays in sync.
+
+> **Terminology:** A “derived state is a `$(() => ...)` value built from other state; it auto‑updates when inputs change.
+
+### Examples
+
+#### Example 1: Sidebar state – before vs after
+
+```jsx
+// BEFORE: repeated calls scattered across components
+import { $ } from "@inspatial/kit/state";
+import { useSidebar } from "@inspatial/kit/navigation";
+
+export function SidebarToggle() {
+  return (
+    <Slot
+      className={SidebarStyle.toggle.getStyle({
+        format: useSidebar.isMinimized.get() ? "minimized" : "expanded",
+      })}
+      on:tap={() =>
+        useSidebar.action.setMinimized(!useSidebar.isMinimized.get())
+      }
+    />
+  );
+}
+
+export function SidebarHeader({ title }: { title?: string }) {
+  const isExpanded = $(() => !useSidebar.isMinimized.get());
+  return <Show when={isExpanded}>{title}</Show>;
+}
+```
+
+```jsx
+// AFTER: consolidate once; consume everywhere
+import { $ } from "@inspatial/kit/state";
+import { useSidebar } from "@inspatial/kit/navigation";
+
+// Consolidated hooks (top‑level)
+export const { isMinimized, action } = useSidebar;
+export const isExpanded = $(() => !isMinimized.get());
+export const sidebarStateClass = $(() =>
+  isMinimized.get() ? "sidebar-minimized" : "sidebar-expanded"
+);
+
+export function SidebarToggle() {
+  return (
+    <Slot
+      className={SidebarStyle.toggle.getStyle({
+        format: isMinimized.get() ? "minimized" : "expanded",
+      })}
+      on:tap={() => action.setMinimized(!isMinimized.get())}
+    />
+  );
+}
+
+export function SidebarHeader({ title }: { title?: string }) {
+  return <Show when={isExpanded}>{title}</Show>;
+}
+```
+
+#### Example 2: Generic UI module
+
+```jsx
+import { $, createState } from "@inspatial/kit/state";
+
+export const ui = createState.in({
+  initialState: { isOpen: false, count: 0 },
+  action: {
+    toggle: { key: "isOpen", fn: (v: boolean) => !v },
+    inc: { key: "count", fn: (c: number, n = 1) => c + n },
+  },
+});
+
+export const { isOpen, count, action: uiAction } = ui;
+export const label = $(() => (isOpen.get() ? "Open" : "Closed"));
+
+// Usage
+<Text>{label}</Text>
+<Button on:tap={() => uiAction.toggle()}>Toggle ({count})</Button>
+```
+
+### What You Get Back
+
+- **Consistency:** One source of truth avoids drift across files.
+- **Less boilerplate:** Fewer repeated `.get()`/action calls.
+
+### Common Mistakes to Avoid
+
+- Hoisting one‑off values; only consolidate what’s reused.
+- Extracting values out of `$(() => ...)` just to rewrap them; pass the computed itself.
+- Creating many new computeds in loops; reuse consolidated ones.
