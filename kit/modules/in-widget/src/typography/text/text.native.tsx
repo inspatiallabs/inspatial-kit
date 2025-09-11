@@ -2,7 +2,7 @@
 
 import { iss } from "@in/style";
 import { createState, createSideEffect, $ } from "@in/teract/state";
-import { createMotion, eases } from "@in/motion";
+// import { createMotion, eases } from "@in/motion";
 import { XStack } from "@in/widget/structure/index.ts";
 import {
   sizeClassMap,
@@ -27,36 +27,37 @@ const animateLetters = (
   letters.forEach((n) => ((n as HTMLElement).style.opacity = "0"));
 
   if (style === "fadeUp" || style === "fadeUpContainer") {
-    createMotion(letters, {
-      opacity: { from: 0, to: 1, duration: durationMs },
-      translateY: { from: 10, to: 0, duration: durationMs },
-      delay: (_t: any, i: number, l: number) =>
-        delayMs + (i / Math.max(1, l)) * 250,
-      ease: eases.inOutQuad,
-      onComplete: () => {
-        // Cleanup inline opacity in case anything stuck
-        letters.forEach((n) => ((n as HTMLElement).style.opacity = ""));
-      },
-    });
+    // createMotion(letters, {
+    //   opacity: { from: 0, to: 1, duration: durationMs },
+    //   translateY: { from: 10, to: 0, duration: durationMs },
+    //   delay: (_t: any, i: number, l: number) =>
+    //     delayMs + (i / Math.max(1, l)) * 250,
+    //   ease: eases.inOutQuad,
+    //   onComplete: () => {
+    //     // Cleanup inline opacity in case anything stuck
+    //     letters.forEach((n) => ((n as HTMLElement).style.opacity = ""));
+    //   },
+    // });
   } else if (style === "fadeIn") {
-    createMotion(letters, {
-      opacity: { from: 0, to: 1, duration: durationMs },
-      delay: (_t: any, i: number) => delayMs + i * 25,
-      ease: eases.inOutQuad,
-      onComplete: () => {
-        letters.forEach((n) => ((n as HTMLElement).style.opacity = ""));
-      },
-    });
+    // createMotion(letters, {
+    //   opacity: { from: 0, to: 1, duration: durationMs },
+    //   delay: (_t: any, i: number) => delayMs + i * 25,
+    //   ease: eases.inOutQuad,
+    //   onComplete: () => {
+    //     letters.forEach((n) => ((n as HTMLElement).style.opacity = ""));
+    //   },
+    // }
+    // );
   } else if (style === "reveal") {
-    createMotion(letters, {
-      opacity: { from: 0, to: 1, duration: durationMs },
-      translateY: { from: 8, to: 0, duration: durationMs },
-      delay: (_t: any, i: number) => delayMs + i * 40,
-      ease: eases.outQuad,
-      onComplete: () => {
-        letters.forEach((n) => ((n as HTMLElement).style.opacity = ""));
-      },
-    });
+    // createMotion(letters, {
+    //   opacity: { from: 0, to: 1, duration: durationMs },
+    //   translateY: { from: 8, to: 0, duration: durationMs },
+    //   delay: (_t: any, i: number) => delayMs + i * 40,
+    //   ease: eases.outQuad,
+    //   onComplete: () => {
+    //     letters.forEach((n) => ((n as HTMLElement).style.opacity = ""));
+    //   },
+    // });
   }
 
   // Fallback safety: force show after total time
@@ -207,15 +208,15 @@ export const Text = ({
             try {
               (root as HTMLElement).style.opacity = "0";
             } catch {}
-            createMotion(root, {
-              opacity: { from: 0, to: 1, duration: 700 },
-              ease: eases.inOutQuad,
-              onComplete: () => {
-                try {
-                  (root as HTMLElement).style.opacity = "";
-                } catch {}
-              },
-            } as any);
+            // createMotion(root, {
+            //   opacity: { from: 0, to: 1, duration: 700 },
+            //   ease: eases.inOutQuad,
+            //   onComplete: () => {
+            //     try {
+            //       (root as HTMLElement).style.opacity = "";
+            //     } catch {}
+            //   },
+            // } as any);
             setTimeout(() => {
               try {
                 if (getComputedStyle(root).opacity === "0")
@@ -226,16 +227,16 @@ export const Text = ({
             try {
               (root as HTMLElement).style.opacity = "0";
             } catch {}
-            createMotion(root, {
-              opacity: { from: 0, to: 1, duration: 700 },
-              translateY: { from: 12, to: 0, duration: 700 },
-              ease: eases.inOutQuad,
-              onComplete: () => {
-                try {
-                  (root as HTMLElement).style.opacity = "";
-                } catch {}
-              },
-            } as any);
+            // createMotion(root, {
+            //   opacity: { from: 0, to: 1, duration: 700 },
+            //   translateY: { from: 12, to: 0, duration: 700 },
+            //   ease: eases.inOutQuad,
+            //   onComplete: () => {
+            //     try {
+            //       (root as HTMLElement).style.opacity = "";
+            //     } catch {}
+            //   },
+            // } as any);
             setTimeout(() => {
               try {
                 if (getComputedStyle(root).opacity === "0")

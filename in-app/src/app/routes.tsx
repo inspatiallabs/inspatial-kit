@@ -9,7 +9,7 @@ import { RouteTestWindow } from "./(example)/route-test/window.tsx";
 import { AuthWindow } from "./(auth)/window.tsx";
 import { AppMenu } from "./menu.tsx";
 import { AccountView } from "./(auth)/account.tsx";
-import { EditorView } from "./(editor)/view.tsx";
+import { EditorView } from "./(creator-portal)/view.tsx";
 import { FPS } from "@inspatial/kit/performance";
 import { ThemeController } from "@inspatial/kit/theme";
 import { KitBorder } from "@inspatial/kit/ornament";

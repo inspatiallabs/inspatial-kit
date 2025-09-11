@@ -1,6 +1,6 @@
 import { iss } from "@in/style";
 import { createState } from "@in/teract/state";
-import { createMotion, eases } from "@in/motion";
+// import { createMotion, eases } from "@in/motion";
 import { ViewStyle } from "./style.ts";
 import type { ViewProps } from "./type.ts";
 import { Slot } from "@in/widget/structure/slot/index.tsx";
@@ -72,7 +72,7 @@ function animateIn(
     duration,
     delay,
     autoplay: true,
-    ease: eases.outQuad,
+    // ease: eases.outQuad,
     composition: "replace",
   };
 
@@ -95,19 +95,20 @@ function animateIn(
   }
 
   try {
-    const animation = createMotion(node, {
-      ...animationParams,
-      onBegin: () => {
-        // Ensure the element is ready for animation
-        node.style.willChange = "opacity, transform";
-      },
-      onComplete: () => {
-        // Clean up inline styles after animation
-        node.style.opacity = "";
-        node.style.transform = "";
-        node.style.willChange = "";
-      },
-    });
+    let animation: any = null;
+    //  createMotion(node, {
+    //   ...animationParams,
+    //   onBegin: () => {
+    //     // Ensure the element is ready for animation
+    //     node.style.willChange = "opacity, transform";
+    //   },
+    //   onComplete: () => {
+    //     // Clean up inline styles after animation
+    //     node.style.opacity = "";
+    //     node.style.transform = "";
+    //     node.style.willChange = "";
+    //   },
+    // });
 
     // Fallback safety: ensure visible state after animation time
     const totalTime = delay + duration + 100;

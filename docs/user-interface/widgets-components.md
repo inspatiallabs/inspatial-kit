@@ -207,3 +207,11 @@ import {
 
 #### Anatomy
 Historically Tabs have been used as owners of a view. But this is merely the case because the anatomy of a tab warrants that a Tab is simply a controller of a view. 
+
+## Navigation
+
+### `<Sidebar>`
+
+
+**Sidebar** vs **Drawer**
+The difference between a Drawer and a Sidebar is in the "presentation". Like most Navigation widgets, a Sidebar is already in View whereas you need an action to trigger a presentation drawer. 

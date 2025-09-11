@@ -43,35 +43,52 @@ export type SidebarGroupProps = JSX.SharedProps &
     expanded?: boolean;
     onExpandChange?: (expanded: boolean) => void;
   };
-
-// Radio props for selection items
-type SidebarRadioProps = Pick<RadioProps,
-  | "selected"
-  | "defaultSelected" 
-  | "name"
-  | "value"
->;
-
 // Sidebar Item Props (unified API for Link and Radio anatomies)
-export type SidebarItemProps = JSX.SharedProps &
-  StyleProps<typeof SidebarStyle.item> & 
-  Partial<LinkProps> &
-  Partial<SidebarRadioProps> & {
-    // Common props
+type SidebarItemBaseProps = JSX.SharedProps &
+  StyleProps<typeof SidebarStyle.item> & {
     icon?: JSX.Element;
     children?: JSX.Element | JSX.Element[];
     disabled?: boolean;
-    
-    // Navigation-specific
-    activeMatch?: "exact" | "prefix" | "custom";
-    isActive?: (currentRoute: string) => boolean;
-    
-    // Manual control (current behavior)
-    onClick?: () => void;
-    
     // Event handlers (Tab/Radio pattern)
     onChange?: (value: string | number | boolean) => void;
+    'on:input'?: (value: string | number | boolean) => void;
+    'on:change'?: (value: string | number | boolean) => void;
   };
+
+// MPV: MultiPageView (Link anatomy)
+export type SidebarItemMPVProps = SidebarItemBaseProps &
+  Partial<LinkProps> & {
+    routeView: 'MPV';
+    to: LinkProps['to'];
+    // Disallow SPV-only props
+    selected?: never;
+    defaultSelected?: never;
+    name?: never;
+    value?: never;
+    // Navigation-specific
+    activeMatch?: 'exact' | 'prefix' | 'custom';
+    isActive?: (currentRoute: string) => boolean;
+  };
+
+// SPV: SinglePageView (Radio group anatomy)
+export type SidebarItemSPVProps = SidebarItemBaseProps & {
+  routeView: 'SPV';
+  name: string;
+  value: string;
+  selected?: boolean | import('@in/teract/signal/index.ts').Signal<boolean>;
+  defaultSelected?: boolean;
+  // Disallow MPV-only props
+  to?: never;
+  params?: never;
+  query?: never;
+  replace?: never;
+  prefetch?: never;
+  protect?: never;
+  activeMatch?: never;
+  isActive?: never;
+};
+
+export type SidebarItemProps = SidebarItemMPVProps | SidebarItemSPVProps;
 
 // Sidebar Toggle Button Props
 export type SidebarToggleProps = JSX.SharedProps &

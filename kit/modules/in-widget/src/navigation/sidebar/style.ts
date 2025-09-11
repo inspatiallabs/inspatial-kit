@@ -155,6 +155,8 @@ export const SidebarStyle = {
       {
         web: {
           width: "100%",
+          display: "flex",
+          flexDirection: "column",
         },
       },
     ],
@@ -206,6 +208,8 @@ export const SidebarStyle = {
           cursor: "pointer",
           transition: "all 0.2s ease",
           color: "var(--primary)",
+          outline: "none",
+          ring: "none",
 
           // Default expanded state
           justifyContent: "start",
@@ -224,6 +228,18 @@ export const SidebarStyle = {
           ".sidebar-minimized &": {
             justifyContent: "center",
             alignItems: "center",
+          },
+
+          // Peer-checked (native radio inside item)
+          '&:has(input[type="radio"]:checked)': {
+            backgroundColor: "var(--brand)",
+            color: "var(--primary)",
+            "&:hover": {
+              background:
+                "radial-gradient(101.08% 100% at 50% 100%, rgba(94, 94, 94, 0.14) 0%, rgba(94, 94, 94, 0.00) 73.85%), radial-gradient(100.02% 100% at 50% 100%, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.00) 55.59%), var(--color-inherit-default, var(--brand))",
+              backgroundBlendMode: "color-dodge, normal, normal",
+              opacity: "0.6",
+            },
           },
         },
       },

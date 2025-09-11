@@ -2,7 +2,7 @@
  * Function to determine if a route is active based on current route
  * Uses browser location as fallback when route system is not available
  */
-export function useActiveRoute(
+export function getActiveRoute(
   to?: string,
   match: "exact" | "prefix" | "custom" = "exact",
   customMatcher?: (currentRoute: string) => boolean

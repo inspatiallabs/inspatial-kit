@@ -11,7 +11,8 @@
   "compilerOptions": {
     "lib": ["ES2022", "DOM", "DOM.Iterable", "deno.ns"],
     "jsx": "react-jsx",
-    "jsxImportSource": "@inspatial/kit"
+    "jsxImportSource": "@inspatial/kit",
+    "allowImportingTsExtensions": true
   },
   "imports": {
     "@in/kit/": "../kit/modules/",

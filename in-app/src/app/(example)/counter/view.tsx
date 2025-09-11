@@ -195,9 +195,14 @@ export function CounterView() {
         <Text>Drawer Base</Text>
       </Drawer>
 
-      <View scrollable>
+      <View scrollable data-inmotion="fade-u duration-500 once">
         <Slot className="flex flex-col justify-center items-center gap-10">
-          <h1 className="text-(--brand) text-8xl">InCounter</h1>
+          <h1
+            data-inmotion="text-shimmer split-letter duration-2000 split-delay-100"
+            className="text-(--brand) text-8xl"
+          >
+            InCounter
+          </h1>
 
           {/* Switch & Checkbox Controls */}
           <Slot className="bg-(--surface) p-6 rounded-lg text-center max-w-md">

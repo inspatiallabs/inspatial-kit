@@ -1,6 +1,6 @@
 import { $ } from "@inspatial/kit/state";
 import { route } from "../../routes.tsx";
-import { EditorNavigation } from "../../(editor)/menu.tsx";
+import { CreatorPortalNavigation } from "../../(creator-portal)/menu.tsx";
 import { XStack } from "@inspatial/kit/structure";
 
 export function RouteTestWindow() {
@@ -18,9 +18,9 @@ export function RouteTestWindow() {
           },
         }}
       >
-        {/*#################################(EDITOR NAVIGATION)#################################*/}
+        {/*#################################(CREATOR PORTAL NAVIGATION)#################################*/}
 
-        <EditorNavigation />
+        <CreatorPortalNavigation />
 
         {/*#################################(ROUTE TEST VIEW)#################################*/}
         <div className="mt-3 p-3 border rounded">

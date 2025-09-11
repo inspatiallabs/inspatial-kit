@@ -63,6 +63,7 @@ export * from "./is-primitive.ts";
 export * from "./is-thenable.ts";
 export * from "./split-first.ts";
 export * from "./create-filter.ts";
+export * from "./keydown.ts";
 
 
 // export * from "./getletterspacing.ts";

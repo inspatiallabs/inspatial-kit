@@ -14,6 +14,7 @@ export * from "./dot-six-icon.tsx";
 export * from "./bubble-grid-icon.tsx";
 export * from "./x-prime-icon.tsx";
 export * from "./plus-prime-icon.tsx";
+export * from "./plus-icon.tsx";
 export * from "./minimize-icon.tsx";
 export * from "./maximize-icon.tsx";
 export * from "./api-icon.tsx";

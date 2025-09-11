@@ -488,28 +488,111 @@ export class InSpatialServe {
               }
             } catch {}
           }
-          // d) Fallback conventions - check both root and src subdirectory
-          const fallbackRel = [
-            "src/types.d.ts",
-            "src/trigger-types.d.ts",
-            "types.d.ts",
-            "trigger-types.d.ts",
-            // Also check if rootDir itself has a src parent (in case we got src/index.ts)
-            "../types.d.ts",
-            "../trigger-types.d.ts",
-          ];
-          for (const rel of fallbackRel) candidates.push(`${rootDir}/${rel}`);
+          // d) If no explicit paths declared, recursively discover in rootDir
+          //    Search for files exporting: `export interface ExtensionTriggerTypes`
+          async function listDir(
+            path: string
+          ): Promise<Array<{ name: string; isFile: boolean; isDir: boolean }>> {
+            const out: Array<{
+              name: string;
+              isFile: boolean;
+              isDir: boolean;
+            }> = [];
+            try {
+              // Try Deno.readDir if available
+              if (InZero.readDir) {
+                for await (const ent of InZero.readDir(path)) {
+                  out.push({
+                    name: ent.name,
+                    isFile: !!ent.isFile,
+                    isDir: !!ent.isDirectory,
+                  });
+                }
+              }
+            } catch {}
+            return out;
+          }
 
-          // Filter to existing files
-          const existing: string[] = [];
-          for (const file of candidates) {
+          async function existsFile(file: string): Promise<boolean> {
             try {
               // deno-lint-ignore no-explicit-any
               const stat = await InZero.stat(file);
-              if ((stat as any)?.isFile) existing.push(file);
-            } catch {}
+              // deno-lint-ignore no-explicit-any
+              return !!(stat as any)?.isFile;
+            } catch {
+              return false;
+            }
           }
-          return existing;
+
+          async function readText(file: string): Promise<string> {
+            try {
+              return await InZero.readTextFile(file);
+            } catch {
+              return "";
+            }
+          }
+
+          const discovered: string[] = [];
+          const visited = new Set<string>();
+          const ignoreDirs = new Set([
+            "node_modules",
+            "dist",
+            ".git",
+            ".cache",
+            ".next",
+            "build",
+          ]);
+          const maxDepth = 6;
+          const maxFiles = 200; // safety cap
+
+          async function walk(dir: string, depth: number): Promise<void> {
+            if (discovered.length >= maxFiles) return;
+            if (depth > maxDepth) return;
+            const norm = dir.replace(/\\/g, "/");
+            if (visited.has(norm)) return;
+            visited.add(norm);
+            const entries = await listDir(norm);
+            for (const ent of entries) {
+              const p = `${norm}/${ent.name}`;
+              if (ent.isDir) {
+                if (!ignoreDirs.has(ent.name)) await walk(p, depth + 1);
+              } else if (ent.isFile && p.endsWith(".d.ts")) {
+                // quick check content
+                const src = await readText(p);
+                if (/export\s+interface\s+ExtensionTriggerTypes\b/.test(src)) {
+                  discovered.push(p);
+                }
+              }
+              if (discovered.length >= maxFiles) break;
+            }
+          }
+
+          // prefer declared config file list first; if none found, do discovery
+          // Build explicit candidate list from known conventional file names at root levels (non-hardcoded deeper paths)
+          const conventional = [
+            "types.d.ts",
+            "trigger-types.d.ts",
+            "trigger.types.d.ts",
+            "src/types.d.ts",
+            "src/trigger-types.d.ts",
+            "src/trigger.types.d.ts",
+          ];
+          for (const rel of conventional) candidates.push(`${rootDir}/${rel}`);
+
+          const existing: string[] = [];
+          for (const file of candidates) {
+            if (await existsFile(file)) {
+              const src = await readText(file);
+              if (/export\s+interface\s+ExtensionTriggerTypes\b/.test(src))
+                existing.push(file);
+            }
+          }
+
+          if (existing.length > 0) return existing;
+
+          // Fallback: recursive discovery
+          await walk(rootDir.replace(/\\/g, "/"), 0);
+          return discovered;
         };
 
         for (const id of extensionIds) {
@@ -538,8 +621,8 @@ export class InSpatialServe {
           let idx = 0;
           const stripComments = (s: string): string =>
             s
-              .replace(/\/\*[\s\S]*?\*\//g, '') // block comments
-              .replace(/^\s*\/\/.*$/gm, ''); // line comments
+              .replace(/\/\*[\s\S]*?\*\//g, "") // block comments
+              .replace(/^\s*\/\/.*$/gm, ""); // line comments
 
           for (const f of files) {
             try {
@@ -547,20 +630,26 @@ export class InSpatialServe {
               try {
                 const src = await InZero.readTextFile(f);
                 const decommented = stripComments(src);
-                if (!/export\s+interface\s+ExtensionTriggerTypes\b/.test(decommented)) {
+                if (
+                  !/export\s+interface\s+ExtensionTriggerTypes\b/.test(
+                    decommented
+                  )
+                ) {
                   continue;
                 }
               } catch {}
-              const normalized = f.replace(/\\/g, '/');
+              const normalized = f.replace(/\\/g, "/");
               // Try to map absolute/relative file path to an import specifier using appImports
               let specifier: string | null = null;
               // Prefer longer mapped paths first
-              const entries = Object.entries(appImports).sort((a, b) => (b[1] || '').length - (a[1] || '').length);
+              const entries = Object.entries(appImports).sort(
+                (a, b) => (b[1] || "").length - (a[1] || "").length
+              );
               for (const [key, mappedPath] of entries) {
-                const base = (mappedPath || '').replace(/\/$/, '');
+                const base = (mappedPath || "").replace(/\/$/, "");
                 if (base && normalized.startsWith(base)) {
                   const remainder = normalized.slice(base.length);
-                  specifier = (key.replace(/\/$/, '')) + remainder;
+                  specifier = key.replace(/\/$/, "") + remainder;
                   break;
                 }
               }
@@ -569,16 +658,22 @@ export class InSpatialServe {
                 specifier = normalized;
               }
               const alias = `T${idx++}`;
-              importLines.push(`import type { ExtensionTriggerTypes as ${alias} } from "${specifier}";`);
+              importLines.push(
+                `import type { ExtensionTriggerTypes as ${alias} } from "${specifier}";`
+              );
               aliasNames.push(alias);
             } catch {}
           }
           const imports = importLines.join("\n");
-          const extendsList = aliasNames.length ? ` extends ${aliasNames.join(', ')} ` : ' ';
+          const extendsList = aliasNames.length
+            ? ` extends ${aliasNames.join(", ")} `
+            : " ";
           return { imports, extendsList };
         };
 
-        const { imports, extendsList } = await mkExtendsFromFiles(discoveredTypeFiles);
+        const { imports, extendsList } = await mkExtendsFromFiles(
+          discoveredTypeFiles
+        );
         const extensionTriggerTypes = `// Auto-generated by InSpatial Serve – DO NOT EDIT
 // This file is regenerated on each build when extensions change
 ${imports ? imports + "\n\n" : ""}declare global {
@@ -813,14 +908,18 @@ export {};
 
     console.log(
       `📝 Source files changed: ${[...relevantFiles, ...assetFiles]
-        .map((p: string) => p.replace((globalThis as any).Deno?.cwd?.() ?? "", "."))
+        .map((p: string) =>
+          p.replace((globalThis as any).Deno?.cwd?.() ?? "", ".")
+        )
         .join(", ")}`
     );
 
     // If only the generated extension types changed, skip rebuilds to avoid loops
     const onlyGeneratedTypesChanged =
       relevantFiles.length === 1 &&
-      relevantFiles[0].endsWith("/src/types/extension-trigger-types.generated.d.ts");
+      relevantFiles[0].endsWith(
+        "/src/types/extension-trigger-types.generated.d.ts"
+      );
     if (onlyGeneratedTypesChanged) {
       return;
     }

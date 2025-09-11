@@ -7,6 +7,7 @@ import { InPresentation } from "@inspatial/kit/presentation";
 import { AppRoutes } from "../app/routes.tsx";
 import { InCloud } from "@inspatial/kit/cloud";
 import { InRoute } from "@inspatial/kit/route";
+import { InMotion } from "@inspatial/kit/motion";
 
 /*################################(Create InSpatial Renderer)################################*/
 
@@ -18,6 +19,7 @@ createRenderer({
     InTrigger(), // exposes universal and standard triggers
     InTheme(),
     InRoute(),
+    InMotion(),
     InPresentation(), // exposes triggers like on:presentation
     InCloud({ reconnect: "reload" }), // exposes triggers like on:cloudStatus / on:cloudReconnected
   ],
