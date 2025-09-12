@@ -1,5 +1,5 @@
 import type { StyleProps } from "@in/style";
-import { NotchStyle } from "./style.ts";
+import type { NotchStyle } from "./style.ts";
 
 /*########################################(TYPE)########################################*/
 export type NotchProps = StyleProps<typeof NotchStyle> &

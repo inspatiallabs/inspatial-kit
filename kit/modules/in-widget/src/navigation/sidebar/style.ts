@@ -67,9 +67,9 @@ export const SidebarStyle = {
         lg: [
           {
             web: {
-              width: "100px",
-              minWidth: "100px",
-              maxWidth: "100px",
+              width: "96px",
+              minWidth: "96px",
+              maxWidth: "96px",
               alignItems: "center",
             },
           },

@@ -1,5 +1,6 @@
 import type { StyleProps } from "@in/style/index.ts";
 import type { TopbarStyle } from "./style.ts";
+import type { NotchProps } from "@in/widget/ornament/notch/index.ts";
 
 /*##################################(TOPBAR LEFT)##################################*/
 export type TopbarLeftProps = StyleProps<typeof TopbarStyle.left> &
@@ -18,8 +19,15 @@ export type TopbarBorderProps = StyleProps<typeof TopbarStyle.border> &
   JSX.SharedProps & {};
 
 /*##################################(TOPBAR)##################################*/
+
+/***************(Topbar Internals)***************/
+type TopbarFormatBarProps = "bar";
+type TopbarFormatNotchProps = NotchProps["variant"];
+
+/***************(Topbar Props)***************/
 export type TopbarProps = StyleProps<typeof TopbarStyle.wrapper> &
   JSX.SharedProps & {
+    format: TopbarFormatBarProps | TopbarFormatNotchProps;
     border: TopbarBorderProps;
     children: {
       left: TopbarLeftProps;

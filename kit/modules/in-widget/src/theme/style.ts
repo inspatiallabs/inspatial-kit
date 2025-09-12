@@ -18,26 +18,24 @@ export const ThemeView = {
 //##############################################(THEME RADIUS)##############################################//
 
 export const ThemeRadius = {
-  none: ["rounded-none", { web: { borderRadius: "0px" } }],
-  xs: ["rounded-xs", { web: { borderRadius: "2px" } }],
-  sm: ["rounded-sm", { web: { borderRadius: "6px" } }],
-  md: ["rounded-md", { web: { borderRadius: "8px" } }],
-  base: ["rounded-base", { web: { borderRadius: "12px" } }],
-  lg: ["rounded-lg", { web: { borderRadius: "16px" } }],
-  xl: ["rounded-xl", { web: { borderRadius: "20px" } }],
-  "2xl": ["rounded-2xl", { web: { borderRadius: "24px" } }],
-  "3xl": ["rounded-3xl", { web: { borderRadius: "32px" } }],
-  "4xl": ["rounded-4xl", { web: { borderRadius: "50px" } }],
-  "5xl": ["rounded-5xl", { web: { borderRadius: "100px" } }],
-  full: ["rounded-full", { web: { borderRadius: "1000px" } }],
+  none: [{ web: { borderRadius: "0px" } }],
+  xs: [{ web: { borderRadius: "2px" } }],
+  sm: [{ web: { borderRadius: "6px" } }],
+  md: [{ web: { borderRadius: "8px" } }],
+  base: [{ web: { borderRadius: "12px" } }],
+  lg: [{ web: { borderRadius: "16px" } }],
+  xl: [{ web: { borderRadius: "20px" } }],
+  "2xl": [{ web: { borderRadius: "24px" } }],
+  "3xl": [{ web: { borderRadius: "32px" } }],
+  "4xl": [{ web: { borderRadius: "50px" } }],
+  "5xl": [{ web: { borderRadius: "100px" } }],
+  full: [{ web: { borderRadius: "1000px" } }],
 } as const;
 
 //##############################################(THEME [BOX] SIZE)##############################################//
 
 export const ThemeBoxSize = {
   none: [
-    "h-[0px]",
-    "w-[0px]",
     {
       web: {
         height: "0px",
@@ -46,11 +44,6 @@ export const ThemeBoxSize = {
     },
   ],
   "12xs": [
-    "h-[2px]",
-    "min-w-[2px]",
-    "min-h-[2px]",
-    "max-h-[2px]",
-    "max-w-full",
     {
       web: {
         height: "2px",
@@ -62,11 +55,6 @@ export const ThemeBoxSize = {
     },
   ],
   "11xs": [
-    "h-[4px]",
-    "min-w-[4px]",
-    "min-h-[4px]",
-    "max-h-[4px]",
-    "max-w-full",
     {
       web: {
         height: "4px",
@@ -78,11 +66,6 @@ export const ThemeBoxSize = {
     },
   ],
   "10xs": [
-    "h-[6px]",
-    "min-w-[6px]",
-    "min-h-[6px]",
-    "max-h-[6px]",
-    "max-w-full",
     {
       web: {
         height: "6px",
@@ -94,11 +77,6 @@ export const ThemeBoxSize = {
     },
   ],
   "9xs": [
-    "h-[8px]",
-    "min-w-[8px]",
-    "min-h-[8px]",
-    "max-h-[8px]",
-    "max-w-full",
     {
       web: {
         height: "8px",
@@ -110,11 +88,6 @@ export const ThemeBoxSize = {
     },
   ],
   "8xs": [
-    "h-[10px]",
-    "min-w-[10px]",
-    "min-h-[10px]",
-    "max-h-[10px]",
-    "max-w-full",
     {
       web: {
         height: "10px",
@@ -126,11 +99,6 @@ export const ThemeBoxSize = {
     },
   ],
   "7xs": [
-    "h-[12px]",
-    "min-w-[12px]",
-    "min-h-[12px]",
-    "max-h-[12px]",
-    "max-w-full",
     {
       web: {
         height: "12px",
@@ -142,11 +110,6 @@ export const ThemeBoxSize = {
     },
   ],
   "6xs": [
-    "h-[14px]",
-    "min-w-[14px]",
-    "min-h-[14px]",
-    "max-h-[14px]",
-    "max-w-full",
     {
       web: {
         height: "14px",
@@ -158,11 +121,6 @@ export const ThemeBoxSize = {
     },
   ],
   "5xs": [
-    "h-[16px]",
-    "min-w-[16px]",
-    "min-h-[16px]",
-    "max-h-[16px]",
-    "max-w-full",
     {
       web: {
         height: "16px",
@@ -174,11 +132,6 @@ export const ThemeBoxSize = {
     },
   ],
   "4xs": [
-    "h-[20px]",
-    "min-w-[20px]",
-    "min-h-[20px]",
-    "max-h-[20px]",
-    "max-w-full",
     {
       web: {
         height: "20px",
@@ -190,12 +143,6 @@ export const ThemeBoxSize = {
     },
   ],
   "3xs": [
-    "h-[24px]",
-    "min-w-[24px]",
-    "min-h-[24px]",
-    "max-h-[24px]",
-    "max-w-full",
-
     {
       web: {
         height: "24px",
@@ -207,11 +154,6 @@ export const ThemeBoxSize = {
     },
   ],
   "2xs": [
-    "h-[28px]",
-    "min-w-[28px]",
-    "min-h-[28px]",
-    "max-h-[28px]",
-    "max-w-full",
     {
       web: {
         height: "28px",
@@ -223,11 +165,6 @@ export const ThemeBoxSize = {
     },
   ],
   xs: [
-    "h-[32px]",
-    "min-w-[32px]",
-    "min-h-[32px]",
-    "max-h-[32px]",
-    "max-w-full",
     {
       web: {
         height: "32px",
@@ -239,11 +176,6 @@ export const ThemeBoxSize = {
     },
   ],
   sm: [
-    "h-[36px]",
-    "min-w-[36px]",
-    "min-h-[36px]",
-    "max-h-[36px]",
-    "max-w-full",
     {
       web: {
         height: "36px",
@@ -255,11 +187,6 @@ export const ThemeBoxSize = {
     },
   ],
   md: [
-    "h-[40px]",
-    "min-w-[40px]",
-    "min-h-[40px]",
-    "max-h-[40px]",
-    "max-w-full",
     {
       web: {
         height: "40px",
@@ -271,11 +198,6 @@ export const ThemeBoxSize = {
     },
   ],
   fit: [
-    "h-fit",
-    "min-w-fit",
-    "min-h-fit",
-    "max-w-full",
-    "px-4",
     {
       web: {
         height: "fit-content",
@@ -288,12 +210,6 @@ export const ThemeBoxSize = {
     },
   ],
   base: [
-    "h-[48px]",
-    "min-w-fit",
-    "min-h-[48px]",
-    "w-auto",
-    "max-w-full",
-    "px-5 py-3",
     {
       web: {
         height: "48px",
@@ -306,12 +222,6 @@ export const ThemeBoxSize = {
     },
   ],
   auto: [
-    "h-[48px]",
-    "min-w-fit",
-    "min-h-[48px]",
-    "w-full",
-    "max-w-full",
-    "px-5 py-3",
     {
       web: {
         height: "48px",
@@ -324,11 +234,6 @@ export const ThemeBoxSize = {
     },
   ],
   lg: [
-    "h-[48px]",
-    "min-w-[48px]",
-    "min-h-[48px]",
-    "max-h-[48px]",
-    "max-w-full",
     {
       web: {
         height: "48px",
@@ -340,11 +245,6 @@ export const ThemeBoxSize = {
     },
   ],
   xl: [
-    "h-[52px]",
-    "min-w-[52px]",
-    "min-h-[52px]",
-    "max-h-[52px]",
-    "max-w-full",
     {
       web: {
         height: "52px",
@@ -356,11 +256,6 @@ export const ThemeBoxSize = {
     },
   ],
   "2xl": [
-    "h-[56px]",
-    "min-w-[56px]",
-    "min-h-[56px]",
-    "max-h-[56px]",
-    "max-w-full",
     {
       web: {
         height: "56px",
@@ -372,17 +267,56 @@ export const ThemeBoxSize = {
     },
   ],
   "3xl": [
-    "h-[64px]",
-    "min-w-[64px]",
-    "min-h-[64px]",
-    "max-h-[64px]",
-    "max-w-full",
     {
       web: {
         height: "64px",
         minWidth: "64px",
         minHeight: "64px",
         maxHeight: "64px",
+        maxWidth: "100%",
+      },
+    },
+  ],
+  "4xl": [
+    {
+      web: {
+        height: "72px",
+        minWidth: "72px",
+        minHeight: "72px",
+        maxHeight: "72px",
+        maxWidth: "100%",
+      },
+    },
+  ],
+  "5xl": [
+    {
+      web: {
+        height: "80px",
+        minWidth: "80px",
+        minHeight: "80px",
+        maxHeight: "80px",
+        maxWidth: "100%",
+      },
+    },
+  ],
+  "6xl": [
+    {
+      web: {
+        height: "88px",
+        minWidth: "88px",
+        minHeight: "88px",
+        maxHeight: "88px",
+        maxWidth: "100%",
+      },
+    },
+  ],
+  "7xl": [
+    {
+      web: {
+        height: "96px",
+        minWidth: "96px",
+        minHeight: "96px",
+        maxHeight: "96px",
         maxWidth: "100%",
       },
     },
@@ -430,8 +364,116 @@ export const ThemeCursor = {
 } as const;
 
 //##############################################(THEME FORMAT)##############################################//
+// Make sure to hardcode values to remove reliance on kit.css styles
+// This is most likely going to go into a new createTheme() api in the future
 export const ThemeFormat = {
-  inspatialKit: [""],
+  inspatial: [
+    {
+      brand: [
+        { web: { color: "var(--brand)" } },
+        {
+          web: {
+            "@media (prefers-color-scheme: dark)": {
+              color: "var(--brand-dark, var(--brand-200))",
+            },
+          },
+        },
+      ],
+      brandBubble: [
+        { web: { color: "var(--brand-bubble)" } },
+        {
+          web: {
+            "@media (prefers-color-scheme: dark)": {
+              color: "var(--brand-bubble-dark, var(--brand-bubble-200))",
+            },
+          },
+        },
+      ],
+      brandOrb: [
+        { web: { color: "var(--brand-orb)" } },
+        {
+          web: {
+            "@media (prefers-color-scheme: dark)": {
+              color: "var(--brand-orb-dark, var(--brand-orb-200))",
+            },
+          },
+        },
+      ],
+
+      window: [
+        { web: { color: "var(--window)" } },
+        {
+          web: {
+            "@media (prefers-color-scheme: dark)": {
+              color: "var(--window-dark, var(--window-200))",
+            },
+          },
+        },
+      ],
+      surface: [
+        { web: { color: "var(--surface)" } },
+        {
+          web: {
+            "@media (prefers-color-scheme: dark)": {
+              color: "var(--surface-dark, var(--surface-200))",
+            },
+          },
+        },
+      ],
+      background: [
+        { web: { color: "var(--background)" } },
+        {
+          web: {
+            "@media (prefers-color-scheme: dark)": {
+              color: "var(--background-dark, var(--background-200))",
+            },
+          },
+        },
+      ],
+      muted: [
+        { web: { color: "var(--muted)" } },
+        {
+          web: {
+            "@media (prefers-color-scheme: dark)": {
+              color: "var(--muted-dark, var(--muted-300))",
+            },
+          },
+        },
+      ],
+      invert: [
+        { web: { color: "var(--invert)" } },
+        {
+          web: {
+            "@media (prefers-color-scheme: dark)": {
+              color: "var(--invert-dark, var(--invert-100))",
+            },
+          },
+        },
+      ],
+
+      primary: [
+        { web: { color: "var(--primary)" } },
+        {
+          web: {
+            "@media (prefers-color-scheme: dark)": {
+              color: "var(--primary-dark, var(--primary-200))",
+            },
+          },
+        },
+      ],
+      secondary: [
+        { web: { color: "var(--secondary)" } },
+        {
+          web: {
+            "@media (prefers-color-scheme: dark)": {
+              color: "var(--secondary-dark, var(--secondary-200))",
+            },
+          },
+        },
+      ],
+      // tertiary: same pattern if/when enabled
+    },
+  ],
   weddingClub: [""],
   appleCupertino: [""],
   googleMaterial: [""],
@@ -521,33 +563,33 @@ export const ThemeTypography = {
 
 export const ThemeScale = {
   none: [""],
-  "12xs": ["p-[2px]", { web: { padding: "2px" } }],
-  "11xs": ["p-[4px]", { web: { padding: "4px" } }],
-  "10xs": ["p-[6px]", { web: { padding: "6px" } }],
-  "9xs": ["p-[8px]", { web: { padding: "8px" } }],
-  "8xs": ["p-[10px]", { web: { padding: "10px" } }],
-  "7xs": ["p-[12px]", { web: { padding: "12px" } }],
-  "6xs": ["p-[14px]", { web: { padding: "14px" } }],
-  "5xs": ["p-[16px]", { web: { padding: "16px" } }],
-  "4xs": ["p-[20px]", { web: { padding: "20px" } }],
-  "3xs": ["p-[24px]", { web: { padding: "24px" } }],
-  "2xs": ["p-[28px]", { web: { padding: "28px" } }],
-  xs: ["p-[32px]", { web: { padding: "32px" } }],
-  sm: ["p-[36px]", { web: { padding: "36px" } }],
-  md: ["p-[40px]", { web: { padding: "40px" } }],
-  fit: ["px-4", { web: { paddingLeft: "1rem", paddingRight: "1rem" } }],
-  base: ["px-5 py-3", { web: { padding: "12px 20px" } }],
-  auto: ["px-5 py-3", { web: { padding: "12px 20px" } }],
-  lg: ["p-[48px]", { web: { padding: "48px" } }],
-  xl: ["p-[52px]", { web: { padding: "52px" } }],
-  "2xl": ["p-[56px]", { web: { padding: "56px" } }],
-  "3xl": ["p-[64px]", { web: { padding: "64px" } }],
+  "12xs": [{ web: { padding: "2px" } }],
+  "11xs": [{ web: { padding: "4px" } }],
+  "10xs": [{ web: { padding: "6px" } }],
+  "9xs": [{ web: { padding: "8px" } }],
+  "8xs": [{ web: { padding: "10px" } }],
+  "7xs": [{ web: { padding: "12px" } }],
+  "6xs": [{ web: { padding: "14px" } }],
+  "5xs": [{ web: { padding: "16px" } }],
+  "4xs": [{ web: { padding: "20px" } }],
+  "3xs": [{ web: { padding: "24px" } }],
+  "2xs": [{ web: { padding: "28px" } }],
+  xs: [{ web: { padding: "32px" } }],
+  sm: [{ web: { padding: "36px" } }],
+  md: [{ web: { padding: "40px" } }],
+  fit: [{ web: { paddingLeft: "1rem", paddingRight: "1rem" } }],
+  base: [{ web: { padding: "12px 20px" } }],
+  auto: [{ web: { padding: "12px 20px" } }],
+  lg: [{ web: { padding: "48px" } }],
+  xl: [{ web: { padding: "52px" } }],
+  "2xl": [{ web: { padding: "56px" } }],
+  "3xl": [{ web: { padding: "64px" } }],
 } as const;
 
 //##############################################(THEME AXIS)##############################################//
 
 export const ThemeAxis = {
-  x: ["flex flex-row", { web: { display: "flex", flexDirection: "row" } }],
+  x: [{ web: { display: "flex", flexDirection: "row" } }],
   y: [
     "flex flex-col rotate-90",
     { web: { display: "flex", flexDirection: "column" } },
@@ -562,16 +604,12 @@ export const ThemeAxis = {
 
 export const ThemeDisabled = {
   true: [
-    "opacity-disabled opacity-50",
-    "text-(--muted)",
-    "pointer-events-none",
-    "cursor-not-allowed",
     {
       web: {
         opacity: 0.5,
         color: "var(--muted)",
         pointerEvents: "none",
-        cursor: "not-allowed",
+        cursor: ThemeCursor.disabled,
       },
     },
   ],
@@ -602,12 +640,11 @@ export const ThemeStyle = createStyle({
     radius: ThemeRadius,
     disabled: {
       true: [
-        "opacity-disabled opacity-50 text-(--muted) pointer-events-none cursor-disabled",
         {
           web: {
             opacity: 0.5,
             pointerEvents: "none",
-            cursor: "not-allowed",
+            cursor: ThemeCursor.disabled,
             color: "var(--muted)",
           },
         },
@@ -619,7 +656,7 @@ export const ThemeStyle = createStyle({
   /*******************************(Default Settings)********************************/
   defaultSettings: {
     effect: "base",
-    format: "inspatialKit",
+    format: "inspatial",
     mode: "auto",
     material: "tilted",
     spacing: "none",
@@ -633,5 +670,7 @@ export const ThemeStyle = createStyle({
 
   /*******************************(Variable Composition)********************************/
   // Move the composition from the variables.ts file here
+  // This File will also replace all kit.css styles making it InSpatial Theme a full replacement for css
+  // Users will still be able to use css if they want but not required to create base style variables.
   // composition: {},
 });

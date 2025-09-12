@@ -515,12 +515,41 @@ function createStyleCore<V extends StyleShapeProp>(
     return (h >>> 0).toString(36);
   }
 
+  // -------------------------- Theme Token Resolver -------------------------- //
+  // Minimal resolver: "$token" => var(--token), "$token/NN" => color-mix with opacity
+  // Works for color, backgroundColor, borderColor, outlineColor, fill, stroke, textDecorationColor, boxShadow
+  const COLOR_FAMILIES: Record<string, string> = {
+    backgroundColor: "bg",
+    background: "bg",
+    color: "text",
+    borderColor: "border",
+    outlineColor: "outline",
+    fill: "fill",
+    stroke: "stroke",
+    textDecorationColor: "decoration",
+    boxShadow: "shadow",
+  };
+
+  function __resolveThemeToken(cssProp: string, value: any): any {
+    if (typeof value !== "string") return value;
+
+    // $token or $token/NN
+    const m = value.match(/^\$(?<token>[a-zA-Z0-9_-]+)(?:\/(?<pct>\d{1,3}))?$/);
+    if (!m || !m.groups) return value;
+    const token = m.groups.token;
+    const pctStr = m.groups.pct;
+    if (!pctStr) return `var(--${token})`;
+    const pct = Math.max(0, Math.min(100, parseInt(pctStr, 10)));
+    return `color-mix(in oklab, var(--${token}) ${pct}%, transparent)`;
+  }
+
   function __serializeWebStyle(styleObj: Record<string, any>): string {
     const parts: string[] = [];
     for (const [k, v] of Object.entries(styleObj || {})) {
       if (v === undefined || v === null || v === false) continue;
       const cssKey = __toKebabCase(k);
-      parts.push(`${cssKey}: ${String(v)}`);
+      const resolved = __resolveThemeToken(k, v);
+      parts.push(`${cssKey}: ${String(resolved)}`);
     }
     return parts.join("; ");
   }
@@ -562,7 +591,7 @@ function createStyleCore<V extends StyleShapeProp>(
       if (v && typeof v === "object" && !Array.isArray(v)) {
         nested.push([k, v]);
       } else {
-        decls[k] = v;
+        decls[k] = __resolveThemeToken(k, v);
       }
     }
 
@@ -762,8 +791,9 @@ function createStyleCore<V extends StyleShapeProp>(
 
     // Convert CSS-variable utilities like bg-(--brand), text-(--primary), border-(--surface)/80
     // into generated CSS classes so they work across browsers and avoid relying on Tailwind parsing
+    // Support util-(--var) and util-$token (with optional /NN)
     const varUtilRegex =
-      /^(bg|text|border|outline|fill|stroke|decoration|shadow)-\((--[a-zA-Z0-9_-]+)\)(?:\/(\d{1,3}))?$/;
+      /^(bg|text|border|outline|fill|stroke|decoration|shadow)-(?:\((--[a-zA-Z0-9_-]+)\)|\$(\w[\w-]*))(?:\/(\d{1,3}))?$/;
     const utilToCssProp: Record<string, string> = {
       bg: "backgroundColor",
       text: "color",
@@ -919,7 +949,13 @@ function createStyleCore<V extends StyleShapeProp>(
         expandedClassParts.push(t);
         return;
       }
-      const [, util, cssVar, opacity] = m;
+      const [, util, cssVar, dollarToken, opacity] = m as unknown as [
+        string,
+        keyof typeof utilToCssProp,
+        string | undefined,
+        string | undefined,
+        string | undefined
+      ];
       const cssProp = utilToCssProp[util] || "";
       if (!cssProp) {
         expandedClassParts.push(t);
@@ -937,12 +973,13 @@ function createStyleCore<V extends StyleShapeProp>(
         "stroke",
         "decoration",
       ]);
-      let value = `var(${cssVar})`;
+      const baseVar = cssVar ? `var(${cssVar})` : dollarToken ? `var(--${dollarToken})` : "";
+      let value = baseVar;
       const pct = opacity
         ? Math.max(0, Math.min(100, parseInt(opacity, 10)))
         : null;
       if (pct !== null && !Number.isNaN(pct) && colorFamilies.has(util)) {
-        value = `color-mix(in oklab, var(${cssVar}) ${pct}%, transparent)`;
+        value = `color-mix(in oklab, ${baseVar} ${pct}%, transparent)`;
       }
       // Always use normal specificity - user utilities override via filtering mechanism
       const cls = __ensureClassForWebStyle({ [cssProp]: value }, "normal");

@@ -1,5 +1,7 @@
 import { Slot } from "@in/widget/structure/slot/index.tsx";
 import { KitBorderStyle } from "./style.ts";
+import { iss } from "@in/style/index.ts";
+import type { KitBorderProps } from "./type.ts";
 
 /**
  * ╔════════════════════════════════════════════════════════════════════════════╗
@@ -15,6 +17,13 @@ import { KitBorderStyle } from "./style.ts";
 /**
  * @returns a border at the top of the page
  */
-export function KitBorder({ className }: { className?: string }) {
-  return <Slot className={KitBorderStyle.getStyle({ className })} />;
+export function KitBorder(props: KitBorderProps) {
+  const { className, class: cls, ...rest } = props;
+  return (
+    <Slot
+      // @ts-ignore
+      className={iss(KitBorderStyle.getStyle({ className, class: cls }))}
+      {...rest}
+    />
+  );
 }

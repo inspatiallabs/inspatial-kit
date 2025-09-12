@@ -1,13 +1,13 @@
 import { iss } from "@in/style/variant/index.ts";
-import { Slot, XStack } from "@in/widget/structure/index.ts";
+import { Slot, XStack, YStack } from "@in/widget/structure/index.ts";
 import type {
   TopbarProps,
-  TopbarBorderProps,
   TopbarCenterProps,
   TopbarLeftProps,
   TopbarRightProps,
 } from "./type.ts";
 import { TopbarStyle } from "./style.ts";
+import { KitBorder } from "@in/widget/ornament/index.ts";
 
 /*##################################(TOPBAR LEFT)##################################*/
 export function TopbarLeft(props: TopbarLeftProps) {
@@ -19,9 +19,9 @@ export function TopbarLeft(props: TopbarLeftProps) {
       )}
       {...rest}
     >
-      {/****************** LEFT ANCHOR *****************/}
+      {/****************** LEFT item *****************/}
       <Slot
-        className={TopbarStyle.left.anchor.getStyle({ className, class: cls })}
+        className={TopbarStyle.left.item.getStyle({ className, class: cls })}
         {...rest}
       >
         {children}
@@ -40,9 +40,9 @@ export function TopbarRight(props: TopbarRightProps) {
       )}
       {...rest}
     >
-      {/****************** RIGHT ANCHOR *****************/}
+      {/****************** RIGHT item *****************/}
       <Slot
-        className={TopbarStyle.right.anchor.getStyle({ className, class: cls })}
+        className={TopbarStyle.right.item.getStyle({ className, class: cls })}
         {...rest}
       >
         {children}
@@ -61,9 +61,9 @@ export function TopbarCenter(props: TopbarCenterProps) {
       )}
       {...rest}
     >
-      {/****************** CENTER ANCHOR *****************/}
+      {/****************** CENTER item *****************/}
       <Slot
-        className={TopbarStyle.center.anchor.getStyle({
+        className={TopbarStyle.center.item.getStyle({
           className,
           class: cls,
         })}
@@ -77,14 +77,33 @@ export function TopbarCenter(props: TopbarCenterProps) {
 
 /*##################################(TOPBAR)##################################*/
 export function Topbar(props: TopbarProps) {
-  const { className, class: cls, children, ...rest } = props;
+  const {
+    className,
+    class: cls,
+    children,
+    border = { position: "top" },
+    ...rest
+  } = props;
 
   return (
-    <XStack
-      className={iss(TopbarStyle.wrapper.getStyle({ className, class: cls }))}
-      {...rest}
-    >
-      {children}
-    </XStack>
+    <YStack>
+      {border && border.position === "top" && (
+        <KitBorder
+          className={TopbarStyle.border.getStyle({ className, class: cls })}
+          style:position="absolute"
+        />
+      )}
+      <XStack
+        className={iss(TopbarStyle.wrapper.getStyle({ className, class: cls }))}
+        {...rest}
+      >
+        {children}
+      </XStack>
+      {border && border.position === "bottom" && (
+        <KitBorder
+          className={TopbarStyle.border.getStyle({ className, class: cls })}
+        />
+      )}
+    </YStack>
   );
 }

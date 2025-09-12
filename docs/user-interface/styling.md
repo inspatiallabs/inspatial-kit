@@ -105,7 +105,7 @@ If you are unsure and want to reduce cognitive load. By taking a singular approa
 
 Because of how InSpatial Serve builds styles, dynamic JIT classes and complex attribute selectors embedded directly inside style functions are not reliably included in the final style bundle. InServe runs Tailwind CLI over `src/config/app.css` (which imports `kit.css`) and only includes classes it can statically detect from content globs. Runtime‑injected style from the variant system is not visible to Tailwind at build time.
 
-— In short: if you need keyframes/animations or any bracket‑based arbitrary variants or attribute selectors (anything inside `[...]`) to be present at runtime, create explicit utility classes in your `app.css` or use a premade utility from `kit.css` under `@layer utilities`, then reference those simple class tokens from your `createStyle()` configs.
+— In short: if you need keyframes/animations or any bracket‑based arbitrary variants or attribute selectors (anything inside `[...]`) to be present at runtime, create explicit utility classes in your `app.css` or use a premade utility from `kit.css` under `@layer utilities`, then reference those simple class variables from your `createStyle()` configs.
 
 **✅ Do this**
 
@@ -156,12 +156,12 @@ export const DrawerStyle = createStyle({
 **❌ Don't do this**
 
 ```ts
-// style.ts – runtime/JIT tokens Tailwind can’t see at build time
+// style.ts – runtime/JIT variables Tailwind can’t see at build time
 createStyle({
   base: [
-    // ❌ Complex attribute + JIT animation tokens
+    // ❌ Complex attribute + JIT animation variables
     "[data-in-presentation-snap-points=false][data-state=open]:animate-[inmotion-drawer-slide-from-right_0.5s_cubic-bezier(0.32,0.72,0,1)_forwards]",
-    // ❌ Dynamic animation variable tokens
+    // ❌ Dynamic animation variable variables
     "animate-[var(--drawer-animation)_0.5s_cubic-bezier(0.32,0.72,0,1)_forwards]",
     // ❌ Any bracket-based arbitrary variants in class strings (e.g., w-[calc(100%-16px)])
     //    Put these as precompiled utilities in your app.css if they must be guaranteed in the bundle
@@ -174,7 +174,7 @@ createStyle({
 - Class Utilities/Tailwind includes only classes they can statically detect from the configured content files.
 - Variant‑injected CSS and dynamic JIT strings are generated at runtime, after Tailwind build.
 - Arbitrary variants and attribute selectors in bracket syntax (e.g., `[data-state=open]:...`, `w-[calc(...)]`) won’t be reliably picked up when composed inside runtime style classes/ strings.
-- Predeclaring utilities in your `app.css` guarantees these styles ship in `dist/kit.css` bundle, and your style tokens remain simple, portable, and platform‑agnostic.
+- Predeclaring utilities in your `app.css` guarantees these styles ship in `dist/kit.css` bundle, and your style variables remain simple, portable, and platform‑agnostic.
 
 **🚨 Key Things to Know**
 
@@ -466,7 +466,9 @@ export const MyStyle = createStyle({
 });
 ```
 
-##### Composition API
+#### Variable ($) Shorthand 
+
+#### Composition API
 
 **How composition styling works (and why you’ll love it)**
 
@@ -627,7 +629,7 @@ export const MyStyle = createStyle({
 - Use CSS in `style.web` for precision; use classes for quick utility layering.
 - If two composition rules match, both apply; keep them complementary.
 - You rarely need `!important`—composition already runs last.
-- If a class uses bracket/attribute syntax or dynamic pieces Tailwind can’t see, define a utility under `@layer utilities` in your CSS and reference the simple token from `createStyle()`.
+- If a class uses bracket/attribute syntax or dynamic pieces Tailwind can’t see, define a utility under `@layer utilities` in your CSS and reference the simple variable from `createStyle()`.
 - If a color variable appears white, ensure the theme variables (e.g., `--brand`, `--background`) are defined to concrete HSL/OKLCH values in your theme scope, not self-referencing.
 
 - **IMPORTANT:** The Composition API only works with the `style` property; using `class` or `className` utilities inside composition rules will not have any effect.
@@ -660,7 +662,7 @@ composition: [
 
 ##### Cross-Style Composition (Advanced)
 
-#### When one style needs to react to settings from other styles
+##### When one style needs to react to settings from other styles
 
 Cross-style composition is like having a conversation between different parts of your component. Think of it as your handle asking the track "Hey, what size are you?" and then adjusting itself accordingly.
 
@@ -964,10 +966,10 @@ This section explains how to compose pseudo selectors (hover, focus-visible, pee
 
 Key ideas:
 
-- Write simple utility tokens in `base` and `settings` when Tailwind can statically see them.
+- Write simple utility variables in `base` and `settings` when Tailwind can statically see them.
 - Use `style.web` nested selectors for pseudo-classes, peer relations, or data attributes the same way you would write CSS, but in JS objects.
-- Use variable utilities like `bg-(--brand)`, `text-(--primary)`, `border-(--surface)` so your tokens bind to theme variables.
-- For tokens Tailwind can't safely detect or for vendor-specific shorthands (e.g., ring), either define a utility in CSS or use `style.web` to set the exact CSS property.
+- Use variable utilities like `bg-(--brand)`, `text-(--primary)`, `border-(--surface)` so your variables bind to theme variables.
+- For variables Tailwind can't safely detect or for vendor-specific shorthands (e.g., ring), either define a utility in CSS or use `style.web` to set the exact CSS property.
 
 Example: simple checkbox indicator (utilities + one nested selector)
 
@@ -1262,3 +1264,66 @@ export const SidebarGroupStyle = createStyle({
 
 - Forgetting to place the class on the shell element; children selectors won’t match.
 - Computing the class once without `$(() => ...)`; it won’t update when state changes.
+
+
+
+
+The `$variable` shorthand lets you write clean, readable color styles without repeating `var(--...)` everywhere. Think of `$brand` as a friendly nickname for the real CSS variable `var(--brand)`. You use the nickname in your styles, and the engine swaps it for the correct variable under the hood.
+
+> **Note:** A theme variable like `$brand` maps to the CSS variable `var(--brand)`. This is different from cross‑style composition keys (e.g., `"$tab-trigger.format"`), which appear only in composition rule keys, not in values.
+
+> **Note:** Dark mode still comes from your CSS variables. `$variable` simply maps to `var(--variable)`, so when your theme flips in CSS (e.g., prefers-color-scheme), your styles change automatically.
+
+##### Example 1: Web styles with `$variable`
+
+```ts
+createStyle({
+  base: [
+    {
+      web: {
+        color: "$primary",                // → color: var(--primary)
+        backgroundColor: "$surface",      // → background-color: var(--surface)
+        borderColor: "$brand/40",         // → color-mix(in oklab, var(--brand) 40%, transparent)
+      },
+    },
+  ],
+});
+```
+
+##### Example 2: Utility variables in classes
+
+```ts
+createStyle({
+  base: [
+    "text-$brand",       // → resolves to color: var(--brand)
+    "bg-$background/80", // → resolves to background with 80% mix
+    "border-$primary",   // → resolves to borderColor: var(--primary)
+  ],
+});
+```
+
+> **Note:** Variant‑prefixed utilities currently support `var(...)` forms (e.g., `hover:bg-(--brand)/80`). For now, prefer `hover:bg-(--brand)/80` over `hover:bg-$brand/80` in class utilities.
+
+##### What You Get Back
+
+- Cleaner, shorter style objects and utilities
+- Automatic dark‑mode behavior via your CSS variables
+- Optional opacity shorthand with `/NN` (0–100): `$brand/60`
+
+##### Common Mistakes to Avoid
+
+- Don’t bake unrelated families into a theme variable source. Keep control at the usage site:
+  - Use only the family you need: `color: "$brand"`, `borderColor: "$brand"`, or `backgroundColor: "$brand"`.
+- Don’t index into theme format objects for values. Prefer variables:
+  - ✅ `web: { borderColor: "$brand" }`
+  - ❌ `web: { borderColor: ThemeFormat.inspatial[0].brand[0].web.color }`
+
+##### Migration Tips
+
+- Replace `var(--variable)` → `$variable`
+- Replace `bg-(--variable)` → `bg-$variable`
+- Replace `text-(--variable)` → `text-$variable`
+- Keep variant‑prefixed forms using `var(...)` for now:
+  - `hover:bg-(--brand)/80`
+
+> **Terminology:** A “variable” is a friendly name for a design value (like a brand color). Here, `$brand` maps to the CSS variable `--brand` so your app stays themeable and consistent.

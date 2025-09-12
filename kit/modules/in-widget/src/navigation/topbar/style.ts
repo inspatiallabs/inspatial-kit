@@ -10,9 +10,16 @@ import {
   ThemeSpacing,
   ThemeView,
   ThemeTypography,
+  ThemeFormat,
 } from "@in/widget/theme/style.ts";
+import {
+KitBorderFormat,
+  KitBorderPosition,
+  KitBorderSize,
+  KitBorderStyle,
+} from "@in/widget/ornament/kit-border/index.ts";
 
-//##############################################(TOPBAR ANCHOR FORMATS)##############################################//
+//##############################################(TOPBAR item FORMATS)##############################################//
 
 const megaFull = [
   {
@@ -62,11 +69,79 @@ export const TopbarStyle = {
       {
         web: {
           display: "flex",
+          position: "relative",
+          backgroundColor: "var(--surface)",
+          width: "100%",
         },
       },
     ],
 
     settings: {
+      size: {
+        xs: [
+          {
+            web: {
+              height: "52px",
+              minHeight: "52px",
+              maxHeight: "52px",
+            },
+          },
+        ],
+        sm: [
+          {
+            web: {
+              height: "56px",
+              minHeight: "56px",
+              maxHeight: "56px",
+            },
+          },
+        ],
+        md: [
+          {
+            web: {
+              height: "64px",
+              minHeight: "64px",
+              maxHeight: "64px",
+            },
+          },
+        ],
+        lg: [
+          {
+            web: {
+              height: "72px",
+              minHeight: "72px",
+              maxHeight: "72px",
+            },
+          },
+        ],
+        xl: [
+          {
+            web: {
+              height: "80px",
+              minHeight: "80px",
+              maxHeight: "80px",
+            },
+          },
+        ],
+        "2xl": [
+          {
+            web: {
+              height: "88px",
+              minHeight: "88px",
+              maxHeight: "88px",
+            },
+          },
+        ],
+        "3xl": [
+          {
+            web: {
+              height: "96px",
+              minHeight: "96px",
+              maxHeight: "96px",
+            },
+          },
+        ],
+      },
       radius: ThemeRadius,
       spacing: ThemeSpacing,
       view: ThemeView,
@@ -74,10 +149,12 @@ export const TopbarStyle = {
       effect: ThemeEffect,
       mode: ThemeMode,
       disabled: ThemeDisabled,
+
       material: ThemeMaterial,
     },
 
     defaultSettings: {
+      size: "sm",
       radius: "none",
       spacing: "none",
       view: "base",
@@ -90,8 +167,8 @@ export const TopbarStyle = {
     container: createStyle({
       name: "topbar-left-container",
     }),
-    anchor: createStyle({
-      name: "topbar-left-anchor",
+    item: createStyle({
+      name: "topbar-left-item",
     }),
   },
 
@@ -100,8 +177,8 @@ export const TopbarStyle = {
     container: createStyle({
       name: "topbar-right-container",
     }),
-    anchor: createStyle({
-      name: "topbar-right-anchor",
+    item: createStyle({
+      name: "topbar-right-item",
     }),
   },
 
@@ -110,128 +187,48 @@ export const TopbarStyle = {
     container: createStyle({
       name: "topbar-center-container",
     }),
-    anchor: createStyle({
-      name: "topbar-center-anchor",
+    item: createStyle({
+      name: "topbar-center-item",
     }),
   },
 
   /**=============================== Border =============================== */
   border: createStyle({
     name: "topbar-border",
-    base: [
-      {
-        web: {
-          display: "block",
-        },
-      },
-    ],
+
+    // base: [
+    //   {
+    //     web: {
+    //       backgroundColor: "yellow",
+    //     },
+    //   },
+    // ],
+
     settings: {
-      size: {
-        xs: [
-          {
-            web: {
-              width: "100%",
-              borderWidth: "1px",
-            },
-          },
-        ],
-        sm: [
-          {
-            web: {
-              width: "100%",
-              borderWidth: "2px",
-            },
-          },
-        ],
-        md: [
-          {
-            web: {
-              width: "100%",
-              borderWidth: "3px",
-            },
-          },
-        ],
-        lg: [
-          {
-            web: {
-              width: "100%",
-              borderWidth: "4px",
-            },
-          },
-        ],
-        xl: [
-          {
-            web: {
-              width: "100%",
-              borderWidth: "5px",
-            },
-          },
-        ],
-      },
-      position: {
-        top: [
-          {
-            web: {
-              borderTop: "solid",
-            },
-          },
-        ],
-        bottom: [
-          {
-            web: {
-              borderBottom: "solid",
-            },
-          },
-        ],
-      },
-      format: {
-        solid: [
-          {
-            web: {
-              borderStyle: "solid",
-            },
-          },
-        ],
-        dashed: [
-          {
-            web: {
-              borderStyle: "dashed",
-            },
-          },
-        ],
-        dotted: [
-          {
-            web: {
-              borderStyle: "dotted",
-            },
-          },
-        ],
-        double: [
-          {
-            web: {
-              borderStyle: "double",
-            },
-          },
-        ],
-      },
-      theme: {
-        brand: [
-          {
-            web: {
-              borderColor: "var(--brand)",
-            },
-          },
-        ],
-      },
+      size: KitBorderSize,
+      position: KitBorderPosition,
+      format: KitBorderFormat,
       radius: ThemeRadius,
       disabled: ThemeDisabled,
     },
 
+    composition: [
+      {
+        format: "brand",
+        style: {
+          web: {
+            backgroundColor: "yellow",
+            borderColor: "var(--brand)",
+            height: "10px",
+          },
+        },
+      },
+    ],
+
     defaultSettings: {
       size: "md",
       position: "top",
-      format: "solid",
-      theme: "brand",
+      format: "brand",
       radius: "none",
       disabled: false,
     },

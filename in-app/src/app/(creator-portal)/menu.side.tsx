@@ -24,7 +24,7 @@ import { Choose } from "@inspatial/kit/control-flow";
 /***********************************(Scene Navigation)*********************************** */
 // soon
 /***********************************(Data Navigation)*********************************** */
-function DataNavigation() {
+function DataExplorerPanel() {
   // Use shared editor state
   const isCollection = $(
     () => useCreatorPortal.mode.get().data === "collection"
@@ -85,11 +85,11 @@ function DataNavigation() {
   );
 }
 
-/*#################################(CREATOR PORTAL NAVIGATION)#################################*/
-export function CreatorPortalNavigation() {
+/*#################################(CREATOR PORTAL SIDEBAR MENU)#################################*/
+export function CreatorPortalSidebarMenu() {
   return (
     <>
-      <DataNavigation />
+      <DataExplorerPanel />
     </>
   );
 }
