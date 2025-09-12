@@ -38,10 +38,11 @@ export interface RouteFiles {
   state?: string;
   style?: string;
   type?: string;
+  menu?: string;
   env?: string;
   doc?: string;
   api?: string;
-  collection?: string | string[];
+  collection?: string | string[]; // folder
 }
 
 export interface RouteNodeMeta {

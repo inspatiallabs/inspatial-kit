@@ -2,6 +2,7 @@
   "version": "5",
   "specifiers": {
     "jsr:@inspatial/cloud-client@*": "0.1.28",
+    "jsr:@std/bytes@^1.0.6": "1.0.6",
     "jsr:@std/collections@1.0.9": "1.0.9",
     "jsr:@std/collections@^1.1.3": "1.1.3",
     "jsr:@std/csv@1.0.4": "1.0.4",
@@ -20,6 +21,9 @@
   "jsr": {
     "@inspatial/cloud-client@0.1.28": {
       "integrity": "50e61e97b217ecb6a4546020fb4fcbc0a0c733f6360debc45c460d7d92805f2c"
+    },
+    "@std/bytes@1.0.6": {
+      "integrity": "f6ac6adbd8ccd99314045f5703e23af0a68d7f7e58364b47d2c7f408aeb5820a"
     },
     "@std/collections@1.0.9": {
       "integrity": "4f58104ead08a04a2199374247f07befe50ba01d9cca8cbb23ab9a0419921e71"
@@ -47,7 +51,10 @@
       ]
     },
     "@std/streams@1.0.11": {
-      "integrity": "db583d27e28d133f389f1eec318cffdf4998305e5134c1d4b1c56b361cee6018"
+      "integrity": "db583d27e28d133f389f1eec318cffdf4998305e5134c1d4b1c56b361cee6018",
+      "dependencies": [
+        "jsr:@std/bytes"
+      ]
     },
     "@std/text@1.0.9": {
       "integrity": "b2db4abc3e6ab93eb0280a0d5e126fd3fca80955bcc297ccaaf555e995eab747"

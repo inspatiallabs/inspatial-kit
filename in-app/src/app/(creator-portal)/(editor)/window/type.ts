@@ -1,7 +1,7 @@
 export type DeviceTypes = "Desktop" | "Mobile" | "Tablet" | "Headset";
 
 export type EditorComponents =
-  /**=============================== HIGH LEVEL COMPONENTS =============================== */
+  /**=============================== HIGH LEVEL (WIDGETS) =============================== */
   | "ornament"
   | "presentation"
   | "icon"
@@ -80,6 +80,7 @@ export interface Editor {
   previewMode: boolean;
   devMode: boolean;
   windowId: string;
+  type: WindowTypes;
 }
 
 /****************************************(EDITOR CONTEXT TYPE)*****************************************/
@@ -158,6 +159,8 @@ export interface WindowStoreProps {
   windowOS: WindowOSProps;
   setWindowOS: (value: WindowOSProps) => void;
 }
+
+export type WindowTypes = "flat" | "volumetric";
 
 /*******************************************************************************************************************/
 /****************************************WINDOW TYPES EXTENDING DATABASE SCHEMA*************************************/
