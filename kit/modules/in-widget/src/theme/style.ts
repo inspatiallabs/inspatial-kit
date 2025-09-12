@@ -7,9 +7,12 @@ import type {
 //##############################################(THEME VIEW)##############################################//
 
 export const ThemeView = {
+  base: [""],
   floating: [""],
   compact: [""],
-  base: [""],
+
+  padLeft: [{ web: { float: "right", width: "91.666667%" } }],
+  padRight: [{ web: { float: "left", width: "91.666667%" } }],
 } as const;
 
 //##############################################(THEME RADIUS)##############################################//
@@ -479,15 +482,17 @@ export const ThemeFormat = {
 //##############################################(THEME EFFECT)##############################################//
 
 export const ThemeEffect = {
-  base: [""],
-  hollow: [""],
+  none: [""],
+  base: [{ web: { shadow: "var(--shadow-base)" } }],
+  effect: [{ web: { shadow: "var(--shadow-effect)" } }],
+  hollow: [{ web: { shadow: "var(--shadow-hollow)" } }],
   brutal: [""],
-  soft: [""],
-  chasm: [""],
-  cool: [""],
-  prime: [""],
-  line: [""],
-  inn: [""],
+  soft: [{ web: { shadow: "var(--shadow-soft)" } }],
+  chasm: [{ web: { shadow: "var(--shadow-chasm)" } }],
+  cool: [{ web: { shadow: "var(--shadow-cool)" } }],
+  prime: [{ web: { shadow: "var(--shadow-prime)" } }],
+  line: [{ web: { shadow: "var(--shadow-line)" } }],
+  inn: [{ web: { shadow: "var(--shadow-inn)" } }],
 } as const;
 
 //##############################################(THEME MODE)##############################################//

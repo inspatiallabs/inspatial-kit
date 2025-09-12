@@ -1,47 +1,38 @@
 import { createStyle } from "@in/style";
+import { ThemeEffect, ThemeRadius } from "@in/widget/theme/index.ts";
 
 /*###################################(STYLE)###################################*/
 export const ImageStyle = createStyle({
-	base: [
-		"inline-block relative overflow-hidden",
-		{ web: { display: "inline-block", position: "relative", overflow: "hidden" } },
-	],
-	settings: {
-		fit: {
-			contain: ["object-contain"],
-			cover: ["object-cover"],
-			fill: ["object-fill"],
-			none: ["object-none"],
-		},
-		radius: {
-			none: ["rounded-none", { web: { borderRadius: "0px" } }],
-			sm: ["rounded-sm", { web: { borderRadius: "0.125rem" } }],
-			md: ["rounded-md", { web: { borderRadius: "0.375rem" } }],
-			lg: ["rounded-lg", { web: { borderRadius: "0.5rem" } }],
-			full: ["rounded-full", { web: { borderRadius: "9999px" } }],
-		},
-		aspect: {
-			auto: [""],
-			"1/1": ["aspect-square", { web: { aspectRatio: "1 / 1" } }],
-			"3/2": ["", { web: { aspectRatio: "3 / 2" } }],
-			"16/9": ["", { web: { aspectRatio: "16 / 9" } }],
-		},
-		shadow: {
-			none: ["shadow-none"],
-			sm: ["shadow-sm"],
-			md: ["shadow-md"],
-			lg: ["shadow-lg"],
-		},
-		inline: {
-			true: ["inline-block"],
-			false: ["block"],
-		},
-	},
-	defaultSettings: {
-		fit: "cover",
-		radius: "none",
-		aspect: "auto",
-		shadow: "none",
-		inline: true,
-	},
+  base: [
+    {
+      web: { display: "block" },
+    },
+  ],
+  settings: {
+    fit: {
+      contain: [{ web: { objectFit: "contain" } }],
+      cover: [{ web: { objectFit: "cover" } }],
+      fill: [{ web: { objectFit: "fill" } }],
+      none: [{ web: { width: "auto", height: "auto" } }],
+    },
+    radius: ThemeRadius,
+    aspect: {
+      auto: [""],
+      "1/1": [{ web: { aspectRatio: "1 / 1" } }],
+      "3/2": [{ web: { aspectRatio: "3 / 2" } }],
+      "16/9": [{ web: { aspectRatio: "16 / 9" } }],
+    },
+    effect: ThemeEffect,
+    inline: {
+      true: ["inline-block"],
+      false: ["block"],
+    },
+  },
+  defaultSettings: {
+    fit: "none",
+    radius: "none",
+    aspect: "auto",
+    effect: "none",
+    inline: true,
+  },
 });

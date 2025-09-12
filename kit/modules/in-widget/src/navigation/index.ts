@@ -1,3 +1,4 @@
-export * from "./link/index.tsx";
-export * from "./carousel/index.tsx";
-export * from "./sidebar/index.native.tsx";
+export * from "./link/index.ts";
+export * from "./carousel/index.ts";
+export * from "./sidebar/index.ts";
+export * from "./topbar/index.ts";

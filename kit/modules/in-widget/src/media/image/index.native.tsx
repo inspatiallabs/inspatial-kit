@@ -46,6 +46,7 @@ export function Image(props: ImageProps) {
           shadow,
           inline,
           className,
+          ...rest,
         })}
         $ref={$ref}
         {...rest}
