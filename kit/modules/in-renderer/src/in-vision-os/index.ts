@@ -1,50 +1,51 @@
-import { createRenderer } from "./create-renderer.ts";
+import { createRenderer } from "@in/renderer/create-renderer.ts";
 import {
   composeExtensions,
   type RendererExtensions,
-} from "@in/extension";
+} from "@in/extension/index.ts";
 
-export interface GenericXROptions {
+export interface VisionOSOptions {
   rendererID?: string;
   extensions?: RendererExtensions;
 }
 
 /**
- * Generic XR renderer fallback
+ * VisionOS renderer for Apple Vision Pro
  */
-export function GPURenderer(options: GenericXROptions = {}): any {
-  const { rendererID = "GenericXR" } = options;
+export function VisionOSRenderer(options: VisionOSOptions = {}): any {
+  const { rendererID = "VisionOS" } = options;
   const { setups } = composeExtensions(options.extensions);
 
-  // Basic XR renderer for WebXR environments
-  console.log("Using generic XR renderer for WebXR environment");
+  // TODO: Implement VisionOS-specific rendering
+  // This would integrate with Apple's RealityKit/ARKit APIs
+  console.warn("VisionOS renderer not yet implemented - using fallback");
 
-  interface XRNode {
-    _isXRNode: true;
+  interface VisionOSNode {
+    _isVisionOSNode: true;
     tagName: string;
-    children: XRNode[];
+    children: VisionOSNode[];
     props: Record<string, any>;
     spatial?: {
-      position: [number, number, number];
-      rotation: [number, number, number, number];
+      transform: Float32Array; // 4x4 transform matrix
+      bounds: { width: number; height: number; depth: number };
     };
   }
 
-  function createNode(tagName: string): XRNode {
+  function createNode(tagName: string): VisionOSNode {
     return {
-      _isXRNode: true,
+      _isVisionOSNode: true,
       tagName,
       children: [],
       props: {},
       spatial: {
-        position: [0, 0, -1], // Default 1 meter away
-        rotation: [0, 0, 0, 1],
+        transform: new Float32Array(16), // Identity matrix
+        bounds: { width: 1, height: 1, depth: 1 },
       },
     };
   }
 
   const nodeOps = {
-    isNode: (node: any) => node?._isXRNode,
+    isNode: (node: any) => node?._isVisionOSNode,
     createNode,
     createTextNode: (text: string | any) => createNode("text"),
     createAnchor: (text: string | any) => createNode("anchor"),

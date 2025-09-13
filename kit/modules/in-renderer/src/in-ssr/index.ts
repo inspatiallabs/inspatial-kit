@@ -1,10 +1,10 @@
-import { createRenderer } from "./create-renderer.ts";
+import { createRenderer } from "@in/renderer/create-renderer.ts";
 import {
   composeExtensions,
   type RendererExtensions,
 } from "@in/extension/index.ts";
 import { isSignal, peek } from "@in/teract/signal/index.ts";
-import { computeClassString, serializeStyle } from "./helpers.ts";
+import { computeClassString, serializeStyle } from "@in/renderer/helpers.ts";
 
 const defaultRendererID = "SSR";
 

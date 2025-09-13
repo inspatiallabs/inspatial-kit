@@ -1,29 +1,26 @@
-import { createRenderer } from "./create-renderer.ts";
-import {
-  composeExtensions,
-  type RendererExtensions,
-} from "@in/extension";
+import { createRenderer } from "@in/renderer/create-renderer.ts";
+import { composeExtensions, type RendererExtensions } from "@in/extension";
 
-export interface HorizonOSOptions {
+export interface AndroidXROptions {
   rendererID?: string;
   extensions?: RendererExtensions;
 }
 
 /**
- * HorizonOS renderer for Meta Quest/VR platforms
+ * AndroidXR renderer for Android Extended Reality
  */
-export function HorizonOSRenderer(options: HorizonOSOptions = {}): any {
-  const { rendererID = "HorizonOS" } = options;
+export function AndroidXRRenderer(options: AndroidXROptions = {}): any {
+  const { rendererID = "AndroidXR" } = options;
   const { setups } = composeExtensions(options.extensions);
 
-  // TODO: Implement HorizonOS-specific rendering
-  // This would integrate with Meta's Spatial SDK and WebXR
-  console.warn("HorizonOS renderer not yet implemented - using fallback");
+  // TODO: Implement AndroidXR-specific rendering
+  // This would integrate with Google's ARCore/VRCore APIs
+  console.warn("AndroidXR renderer not yet implemented - using fallback");
 
-  interface HorizonOSNode {
-    _isHorizonOSNode: true;
+  interface AndroidXRNode {
+    _isAndroidXRNode: true;
     tagName: string;
-    children: HorizonOSNode[];
+    children: AndroidXRNode[];
     props: Record<string, any>;
     spatial?: {
       position: [number, number, number];
@@ -32,14 +29,14 @@ export function HorizonOSRenderer(options: HorizonOSOptions = {}): any {
     };
   }
 
-  function createNode(tagName: string): HorizonOSNode {
+  function createNode(tagName: string): AndroidXRNode {
     return {
-      _isHorizonOSNode: true,
+      _isAndroidXRNode: true,
       tagName,
       children: [],
       props: {},
       spatial: {
-        position: [0, 0, -1], // Default position in VR space
+        position: [0, 0, 0],
         rotation: [0, 0, 0, 1],
         scale: [1, 1, 1],
       },
@@ -47,7 +44,7 @@ export function HorizonOSRenderer(options: HorizonOSOptions = {}): any {
   }
 
   const nodeOps = {
-    isNode: (node: any) => node?._isHorizonOSNode,
+    isNode: (node: any) => node?._isAndroidXRNode,
     createNode,
     createTextNode: (text: string | any) => createNode("text"),
     createAnchor: (text: string | any) => createNode("anchor"),

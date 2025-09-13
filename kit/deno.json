@@ -119,13 +119,26 @@
     "@in/dom": "./modules/in-renderer/src/in-dom/index.ts",
     "@in/dom/": "./modules/in-renderer/src/in-dom/",
 
-    "@in/ssr/": "./modules/in-renderer/src/",
-    "@in/gpu/": "./modules/in-renderer/src/",
-    "@in/xr/": "./modules/in-renderer/src/",
-    "@in/android-xr/": "./modules/in-renderer/src/",
-    "@in/vision-os/": "./modules/in-renderer/src/",
-    "@in/horizon-os/": "./modules/in-renderer/src/",
-    "@in/nativescript/": "./modules/in-renderer/src/",
+    "@in/ssr/": "./modules/in-renderer/src/in-ssr/",
+    "@in/ssr": "./modules/in-renderer/src/in-ssr/index.ts",
+
+    "@in/gpu/": "./modules/in-renderer/src/in-gpu/",
+    "@in/gpu": "./modules/in-renderer/src/in-gpu/index.ts",
+    
+    "@in/xr/": "./modules/in-renderer/src/in-xr/",
+    "@in/xr": "./modules/in-renderer/src/in-xr/index.ts",
+    
+    "@in/android-xr/": "./modules/in-renderer/src/in-android-xr/",
+    "@in/android-xr": "./modules/in-renderer/src/in-android-xr/index.ts",
+    
+    "@in/vision-os/": "./modules/in-renderer/src/in-vision-os/",
+    "@in/vision-os": "./modules/in-renderer/src/in-vision-os/index.ts",
+    
+    "@in/horizon-os/": "./modules/in-renderer/src/in-horizon-os/",
+    "@in/horizon-os": "./modules/in-renderer/src/in-horizon-os/index.ts",
+    
+    "@in/nativescript/": "./modules/in-renderer/src/in-nativescript/",
+    "@in/nativescript": "./modules/in-renderer/src/in-nativescript/index.ts",
 
     "@in/zero": "./modules/in-zero/src/index.ts",
     "@in/zero/": "./modules/in-zero/src/",

@@ -194,7 +194,7 @@ async function createBrowserRenderer({
 
   if (resolvedTarget === "static" || resolvedTarget === "ssr") {
     // Use SSR renderer for static/SSR
-    const { SSRRenderer } = await import("./ssr.ts");
+    const { SSRRenderer } = await import("@in/ssr");
     const renderer = SSRRenderer({
       rendererID: "Browser-Static",
       extensions,
@@ -234,7 +234,7 @@ async function createXRRenderer({
   debugCtx,
   runtimeTemplate,
 }: any): Promise<any> {
-  const { XRRenderer } = await import("./xr.ts");
+  const { XRRenderer } = await import("@in/xr");
 
   // XR mode defaults to WebXR (GenericXR) unless specific platform detected
   const renderer = XRRenderer({
@@ -266,7 +266,7 @@ async function createNativeRenderer({
   debugCtx,
   runtimeTemplate,
 }: any): Promise<any> {
-  const { NativeScriptRenderer } = await import("./nativescript.ts");
+  const { NativeScriptRenderer } = await import("@in/nativescript");
 
   const renderer = NativeScriptRenderer({
     rendererID: "Native-Mode",
@@ -295,7 +295,7 @@ async function createServerRenderer({
   debugCtx,
   runtimeTemplate,
 }: any): Promise<any> {
-  const { SSRRenderer } = await import("./ssr.ts");
+  const { SSRRenderer } = await import("@in/ssr");
 
   const renderer = SSRRenderer({
     rendererID: "Server-SSR",

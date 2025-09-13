@@ -1,12 +1,9 @@
-import { AndroidXRRenderer } from "./android-xr.ts";
-import { VisionOSRenderer } from "./vision-os.ts";
-import { HorizonOSRenderer } from "./horizon-os.ts";
-import { GPURenderer } from "./gpu.ts";
-import type { EnvironmentInfo } from "@in/vader/env";
-import {
-  type RendererExtensions,
-  composeExtensions,
-} from "@in/extension";
+import { AndroidXRRenderer } from "@in/android-xr";
+import { VisionOSRenderer } from "@in/vision-os";
+import { HorizonOSRenderer } from "@in/horizon-os";
+import { GPURenderer } from "@in/gpu";
+import type { EnvironmentInfo } from "@in/vader/env/index.ts";
+import { type RendererExtensions, composeExtensions } from "@in/extension";
 
 export interface XROptions {
   rendererID?: string;

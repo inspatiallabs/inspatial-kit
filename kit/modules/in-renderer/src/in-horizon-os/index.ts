@@ -1,51 +1,53 @@
-import { createRenderer } from "./create-renderer.ts";
+import { createRenderer } from "@in/renderer/create-renderer.ts";
 import {
   composeExtensions,
   type RendererExtensions,
-} from "@in/extension/index.ts";
+} from "@in/extension";
 
-export interface VisionOSOptions {
+export interface HorizonOSOptions {
   rendererID?: string;
   extensions?: RendererExtensions;
 }
 
 /**
- * VisionOS renderer for Apple Vision Pro
+ * HorizonOS renderer for Meta Quest/VR platforms
  */
-export function VisionOSRenderer(options: VisionOSOptions = {}): any {
-  const { rendererID = "VisionOS" } = options;
+export function HorizonOSRenderer(options: HorizonOSOptions = {}): any {
+  const { rendererID = "HorizonOS" } = options;
   const { setups } = composeExtensions(options.extensions);
 
-  // TODO: Implement VisionOS-specific rendering
-  // This would integrate with Apple's RealityKit/ARKit APIs
-  console.warn("VisionOS renderer not yet implemented - using fallback");
+  // TODO: Implement HorizonOS-specific rendering
+  // This would integrate with Meta's Spatial SDK and WebXR
+  console.warn("HorizonOS renderer not yet implemented - using fallback");
 
-  interface VisionOSNode {
-    _isVisionOSNode: true;
+  interface HorizonOSNode {
+    _isHorizonOSNode: true;
     tagName: string;
-    children: VisionOSNode[];
+    children: HorizonOSNode[];
     props: Record<string, any>;
     spatial?: {
-      transform: Float32Array; // 4x4 transform matrix
-      bounds: { width: number; height: number; depth: number };
+      position: [number, number, number];
+      rotation: [number, number, number, number];
+      scale: [number, number, number];
     };
   }
 
-  function createNode(tagName: string): VisionOSNode {
+  function createNode(tagName: string): HorizonOSNode {
     return {
-      _isVisionOSNode: true,
+      _isHorizonOSNode: true,
       tagName,
       children: [],
       props: {},
       spatial: {
-        transform: new Float32Array(16), // Identity matrix
-        bounds: { width: 1, height: 1, depth: 1 },
+        position: [0, 0, -1], // Default position in VR space
+        rotation: [0, 0, 0, 1],
+        scale: [1, 1, 1],
       },
     };
   }
 
   const nodeOps = {
-    isNode: (node: any) => node?._isVisionOSNode,
+    isNode: (node: any) => node?._isHorizonOSNode,
     createNode,
     createTextNode: (text: string | any) => createNode("text"),
     createAnchor: (text: string | any) => createNode("anchor"),

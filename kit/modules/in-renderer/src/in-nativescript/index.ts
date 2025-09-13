@@ -1,4 +1,4 @@
-import { createRenderer } from "./create-renderer.ts";
+import { createRenderer } from "@in/renderer/create-renderer.ts";
 import {
   composeExtensions,
   type RendererExtensions,

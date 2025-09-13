@@ -1,50 +1,50 @@
-import { createRenderer } from "./create-renderer.ts";
-import { composeExtensions, type RendererExtensions } from "@in/extension";
+import { createRenderer } from "@in/renderer/create-renderer.ts";
+import {
+  composeExtensions,
+  type RendererExtensions,
+} from "@in/extension";
 
-export interface AndroidXROptions {
+export interface GenericXROptions {
   rendererID?: string;
   extensions?: RendererExtensions;
 }
 
 /**
- * AndroidXR renderer for Android Extended Reality
+ * Generic XR renderer fallback
  */
-export function AndroidXRRenderer(options: AndroidXROptions = {}): any {
-  const { rendererID = "AndroidXR" } = options;
+export function GPURenderer(options: GenericXROptions = {}): any {
+  const { rendererID = "GenericXR" } = options;
   const { setups } = composeExtensions(options.extensions);
 
-  // TODO: Implement AndroidXR-specific rendering
-  // This would integrate with Google's ARCore/VRCore APIs
-  console.warn("AndroidXR renderer not yet implemented - using fallback");
+  // Basic XR renderer for WebXR environments
+  console.log("Using generic XR renderer for WebXR environment");
 
-  interface AndroidXRNode {
-    _isAndroidXRNode: true;
+  interface XRNode {
+    _isXRNode: true;
     tagName: string;
-    children: AndroidXRNode[];
+    children: XRNode[];
     props: Record<string, any>;
     spatial?: {
       position: [number, number, number];
       rotation: [number, number, number, number];
-      scale: [number, number, number];
     };
   }
 
-  function createNode(tagName: string): AndroidXRNode {
+  function createNode(tagName: string): XRNode {
     return {
-      _isAndroidXRNode: true,
+      _isXRNode: true,
       tagName,
       children: [],
       props: {},
       spatial: {
-        position: [0, 0, 0],
+        position: [0, 0, -1], // Default 1 meter away
         rotation: [0, 0, 0, 1],
-        scale: [1, 1, 1],
       },
     };
   }
 
   const nodeOps = {
-    isNode: (node: any) => node?._isAndroidXRNode,
+    isNode: (node: any) => node?._isXRNode,
     createNode,
     createTextNode: (text: string | any) => createNode("text"),
     createAnchor: (text: string | any) => createNode("anchor"),

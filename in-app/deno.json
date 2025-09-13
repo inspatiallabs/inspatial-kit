@@ -61,20 +61,26 @@
     "@in/dom/renderer": "../kit/modules/in-renderer/src/in-dom/renderer/index.ts",
     "@in/dom/memory": "../kit/modules/in-renderer/src/in-dom/memory/index.ts",
 
-    "@in/ssr": "../kit/modules/in-renderer/src/ssr.ts",
-    "@in/android-xr": "../kit/modules/in-renderer/src/android-xr.ts",
-    "@in/vision-os": "../kit/modules/in-renderer/src/vision-os.ts",
-    "@in/horizon-os": "../kit/modules/in-renderer/src/horizon-os.ts",
-    "@in/xr": "../kit/modules/in-renderer/src/xr.ts",
-    "@in/gpu": "../kit/modules/in-renderer/src/gpu.ts",
-    "@in/nativescript": "../kit/modules/in-renderer/src/nativescript.ts",
-    "@in/ssr/": "../kit/modules/in-renderer/src/",
-    "@in/gpu/": "../kit/modules/in-renderer/src/",
-    "@in/xr/": "../kit/modules/in-renderer/src/",
-    "@in/android-xr/": "../kit/modules/in-renderer/src/",
-    "@in/vision-os/": "../kit/modules/in-renderer/src/",
-    "@in/horizon-os/": "../kit/modules/in-renderer/src/",
-    "@in/nativescript/": "../kit/modules/in-renderer/src/",
+    "@in/ssr": "../kit/modules/in-renderer/src/in-ssr/index.ts",
+    "@in/ssr/": "../kit/modules/in-renderer/src/in-ssr/",
+
+    "@in/android-xr": "../kit/modules/in-renderer/src/in-android-xr/index.ts",
+    "@in/android-xr/": "../kit/modules/in-renderer/src/in-android-xr/",
+
+    "@in/vision-os": "../kit/modules/in-renderer/src/in-vision-os/index.ts",
+    "@in/vision-os/": "../kit/modules/in-renderer/src/in-vision-os/",
+
+    "@in/xr": "../kit/modules/in-renderer/src/in-xr/index.ts",
+    "@in/xr/": "../kit/modules/in-renderer/src/in-xr/",
+
+    "@in/gpu": "../kit/modules/in-renderer/src/in-gpu/index.ts",
+    "@in/gpu/": "../kit/modules/in-renderer/src/in-gpu/",
+
+    "@in/nativescript": "../kit/modules/in-renderer/src/in-nativescript/index.ts",
+    "@in/nativescript/": "../kit/modules/in-renderer/src/in-nativescript/",
+
+    "@in/horizon-os/": "../kit/modules/in-renderer/src/in-horizon-os/",
+    "@in/horizon-os": "../kit/modules/in-renderer/src/in-horizon-os/index.ts",
 
     "@in/teract/signal/": "../kit/modules/in-teract/src/signal/",
     "@in/teract/signal": "../kit/modules/in-teract/src/signal/index.ts",
