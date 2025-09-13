@@ -70,6 +70,7 @@ export function TableList({
     return (
       <tbody
         $ref={$ref}
+        data-inmotion="split-item split-fade-u split-delay-100"
         className={iss(
           TableStyle.list.getStyle({
             class: className as JSX.SharedProps["className"],
@@ -112,6 +113,7 @@ export function TableFooter({
   return (
     <tfoot
       $ref={$ref}
+      data-inmotion="fade-u delay-0 duration-800 once"
       className={iss(
         TableStyle.footer.getStyle({
           class: className as JSX.SharedProps["className"],
@@ -136,6 +138,7 @@ export function TableRow({
   return (
     <tr
       $ref={$ref}
+      // data-inmotion="fade-u delay-0 duration-800 once"
       className={iss(
         TableStyle.row.getStyle({
           class: className as JSX.SharedProps["className"],
@@ -217,6 +220,7 @@ export function TableHeaderBar({
   return (
     <>
       <XStack
+        data-inmotion="fade-d delay-0 duration-1000 once"
         style={{
           web: {
             width: "100%",
@@ -419,6 +423,7 @@ export function TableHeaderRelations(props: TableHeaderRelationsProps) {
   return (
     <Slot
       {...wrapper}
+      data-inmotion="fade-d delay-0 duration-900 once"
       style={{
         web: {
           width: "100%",
@@ -457,6 +462,7 @@ export function TableHeaderNavigator(props: TableHeaderNavigatorProps) {
   return (
     <Slot
       {...wrapper}
+      data-inmotion="fade-d delay-0 duration-800 once"
       style={{
         web: {
           width: "100%",

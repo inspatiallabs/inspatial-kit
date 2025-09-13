@@ -34,7 +34,7 @@ function DataExplorerPanel() {
 
   return (
     <>
-      <Sidebar defaultMinimized={true}>
+      <Sidebar defaultMinimized={true} style={{ web: { gap: "52px" } }}>
         <SidebarItem
           routeView="SPV"
           name="editor-view"
@@ -46,7 +46,9 @@ function DataExplorerPanel() {
               data: "collection",
             })
           }
-          icon={<DBIcon scale="10xs" />}
+          icon={
+            <DBIcon data-inmotion="split-item split-flip-dr delay-2000 duration-800 once" scale="10xs" />
+          }
         >
           Collection
         </SidebarItem>
@@ -61,7 +63,12 @@ function DataExplorerPanel() {
               data: "insights",
             })
           }
-          icon={<LeaderboardIcon scale="10xs" />}
+          icon={
+            <LeaderboardIcon
+              data-inmotion="split-item split-zoomin-dl once"
+              scale="10xs"
+            />
+          }
         >
           Insights
         </SidebarItem>
@@ -76,7 +83,12 @@ function DataExplorerPanel() {
               data: "api",
             })
           }
-          icon={<APIIcon scale="10xs" />}
+          icon={
+            <APIIcon
+              data-inmotion="split-item split-fade-r once"
+              scale="10xs"
+            />
+          }
         >
           API Explorer
         </SidebarItem>

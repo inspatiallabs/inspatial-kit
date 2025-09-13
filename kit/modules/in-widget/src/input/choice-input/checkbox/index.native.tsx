@@ -2,6 +2,7 @@ import { iss } from "@in/style";
 import { CheckboxStyle } from "./style.ts";
 import type { CheckboxProps } from "./type.ts";
 import { Slot } from "@in/widget/structure/index.ts";
+import { Show } from "@in/widget/control-flow/show/index.ts";
 import { getChoiceInputIcon } from "../helpers.tsx";
 
 /*##############################(CHECKBOX)####################################*/
@@ -16,6 +17,7 @@ export function Checkbox(props: CheckboxProps) {
     disabled,
     selected = false,
     icon,
+    type = "default",
     $ref,
     ...rest
   } = props;
@@ -31,6 +33,7 @@ export function Checkbox(props: CheckboxProps) {
   /**************************(State)**************************/
   const isSelected = selected === true;
   const isIndeterminate = selected === "indeterminate";
+  const isToggle = type === "toggle";
 
   /**************************(Render)**************************/
   return (
@@ -44,13 +47,33 @@ export function Checkbox(props: CheckboxProps) {
           $ref={$ref}
           {...rest}
         />
-        <Slot
-          className={iss(CheckboxStyle.indicator.getStyle(styleProps))}
-          data-checked={isSelected}
-          data-indeterminate={isIndeterminate}
-        >
-          {getChoiceInputIcon(icon, isSelected)}
-        </Slot>
+        {/* Default Indicator */}
+        {/* @ts-ignore */}
+        <Show when={!isToggle}>
+          <Slot
+            className={iss(
+              CheckboxStyle.indicator.default.getStyle(styleProps)
+            )}
+            data-checked={isSelected}
+            data-indeterminate={isIndeterminate}
+            {...rest}
+          >
+            {getChoiceInputIcon(icon, isSelected)}
+          </Slot>
+        </Show>
+
+        {/* Toggle Indicator */}
+        {/* @ts-ignore */}
+        <Show when={isToggle}>
+          <Slot
+            className={iss(CheckboxStyle.indicator.toggle.getStyle(styleProps))}
+            data-checked={isSelected}
+            data-indeterminate={isIndeterminate}
+            {...rest}
+          >
+            {getChoiceInputIcon(icon, true)}
+          </Slot>
+        </Show>
       </label>
     </>
   );

@@ -1,5 +1,6 @@
 export * from "./style.ts";
 export * from "./type.ts";
+export * from "./icon.tsx";
 export * from "./inspatial-icon.tsx";
 export * from "./light-mode-icon.tsx";
 export * from "./dark-mode-icon.tsx";
@@ -29,3 +30,7 @@ export * from "./security-key-icon.tsx";
 export * from "./direction-right-icon.tsx";
 export * from "./db-icon.tsx";
 export * from "./leaderboard-icon.tsx";
+export * from "./flow-visualizer-icon.tsx";
+export * from "./clock-icon.tsx";
+export * from "./play-icon.tsx";
+export * from "./code-icon.tsx";

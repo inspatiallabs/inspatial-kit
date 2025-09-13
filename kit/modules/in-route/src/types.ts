@@ -37,6 +37,7 @@ export interface RouteFiles {
   };
   state?: string;
   style?: string;
+  theme?: string; // can only have one theme.ts file
   type?: string;
   menu?: string;
   env?: string;

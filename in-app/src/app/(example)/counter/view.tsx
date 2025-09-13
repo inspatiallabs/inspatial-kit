@@ -222,7 +222,12 @@ export function CounterView() {
 
             {/* Switch & Checkbox Controls */}
             <Slot className="bg-(--surface) p-6 rounded-lg text-center max-w-md">
-              <h3 className="text-white text-lg mb-4">🎛️ UI Controls</h3>
+              <h3
+                data-inmotion="text-fluid split-letter duration-2000 split-delay-50"
+                className="text-white text-lg mb-4"
+              >
+                🎛️ UI Controls
+              </h3>
 
               <YStack className="gap-4">
                 {/* Switch with custom styles */}

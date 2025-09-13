@@ -8,10 +8,12 @@ import type {
 } from "./type.ts";
 import { TopbarStyle } from "./style.ts";
 import { KitBorder } from "@in/widget/ornament/index.ts";
+import { TopbarPresets } from "./preset.tsx";
+import { Show } from "@in/widget/control-flow/index.ts";
 
 /*##################################(TOPBAR LEFT)##################################*/
-export function TopbarLeft(props: TopbarLeftProps) {
-  const { classname, class: cls, children, ...rest } = props;
+function TopbarLeft(props: TopbarLeftProps) {
+  const { className, class: cls, children, preset, ...rest } = props;
   return (
     <XStack
       className={iss(
@@ -24,36 +26,22 @@ export function TopbarLeft(props: TopbarLeftProps) {
         className={TopbarStyle.left.item.getStyle({ className, class: cls })}
         {...rest}
       >
-        {children}
-      </Slot>
-    </XStack>
-  );
-}
-
-/*##################################(TOPBAR RIGHT)##################################*/
-export function TopbarRight(props: TopbarRightProps) {
-  const { classname, class: cls, children, ...rest } = props;
-  return (
-    <XStack
-      className={iss(
-        TopbarStyle.right.container.getStyle({ className, class: cls })
-      )}
-      {...rest}
-    >
-      {/****************** RIGHT item *****************/}
-      <Slot
-        className={TopbarStyle.right.item.getStyle({ className, class: cls })}
-        {...rest}
-      >
-        {children}
+        <Show when={preset !== "none"} otherwise={children}>
+          <TopbarPresets
+            preset={preset}
+            className={className}
+            class={cls}
+            {...rest}
+          />
+        </Show>
       </Slot>
     </XStack>
   );
 }
 
 /*##################################(TOPBAR CENTER)##################################*/
-export function TopbarCenter(props: TopbarCenterProps) {
-  const { classname, class: cls, children, ...rest } = props;
+function TopbarCenter(props: TopbarCenterProps) {
+  const { className, class: cls, children, preset, ...rest } = props;
   return (
     <XStack
       className={iss(
@@ -69,7 +57,42 @@ export function TopbarCenter(props: TopbarCenterProps) {
         })}
         {...rest}
       >
-        {children}
+        <Show when={preset !== "none"} otherwise={children}>
+          <TopbarPresets
+            preset={preset}
+            className={className}
+            class={cls}
+            {...rest}
+          />
+        </Show>
+      </Slot>
+    </XStack>
+  );
+}
+
+/*##################################(TOPBAR RIGHT)##################################*/
+function TopbarRight(props: TopbarRightProps) {
+  const { className, class: cls, children, preset, ...rest } = props;
+  return (
+    <XStack
+      className={iss(
+        TopbarStyle.right.container.getStyle({ className, class: cls })
+      )}
+      {...rest}
+    >
+      {/****************** RIGHT item *****************/}
+      <Slot
+        className={TopbarStyle.right.item.getStyle({ className, class: cls })}
+        {...rest}
+      >
+        <Show when={preset !== "none"} otherwise={children}>
+          <TopbarPresets
+            preset={preset}
+            className={className}
+            class={cls}
+            {...rest}
+          />
+        </Show>
       </Slot>
     </XStack>
   );
@@ -80,25 +103,48 @@ export function Topbar(props: TopbarProps) {
   const {
     className,
     class: cls,
-    children,
+    children = { left: {}, center: {}, right: {} },
     border = { position: "top" },
     ...rest
   } = props;
 
   return (
     <YStack>
+      {/*================(Topbar Border Top)==================*/}
       {border && border.position === "top" && (
         <KitBorder
           className={TopbarStyle.border.getStyle({ className, class: cls })}
-          style:position="absolute"
+          style={{ web: { position: "absolute" } }}
         />
       )}
+      {/*************************** (TOPBAR CHILDREN START) ***************************/}
+
       <XStack
         className={iss(TopbarStyle.wrapper.getStyle({ className, class: cls }))}
         {...rest}
       >
-        {children}
+        {/* Left */}
+        <Show when={children.left}>
+          {/* @ts-ignore */}
+          <TopbarLeft {...(children.left ?? {})} />
+        </Show>
+
+        {/* Center */}
+        <Show when={children.center}>
+          {/* @ts-ignore */}
+          <TopbarCenter {...(children.center ?? {})} />
+        </Show>
+
+        {/* Right */}
+        <Show when={children.right}>
+          {/* @ts-ignore */}
+          <TopbarRight {...(children.right ?? {})} />
+        </Show>
       </XStack>
+
+      {/*************************** (TOPBAR CHILDREN END) ***************************/}
+
+      {/*================(Topbar Border Bottom)==================*/}
       {border && border.position === "bottom" && (
         <KitBorder
           className={TopbarStyle.border.getStyle({ className, class: cls })}

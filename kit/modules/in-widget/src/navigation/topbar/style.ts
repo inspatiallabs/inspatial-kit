@@ -13,7 +13,7 @@ import {
   ThemeFormat,
 } from "@in/widget/theme/style.ts";
 import {
-KitBorderFormat,
+  KitBorderFormat,
   KitBorderPosition,
   KitBorderSize,
   KitBorderStyle,
@@ -70,6 +70,10 @@ export const TopbarStyle = {
         web: {
           display: "flex",
           position: "relative",
+          alignItems: "center",
+          paddingLeft: "10px",
+          paddingRight: "10px",
+          justifyContent: "space-between",
           backgroundColor: "var(--surface)",
           width: "100%",
         },
@@ -149,9 +153,51 @@ export const TopbarStyle = {
       effect: ThemeEffect,
       mode: ThemeMode,
       disabled: ThemeDisabled,
-
       material: ThemeMaterial,
     },
+
+    composition: [
+      {
+        "$topbar-border.size": "xs",
+        style: {
+          web: {
+            marginTop: "2px",
+          },
+        },
+      },
+      {
+        "$topbar-border.size": "sm",
+        style: {
+          web: {
+            marginTop: "3px",
+          },
+        },
+      },
+      {
+        "$topbar-border.size": "md",
+        style: {
+          web: {
+            marginTop: "4px",
+          },
+        },
+      },
+      {
+        "$topbar-border.size": "lg",
+        style: {
+          web: {
+            marginTop: "5px",
+          },
+        },
+      },
+      {
+        "$topbar-border.size": "xl",
+        style: {
+          web: {
+            marginTop: "6px",
+          },
+        },
+      },
+    ],
 
     defaultSettings: {
       size: "sm",
@@ -166,19 +212,32 @@ export const TopbarStyle = {
   left: {
     container: createStyle({
       name: "topbar-left-container",
+      base: [
+        {
+          web: {
+            display: "flex",
+            flexGrow: 1,
+            height: "100%",
+            width: "100%",
+            alignItems: "center",
+            justifyContent: "center",
+          },
+        },
+      ],
     }),
     item: createStyle({
       name: "topbar-left-item",
-    }),
-  },
-
-  /**=============================== Right =============================== */
-  right: {
-    container: createStyle({
-      name: "topbar-right-container",
-    }),
-    item: createStyle({
-      name: "topbar-right-item",
+      base: [
+        {
+          web: {
+            display: "flex",
+            height: "100%",
+            width: "100%",
+            alignItems: "center",
+            justifyContent: "start",
+          },
+        },
+      ],
     }),
   },
 
@@ -186,23 +245,71 @@ export const TopbarStyle = {
   center: {
     container: createStyle({
       name: "topbar-center-container",
+      base: [
+        {
+          web: {
+            display: "flex",
+            flexGrow: 1,
+            height: "100%",
+            width: "100%",
+            alignItems: "center",
+            justifyContent: "center",
+          },
+        },
+      ],
     }),
     item: createStyle({
       name: "topbar-center-item",
+      base: [
+        {
+          web: {
+            display: "flex",
+            height: "100%",
+            width: "100%",
+            alignItems: "center",
+            justifyContent: "center",
+          },
+        },
+      ],
+    }),
+  },
+
+  /**=============================== Right =============================== */
+  right: {
+    container: createStyle({
+      name: "topbar-right-container",
+      base: [
+        {
+          web: {
+            display: "flex",
+            flexGrow: 1,
+            height: "100%",
+            width: "100%",
+            alignItems: "center",
+            justifyContent: "center",
+          },
+        },
+      ],
+    }),
+    item: createStyle({
+      name: "topbar-right-item",
+      base: [
+        {
+          web: {
+            display: "flex",
+            height: "100%",
+            width: "100%",
+            alignItems: "center",
+            justifyContent: "end",
+          },
+        },
+      ],
     }),
   },
 
   /**=============================== Border =============================== */
   border: createStyle({
     name: "topbar-border",
-
-    // base: [
-    //   {
-    //     web: {
-    //       backgroundColor: "yellow",
-    //     },
-    //   },
-    // ],
 
     settings: {
       size: KitBorderSize,
@@ -217,7 +324,6 @@ export const TopbarStyle = {
         format: "brand",
         style: {
           web: {
-            backgroundColor: "yellow",
             borderColor: "var(--brand)",
             height: "10px",
           },

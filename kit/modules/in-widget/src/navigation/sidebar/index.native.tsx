@@ -471,6 +471,7 @@ export function Sidebar(props: SidebarProps) {
 
   return (
     <Slot
+      data-inmotion="fade-r duration-500 once"
       id={instanceId}
       className={$(() =>
         iss(
@@ -497,6 +498,7 @@ export function Sidebar(props: SidebarProps) {
         )}
       >
         <SidebarToggle
+          data-inmotion="fade-l duration-500 once"
           minimized={minimizedForInstance.get()}
           onToggle={() => useSidebar.action.toggleMinimizedForId(instanceId)}
         />
