@@ -11,8 +11,7 @@
   "compilerOptions": {
     "lib": ["ES2022", "DOM", "DOM.Iterable", "deno.ns"],
     "jsx": "react-jsx",
-    "jsxImportSource": "@inspatial/kit",
-    "allowImportingTsExtensions": true
+    "jsxImportSource": "@inspatial/kit"
   },
   "imports": {
     "@in/kit/": "../kit/modules/",
@@ -57,7 +56,11 @@
     "@in/route": "../kit/modules/in-route/src/index.ts",
     "@in/zero": "../kit/modules/in-zero/src/index.ts",
 
-    "@in/dom": "../kit/modules/in-renderer/src/dom.ts",
+    "@in/dom": "../kit/modules/in-renderer/src/in-dom/index.ts",
+    "@in/dom/": "../kit/modules/in-renderer/src/in-dom/",
+    "@in/dom/renderer": "../kit/modules/in-renderer/src/in-dom/renderer/index.ts",
+    "@in/dom/memory": "../kit/modules/in-renderer/src/in-dom/memory/index.ts",
+
     "@in/ssr": "../kit/modules/in-renderer/src/ssr.ts",
     "@in/android-xr": "../kit/modules/in-renderer/src/android-xr.ts",
     "@in/vision-os": "../kit/modules/in-renderer/src/vision-os.ts",
@@ -65,7 +68,6 @@
     "@in/xr": "../kit/modules/in-renderer/src/xr.ts",
     "@in/gpu": "../kit/modules/in-renderer/src/gpu.ts",
     "@in/nativescript": "../kit/modules/in-renderer/src/nativescript.ts",
-    "@in/dom/": "../kit/modules/in-renderer/src/",
     "@in/ssr/": "../kit/modules/in-renderer/src/",
     "@in/gpu/": "../kit/modules/in-renderer/src/",
     "@in/xr/": "../kit/modules/in-renderer/src/",

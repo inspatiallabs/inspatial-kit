@@ -40,7 +40,6 @@
     "jsx": "react-jsx",
     "jsxImportSource": "@inspatial/kit",
     "types": ["@inspatial/kit/jsx-runtime"],
-    "allowImportingTsExtensions": true,
     "lib": [
       "dom",
       "dom.iterable",
@@ -114,7 +113,12 @@
 
     "@in/extension/": "./modules/in-teract/src/extension/",
     "@in/extension": "./modules/in-teract/src/extension/index.ts",
-    "@in/dom/": "./modules/in-renderer/src/",
+
+    "@in/dom/memory/": "./modules/in-renderer/src/in-dom/memory/",
+    "@in/dom/renderer/": "./modules/in-renderer/src/in-dom/renderer/",
+    "@in/dom": "./modules/in-renderer/src/in-dom/index.ts",
+    "@in/dom/": "./modules/in-renderer/src/in-dom/",
+
     "@in/ssr/": "./modules/in-renderer/src/",
     "@in/gpu/": "./modules/in-renderer/src/",
     "@in/xr/": "./modules/in-renderer/src/",

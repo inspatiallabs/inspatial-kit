@@ -1,9 +1,9 @@
 import { isSignal, peek, bind } from "@in/teract/signal";
-import { createRenderer } from "./create-renderer.ts";
+import { createRenderer } from "@in/renderer/create-renderer.ts";
 import { cachedStrKeyNoFalsy, splitFirst } from "@in/vader";
 import { env } from "@in/vader/env/index.ts";
 import { composeExtensions, type RendererExtensions } from "@in/extension";
-import { applyWebStyle, computeClassString } from "./helpers.ts";
+import { applyWebStyle, computeClassString } from "@in/renderer/helpers.ts";
 
 const defaultRendererID = "DOM";
 
@@ -32,10 +32,15 @@ export function DOMRenderer(options: DOMOptions = {}): any {
         for (const [name, declaration] of triggers) {
           createTrigger(name, declaration.handler);
         }
-        console.log(`🌐 InSpatial:[DOM Renderer] Registered ${triggers.size} extension triggers`);
+        console.log(
+          `🌐 InSpatial:[DOM Renderer] Registered ${triggers.size} extension triggers`
+        );
       })
       .catch((err) => {
-        console.warn("🌐 InSpatial:[DOM Renderer] Failed to register extension triggers:", err);
+        console.warn(
+          "🌐 InSpatial:[DOM Renderer] Failed to register extension triggers:",
+          err
+        );
       });
   }
 

@@ -38,10 +38,12 @@ export interface RouteFiles {
   state?: string;
   style?: string;
   theme?: string; // can only have one theme.ts file
+  extension?: string;
+  trigger?: string;
   type?: string;
   menu?: string;
   env?: string;
-  doc?: string;
+  doc?: string; // folder
   api?: string;
   collection?: string | string[]; // folder
 }

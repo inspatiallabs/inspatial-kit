@@ -204,7 +204,7 @@ async function createBrowserRenderer({
     return renderer;
   } else {
     // Use DOM renderer for interactive (DEFAULT for browser mode)
-    const { DOMRenderer } = await import("./dom.ts");
+    const { DOMRenderer } = await import("@in/dom/renderer");
     const renderer = DOMRenderer({
       rendererID: "Browser-Interactive",
       extensions,

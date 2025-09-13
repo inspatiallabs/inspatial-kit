@@ -158,7 +158,7 @@ export function EditorDataCollectionView() {
                 console.log("Navigator changed:", label),
               children: [{ label: "User" }, { label: "Post" }],
               cta: {
-                children: <PlusIcon scale="9xs" />,
+                children: <PlusIcon scale="8xs" />,
                 "on:presentation": {
                   id: "create-new-collection",
                   action: "toggle",
