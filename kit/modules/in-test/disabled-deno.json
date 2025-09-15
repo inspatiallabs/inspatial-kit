@@ -29,9 +29,22 @@
     "test": "deno test --no-check --allow-env --allow-read --allow-write --allow-run --allow-net --allow-hrtime",
     "test:snapshot": "deno test --no-check --allow-env --allow-read --allow-write ./src/snapshot/index.test.ts",
     "test:snapshot:update": "deno test --no-check --allow-env --allow-read --allow-write ./src/snapshot/index.test.ts -- -u",
-    "test:all": "deno test --allow-env --allow-read --allow-write --allow-run --allow-net --allow-hrtime"
+    "test:all": "deno test --allow-env --allow-read --allow-write --allow-run --allow-net --allow-hrtime",
+    "test:spec": "deno test --no-check --allow-env --allow-read --allow-run ./src/run-specs.ts"
   },
   "publish": {
-    "exclude": [".github", ".vscode", "**/*.test.ts", "test_deps.ts"]
+    "exclude": [
+      ".github",
+      ".vscode",
+      "**/*.test.ts",
+      "**/*.spec.ts",
+      "**/*.test.tsx",
+      "**/*.spec.tsx",
+      "**/*.test.jsx",
+      "**/*.spec.jsx",
+      "**/*.test.js",
+      "**/*.spec.js",
+      "test_deps.ts"
+    ]
   }
 }

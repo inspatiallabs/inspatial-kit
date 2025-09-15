@@ -977,7 +977,7 @@ export {};
     // Detect asset file changes (images, etc.) under src
     const assetFiles = normalizedPaths.filter(
       (path: string) =>
-        /\.(png|jpe?g|gif|svg|webp|avif)$/i.test(path) &&
+        /\.(png|jpe?g|gif|svg|webp|avif|wgsl)$/i.test(path) &&
         path.includes("/src/") &&
         !path.includes("/dist/")
     );
@@ -1330,6 +1330,8 @@ export {};
         return "application/javascript";
       case "json":
         return "application/json";
+      case "wgsl":
+        return "text/plain";
       case "png":
         return "image/png";
       case "jpg":

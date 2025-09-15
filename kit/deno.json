@@ -25,7 +25,7 @@
     "./modules/in-zero/*"
   ],
   "tasks": {
-    "test": "deno test --no-check --allow-env --allow-read --allow-write --allow-run --allow-net --unstable-sloppy-imports ./modules/",
+    "test": "deno test --no-check --allow-env --allow-read --allow-write --allow-run --allow-net --unstable-sloppy-imports \"./modules/**/*.test.{ts,tsx,js,jsx}\" \"./modules/**/*_test.{ts,tsx,js,jsx}\" \"./modules/**/*.spec.{ts,tsx,js,jsx}\"",
     "test:style": "deno test --no-check --allow-env --allow-read --allow-write --allow-run --allow-net --unstable-sloppy-imports ./modules/in-style/src/",
     "lint": "deno lint",
     "fmt": "deno fmt",
@@ -34,7 +34,13 @@
     "publish": "deno publish --allow-slow-types --no-check --allow-dirty"
   },
   "publish": {
-    "exclude": [".github", ".vscode", "**/*.test.ts", "test_deps.ts"]
+    "exclude": [
+      ".github",
+      ".vscode",
+      "**/*.test.ts",
+      "**/*.spec.ts",
+      "test_deps.ts"
+    ]
   },
   "compilerOptions": {
     "jsx": "react-jsx",
@@ -101,6 +107,7 @@
     "@in/widget/typography/": "./modules/in-widget/src/typography/",
     "@in/widget/ornament/": "./modules/in-widget/src/ornament/",
     "@in/widget/icon/": "./modules/in-widget/src/icon/",
+    "@in/widget/recursive/": "./modules/in-widget/src/recursive/",
 
     "@in/renderer/": "./modules/in-renderer/src/",
     "@in/runtime/": "./modules/in-runtime/src/",
@@ -124,19 +131,19 @@
 
     "@in/gpu/": "./modules/in-renderer/src/in-gpu/",
     "@in/gpu": "./modules/in-renderer/src/in-gpu/index.ts",
-    
+
     "@in/xr/": "./modules/in-renderer/src/in-xr/",
     "@in/xr": "./modules/in-renderer/src/in-xr/index.ts",
-    
+
     "@in/android-xr/": "./modules/in-renderer/src/in-android-xr/",
     "@in/android-xr": "./modules/in-renderer/src/in-android-xr/index.ts",
-    
+
     "@in/vision-os/": "./modules/in-renderer/src/in-vision-os/",
     "@in/vision-os": "./modules/in-renderer/src/in-vision-os/index.ts",
-    
+
     "@in/horizon-os/": "./modules/in-renderer/src/in-horizon-os/",
     "@in/horizon-os": "./modules/in-renderer/src/in-horizon-os/index.ts",
-    
+
     "@in/nativescript/": "./modules/in-renderer/src/in-nativescript/",
     "@in/nativescript": "./modules/in-renderer/src/in-nativescript/index.ts",
 
@@ -155,7 +162,7 @@
 
     "@in/vader/env/": "./modules/in-vader/src/env/",
     "@in/vader/env": "./modules/in-vader/src/env/index.ts",
-    
+
     "@in/vader/debug/": "./modules/in-vader/debug/",
     "@in/vader/remove-from-arr/": "./modules/in-vader/remove-from-arr/",
     "@in/vader": "./modules/in-vader/src/index.ts",
@@ -194,6 +201,10 @@
       "**/*.test.tsx",
       "**/*.test.jsx",
       "**/*.test.js",
+      "**/*.spec.ts",
+      "**/*.spec.tsx",
+      "**/*.spec.jsx",
+      "**/*.spec.js",
       "**/*_test.ts",
       "**/*_test.tsx",
       "**/*_test.jsx",

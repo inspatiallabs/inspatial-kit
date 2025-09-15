@@ -5,6 +5,7 @@ import {
   SidebarItem,
 } from "@inspatial/kit/navigation";
 import { InSpatialIcon } from "@inspatial/kit/icon";
+import { Tree } from "@in/widget/recursive";
 
 export function Menu() {
   return (
@@ -48,6 +49,9 @@ export function Menu() {
         <SidebarItem to="/editor" icon={<InSpatialIcon />}>
           Editor
         </SidebarItem>
+
+        {/* Recursive (Tree) Group */}
+        <Tree />
       </Sidebar>
     </>
   );

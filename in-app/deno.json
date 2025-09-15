@@ -39,6 +39,8 @@
     "@in/widget/performance/": "../kit/modules/in-widget/src/performance/",
     "@in/widget/data-flow": "../kit/modules/in-widget/src/data-flow/index.ts",
     "@in/widget/data-flow/": "../kit/modules/in-widget/src/data-flow/",
+    "@in/widget/recursive/": "../kit/modules/in-widget/src/recursive/",
+    "@in/widget/recursive": "../kit/modules/in-widget/src/recursive/index.ts",
 
     "@in/renderer/": "../kit/modules/in-renderer/src/",
     "@in/runtime/": "../kit/modules/in-runtime/src/",

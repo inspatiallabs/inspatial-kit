@@ -6,6 +6,10 @@ InSpatial is a Universal development environment (UDE) for building cross-platfo
 
 InSpatial Kit is a (UDE) framework for building cross-platform interfaces. to understand the problems InSpatial Kit is solving and why, read the InSpatial Kit Philosophy.
 
+> **Note:** The InSpatial Kit documentation starts from first principles. We don’t assume prior knowledge, so each topic is explained clearly and step‑by‑step. Think of this as a friendly guide, not a cryptic reference.
+
+> **Genius:** When you want the deeper, technical breakdown (algorithms, scheduling, configuration resolution), open the Genius section in each page for an expert‑level explanation.
+
 # Core Concepts
 
 1. User Interface
@@ -35,6 +39,7 @@ InSpatial Kit is a (UDE) framework for building cross-platform interfaces. to un
 7. Building For Dev & Production
 
 8. Store
+
 - Apps
 - Extensions
 - Modules

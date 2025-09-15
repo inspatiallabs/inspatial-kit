@@ -6,3 +6,4 @@ export * from "./mock/index.ts";
 export * from "./snapshot/index.ts";
 export * from "./log/index.ts";
 export * from "./bdd/bdd.ts";
+export * from "./time.ts";
