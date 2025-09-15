@@ -1,4 +1,6 @@
+// deno-lint-ignore-file no-empty
 import { InZero } from "@in/zero";
+import { resolveServeConfig, type InServeResolvedConfig } from "./config.ts";
 
 /**
  * @fileoverview InSpatial Development Server
@@ -62,13 +64,6 @@ import { InZero } from "@in/zero";
  * └── Hot Reload Client    # Browser-side reload script
  * ```
  *
- * ## Hot Reload System
- *
- * - `InSpatialServe` - Native Development server for Bare InSpatial apps
- * - `InVite` - Vite plugin
- * - `InPack` - Webpack plugin
- * - Hot reload utilities
- *
  *
  * @author InSpatial
  * @version 1.0.0
@@ -82,6 +77,17 @@ import { InZero } from "@in/zero";
  * @internal
  */
 class BuildQueue {
+  private getConfig: () => InServeResolvedConfig;
+  private onMemoryArtifactsUpdate?: (
+    artifacts: Map<string, Uint8Array>
+  ) => void;
+  constructor(
+    getConfig: () => InServeResolvedConfig,
+    onMemoryArtifactsUpdate?: (artifacts: Map<string, Uint8Array>) => void
+  ) {
+    this.getConfig = getConfig;
+    this.onMemoryArtifactsUpdate = onMemoryArtifactsUpdate;
+  }
   private queue = new Set<"js" | "css" | "html">();
   private building = false;
   private buildTimer: number | undefined;
@@ -96,10 +102,10 @@ class BuildQueue {
       clearTimeout(this.buildTimer);
     }
 
-    // Debounce builds by 100ms to handle rapid file changes
+    // Debounce builds per configuration to handle rapid file changes
     this.buildTimer = setTimeout(() => {
       this.processBuildQueue();
-    }, 100) as unknown as number;
+    }, this.getConfig().build.timing.debounceMs) as unknown as number;
   }
 
   private async processBuildQueue() {
@@ -145,7 +151,7 @@ class BuildQueue {
     }
   }
 
-  private async executeBuild(buildType: "js" | "css" | "html"): Promise<void> {
+  private executeBuild(buildType: "js" | "css" | "html"): Promise<void> {
     switch (buildType) {
       case "js":
         return this.buildJavaScript();
@@ -158,54 +164,118 @@ class BuildQueue {
 
   private async buildJavaScript(): Promise<void> {
     console.log("📦 Building JavaScript bundle...");
+    const cfg = this.getConfig();
+    const entries =
+      cfg.build.js.entrypoints && cfg.build.js.entrypoints.length > 0
+        ? cfg.build.js.entrypoints
+        : [cfg.paths.renderEntry];
+
+    // Try inprocess bundling if requested and available
+    // deno-lint-ignore no-explicit-any
+    const D = (globalThis as any).Deno;
+    if (cfg.build.js.engine === "inprocess" && D?.bundle) {
+      try {
+        const result = await D.bundle({
+          entrypoints: entries,
+          outputDir: cfg.build.js.outputDir || cfg.paths.distDir,
+          output: cfg.build.js.output || undefined,
+          platform: cfg.build.js.platform,
+          minify: cfg.build.js.minify,
+          codeSplitting: cfg.build.js.codeSplitting,
+          format: cfg.build.js.format,
+          inlineImports: cfg.build.js.inlineImports,
+          external: cfg.build.js.external,
+          packages: cfg.build.js.packages,
+          sourcemap: cfg.build.js.sourcemap,
+          write: cfg.build.js.write,
+        });
+        if (!cfg.build.js.write) {
+          // Capture outputs in memory for serving
+          const artifacts = new Map<string, Uint8Array>();
+          const files = (result as any)?.outputFiles as Array<any> | undefined;
+          if (files && Array.isArray(files)) {
+            for (const f of files) {
+              try {
+                let bytes: Uint8Array | undefined;
+                if (f?.bytes) bytes = f.bytes as Uint8Array;
+                if (!bytes) {
+                  let text: string | undefined;
+                  try {
+                    text = typeof f?.text === "function" ? f.text() : undefined;
+                  } catch {}
+                  if (text) bytes = new TextEncoder().encode(text);
+                }
+                if (!bytes) continue;
+                const raw: string = (
+                  f?.path ||
+                  f?.filePath ||
+                  f?.name ||
+                  ""
+                ).toString();
+                const normalized = raw.replace(/\\/g, "/");
+                const fileName = normalized
+                  ? normalized.substring(normalized.lastIndexOf("/") + 1)
+                  : "bundle.js";
+                const key = `/${fileName}`;
+                artifacts.set(key, bytes);
+              } catch {}
+            }
+          }
+          this.onMemoryArtifactsUpdate?.(artifacts);
+          console.log(`🧠 Runtime bundle (in-memory): ${artifacts.size} files`);
+        }
+        console.log("✅ JavaScript bundle built (runtime)");
+        return;
+      } catch (err) {
+        console.warn(
+          "⚠️ Runtime bundling failed, falling back to CLI:",
+          (err as any)?.message || err
+        );
+      }
+    }
+
+    // CLI fallback
+    const args: string[] = ["bundle"];
+    if (cfg.build.js.platform) args.push(`--platform=${cfg.build.js.platform}`);
+    if (cfg.build.js.sourcemap) args.push("--sourcemap");
+    if (cfg.build.js.minify) args.push("--minify");
+    if (cfg.build.js.codeSplitting) args.push("--code-splitting");
+    if (cfg.build.js.format) args.push(`--format=${cfg.build.js.format}`);
+    if (cfg.build.js.inlineImports) args.push("--inline-imports");
+
+    const isHtml =
+      entries.length === 1 && entries[0].toLowerCase().endsWith(".html");
+    if (isHtml) {
+      args.push("--outdir", cfg.build.js.outputDir || cfg.paths.distDir);
+      args.push(entries[0]);
+    } else {
+      const out = cfg.paths.jsOutput;
+      args.push("--output", out);
+      // For multiple entries, we run one-by-one into outputDir when possible; for now, pick the first.
+      args.push(entries[0]);
+    }
 
     const buildProcess = new InZero.Command("deno", {
-      args: [
-        "bundle",
-        "--platform=browser",
-        "--output=dist/bundle.js",
-        "--sourcemap",
-        "src/config/render.ts",
-      ],
+      args,
       cwd: InZero.cwd(),
     });
-
     const { code, stderr } = await buildProcess.output();
-
     if (code !== 0) {
       const errorText = new TextDecoder().decode(stderr);
       throw new Error(`JavaScript build failed: ${errorText}`);
     }
-
-    console.log("✅ JavaScript bundle built");
+    console.log("✅ JavaScript bundle built (subprocess)");
   }
 
   private async buildCSS(): Promise<void> {
     console.log("🎨 Building CSS...");
-
-    // Base content globs always include the app sources
-    const contentGlobs = ["src/**/*.{ts,tsx,js,jsx}"] as string[];
-
-    // Conditionally include monorepo framework sources
-    // Support both legacy path ../kit/src and current ../kit/modules
-    try {
-      const statSrc = await InZero.stat("../kit/src");
-      // deno-lint-ignore no-explicit-any
-      if ((statSrc as any)?.isDirectory) {
-        contentGlobs.push("../kit/src/**/*.{ts,tsx,js,jsx}");
-        console.log("📦 Including ../kit/src in Tailwind content globs");
-      }
-    } catch {}
-    try {
-      const statModules = await InZero.stat("../kit/modules");
-      // deno-lint-ignore no-explicit-any
-      if ((statModules as any)?.isDirectory) {
-        contentGlobs.push("../kit/modules/**/*.{ts,tsx,js,jsx}");
-        console.log("📦 Including ../kit/modules in Tailwind content globs");
-      }
-    } catch {}
-
-    // Repeat --content per glob (Tailwind CLI expects individual flags)
+    const cfg = this.getConfig();
+    const contentGlobs = [...cfg.build.css.contentGlobs];
+    // Augment with kitRoots if developer didn't already specify
+    for (const root of cfg.discovery.kitRoots || []) {
+      const glob = `${root.replace(/\/$/, "")}/**/*.{ts,tsx,js,jsx}`;
+      if (!contentGlobs.includes(glob)) contentGlobs.push(glob);
+    }
     const contentArgs = ([] as string[]).concat(
       ...contentGlobs.map((g) => ["--content", g])
     );
@@ -216,9 +286,9 @@ class BuildQueue {
         "-A",
         "npm:@tailwindcss/cli@latest",
         "-i",
-        "src/config/app.css",
+        cfg.build.css.input,
         "-o",
-        "dist/kit.css",
+        cfg.build.css.output,
         ...contentArgs,
       ],
       cwd: InZero.cwd(),
@@ -236,9 +306,23 @@ class BuildQueue {
 
   private async buildHTML(): Promise<void> {
     console.log("📄 Copying HTML...");
-
+    const cfg = this.getConfig();
+    // If inprocess HTML entrypoints are enabled, Deno.bundle will manage HTML outputs; skip copy
+    const entries =
+      cfg.build.js.entrypoints && cfg.build.js.entrypoints.length > 0
+        ? cfg.build.js.entrypoints
+        : [cfg.paths.renderEntry];
+    const isRuntimeHtml =
+      cfg.build.js.engine === "inprocess" &&
+      cfg.build.js.htmlEntrypoints &&
+      entries.length === 1 &&
+      entries[0].toLowerCase().endsWith(".html");
+    if (isRuntimeHtml) {
+      console.log("ℹ️ Skipping HTML copy (managed by runtime bundler)");
+      return;
+    }
     try {
-      await InZero.copyFile("index.html", "dist/index.html");
+      await InZero.copyFile(cfg.paths.htmlEntry, cfg.paths.htmlDist);
       console.log("✅ HTML updated");
     } catch (error) {
       throw new Error(`HTML copy failed: ${error}`);
@@ -279,11 +363,13 @@ export class InSpatialServe {
   private watchers: any[] = [];
   private clients: Set<WebSocket> = new Set();
   private isRunning = false;
-  private buildQueue = new BuildQueue();
+  private buildQueue!: BuildQueue;
   private httpServer: any | null = null;
   private wsServer: any | null = null;
   private extensionTriggers: Map<string, any> = new Map();
   private generatingTypes = false;
+  private config!: InServeResolvedConfig;
+  private memoryArtifacts: Map<string, Uint8Array> = new Map();
 
   /**
    * Runs the InSpatial Development Server
@@ -309,6 +395,16 @@ export class InSpatialServe {
     const t0 = (globalThis as any).performance?.now?.() ?? Date.now();
     console.log("🔥 runing InSpatial development server...");
 
+    // Load configuration
+    this.config = await resolveServeConfig();
+    this.buildQueue = new BuildQueue(
+      () => this.config,
+      (artifacts) => {
+        // atomic swap of in-memory artifacts for serving
+        this.memoryArtifacts = artifacts;
+      }
+    );
+
     // Ensure dist directory exists and is set up
     await this.initialSetup();
 
@@ -325,7 +421,21 @@ export class InSpatialServe {
     this.runFileServer();
 
     this.isRunning = true;
+    // Startup summary
+    const summary = {
+      httpPorts: this.config.server.httpPorts,
+      wsPorts: this.config.server.wsPorts,
+      host: this.config.server.host,
+      engine: this.config.build.js.engine,
+      entrypoints:
+        this.config.build.js.entrypoints &&
+        this.config.build.js.entrypoints.length > 0
+          ? this.config.build.js.entrypoints
+          : [this.config.paths.renderEntry],
+      dist: this.config.paths.distDir,
+    };
     console.log("✅ InSpatial development server is running");
+    console.log(`⚙️ Config: ${JSON.stringify(summary)}`);
     const t1 = (globalThis as any).performance?.now?.() ?? Date.now();
     const readyMs = Math.round(t1 - t0);
     console.log(`🕒 Ready in ${readyMs}ms`);
@@ -337,17 +447,12 @@ export class InSpatialServe {
     try {
       if (this.generatingTypes) return; // prevent re-entrancy
       this.generatingTypes = true;
-      // Scan for render.ts file (can be at InSpatial Recommended location)
+      // Scan for render.ts file using configured entry and search candidates
       let renderPath: string | null = null;
-      const possiblePaths = [
-        "./render.ts",
-        "./src/render.ts",
-        "./src/config/render.ts",
-        "./config/render.ts",
-        "./app/render.ts",
-      ];
+      const cfg = this.config;
+      const candidates = [cfg.paths.renderEntry, ...cfg.discovery.renderSearch];
 
-      for (const path of possiblePaths) {
+      for (const path of candidates) {
         try {
           await InZero.stat(path);
           renderPath = path;
@@ -424,7 +529,9 @@ export class InSpatialServe {
           const denoJson = await InZero.readTextFile("./deno.json");
           const denoCfg = JSON.parse(denoJson || "{}");
           appImports = denoCfg?.imports || {};
-        } catch {}
+        } catch {
+          // best-effort: app import map may be missing
+        }
 
         const resolveSpecifierToPath = async (
           specifier: string
@@ -595,7 +702,7 @@ export class InSpatialServe {
           return discovered;
         };
 
-        for (const id of extensionIds) {
+        for (const id of Array.from(extensionIds)) {
           const spec = importMap[id];
           if (!spec) continue;
           const resolvedRoot = await resolveSpecifierToPath(spec);
@@ -713,15 +820,15 @@ export {};
 
     try {
       // Create dist directory if it doesn't exist
-
-      await InZero.mkdir("dist", { recursive: true });
-      await InZero.mkdir("dist/asset", { recursive: true });
+      const cfg = this.config;
+      await InZero.mkdir(cfg.paths.distDir, { recursive: true });
+      await InZero.mkdir(cfg.paths.assetDistDir, { recursive: true });
 
       // Copy static assets
       try {
         await InZero.copyFile(
-          "src/asset/favicon.png",
-          "dist/asset/favicon.png"
+          cfg.paths.favicon,
+          `${cfg.paths.assetDistDir}/favicon.png`
         );
       } catch {
         console.log("⚠️ No favicon found, skipping...");
@@ -770,7 +877,7 @@ export {};
       return response;
     };
 
-    const tryPorts = [8888, 8889, 8890];
+    const tryPorts = this.config.server.wsPorts;
     for (const p of tryPorts) {
       try {
         this.wsServer = InZero.serve({ port: p }, handler);
@@ -788,79 +895,50 @@ export {};
 
   private runSmartWatching() {
     try {
-      // Watch source files
-      const srcWatcher = InZero.watchFs("./src", { recursive: true });
-      this.watchers.push(srcWatcher);
+      const cfg = this.config;
+      // Watch include roots
+      const srcWatchers: any[] = [];
+      for (const root of cfg.watch.include) {
+        try {
+          const w = InZero.watchFs(root, { recursive: true });
+          this.watchers.push(w);
+          srcWatchers.push(w);
+        } catch {}
+      }
 
-      // Watch local framework/runtime sources when linked as a package (import map path)
+      // Watch framework/runtime sources
+      for (const root of cfg.watch.includeFramework) {
+        try {
+          const runWatcher = InZero.watchFs(root, { recursive: true });
+          this.watchers.push(runWatcher);
+          (async () => {
+            for await (const event of runWatcher) {
+              await this.handleSourceChange(event);
+            }
+          })();
+          console.log(`👁️ Watching ${root} for framework changes`);
+        } catch {}
+      }
+
+      // Watch root directory shallow (for html entry changes)
       try {
-        const runWatcher = InZero.watchFs("@inspatial/kit", {
-          recursive: true,
-        });
-        this.watchers.push(runWatcher);
+        const rootWatcher = InZero.watchFs("./", { recursive: false });
+        this.watchers.push(rootWatcher);
         (async () => {
-          for await (const event of runWatcher) {
+          for await (const event of rootWatcher) {
+            await this.handleRootChange(event);
+          }
+        })();
+      } catch {}
+
+      // Process source file changes
+      for (const w of srcWatchers) {
+        (async () => {
+          for await (const event of w) {
             await this.handleSourceChange(event);
           }
         })();
-        console.log("👁️ Watching @inspatial/kit for framework changes");
-      } catch {
-        // optional; ignore if package path not present
       }
-
-      // Conditionally also watch monorepo source (../kit/src or ../kit/modules) when present
-      (async () => {
-        try {
-          const stat = await InZero.stat("../kit/src");
-          // deno-lint-ignore no-explicit-any
-          if ((stat as any)?.isDirectory) {
-            const kitWatcher = InZero.watchFs("../kit/src", {
-              recursive: true,
-            });
-            this.watchers.push(kitWatcher);
-            (async () => {
-              for await (const event of kitWatcher) {
-                await this.handleSourceChange(event);
-              }
-            })();
-            console.log("👁️ Watching ../kit/src for framework changes");
-          }
-        } catch {}
-        try {
-          const stat = await InZero.stat("../kit/modules");
-          // deno-lint-ignore no-explicit-any
-          if ((stat as any)?.isDirectory) {
-            const kitWatcher = InZero.watchFs("../kit/modules", {
-              recursive: true,
-            });
-            this.watchers.push(kitWatcher);
-            (async () => {
-              for await (const event of kitWatcher) {
-                await this.handleSourceChange(event);
-              }
-            })();
-            console.log("👁️ Watching ../kit/modules for framework changes");
-          }
-        } catch {}
-      })();
-
-      // Watch root files (index.html, etc.)
-      const rootWatcher = InZero.watchFs("./", { recursive: false });
-      this.watchers.push(rootWatcher);
-
-      // Process source file changes
-      (async () => {
-        for await (const event of srcWatcher) {
-          await this.handleSourceChange(event);
-        }
-      })();
-
-      // Process root file changes
-      (async () => {
-        for await (const event of rootWatcher) {
-          await this.handleRootChange(event);
-        }
-      })();
 
       console.log("👁️ Smart file watching runed");
     } catch (error) {
@@ -977,13 +1055,16 @@ export {};
 
   private async waitForBuildAndNotify() {
     // Wait a bit for the build queue to process
+    const timing = this.config.build.timing;
     let attempts = 0;
-    while (this.buildQueue.isBuilding() && attempts < 50) {
-      await new Promise((resolve) => setTimeout(resolve, 100));
+    while (this.buildQueue.isBuilding() && attempts < timing.waitAttempts) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, timing.waitIntervalMs)
+      );
       attempts++;
     }
 
-    if (attempts >= 50) {
+    if (attempts >= timing.waitAttempts) {
       console.error("⏰ Build timeout, notifying clients anyway");
     }
 
@@ -991,7 +1072,9 @@ export {};
     // This prevents race conditions where JS completes before CSS is available
     console.log("⏳ Ensuring all builds are complete...");
     await this.ensureCSSIsReady();
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise((resolve) =>
+      setTimeout(resolve, this.config.build.timing.waitIntervalMs)
+    );
 
     // Notify all connected clients
     await this.notifyClients();
@@ -1000,11 +1083,12 @@ export {};
   private async ensureCSSIsReady(): Promise<void> {
     // Wait for CSS file to be written and stabilized
     try {
-      const cssPath = "./dist/kit.css";
+      const cssPath =
+        this.config.build.css.output || this.config.paths.cssOutput;
       let attempts = 0;
       let lastSize = 0;
 
-      while (attempts < 10) {
+      while (attempts < this.config.build.timing.cssStabilizeAttempts) {
         try {
           const stat = await InZero.stat(cssPath);
           const currentSize = stat.size;
@@ -1016,11 +1100,15 @@ export {};
           }
 
           lastSize = currentSize;
-          await new Promise((resolve) => setTimeout(resolve, 100));
+          await new Promise((resolve) =>
+            setTimeout(resolve, this.config.build.timing.cssStabilizeIntervalMs)
+          );
           attempts++;
         } catch {
           // File might not exist yet, wait a bit
-          await new Promise((resolve) => setTimeout(resolve, 100));
+          await new Promise((resolve) =>
+            setTimeout(resolve, this.config.build.timing.cssStabilizeIntervalMs)
+          );
           attempts++;
         }
       }
@@ -1039,7 +1127,7 @@ export {};
 
     const deadClients: WebSocket[] = [];
 
-    for (const client of this.clients) {
+    for (const client of Array.from(this.clients)) {
       try {
         if (client.readyState === WebSocket.OPEN) {
           client.send(message);
@@ -1073,15 +1161,33 @@ export {};
     const handler = async (request: Request) => {
       const url = new URL(request.url);
       let pathname = url.pathname;
+      const cfg = this.config;
 
       // Default to index.html
       if (pathname === "/") {
         pathname = "/index.html";
       }
 
-      // Dev asset handler: serve /asset/* from dist first, then src as fallback
-      if (pathname.startsWith("/asset/")) {
-        const safeRel = pathname.replace(/^\/asset\//, "");
+      // Serve in-memory artifacts first (runtime bundler write=false)
+      if (this.memoryArtifacts.size > 0) {
+        const mem = this.memoryArtifacts.get(pathname);
+        if (mem) {
+          return new Response(mem as unknown as ReadableStream | null, {
+            headers: { "Content-Type": this.getContentType(pathname) },
+          });
+        }
+      }
+
+      // Dev asset handler: serve asset route base from dist first, then src as fallback
+      const assetBase = (cfg.server.assetRouteBase || "/asset/").replace(
+        /\/?$/,
+        "/"
+      );
+      if (pathname.startsWith(assetBase)) {
+        const safeRel = pathname.replace(
+          new RegExp(`^${assetBase.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")}`),
+          ""
+        );
         // Disallow path traversal
         if (safeRel.includes("..")) {
           return new Response("400 - Bad Request", { status: 400 });
@@ -1092,18 +1198,17 @@ export {};
             const content = await InZero.readFile(filePath);
             const contentType = this.getContentType(pathname);
             const headers = new Headers({ "Content-Type": contentType });
-            // Dev cache policy: avoid stale assets during development
-            headers.set("Cache-Control", "no-store");
+            headers.set("Cache-Control", cfg.server.cacheControl || "no-store");
             return new Response(content, { headers });
           } catch {
             return null;
           }
         };
         // Prefer built assets (parity with production)
-        const fromDist = await tryServe("./dist/asset");
+        const fromDist = await tryServe(cfg.paths.assetDistDir);
         if (fromDist) return fromDist;
         // Fallback to source assets during dev
-        const fromSrc = await tryServe("./src/asset");
+        const fromSrc = await tryServe(cfg.paths.assetSrcDir);
         if (fromSrc) return fromSrc;
         console.log(`❌ Asset not found: ${pathname}`);
         return new Response("404 - Asset Not Found", { status: 404 });
@@ -1111,19 +1216,21 @@ export {};
 
       try {
         // Serve from dist directory
-        const filePath = `./dist${pathname}`;
+        const filePath = `${cfg.paths.distDir}${pathname}`;
         const content = await InZero.readFile(filePath);
 
         // Inject InSpatial hot reload client for HTML files
-        if (pathname.endsWith(".html")) {
+        if (pathname.endsWith(".html") && this.config.server.injectClient) {
           const textContent = new TextDecoder().decode(content);
           const wsPort = (this.wsServer as any)?.addr?.port || 8888;
-          const modifiedContent = textContent.replace(
-            "</body>",
-            `
+          const injection = this.config.server.clientScriptUrl
+            ? `<script src="${this.config.server.clientScriptUrl}"></script>`
+            : `
             <script>
               // InSpatial Hot Reload Client
-              const ws = new WebSocket('ws://localhost:${wsPort}');
+              const ws = new WebSocket('ws://${
+                this.config.server.host || "localhost"
+              }:${wsPort}');
               ws.onmessage = (event) => {
                 const data = JSON.parse(event.data);
                 if (data.type === 'reload') {
@@ -1133,8 +1240,10 @@ export {};
               };
               ws.onopen = () => console.log('🔌 InSpatial: Connected to hot reload');
               ws.onclose = () => console.log('❌ InSpatial: Disconnected from hot reload');
-            </script>
-            </body>`
+            </script>`;
+          const modifiedContent = textContent.replace(
+            "</body>",
+            `${injection}\n</body>`
           );
           return new Response(modifiedContent, {
             headers: { "Content-Type": "text/html" },
@@ -1151,15 +1260,20 @@ export {};
         const hasExtension = pathname.includes(".");
         if (!hasExtension) {
           try {
-            const indexContent = await InZero.readFile("./dist/index.html");
+            const indexContent = await InZero.readFile(
+              `${this.config.paths.distDir}/index.html`
+            );
             const textContent = new TextDecoder().decode(indexContent);
             const wsPort = (this.wsServer as any)?.addr?.port || 8888;
-            const modifiedContent = textContent.replace(
-              "</body>",
-              `
+            const injection = this.config.server.injectClient
+              ? this.config.server.clientScriptUrl
+                ? `<script src="${this.config.server.clientScriptUrl}"></script>`
+                : `
               <script>
                 // InSpatial Hot Reload Client (SPA fallback)
-                const ws = new WebSocket('ws://localhost:${wsPort}');
+                const ws = new WebSocket('ws://${
+                  this.config.server.host || "localhost"
+                }:${wsPort}');
                 ws.onmessage = (event) => {
                   const data = JSON.parse(event.data);
                   if (data.type === 'reload') {
@@ -1169,9 +1283,11 @@ export {};
                 };
                 ws.onopen = () => console.log('🔌 InSpatial: Connected to hot reload');
                 ws.onclose = () => console.log('❌ InSpatial: Disconnected from hot reload');
-              </script>
-              </body>`
-            );
+              </script>`
+              : "";
+            const modifiedContent = injection
+              ? textContent.replace("</body>", `${injection}\n</body>`)
+              : textContent;
             return new Response(modifiedContent, {
               headers: { "Content-Type": "text/html" },
             });
@@ -1184,7 +1300,7 @@ export {};
       }
     };
 
-    const tryPorts = [6310, 6311, 6312];
+    const tryPorts = this.config.server.httpPorts;
     for (const p of tryPorts) {
       try {
         this.httpServer = InZero.serve({ port: p }, handler);

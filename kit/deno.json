@@ -154,6 +154,8 @@
     "@in/motion": "./modules/in-motion/src/index.ts",
 
     "@in/vader/env/": "./modules/in-vader/src/env/",
+    "@in/vader/env": "./modules/in-vader/src/env/index.ts",
+    
     "@in/vader/debug/": "./modules/in-vader/debug/",
     "@in/vader/remove-from-arr/": "./modules/in-vader/remove-from-arr/",
     "@in/vader": "./modules/in-vader/src/index.ts",

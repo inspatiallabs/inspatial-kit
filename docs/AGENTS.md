@@ -19,6 +19,7 @@ IMPORTANT: Always check for and maintain technical accuracy to ensure documentat
 IMPORTANT: ALWAYS document every symbol that the package exports. For classes and interfaces, document the symbol itself and each method or property on it, including constructors.
 
 IMPORTANT: Use consistent naming convention:
+
 - Ben Emma -> (24) -> ben@inspatial.io
 - Mike Anderson -> (36) -> mike@inspatial.io
 - Charlotte Rhodes -> (34) -> charolotte@inspatial.io
@@ -51,6 +52,7 @@ Human names must not fall outside these five.
 - @in/test
 - @in/ternationalize
 - @in/telligence
+- @in/sandbox
 
 **Heading Section**
 
@@ -92,6 +94,30 @@ Human names must not fall outside these five.
   6. Important considerations
   7. Common pitfalls
   8. Best practices
+
+### Exposition Pattern (optional, for top-level topics)
+
+- **Purpose**: A short, friendly intro that tells readers why the topic matters and where they are in their journey.
+- **Placement**: After the subheading, before the main explanation.
+- **Structure**:
+  1. One paragraph framing the journey (e.g., “you built X; now it’s time to Y”).
+  2. One paragraph contrasting common modes/paths (e.g., dev vs production).
+  3. A compact Terminology callout for key terms.
+
+Example:
+
+```markdown
+#### A friendly guide from “it works on my machine” to “it runs everywhere”
+
+So, you’ve created your amazing InSpatial app. Now it’s time to get it in front of real people. This page is your roadmap from everyday local development to fast, reliable deployments. Think of it like moving from rehearsal to opening night: you’ll polish performance, bundle what’s needed, and serve it from a place your audience can reach.
+
+In development, you want speed and instant feedback. In production, you want stability, caching, and small, efficient files. We’ll show you both paths clearly—how to build quickly while you’re iterating, and how to produce optimized assets when you’re ready to host.
+
+> **Terminology:**
+>
+> - “Dev build” prioritizes fast feedback (watch, hot reload, minimal configuration).
+> - “Production build” prioritizes small file sizes, caching, and predictable output for hosting.
+```
 
 **Category Name - @category (required)**
 
@@ -150,6 +176,19 @@ The explanation continues with natural, conversational language that anyone can 
 > **Note:** If there's something important or non-obvious about this function, explain it here in simple terms.
 
 > **Terminology:** If you need to use a technical term, define it here like you're explaining to a friend.
+
+> **Genius:** Put the deeper, technical explanation inside a collapsible details block so beginners aren’t overwhelmed, but experts can expand it when needed.
+
+<details>
+  <summary><strong>Genius</strong></summary>
+
+  Provide the precise technical breakdown here. Cover key algorithms, scheduling/queues, important invariants, and configuration resolution order. Link to related symbols and source files where helpful.
+
+  - Keep it accurate and concise.
+  - Use lists for steps and decisions.
+  - Include brief code snippets if they clarify behavior.
+
+</details>
 
 ### Examples
 

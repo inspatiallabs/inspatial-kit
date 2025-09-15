@@ -39,7 +39,7 @@ export * from "./same-start.ts";
 export * from "./farthest-point.ts";
 export * from "./difference.ts";
 export * from "./delay.ts";
-export * from "./backoff-jitter.ts"
+export * from "./backoff-jitter.ts";
 export * from "./get-package-version.ts";
 export * from "./abortable.ts";
 export * from "./convert-image-to-base-64-dom.ts";
@@ -65,6 +65,7 @@ export * from "./split-first.ts";
 export * from "./create-filter.ts";
 export * from "./keydown.ts";
 
+export * from "./env/index.ts";
 
 // export * from "./getletterspacing.ts";
 // export * from "./server-action.ts"; moved to InSpatial Run as part of the Framework Runtime

@@ -3,7 +3,7 @@
 
 ### 8. InSpatial Route
 
-InSpatial Route is a universal filesystem router built on InSPatial's `@in/route` module.
+InSpatial Route is a universal filesystem router built on InSpatial's `@in/route` module.
 
 ### Programmatic routing - `createRoute()` API
 

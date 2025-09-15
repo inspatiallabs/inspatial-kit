@@ -21,10 +21,10 @@ export function AppWindow() {
             // $(() => useAuth.view.peek() === "auth")
           }
           otherwise={() => <ProjectsWindow />}
-        >
+        > 
           <AuthWindow />
         </Show>
-      </Stack>
+      </Stack> 
     </>
   );
 }

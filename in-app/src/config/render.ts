@@ -13,7 +13,7 @@ import { InMotion } from "@inspatial/kit/motion";
 
 createRenderer({
   mode: "auto",
-  debug: "normal",
+  debug: "verbose",
   extensions: [
     InServe(),
     InTrigger(), // exposes universal and standard triggers

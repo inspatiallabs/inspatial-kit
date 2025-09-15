@@ -6,16 +6,11 @@ import {
   ThemeBoxSize,
   ThemeScale,
 } from "@in/widget/theme/index.ts";
-import { ThemeMaterial } from "@in/widget/theme/style.ts"
+import { ThemeMaterial } from "@in/widget/theme/style.ts";
 
 export const ButtonStyle = createStyle({
   /*******************************(Base)********************************/
   base: [
-    "inline-flex",
-    "cursor-pointer",
-    "items-center",
-    "justify-center",
-    "text-center",
     {
       web: {
         display: "inline-flex",
@@ -47,9 +42,6 @@ export const ButtonStyle = createStyle({
     //##############################################(FORMAT PROP)##############################################//
     format: {
       base: [
-        "bg-(--brand)",
-        "text-white",
-        "shadow-effect",
         {
           web: {
             backgroundColor: "var(--brand)",
@@ -73,12 +65,6 @@ export const ButtonStyle = createStyle({
         },
       ],
       outlineSurface: [
-        "border-2",
-        "border-(--surface)",
-        "shadow-muted",
-        "text-primary",
-        "bg-(--surface)",
-        "hover:bg-(--surface)",
         {
           web: {
             borderWidth: "2px",
@@ -91,17 +77,6 @@ export const ButtonStyle = createStyle({
         },
       ],
       outlineBackground: [
-        "border-2",
-        "shadow-muted",
-        "border-(--background)",
-
-        "hover:bg-(--surface)",
-        "hover:border-(--brand)",
-        "hover:border-t-4",
-        "hover:border-b-0.5",
-        "hover:border-l-2",
-        "hover:border-r-2",
-        "hover:text-(--primary)",
         {
           web: {
             borderWidth: "2px",
@@ -120,7 +95,6 @@ export const ButtonStyle = createStyle({
         },
       ],
       outlineMuted: [
-        "border-2 border-(--muted) shadow-muted text-primary bg-(--surface)",
         {
           web: {
             borderWidth: "2px",
@@ -130,17 +104,8 @@ export const ButtonStyle = createStyle({
           },
         },
       ],
-      ghost: [
-        "bg-transparent shadow-none text-primary",
-        { web: { backgroundColor: "transparent", boxShadow: "none" } },
-      ],
+      ghost: [{ web: { backgroundColor: "transparent", boxShadow: "none" } }],
       background: [
-        "bg-(--background)",
-        "shadow-none",
-        "text-(--secondary)",
-        "hover:bg-(--surface)",
-        "hover:border-2",
-        "hover:border-(--background)",
         {
           web: {
             backgroundColor: "var(--background)",
@@ -155,7 +120,6 @@ export const ButtonStyle = createStyle({
         },
       ],
       underline: [
-        "bg-inherit text-primary shadow-none underline-offset-[4px] underline decoration-4 decoration-(--brand)",
         {
           web: {
             textDecorationThickness: "4px",

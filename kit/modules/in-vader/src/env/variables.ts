@@ -2,7 +2,7 @@ import {
   detectRuntime,
   getRuntimeInfo,
   runtimeProviders,
-  type Runtime,
+  type RuntimeProps,
   type RuntimeInfo,
 } from "./runtime.ts";
 import type { EnvironmentProvider } from "./environment.ts";
@@ -177,11 +177,13 @@ export class EnvVariableManager {
   private cacheEnabled = true;
   private readonly runtimeInfo: RuntimeInfo | undefined;
 
-  constructor(runtime?: Runtime) {
+  constructor(runtime?: RuntimeProps) {
     const detectedRuntime = runtime ?? detectRuntime();
     // Always default to browser if runtime detection fails
-    const finalRuntime = detectedRuntime || "browser";
-    this.provider = runtimeProviders[finalRuntime]();
+    const finalRuntime: RuntimeProps = (detectedRuntime ||
+      "browser") as RuntimeProps;
+    this.provider =
+      runtimeProviders[finalRuntime]?.() ?? runtimeProviders["browser"]();
     this.runtimeInfo = getRuntimeInfo();
   }
 
@@ -845,7 +847,7 @@ export class EnvVariableManager {
    * }
    * ```
    */
-  isRuntime(runtime: Runtime): boolean {
+  isRuntime(runtime: RuntimeProps): boolean {
     return this.runtimeInfo?.name === runtime;
   }
 
@@ -1169,7 +1171,7 @@ export class EnvVariableManager {
     return {
       isValid,
       missing,
-      suggestions: [...new Set(suggestions)], // Remove duplicates
+      suggestions: Array.from(new Set(suggestions)), // Remove duplicates
       summary,
     };
   }

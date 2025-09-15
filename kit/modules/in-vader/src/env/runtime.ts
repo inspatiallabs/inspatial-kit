@@ -3,12 +3,12 @@ import type { EnvironmentProvider } from "./environment.ts";
 /**
  * Supported JavaScript runtimes
  */
-export type Runtime = "deno" | "node" | "bun" | "browser";
+export type RuntimeProps = "deno" | "node" | "bun" | "browser";
 
 /**
  * Runtime-specific environment providers
  */
-export const runtimeProviders: Record<Runtime, () => EnvironmentProvider> = {
+export const runtimeProviders: Record<RuntimeProps, () => EnvironmentProvider> = {
   node: () => ({
     get: (key: string) => (globalThis as any).process?.env[key],
   }),
@@ -46,7 +46,7 @@ export const runtimeProviders: Record<Runtime, () => EnvironmentProvider> = {
 /**
  * Detect current runtime
  */
-export function detectRuntime(): Runtime | undefined {
+export function detectRuntime(): RuntimeProps | undefined {
   // Check for browser environment first (has window or import.meta but no server runtimes)
   const hasWindow = typeof (globalThis as any).window === "object";
   const hasImportMeta = typeof (globalThis as any).import?.meta === "object";
@@ -72,7 +72,7 @@ export function detectRuntime(): Runtime | undefined {
  * Runtime information interface
  */
 export interface RuntimeInfo {
-  name: Runtime;
+  name: RuntimeProps;
   version?: string;
   platform?: string;
   supportsImportMeta: boolean;
