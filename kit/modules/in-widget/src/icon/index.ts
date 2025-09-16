@@ -34,3 +34,6 @@ export * from "./flow-visualizer-icon.tsx";
 export * from "./clock-icon.tsx";
 export * from "./play-icon.tsx";
 export * from "./code-icon.tsx";
+export * from "./folder-notch-open-icon.tsx";
+export * from "./folder-notch-icon.tsx";
+export * from "./file-icon.tsx";

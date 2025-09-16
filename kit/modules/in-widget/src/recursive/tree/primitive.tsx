@@ -13,7 +13,7 @@ export function TreeItem<T>({
   children,
   indent = 10,
   ...props
-}: Omit<TreeItemProps<T>, "indent">) {
+}: Omit<TreeItemProps, "indent">) {
   const { style: propStyle, ...rest } = props;
 
   const level = item.getItemMeta().level ?? 0;
@@ -27,8 +27,62 @@ export function TreeItem<T>({
 
   const Comp = asChild ? Slot : Button;
   const itemProps = typeof item.getProps === "function" ? item.getProps() : {};
-  const { onClick: itemOnClick, ...itemPropsSafe } =
-    (itemProps as Record<string, unknown>) ?? {};
+
+  // Extract event handlers that need special handling
+  const {
+    onClick: itemOnClick,
+    onDragStart,
+    onDragEnd,
+    onDragEnter,
+    onDragLeave,
+    onDragOver,
+    onDrop,
+    ...itemPropsSafe
+  } = (itemProps as Record<string, unknown>) ?? {};
+
+  const handleItemTap = (e?: any) => {
+    if (typeof itemOnClick !== "function") return;
+
+    // Create a normalized event object with safe defaults
+    const normalized = {
+      ctrlKey: e?.ctrlKey ?? false,
+      shiftKey: e?.shiftKey ?? false,
+      metaKey: e?.metaKey ?? false,
+      altKey: e?.altKey ?? false,
+      preventDefault: e?.preventDefault ? () => e.preventDefault() : () => {},
+      stopPropagation: e?.stopPropagation
+        ? () => e.stopPropagation()
+        : () => {},
+      ...(e || {}),
+    };
+
+    itemOnClick(normalized);
+  };
+
+  // Create safe wrapper for drag events
+  const createDragHandler = (handler: any) => {
+    if (typeof handler !== "function") return undefined;
+    return (e?: any) => {
+      if (!e) return;
+      handler(e);
+    };
+  };
+
+  // Build drag event props only if handlers exist
+  const dragProps = {
+    ...(onDragStart
+      ? { ["on:dragstart"]: createDragHandler(onDragStart) }
+      : {}),
+    ...(onDragEnd ? { ["on:dragend"]: createDragHandler(onDragEnd) } : {}),
+    ...(onDragEnter
+      ? { ["on:dragenter"]: createDragHandler(onDragEnter) }
+      : {}),
+    ...(onDragLeave
+      ? { ["on:dragleave"]: createDragHandler(onDragLeave) }
+      : {}),
+    ...(onDragOver ? { ["on:dragover"]: createDragHandler(onDragOver) } : {}),
+    ...(onDrop ? { ["on:drop"]: createDragHandler(onDrop) } : {}),
+  };
 
   return (
     <Slot
@@ -54,7 +108,8 @@ export function TreeItem<T>({
           "z-10 ps-(--tree-padding) outline-hidden select-none not-last:pb-0.5 focus:z-20 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
           className
         )}
-        {...({ ["on:tap"]: itemOnClick, ["on:click"]: itemOnClick } as any)}
+        {...({ ["on:tap"]: handleItemTap, ["on:click"]: handleItemTap } as any)}
+        {...(dragProps as any)}
         data-focus={
           typeof item.isFocused === "function"
             ? item.isFocused() || false
@@ -90,6 +145,9 @@ export function TreeItem<T>({
 
 /*##############################(TREE ITEM LABEL)##############################*/
 
+// Store click time outside component to persist between renders
+const clickTimeMap = new Map<string, number>();
+
 export function TreeItemLabel<T = any>({
   item: propItem,
   children,
@@ -103,13 +161,31 @@ export function TreeItemLabel<T = any>({
     return null;
   }
 
+  // Track double-click for rename
+  const itemId = item.getId?.() || "unknown";
+  const handleLabelClick = (e?: any) => {
+    const now = Date.now();
+    const lastClickTime = clickTimeMap.get(itemId) || 0;
+
+    if (now - lastClickTime < 500 && typeof item.startRenaming === "function") {
+      // Double-click detected - start renaming
+      e?.stopPropagation?.();
+      e?.preventDefault?.();
+      item.startRenaming();
+      clickTimeMap.delete(itemId); // Reset after successful double-click
+    } else {
+      clickTimeMap.set(itemId, now);
+    }
+  };
+
   return (
     <Slot
       data-slot="tree-item-label"
       className={iss(
-        "in-focus-visible:ring-ring/50 bg-(--background) hover:bg-(--brand) in-data-[selected=true]:bg-(--brand) in-data-[selected=true]:text-(--brand) in-data-[drag-target=true]:bg-(--brand) flex items-center gap-1 rounded-sm px-2 py-1.5 text-sm transition-colors not-in-data-[folder=true]:ps-7 in-focus-visible:ring-[3px] in-data-[search-match=true]:bg-blue-400/20! [&_svg]:pointer-events-none [&_svg]:shrink-0",
+        "in-focus-visible:ring-ring/50 bg-(--background) hover:bg-(--brand) in-data-[selected=true]:bg-(--brand) in-data-[selected=true]:text-(--brand) in-data-[drag-target=true]:bg-(--brand) flex items-center gap-1 rounded-sm px-2 py-1.5 text-sm transition-colors not-in-data-[folder=true]:ps-7 in-focus-visible:ring-[3px] in-data-[search-match=true]:bg-red-400/30! [&_svg]:pointer-events-none [&_svg]:shrink-0",
         className
       )}
+      on:tap={handleLabelClick}
       {...props}
     >
       {item.isFolder() && (

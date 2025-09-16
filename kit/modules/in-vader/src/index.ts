@@ -67,5 +67,8 @@ export * from "./keydown.ts";
 
 export * from "./env/index.ts";
 
+export * from "./normalize-path.ts";
+export * from "./parse-x.ts";
+
 // export * from "./getletterspacing.ts";
 // export * from "./server-action.ts"; moved to InSpatial Run as part of the Framework Runtime

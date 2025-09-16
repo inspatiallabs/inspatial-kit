@@ -59,7 +59,11 @@ export const searchFeature: FeatureImplementation = {
     // TODO memoize with propMemoizationFeature
     getSearchInputElementProps: ({ tree }) => ({
       value: tree.getSearchValue(),
-      onChange: (e: any) => tree.setSearch(e.target.value),
+      onChange: (e: any) => {
+        // Handle both event objects and direct values
+        const value = typeof e === "string" ? e : e?.target?.value ?? "";
+        tree.setSearch(value);
+      },
       onBlur: () => tree.closeSearch(),
       ref: tree.registerSearchInputElement,
     }),
@@ -86,8 +90,8 @@ export const searchFeature: FeatureImplementation = {
       preventDefault: true, // TODO make true default
       isEnabled: (tree) => !tree.isSearchOpen(),
       handler: (e, tree) => {
-        e.stopPropagation();
-        tree.openSearch(e.key);
+        e?.stopPropagation?.();
+        tree.openSearch(e?.key || "");
       },
     },
 

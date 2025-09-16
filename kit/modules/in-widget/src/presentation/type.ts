@@ -73,7 +73,7 @@ type ModalChildrenTree = {
 type ModalPropsTree = StyleProps<typeof ModalStyle.wrapper> &
   PresentationProps & {
     id: string;
-    children?: ModalChildrenTree;
+    children?: ModalChildrenTree ;
   };
 
 type ModalPropsDirect = StyleProps<typeof ModalStyle.wrapper> &
@@ -98,7 +98,5 @@ export type DrawerProps = StyleProps<typeof DrawerStyle.view> &
   JSX.SharedProps &
   PresentationProps & {
     id: string;
-    backdrop?: StyleProps<
-      typeof PresentationStyle.overlay
-    >["backdrop"];
+    backdrop?: StyleProps<typeof PresentationStyle.overlay>["backdrop"];
   };

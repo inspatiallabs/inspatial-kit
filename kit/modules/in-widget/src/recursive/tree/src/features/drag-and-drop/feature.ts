@@ -142,7 +142,7 @@ export const dragAndDropFeature: FeatureImplementation = {
         ...prevProps,
 
         onDragOver: (e: DragEvent) => {
-          e.preventDefault();
+          e?.preventDefault?.();
         },
 
         onDrop: async (e: DragEvent) => {
@@ -154,7 +154,7 @@ export const dragAndDropFeature: FeatureImplementation = {
             return;
           }
 
-          e.preventDefault();
+          e?.preventDefault?.();
           const config = tree.getConfig();
           const draggedItems = tree.getState().dnd?.draggedItems;
 
@@ -162,8 +162,8 @@ export const dragAndDropFeature: FeatureImplementation = {
 
           if (draggedItems) {
             await config.onDrop?.(draggedItems, target);
-          } else if (e.dataTransfer) {
-            await config.onDropForeignDragObject?.(e.dataTransfer, target);
+          } else if (e?.dataTransfer) {
+            await config.onDropForeignDragObject?.(e?.dataTransfer, target);
           }
         },
 
@@ -181,7 +181,7 @@ export const dragAndDropFeature: FeatureImplementation = {
 
       draggable: true,
 
-      onDragEnter: (e: DragEvent) => e.preventDefault(),
+      onDragEnter: (e: DragEvent) => e?.preventDefault?.(),
 
       onDragStart: (e: DragEvent) => {
         const selectedItems = tree.getSelectedItems
@@ -195,16 +195,16 @@ export const dragAndDropFeature: FeatureImplementation = {
         }
 
         if (!(config.canDrag?.(items) ?? true)) {
-          e.preventDefault();
+          e?.preventDefault?.();
           return;
         }
 
-        if (config.setDragImage) {
+        if (config.setDragImage && e?.dataTransfer) {
           const { imgElement, xOffset, yOffset } = config.setDragImage(items);
-          e.dataTransfer?.setDragImage(imgElement, xOffset ?? 0, yOffset ?? 0);
+          e.dataTransfer.setDragImage(imgElement, xOffset ?? 0, yOffset ?? 0);
         }
 
-        if (config.createForeignDragObject && e.dataTransfer) {
+        if (config.createForeignDragObject && e?.dataTransfer) {
           const { format, data, dropEffect, effectAllowed } =
             config.createForeignDragObject(items);
           e.dataTransfer.setData(format, data);
@@ -220,7 +220,7 @@ export const dragAndDropFeature: FeatureImplementation = {
       },
 
       onDragOver: (e: DragEvent) => {
-        e.stopPropagation(); // don't bubble up to container dragover
+        e?.stopPropagation?.(); // don't bubble up to container dragover
         const dataRef = tree.getDataRef<DndDataRef>();
         const placement = getTargetPlacement(e, item, tree, true);
         const nextDragCode = getDragCode(item, placement);
@@ -240,7 +240,7 @@ export const dragAndDropFeature: FeatureImplementation = {
 
         if (
           !tree.getState().dnd?.draggedItems &&
-          (!e.dataTransfer ||
+          (!e?.dataTransfer ||
             !tree
               .getConfig()
               .canDragForeignDragObjectOver?.(e.dataTransfer, target))
@@ -260,7 +260,7 @@ export const dragAndDropFeature: FeatureImplementation = {
           draggingOverItem: item,
         }));
         dataRef.current.lastAllowDrop = true;
-        e.preventDefault();
+        e?.preventDefault?.();
       },
 
       onDragLeave: () => {
@@ -298,7 +298,7 @@ export const dragAndDropFeature: FeatureImplementation = {
       },
 
       onDrop: async (e: DragEvent) => {
-        e.stopPropagation();
+        e?.stopPropagation?.();
         const dataRef = tree.getDataRef<DndDataRef>();
         const target = getDragTarget(e, item, tree);
         const draggedItems = tree.getState().dnd?.draggedItems;
@@ -314,14 +314,14 @@ export const dragAndDropFeature: FeatureImplementation = {
           return;
         }
 
-        e.preventDefault();
+        e?.preventDefault?.();
         const config = tree.getConfig();
 
         dataRef.current.lastDragCode = undefined;
 
         if (draggedItems) {
           await config.onDrop?.(draggedItems, target);
-        } else if (e.dataTransfer) {
+        } else if (e?.dataTransfer) {
           await config.onDropForeignDragObject?.(e.dataTransfer, target);
         }
       },

@@ -332,6 +332,16 @@ export const DOM_MISC_EVENTS = [
   "abort",
 ] as const;
 
+export const DOM_DRAG_EVENTS = [
+  "drag",
+  "dragstart",
+  "dragend",
+  "dragenter",
+  "dragleave",
+  "dragover",
+  "drop",
+] as const;
+
 // Create DOM event handler factory
 type AnyEventHandler = (...args: any[]) => any;
 type MaybeSignalHandler = AnyEventHandler | Signal<AnyEventHandler>;
@@ -420,6 +430,14 @@ export function InDOMTriggerProps(): void {
 
   // Other common events
   DOM_MISC_EVENTS.forEach((event: (typeof DOM_MISC_EVENTS)[number]) => {
+    triggerBridgeRegistry.register(event, {
+      handler: DOMEventHandler(event),
+      platforms: ["dom"],
+    });
+  });
+  
+  // Drag and drop events
+  DOM_DRAG_EVENTS.forEach((event: (typeof DOM_DRAG_EVENTS)[number]) => {
     triggerBridgeRegistry.register(event, {
       handler: DOMEventHandler(event),
       platforms: ["dom"],

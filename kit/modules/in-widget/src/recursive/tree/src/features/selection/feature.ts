@@ -1,5 +1,5 @@
-import { FeatureImplementation } from "../../types/core";
-import { makeStateUpdater } from "../../utils";
+import type { FeatureImplementation } from "../../types/core.ts";
+import { makeStateUpdater } from "../../utils.ts";
 
 export const selectionFeature: FeatureImplementation = {
   key: "selection",
@@ -34,7 +34,7 @@ export const selectionFeature: FeatureImplementation = {
       tree.setSelectedItems(
         selectedItems.includes(itemId)
           ? selectedItems
-          : [...selectedItems, itemId],
+          : [...selectedItems, itemId]
       );
     },
 

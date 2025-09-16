@@ -35,8 +35,8 @@ export interface RouteFiles {
     notUnauthorized?: string | PlatformFileMap;
     global?: string | PlatformFileMap; // root only
   };
-  state?: string;
-  style?: string;
+  state?: string; 
+  style?: string; // can only have one style.ts file per folder
   theme?: string; // can only have one theme.ts file
   extension?: string;
   trigger?: string;
@@ -45,7 +45,12 @@ export interface RouteFiles {
   env?: string;
   doc?: string; // folder
   api?: string;
+  render?: string; // can only have one render.ts file
+  window?: string; // can only have one window.tsx per folder
+  scene?: string; // can only have one scene.tsx per folder
   collection?: string | string[]; // folder
+  asset?: string | string[]; // folder
+  config?: string; // folder
 }
 
 export interface RouteNodeMeta {

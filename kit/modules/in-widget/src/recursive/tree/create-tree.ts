@@ -20,12 +20,16 @@ export const createTree = <T>(config: TreeConfig<T>) => {
     setState: (updater: any) => {
       const nextState =
         typeof updater === "function" ? updater(state.peek()) : updater;
-      console.log("createTree: setState called", {
-        prevState: state.peek(),
-        nextState,
-      });
       state.set(nextState);
       config.setState?.(nextState);
+
+      // Trigger rebuild for certain state changes
+      if (
+        nextState.renamingItem !== state.peek().renamingItem ||
+        nextState.search !== state.peek().search
+      ) {
+        nextTick(() => tree.peek().rebuildTree());
+      }
     },
   }));
 
@@ -36,25 +40,20 @@ export const createTree = <T>(config: TreeConfig<T>) => {
 
   // Create a version counter that increments when tree rebuilds
   const treeVersion = createSignal(0);
-  
+
   // Override rebuildTree to increment version
   const originalRebuildTree = tree.peek().rebuildTree;
   tree.peek().rebuildTree = () => {
     originalRebuildTree();
     treeVersion.set(treeVersion.peek() + 1);
   };
-  
+
   // Expose reactive items list that tracks tree version changes
   const items = $(() => {
     // Track the version signal - will re-run when tree rebuilds
     const version = treeVersion.get();
-    
+
     const treeItems = tree.peek().getItems();
-    console.log("createTree: items computed", {
-      version,
-      count: treeItems.length,
-      expandedItems: tree.peek().getState().expandedItems,
-    });
     return treeItems;
   });
   (tree.peek() as any).items = items;

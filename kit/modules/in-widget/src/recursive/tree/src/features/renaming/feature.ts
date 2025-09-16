@@ -72,7 +72,9 @@ export const renamingFeature: FeatureImplementation = {
       onBlur: () => tree.abortRenaming(),
       value: tree.getRenamingValue(),
       onChange: (e: InputEvent) => {
-        tree.applySubStateUpdate("renamingValue", e.target?.value);
+        // Handle both event objects and direct values
+        const value = typeof e === 'string' ? e : e?.target?.value ?? '';
+        tree.applySubStateUpdate("renamingValue", value);
       },
     }),
 

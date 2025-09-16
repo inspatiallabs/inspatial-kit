@@ -66,13 +66,15 @@ export const hotkeysCoreFeature: FeatureImplementation = {
     const data = tree.getDataRef<HotkeysCoreDataRef>();
     const keydown = (e: KeyboardEvent) => {
       const { ignoreHotkeysOnInputs, onTreeHotkey, hotkeys } = tree.getConfig();
-      if (e.target instanceof HTMLInputElement && ignoreHotkeysOnInputs) {
+      if (e?.target instanceof HTMLInputElement && ignoreHotkeysOnInputs) {
         return;
       }
 
       data.current.pressedKeys ??= new Set();
-      const newMatch = !data.current.pressedKeys.has(e.code);
-      data.current.pressedKeys.add(e.code);
+      const code = e?.code || e?.key || "";
+      if (!code) return;
+      const newMatch = !data.current.pressedKeys.has(code);
+      data.current.pressedKeys.add(code);
 
       const hotkeyName = findHotkeyMatch(
         data.current.pressedKeys,
@@ -81,10 +83,10 @@ export const hotkeysCoreFeature: FeatureImplementation = {
         hotkeys as HotkeysConfig<any>
       );
 
-      if (e.target instanceof HTMLInputElement) {
+      if (e?.target instanceof HTMLInputElement) {
         // JS respects composite keydowns while input elements are focused, and
         // doesnt send the associated keyup events with the same key name
-        data.current.pressedKeys.delete(e.code);
+        data.current.pressedKeys.delete(code);
       }
 
       if (!hotkeyName) return;
@@ -97,11 +99,11 @@ export const hotkeysCoreFeature: FeatureImplementation = {
       if (!hotkeyConfig) return;
       if (
         !hotkeyConfig.allowWhenInputFocused &&
-        e.target instanceof HTMLInputElement
+        e?.target instanceof HTMLInputElement
       )
         return;
       if (!hotkeyConfig.canRepeat && !newMatch) return;
-      if (hotkeyConfig.preventDefault) e.preventDefault();
+      if (hotkeyConfig.preventDefault) e?.preventDefault?.();
 
       hotkeyConfig.handler(e, tree as any);
       onTreeHotkey?.(hotkeyName, e);
@@ -109,7 +111,10 @@ export const hotkeysCoreFeature: FeatureImplementation = {
 
     const keyup = (e: KeyboardEvent) => {
       data.current.pressedKeys ??= new Set();
-      data.current.pressedKeys.delete(e.code);
+      const code = e?.code || e?.key || "";
+      if (code) {
+        data.current.pressedKeys.delete(code);
+      }
     };
 
     const reset = () => {

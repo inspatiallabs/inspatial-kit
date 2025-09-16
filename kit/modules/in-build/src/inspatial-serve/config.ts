@@ -1,89 +1,17 @@
-// deno-lint-ignore-file no-empty
 import { InZero } from "@in/zero";
-import { env, type RuntimeProps } from "@in/vader/env";
+import {
+  env,
+  normalizePath,
+  parseNumberArray,
+  parseStringArray,
+} from "@in/vader";
+import type {
+  InServeResolvedConfig,
+  InServeConfig,
+  SourceMapMode,
+} from "./type.ts";
 
-export type SourceMapMode = "linked" | "inline" | "external" | false;
-
-export interface InServeConfig {
-  server?: {
-    httpPorts?: number[];
-    wsPorts?: number[];
-    host?: string;
-    injectClient?: boolean;
-    clientScriptUrl?: string;
-    cacheControl?: string;
-    assetRouteBase?: string;
-  };
-  paths?: {
-    srcDir?: string;
-    distDir?: string;
-    htmlEntry?: string;
-    htmlDist?: string;
-    assetSrcDir?: string;
-    assetDistDir?: string;
-    favicon?: string;
-    renderEntry?: string;
-    cssInput?: string;
-    cssOutput?: string;
-    jsOutput?: string;
-  };
-  watch?: {
-    include?: string[];
-    includeFramework?: string[];
-    exclude?: string[];
-  };
-  build?: {
-    js?: {
-      engine?: "inprocess" | "subprocess";
-      entrypoints?: string[];
-      outputDir?: string;
-      output?: string;
-      platform?: RuntimeProps
-      minify?: boolean;
-      codeSplitting?: boolean;
-      format?: "esm" | "iife" | "cjs";
-      inlineImports?: boolean;
-      external?: string[];
-      packages?: "bundle" | "external";
-      sourcemap?: SourceMapMode;
-      write?: boolean;
-      htmlEntrypoints?: boolean;
-    };
-    css?: {
-      input?: string;
-      output?: string;
-      contentGlobs?: string[];
-    };
-    html?: {
-      enabled?: boolean;
-    };
-    timing?: {
-      debounceMs?: number;
-      waitAttempts?: number;
-      waitIntervalMs?: number;
-      cssStabilizeAttempts?: number;
-      cssStabilizeIntervalMs?: number;
-    };
-  };
-  discovery?: {
-    renderSearch?: string[];
-    kitRoots?: string[];
-  };
-}
-
-export interface InServeResolvedConfig {
-  server: Required<Required<InServeConfig>["server"]>;
-  paths: Required<Required<InServeConfig>["paths"]>;
-  watch: Required<Required<InServeConfig>["watch"]>;
-  build: Required<Required<InServeConfig>["build"]> & {
-    js: Required<NonNullable<InServeConfig["build"]>["js"]>;
-    css: Required<NonNullable<InServeConfig["build"]>["css"]>;
-    html: Required<NonNullable<InServeConfig["build"]>["html"]>;
-    timing: Required<NonNullable<InServeConfig["build"]>["timing"]>;
-  };
-  discovery: Required<Required<InServeConfig>["discovery"]>;
-}
-
+/*##############################(DEFAULT CONFIG)##############################*/
 const defaultConfig: InServeResolvedConfig = {
   server: {
     httpPorts: [6310, 6311, 6312],
@@ -119,7 +47,7 @@ const defaultConfig: InServeResolvedConfig = {
       outputDir: "./dist",
       output: "",
       platform: "browser",
-      minify: true,
+      minify: false, // Code is beautiful when you can read it 😂
       codeSplitting: false,
       format: "esm",
       inlineImports: false,
@@ -157,44 +85,7 @@ const defaultConfig: InServeResolvedConfig = {
   },
 };
 
-function normalizePath(p: string): string {
-  return p.replace(/\\/g, "/");
-}
-
-function getEnv(name: string): string | undefined {
-  try {
-    const D = (globalThis as any).Deno;
-    if (D?.env?.get) return D.env.get(name);
-  } catch {}
-  return undefined;
-}
-
-function parseNumberArray(value?: string): number[] | undefined {
-  if (!value) return undefined;
-  try {
-    return value
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean)
-      .map((s) => Number(s))
-      .filter((n) => Number.isFinite(n));
-  } catch {
-    return undefined;
-  }
-}
-
-function parseStringArray(value?: string): string[] | undefined {
-  if (!value) return undefined;
-  try {
-    return value
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean);
-  } catch {
-    return undefined;
-  }
-}
-
+/*##############################(PARSE SOURCE MAP MODE)##############################*/
 function parseSourceMapMode(value?: string): SourceMapMode | undefined {
   if (!value) return undefined;
   const v = value.toLowerCase().trim();
@@ -204,6 +95,7 @@ function parseSourceMapMode(value?: string): SourceMapMode | undefined {
   return undefined;
 }
 
+/*##############################(RESOLVE SERVE CONFIG)##############################*/
 export async function resolveServeConfig(): Promise<InServeResolvedConfig> {
   let userCfg: InServeConfig = {};
   try {
@@ -217,16 +109,16 @@ export async function resolveServeConfig(): Promise<InServeResolvedConfig> {
   const merged: InServeResolvedConfig = {
     server: {
       httpPorts:
-        parseNumberArray(getEnv("INSPATIAL_SERVE_HTTP_PORTS")) ||
+        parseNumberArray(env.get("INSPATIAL_SERVE_HTTP_PORTS")) ||
         userCfg.server?.httpPorts ||
         defaultConfig.server.httpPorts,
       wsPorts:
-        parseNumberArray(getEnv("INSPATIAL_SERVE_WS_PORTS")) ||
+        parseNumberArray(env.get("INSPATIAL_SERVE_WS_PORTS")) ||
         userCfg.server?.wsPorts ||
         defaultConfig.server.wsPorts,
       host: userCfg.server?.host || defaultConfig.server.host,
       injectClient:
-        (getEnv("INSPATIAL_SERVE_INJECT_CLIENT")?.toLowerCase() === "false"
+        (env.get("INSPATIAL_SERVE_INJECT_CLIENT")?.toLowerCase() === "false"
           ? false
           : undefined) ??
         userCfg.server?.injectClient ??
@@ -287,11 +179,11 @@ export async function resolveServeConfig(): Promise<InServeResolvedConfig> {
     build: {
       js: {
         engine:
-          (getEnv("INSPATIAL_SERVE_JS_ENGINE") as any) ||
+          (env.get("INSPATIAL_SERVE_JS_ENGINE") as any) ||
           userCfg.build?.js?.engine ||
           defaultConfig.build.js.engine,
         entrypoints:
-          parseStringArray(getEnv("INSPATIAL_SERVE_JS_ENTRYPOINTS")) ||
+          parseStringArray(env.get("INSPATIAL_SERVE_JS_ENTRYPOINTS")) ||
           userCfg.build?.js?.entrypoints ||
           [],
         outputDir: normalizePath(
@@ -317,7 +209,7 @@ export async function resolveServeConfig(): Promise<InServeResolvedConfig> {
         sourcemap: ((): SourceMapMode => {
           // 1) ENV override wins
           const envOverride = parseSourceMapMode(
-            getEnv("INSPATIAL_SERVE_JS_SOURCEMAP")
+            env.get("INSPATIAL_SERVE_JS_SOURCEMAP")
           );
           if (envOverride !== undefined) return envOverride;
           // 2) User config if present
