@@ -119,6 +119,18 @@ export const ButtonStyle = createStyle({
           },
         },
       ],
+      surface: [
+        {
+          web: {
+            backgroundColor: "var(--surface)",
+            boxShadow: "none",
+            color: "var(--secondary)",
+            "&:hover": {
+              backgroundColor: "var(--surface)",
+            },
+          },
+        },
+      ],
       underline: [
         {
           web: {

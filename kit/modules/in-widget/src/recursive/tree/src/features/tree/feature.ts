@@ -146,12 +146,6 @@ export const treeFeature: FeatureImplementation<any> = {
         "aria-level": itemMeta.level + 1,
         tabIndex: item.isFocused() ? 0 : -1,
         onClick: (e: MouseEvent) => {
-          console.log("tree/feature: onClick handler", {
-            itemId: item.getId(),
-            isFolder: item.isFolder(),
-            isExpanded: item.isExpanded(),
-            ctrlKey: e.ctrlKey,
-          });
           item.setFocused();
           item.primaryAction();
 
@@ -172,10 +166,6 @@ export const treeFeature: FeatureImplementation<any> = {
       };
     },
     expand: ({ tree, item, itemId }) => {
-      console.log("tree/feature: expand called", {
-        itemId,
-        isFolder: item.isFolder(),
-      });
       if (!item.isFolder()) {
         return;
       }

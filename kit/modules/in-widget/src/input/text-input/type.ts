@@ -1,4 +1,9 @@
-export interface TextInputProps extends JSX.SharedProps {
+export type TextInputProps = JSX.SharedProps & {
+  value?: string;
+  cta?: {
+    clear?: () => void;
+    action?: () => void;
+  };
   placeholder?: string;
   type:
     | "emailfield"
@@ -13,4 +18,4 @@ export interface TextInputProps extends JSX.SharedProps {
     | "locationfield"
     | "datefield"
     | "timefield";
-}
+};

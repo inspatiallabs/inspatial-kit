@@ -336,7 +336,7 @@ export function DOMRenderer(options: DOMOptions = {}): any {
 
   const renderer = createRenderer(nodeOps, rendererID);
 
-  // if DOMRenderer is used directly (without implicitly choosing a runtimeTemplate)
+  // if DOMRenderer is used directly (without implicitly choosing a runtimeMarkup)
   // and no global renderer is present, defer a microtask to apply JSX wrap.
   try {
     const maybeGlobal = (globalThis as any).R;

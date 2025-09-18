@@ -2,9 +2,9 @@ import { detectEnvironment, type EnvironmentInfo } from "@in/vader/env";
 import type { RendererExtensions } from "@in/extension";
 import { createDebugContext, type DebugMode } from "@in/vader/debug";
 import {
-  applyRuntimeTemplate,
-  type RuntimeTemplateApply,
-} from "./runtime-template.ts";
+  applyRuntimeMarkup,
+  type RuntimeMarkupApply,
+} from "./runtime-markup.ts";
 
 /**
  * Render Mode Configuration
@@ -23,10 +23,10 @@ export interface RenderModeOptions {
   /** Debug mode - true, false, or configuration */
   debug?: DebugMode;
   /** Runtime template selection or applier. Defaults to jsx in browser-interactive */
-  runtimeTemplate?:
+  runtimeMarkup?:
     | "jsx"
     | "jsxsfc" // Single File Component (SFC) Powered by JSX --- NOT YET IMPLEMENTED
-    | RuntimeTemplateApply;
+    | RuntimeMarkupApply;
 }
 
 /**
@@ -43,7 +43,7 @@ export async function createRenderer(
     environment,
     extensions,
     debug = false,
-    runtimeTemplate,
+    runtimeMarkup,
   } = options;
 
   // Create debug context
@@ -75,7 +75,7 @@ export async function createRenderer(
         env,
         extensions,
         debugCtx,
-        runtimeTemplate,
+        runtimeMarkup,
       });
       break;
 
@@ -85,7 +85,7 @@ export async function createRenderer(
         env,
         extensions,
         debugCtx,
-        runtimeTemplate,
+        runtimeMarkup,
       });
       break;
 
@@ -95,7 +95,7 @@ export async function createRenderer(
         env,
         extensions,
         debugCtx,
-        runtimeTemplate,
+        runtimeMarkup,
       });
       break;
 
@@ -104,7 +104,7 @@ export async function createRenderer(
         env,
         extensions,
         debugCtx,
-        runtimeTemplate,
+        runtimeMarkup,
       });
       break;
 
@@ -119,7 +119,7 @@ export async function createRenderer(
         env,
         extensions,
         debugCtx,
-        runtimeTemplate,
+        runtimeMarkup,
       });
   }
 
@@ -179,7 +179,7 @@ async function createBrowserRenderer({
   env,
   extensions,
   debugCtx,
-  runtimeTemplate,
+  runtimeMarkup,
 }: any): Promise<any> {
   // Smart target detection within browser mode
   let resolvedTarget = target;
@@ -212,9 +212,9 @@ async function createBrowserRenderer({
 
     // Apply runtime template: default to jsx unless explicitly disabled (undefined => jsx)
     try {
-      await applyRuntimeTemplate(
+      await applyRuntimeMarkup(
         renderer,
-        runtimeTemplate === undefined ? "jsx" : runtimeTemplate
+        runtimeMarkup === undefined ? "jsx" : runtimeMarkup
       );
     } catch (e) {
       debugCtx?.debug.warn("renderer", "Failed to apply runtime template", e);
@@ -232,7 +232,7 @@ async function createXRRenderer({
   env: _env,
   extensions,
   debugCtx,
-  runtimeTemplate,
+  runtimeMarkup,
 }: any): Promise<any> {
   const { XRRenderer } = await import("@in/xr");
 
@@ -245,9 +245,9 @@ async function createXRRenderer({
 
   // Default to JSX runtime for XR when none specified (explicit setting overrides)
   try {
-    await applyRuntimeTemplate(
+    await applyRuntimeMarkup(
       renderer,
-      runtimeTemplate === undefined ? "jsx" : runtimeTemplate
+      runtimeMarkup === undefined ? "jsx" : runtimeMarkup
     );
   } catch (e) {
     debugCtx?.debug.warn("renderer", "Failed to apply runtime template", e);
@@ -264,7 +264,7 @@ async function createNativeRenderer({
   env: _env,
   extensions,
   debugCtx,
-  runtimeTemplate,
+  runtimeMarkup,
 }: any): Promise<any> {
   const { NativeScriptRenderer } = await import("@in/nativescript");
 
@@ -275,9 +275,9 @@ async function createNativeRenderer({
 
   // Default to JSX runtime for Native when none specified (explicit setting overrides)
   try {
-    await applyRuntimeTemplate(
+    await applyRuntimeMarkup(
       renderer,
-      runtimeTemplate === undefined ? "jsx" : runtimeTemplate
+      runtimeMarkup === undefined ? "jsx" : runtimeMarkup
     );
   } catch (e) {
     debugCtx?.debug.warn("renderer", "Failed to apply runtime template", e);
@@ -293,7 +293,7 @@ async function createServerRenderer({
   env: _env,
   extensions,
   debugCtx,
-  runtimeTemplate,
+  runtimeMarkup,
 }: any): Promise<any> {
   const { SSRRenderer } = await import("@in/ssr");
 
@@ -303,9 +303,9 @@ async function createServerRenderer({
   });
 
   // Server-side generally should not apply client runtimes; apply only if explicitly requested
-  if (runtimeTemplate) {
+  if (runtimeMarkup) {
     try {
-      await applyRuntimeTemplate(renderer, runtimeTemplate);
+      await applyRuntimeMarkup(renderer, runtimeMarkup);
     } catch (e) {
       debugCtx?.debug.warn("renderer", "Failed to apply runtime template", e);
     }

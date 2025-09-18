@@ -31,6 +31,8 @@ export const searchFeature: FeatureImplementation = {
           tree.getConfig().isSearchMatchingItem?.(tree.getSearchValue(), item)
         )
         ?.setFocused();
+      // Rebuild to propagate search-driven state to consumers (e.g., reactive wrappers)
+      tree.rebuildTree();
     },
     openSearch: ({ tree }, initialValue = "") => {
       tree.setSearch(initialValue);

@@ -12,10 +12,10 @@ InSpatial Kit is a (UDE) framework for building cross-platform interfaces. to un
 
 # Core Concepts
 
-1. User Interface
+1. Graphical User Interface
 
 - Rendering
-- Templating & Runtime
+- Runtime & Markup
 - Widgets & Components
 - Styling
 

@@ -8,10 +8,10 @@ export type {
 } from "@in/extension";
 export { createExtension } from "@in/extension";
 export {
-  createRuntimeTemplate,
-  applyRuntimeTemplate,
-  type RuntimeTemplateApply,
-} from "./runtime-template.ts";
+  createRuntimeMarkup,
+  applyRuntimeMarkup,
+  type RuntimeMarkupApply,
+} from "./runtime-markup.ts";
 
 // Base renderer factory (for advanced users)
 export { createRenderer as createBaseRenderer } from "./create-renderer.ts";

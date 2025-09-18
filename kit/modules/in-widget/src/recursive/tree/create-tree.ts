@@ -26,7 +26,9 @@ export const createTree = <T>(config: TreeConfig<T>) => {
       // Trigger rebuild for certain state changes
       if (
         nextState.renamingItem !== state.peek().renamingItem ||
-        nextState.search !== state.peek().search
+        nextState.search !== state.peek().search ||
+        JSON.stringify(nextState.expandedItems) !==
+          JSON.stringify(state.peek().expandedItems)
       ) {
         nextTick(() => tree.peek().rebuildTree());
       }

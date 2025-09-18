@@ -65,4 +65,8 @@
 /*###################################################( UTILITIES )###################################################*/
 
 @layer utilities {
+  [aria-expanded="false"].caret-rotate-on-collapse {
+    transform: rotate(-90deg);
+    transition: transform 0.2s ease;
+  }
 }

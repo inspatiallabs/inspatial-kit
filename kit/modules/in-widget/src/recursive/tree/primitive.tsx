@@ -1,7 +1,6 @@
 import { Slot } from "@in/widget/structure/index.ts";
 import { Button } from "@in/widget/ornament/index.ts";
 import { iss, type ISSProps } from "@in/style";
-import { CaretDownPrimeIcon } from "@in/widget/icon/caret-down-prime-icon.tsx";
 import type { TreeItemLabelProps, TreeItemProps, TreeProps } from "./type.ts";
 
 /*##############################(TREE ITEM)##############################*/
@@ -188,13 +187,6 @@ export function TreeItemLabel<T = any>({
       on:tap={handleLabelClick}
       {...props}
     >
-      {item.isFolder() && (
-        <CaretDownPrimeIcon
-          className="text-(--muted) size-4 in-aria-[expanded=false]:-rotate-90"
-          size={"5xs"}
-          scale="12xs"
-        />
-      )}
       {children ||
         (typeof item.getItemName === "function" ? item.getItemName() : null)}
     </Slot>
@@ -237,9 +229,9 @@ export function TreeWrapper({
     tree && typeof tree.getContainerProps === "function"
       ? tree.getContainerProps()
       : {};
-  const mergedProps = { ...props, ...containerProps };
+  const mergedProps = { ...props, ...containerProps } as Record<string, any>;
 
-  const { style: propStyle, ...rest } = mergedProps;
+  const { style: propStyle, ...rest } = mergedProps as any;
 
   return (
     <Slot

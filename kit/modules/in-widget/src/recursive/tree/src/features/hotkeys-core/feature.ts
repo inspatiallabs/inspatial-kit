@@ -124,8 +124,11 @@ export const hotkeysCoreFeature: FeatureImplementation = {
     // keyup is registered on document, because some hotkeys shift
     // the focus away from the tree (i.e. search)
     // and then we wouldn't get the keyup event anymore
+    // Support both native DOM and InSpatial trigger system
     element.addEventListener("keydown", keydown);
+    (element as any)["on:key:down"] = keydown as any;
     document.addEventListener("keyup", keyup);
+    (element as any)["on:key:up"] = keyup as any;
     window.addEventListener("focus", reset);
     data.current.keydownHandler = keydown;
     data.current.keyupHandler = keyup;

@@ -1,16 +1,16 @@
-type RuntimeTemplateApply = (renderer: any) => void | Promise<void>;
+type RuntimeMarkupApply = (renderer: any) => void | Promise<void>;
 
-const templates: Map<string, RuntimeTemplateApply> = new Map();
+const templates: Map<string, RuntimeMarkupApply> = new Map();
 
 /** Create a named runtime template applier */
-function createRuntimeTemplate(name: string, apply: RuntimeTemplateApply): void {
+function createRuntimeMarkup(name: string, apply: RuntimeMarkupApply): void {
   templates.set(name, apply);
 }
 
 /** Apply a template by name or direct function */
-async function applyRuntimeTemplate(
+async function applyRuntimeMarkup(
   renderer: any,
-  template?: "jsx" | "jsxsfc" | RuntimeTemplateApply
+  template?: "jsx" | "jsxsfc" | RuntimeMarkupApply
 ): Promise<void> {
   if (!template) return;
   const applier = typeof template === "function" ? template : templates.get(template);
@@ -18,13 +18,13 @@ async function applyRuntimeTemplate(
 }
 
 // Built-in creation for JSX
-createRuntimeTemplate("jsx", async function (renderer: any) {
+createRuntimeMarkup("jsx", async function (renderer: any) {
   const mod = await import("@in/runtime/index.ts");
   const fn = (mod as any).jsxRuntimeWrap || (mod as any).wrap;
   if (typeof fn === "function") fn(renderer);
 });
 
-export type { RuntimeTemplateApply };
-export { createRuntimeTemplate, applyRuntimeTemplate };
+export type { RuntimeMarkupApply };
+export { createRuntimeMarkup, applyRuntimeMarkup };
 
 

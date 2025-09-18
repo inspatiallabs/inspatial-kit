@@ -5,6 +5,9 @@ InSpatial Kit is based on InSpatial's own signal reactive primitives `@in/teract
 
 All core utilities, actions and APIs are encapsulated into simpler functions and file routes essentially removing the need for any form of project initialization or configurations. InSpatial Kit removes the need to install or use any of InSpatial's stand-alone dev and cloud modules as they come bundled with it by default.
 
+All event listeners must be created or flow through InSpatial trigger prop system
+
+
 ## AI contribution rules (apply to every task)
 
 1. Preserve existing code style, indentation, variable names, resource naming, and line endings; never re-format unrelated code.

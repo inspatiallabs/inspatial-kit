@@ -1,4 +1,3 @@
-// deno-lint-ignore-file jsx-no-children-prop
 import {
   checkboxesFeature,
   createOnDropHandler,
@@ -17,20 +16,23 @@ import { createTree } from "./create-tree.ts";
 import { Slot, YStack } from "@in/widget/structure/index.ts";
 import { List } from "@in/widget/data-flow/index.ts";
 import {
+  ArrowBottomIcon,
+  ArrowUpIcon,
+  CaretDownPrimeIcon,
   FileIcon,
   FolderNotchIcon,
   FolderNotchOpenIcon,
   Icon,
+  XPrimeIcon,
 } from "@in/widget/icon/index.ts";
 import { XStack } from "@in/widget/structure/stack/index.tsx";
 import { Show } from "@in/widget/control-flow/index.ts";
 import type { TreeAnchorProps } from "./type.ts";
-import { createState, $ } from "@in/teract/state";
-import { createAction } from "@in/teract/state/action.ts";
+import type { ItemInstance } from "./src/index.ts";
+import { createState, createAction, $ } from "@in/teract/state/index.ts";
 import { Checkbox, SearchField, InputField } from "@in/widget/input/index.ts";
 import { Button } from "@in/widget/ornament/button/index.ts";
-import { Text } from "@in/widget/typography/index.ts";
-import { Modal } from "@in/widget/presentation/modal/index.tsx";
+import { isOneEditAway } from "@in/vader";
 
 const initialItems: Record<string, TreeAnchorProps> = {
   company: {
@@ -70,14 +72,17 @@ export function Tree() {
 
     const useTree = createState({
       items: initialItems,
-      searchQuery: "",
       showHelp: false,
+      isExpanded: true,
+      searchValue: "",
     });
 
-    const setSearchQuery = createAction(
-      [useTree, "searchQuery"],
-      (current, searchQuery) => searchQuery
+    const setSearchValue = createAction(
+      useTree.searchValue,
+      (_current, searchValue: string) => searchValue
     );
+
+    const clearSearchAction = createAction(useTree.searchValue, () => "");
 
     /*##############################(CREATE TREE)##############################*/
     const tree = createTree<TreeAnchorProps>({
@@ -121,7 +126,6 @@ export function Tree() {
         propMemoizationFeature,
       ],
       // Search configuration
-      setSearch: (search) => setSearchQuery(search || ""),
       isSearchMatchingItem: (search, item) =>
         search.length > 0 &&
         item.getItemName().toLowerCase().includes(search.toLowerCase()),
@@ -139,101 +143,182 @@ export function Tree() {
       },
     });
 
-    // Create a computed list of filtered items based on search
-    const filteredItems = $(() => {
-      // Track tree items to trigger recomputation
-      const allItems = tree.items;
-      const searchValue = tree.getSearchValue();
+    // Helper to get all descendant IDs using tree API (reactive)
+    const getAllDescendantIds = (
+      item: ItemInstance<TreeAnchorProps>
+    ): string[] => {
+      const children = item.getChildren();
+      if (!children || children.length === 0) return [];
+      const ids: string[] = [];
+      for (const child of children) {
+        ids.push(child.getId());
+        ids.push(...getAllDescendantIds(child));
+      }
+      return ids;
+    };
+
+    // Create reactive filtered items based on search (searches full data map, not only visible items)
+    const filteredItemIds = $(() => {
+      const searchValue = useTree.searchValue.get();
+
+      if (!searchValue || searchValue.trim() === "") {
+        return [];
+      }
+
+      // Work with the full items data map (source of truth)
+      const itemsData = useTree.items.get();
+      const allIds = Object.keys(itemsData);
+
+      // Build child->parent map for quick ascent
+      const parentOf: Record<string, string | undefined> = {};
+      for (const [id, data] of Object.entries(itemsData)) {
+        const children = data?.children || [];
+        for (const childId of children) parentOf[childId] = id;
+      }
+
+      // Find direct matches by name (substring or one-edit fuzzy)
+      const q = searchValue.toLowerCase();
+      const directMatches = allIds.filter((id) => {
+        const name = (itemsData[id]?.name || "").toLowerCase();
+        return name.includes(q) || isOneEditAway(name, q);
+      });
+
+      // Collect all parents of each direct match
+      const parentIds = new Set<string>();
+      for (const id of directMatches) {
+        let p = parentOf[id];
+        while (p) {
+          parentIds.add(p);
+          p = parentOf[p];
+        }
+      }
+
+      // Collect all descendants of each direct match via itemsData
+      const childrenIds = new Set<string>();
+      const collectDesc = (id: string) => {
+        const children = itemsData[id]?.children || [];
+        for (const child of children) {
+          childrenIds.add(child);
+          collectDesc(child);
+        }
+      };
+      for (const id of directMatches) collectDesc(id);
+
+      // Combine direct matches, parents, and children
+      return [
+        ...directMatches,
+        ...Array.from(parentIds),
+        ...Array.from(childrenIds),
+      ];
+    });
+
+    // Update filtered items when search changes
+    const updateFilteredItems = (searchValue: string) => {
+      // This will trigger the computed to recalculate
+      setSearchValue(searchValue);
+      // Keep headless search feature in sync for hotkeys/highlights
+      if (typeof tree.setSearch === "function") {
+        if (searchValue && searchValue.trim() !== "")
+          tree.setSearch(searchValue);
+        else tree.setSearch(null);
+      }
+
+      // Expand all folders during search
+      if (searchValue && searchValue.trim() !== "") {
+        const allItems = tree.getItems();
+        const folderIds = allItems
+          .filter((item) => item.isFolder())
+          .map((item) => item.getId());
+
+        tree.setConfig((prev) => ({
+          ...prev,
+          state: {
+            ...prev.state,
+            expandedItems: [
+              ...new Set([...tree.getState().expandedItems, ...folderIds]),
+            ],
+          },
+        }));
+      } else {
+        // Reset to initial expanded state when search is cleared
+        tree.setConfig((prev) => ({
+          ...prev,
+          state: {
+            ...prev.state,
+            expandedItems: ["engineering", "frontend", "design-system"],
+          },
+        }));
+      }
+    };
+
+    // Create a computed list of visible items based on search
+    const visibleItems = $(() => {
+      const allItems = tree.items.get();
+      const searchValue = useTree.searchValue.get();
 
       if (!searchValue || searchValue.trim() === "") {
         return allItems;
       }
 
-      // Get all matching items and their ancestors
-      const matchingItems = tree.getSearchMatchingItems();
-      if (matchingItems.length === 0) {
-        return []; // No matches, show empty tree
-      }
-
-      const matchingIds = new Set(matchingItems.map((item) => item.getId()));
-
-      // Also include parent items to maintain tree structure
-      const itemsToShow = new Set(matchingIds);
-      matchingItems.forEach((item) => {
-        let parent = item.getParent();
-        while (parent) {
-          itemsToShow.add(parent.getId());
-          parent = parent.getParent();
-        }
-      });
-
-      // Filter tree items to only show matching and their ancestors
-      return allItems.filter((item) => itemsToShow.has(item.getId()));
+      // Use the reactive computed filteredItemIds
+      const filtered = filteredItemIds.get();
+      const out = allItems.filter((item) => filtered.includes(item.getId()));
+      return out;
     });
 
     /*##############################(RENDER TREE)##############################*/
     return (
       <>
-        <Modal id="tree-help-modal">
-          {/* @ts-ignore */}
-          <YStack>
-            <Text>Keyboard Shortcuts:</Text>
-            <Text>• Arrow Up/Down - Navigate items</Text>
-            <Text>• Arrow Left/Right - Collapse/Expand folders</Text>
-            <Text>• Enter - Select item</Text>
-            <Text>• Space - Toggle item selection</Text>
-            <Text>• Ctrl+Click - Multi-select</Text>
-            <Text>• Shift+Click - Range select</Text>
-            <Text>• Ctrl+A - Select all</Text>
-            <Text>• F2 - Rename selected item</Text>
-            <Text>• Type any letter - Start search</Text>
-            <Text>• Escape - Close search/rename</Text>
-            <Text>• Ctrl+Shift+Plus - Expand all</Text>
-            <Text>• Ctrl+Shift+Minus - Collapse all</Text>
-            <Text>• Ctrl+Shift+D - Start drag</Text>
-          </YStack>
-        </Modal>
-
         <YStack className="h-full *:first:grow" gap={2}>
           {/*=============================(CONTROLS)=============================*/}
-          <XStack className="gap-2 p-2 border-b">
+          <XStack gap={2} className="h-auto items-center">
             <Button
-              format="ghost"
+              format="outlineMuted"
               size="sm"
-              on:tap={() => tree.expandAll()}
+              on:tap={() => {
+                useTree.isExpanded.set(!useTree.isExpanded.peek());
+                if (useTree.isExpanded.peek()) {
+                  tree.expandAll();
+                } else {
+                  tree.collapseAll();
+                }
+              }}
               title="Expand all folders (Ctrl+Shift+Plus)"
             >
-              Expand
-            </Button>
-            <Button
-              format="ghost"
-              size="sm"
-              on:tap={() => tree.collapseAll()}
-              title="Collapse all folders (Ctrl+Shift+Minus)"
-            >
-              Collapse
+              <Show when={useTree.isExpanded} otherwise={<ArrowBottomIcon />}>
+                <ArrowUpIcon />
+              </Show>
             </Button>
 
-            <Button
-              format="ghost"
-              size="sm"
-              on:presentation={{ id: "tree-help-modal", action: "toggle" }}
-              title="Show keyboard shortcuts"
-            >
-              i
-            </Button>
+            {/*================================(SEARCH FIELD)================================*/}
+            <XStack className="relative">
+              <SearchField
+                $ref={(el: HTMLInputElement | null) =>
+                  tree.registerSearchInputElement?.(el as any)
+                }
+                value={$(() => useTree.searchValue.get())}
+                placeholder="Search hierarchy..."
+                className="peer ps-9"
+                type="searchfield"
+                on:input={(e: any) => {
+                  const value =
+                    typeof e === "string"
+                      ? e
+                      : e?.target?.value || e?.currentTarget?.value || "";
+                  updateFilteredItems(value);
+                }}
+                on:blur={(e: any) => {
+                  // Prevent clearing search on blur
+                  e?.preventDefault?.();
+                }}
+                cta={{
+                  clear: () => {
+                    clearSearchAction();
+                  },
+                }}
+              />
+            </XStack>
           </XStack>
-
-          {/*================================(SEARCH FIELD)================================*/}
-          {/* <Show when={tree.isSearchOpen()}> */}
-          <SearchField
-            value={tree.getSearchValue()}
-            placeholder="Search hierarchy..."
-            on:input={(value: string) => tree.setSearch(value)}
-            on:blur={() => tree.closeSearch()}
-            ref={(el: any) => tree.registerSearchInputElement(el)}
-          />
-          {/* </Show> */}
 
           {/*================================(TREE WRAPPER)================================*/}
           <TreeWrapper
@@ -242,7 +327,20 @@ export function Tree() {
             {...tree.getContainerProps("File tree navigation")}
             className="overflow-auto flex-1"
           >
-            <List each={filteredItems}>
+            {/* Show "No results" message when search has no matches */}
+            <Show
+              when={$(
+                () =>
+                  useTree.searchValue.get().length > 0 &&
+                  filteredItemIds.get().length === 0
+              )}
+            >
+              <Slot className="px-3 py-4 text-center text-sm text-muted-foreground">
+                No items found for "{$(() => useTree.searchValue.get())}"
+              </Slot>
+            </Show>
+
+            <List each={visibleItems}>
               {(item: any) => {
                 try {
                   return (
@@ -278,26 +376,46 @@ export function Tree() {
                         </Show>
 
                         <TreeItemLabel item={item}>
-                          <XStack className="flex items-center gap-1.5 flex-1">
-                            {/*********************(Folder/File Icons)*********************/}
-                            <Show when={item.isFolder() && item.isExpanded()}>
-                              <FolderNotchOpenIcon
-                                size="4xs"
-                                className="shrink-0 text-primary"
-                              />
+                          <XStack className="flex items-center gap-2 flex-1">
+                            {/*********************(Icons)*********************/}
+                            <Show when={item.isFolder()}>
+                              <Slot
+                                style={$(() => {
+                                  // Force reactive re-run on tree rebuilds
+                                  const _ = tree.items.get();
+                                  const expanded = item.isExpanded();
+                                  return {
+                                    transform: expanded
+                                      ? "rotate(0deg)"
+                                      : "rotate(-90deg)",
+                                    transition: "transform 0.2s ease",
+                                  };
+                                })}
+                              >
+                                <CaretDownPrimeIcon
+                                  style={item.isExpanded() ? "true" : "false"}
+                                  size="6xs"
+                                  scale="12xs"
+                                />
+                              </Slot>
                             </Show>
-                            <Show when={item.isFolder() && !item.isExpanded()}>
-                              <FolderNotchIcon
-                                size="4xs"
-                                className="shrink-0 text-muted-foreground"
-                              />
-                            </Show>
-                            <Show when={!item.isFolder()}>
-                              <FileIcon
-                                size="4xs"
-                                className="shrink-0 text-muted-foreground"
-                              />
-                            </Show>
+
+                            {/* Folder/File Icons */}
+                            {/* <Choose
+                              cases={[
+                                {
+                                  when: () =>
+                                    item.isFolder() && item.isExpanded(),
+                                  children: <FolderNotchOpenIcon size="4xs" />,
+                                },
+                                {
+                                  when: () =>
+                                    item.isFolder() && !item.isExpanded(),
+                                  children: <FolderNotchIcon size="4xs" />,
+                                },
+                              ]}
+                              otherwise={<FileIcon size="4xs" />}
+                            /> */}
 
                             {/*********************(Item Name or Rename Input)*********************/}
                             <Show when={item.isRenaming()}>
@@ -332,11 +450,20 @@ export function Tree() {
                             </Show>
                             <Show when={!item.isRenaming()}>
                               <span
-                                className={
-                                  item.isMatchingSearch()
-                                    ? "bg-yellow-200 dark:bg-yellow-900 px-1 rounded"
-                                    : ""
-                                }
+                                className={$(() => {
+                                  const searchValue = useTree.searchValue.get();
+                                  const itemName = item
+                                    .getItemName()
+                                    .toLowerCase();
+                                  const isMatch =
+                                    searchValue &&
+                                    searchValue.trim() !== "" &&
+                                    itemName.includes(
+                                      searchValue.toLowerCase()
+                                    );
+
+                                  return isMatch ? "bg-yellow-200" : "";
+                                })}
                               >
                                 {item.getItemName()}
                               </span>

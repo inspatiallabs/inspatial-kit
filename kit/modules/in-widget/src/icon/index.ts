@@ -37,3 +37,5 @@ export * from "./code-icon.tsx";
 export * from "./folder-notch-open-icon.tsx";
 export * from "./folder-notch-icon.tsx";
 export * from "./file-icon.tsx";
+export * from "./arrow-bottom-icon.tsx";
+export * from "./arrow-up-icon.tsx";

@@ -466,7 +466,7 @@ export const MyStyle = createStyle({
 });
 ```
 
-#### Variable ($) Shorthand 
+#### Variable ($) Shorthand
 
 #### Composition API
 
@@ -1200,13 +1200,19 @@ Root causes:
 
 #### Stateful Shell Class (SSC)
 
-Stateful Shell Class (SSC) is a pattern where a container toggles one state‑driven class on itself so descendants change purely via style selectors.
+Stateful Shell Class (SSC) is a pattern where a container toggles one state‑driven class on itself so descendants change purely via **Style Selectors**.
 
 The Stateful Shell Class (SSC) is like using a room’s main light switch. Instead of re‑wiring every lamp (each child component), you flip one switch (a "class utility" on the shell) and all the lamps respond through simple selectors. It keeps state visible in DevTools, and scales well when a single container state (e.g., Sidebar minimized/expanded) needs to influence many descendants.
 
-> **Note:** Use this when a container’s state needs to “fan out” to multiple child elements.
+> **Terminology:** “Style Selectors” are rules that let you target and style elements based on their classes, states, or where they appear in the component tree.
+>
+> Think of style selectors like giving instructions to a group: “Everyone wearing a red shirt, stand up!” In code, selectors let you say, “All elements with this class, use this style.”
+>
+> For example, `.sidebar-minimized &` means “apply these styles to this element when its parent has the `sidebar-minimized` class.” This makes it easy to change the look of many elements just by toggling a class on a container.
 
 > **Terminology:** “Shell state” is high‑level UI state owned by a container (like a Sidebar) rather than a single element.
+
+> **Note:** Use this when a container’s state needs to “fan out” to multiple child elements.
 
 ##### Examples
 
@@ -1265,9 +1271,6 @@ export const SidebarGroupStyle = createStyle({
 - Forgetting to place the class on the shell element; children selectors won’t match.
 - Computing the class once without `$(() => ...)`; it won’t update when state changes.
 
-
-
-
 The `$variable` shorthand lets you write clean, readable color styles without repeating `var(--...)` everywhere. Think of `$brand` as a friendly nickname for the real CSS variable `var(--brand)`. You use the nickname in your styles, and the engine swaps it for the correct variable under the hood.
 
 > **Note:** A theme variable like `$brand` maps to the CSS variable `var(--brand)`. This is different from cross‑style composition keys (e.g., `"$tab-trigger.format"`), which appear only in composition rule keys, not in values.
@@ -1281,9 +1284,9 @@ createStyle({
   base: [
     {
       web: {
-        color: "$primary",                // → color: var(--primary)
-        backgroundColor: "$surface",      // → background-color: var(--surface)
-        borderColor: "$brand/40",         // → color-mix(in oklab, var(--brand) 40%, transparent)
+        color: "$primary", // → color: var(--primary)
+        backgroundColor: "$surface", // → background-color: var(--surface)
+        borderColor: "$brand/40", // → color-mix(in oklab, var(--brand) 40%, transparent)
       },
     },
   ],
@@ -1295,9 +1298,9 @@ createStyle({
 ```ts
 createStyle({
   base: [
-    "text-$brand",       // → resolves to color: var(--brand)
+    "text-$brand", // → resolves to color: var(--brand)
     "bg-$background/80", // → resolves to background with 80% mix
-    "border-$primary",   // → resolves to borderColor: var(--primary)
+    "border-$primary", // → resolves to borderColor: var(--primary)
   ],
 });
 ```
@@ -1327,3 +1330,85 @@ createStyle({
   - `hover:bg-(--brand)/80`
 
 > **Terminology:** A “variable” is a friendly name for a design value (like a brand color). Here, `$brand` maps to the CSS variable `--brand` so your app stays themeable and consistent.
+
+### Transforming widgets and components using reactive style
+
+> **Terminology:** "Transforming", "Transform" or "Transformation" is the process of changing the rotation axis, position, size and/or skew of a widget or component.
+
+The example shows how to rotate a caret icon when a function i.e tree item expands or collapses using Reactive Style.
+
+#### Example 1: Minimal
+
+```jsx
+import { $ } from "@inspatial/kit/state";
+import { Slot } from "@inspatial/kit/widget";
+import { CaretDownPrimeIcon } from "@inspatial/kit/icon";
+
+// No extra dependency required (local state is enough)
+
+const isMinimized = useSidebar.isMinimized.get()
+
+<Slot
+  style={$(() => ({
+    web: {
+      transform: isMinimized  ? "rotate(0deg)" : "rotate(180deg)",
+      transition: "transform 0.3s ease",
+    },
+  }))}
+>
+  <CaretRightPrimeIcon />
+</Slot>
+```
+
+#### Example 2: Forced Recomputation
+
+**`WTF` is forced recomputation?**
+
+Think of a digital photo frame: it auto‑cycles photos (reactive), but when you re‑arrange albums on your phone (change elsewhere), the frame won’t notice until you tap “refresh.” That tap is forced recomputation — a tiny, harmless signal you add so the view knows to re‑run right now and pick up the external change.
+
+Some reactive styles need an extra “poke” to update. Always force recomputation when you have a style that depends on a function that rebuilds elsewhere, and your component needs a stable dependency to re-run.
+
+In the Example below, the tree expansion state lives in the tree instance which rebuilds on structural changes; to ensure the caret’s `$(() => …)` is re-evaluated, add a benign dependency like `const _ = tree.items.get()` inside the compute. This guarantees the style recomputes whenever the tree rebuilds.
+
+```jsx
+import { $ } from "@inspatial/kit/state";
+import { Slot } from "@inspatial/kit/widget";
+import { CaretDownPrimeIcon } from "@inspatial/kit/icon";
+
+<Slot
+  style={$(() => {
+    // Force recomputation on tree rebuilds
+    const _ = tree.items.get();
+    const expanded = item.isExpanded(); // always abstract your functions
+
+    return {
+      web: {
+        transform: expanded ? "rotate(0deg)" : "rotate(-90deg)",
+        transition: "transform 0.2s ease",
+      },
+    };
+  })}
+>
+  <CaretDownPrimeIcon />
+</Slot>;
+```
+
+##### When to force recomputation vs when not to
+
+Not all reactive styles need an extra “poke” to update. Use this quick rule of thumb:
+
+- Don’t force recomputation when the same component already owns the state that drives style, and the reactive wrapper ($(() => …)) directly reads that state.
+
+  - Example: Sidebar toggle. The icon’s rotation depends on a local signal (`isMinimized`) that the same component reads inside `$(() => …)`. No extra dependency is needed.
+
+> **Note:** Prefer SSC (Stateful Shell Class) for broad, container-led styling (like `sidebar-minimized`), and use reactive style with a forced dependency only when you have a function that must explicitly invalidate your view.
+
+#### Common pitfalls
+
+- Don’t compute reactive values with `.get()` outside `$(() => …)`. Wrap the whole style or class computation reactively.
+- Avoid runtime JIT attribute utilities (like `in-aria-[expanded=false]:…`) unless they’re predeclared in style as shown above.
+- Keep transitions on the element that actually transforms (the icon or its immediate wrapper) to prevent cumulative layout shift (CLS).
+
+> **Terminology:** "Cumulative Layout Shift (CLS)" is a metric that measures how much a window view structure and layout unexpectedly moves or shifts during its entire life.
+
+> **Terminology:** "JIT (Just In Time)" means something is created or calculated only when it's actually needed, not ahead of time. For example, a "JIT" style system generates style rules right when you use them, instead of preparing every possible rule in advance. This saves memory and keeps things fast, but can sometimes mean a little extra work happens at the last moment.

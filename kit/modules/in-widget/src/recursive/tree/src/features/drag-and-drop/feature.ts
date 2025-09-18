@@ -167,6 +167,9 @@ export const dragAndDropFeature: FeatureImplementation = {
           }
         },
 
+        ["on:dragover"]: (e: any) => prevProps?.onDragOver?.(e),
+        ["on:drop"]: async (e: any) => prevProps?.onDrop?.(e),
+
         style: {
           ...prevProps?.style,
           position: "relative",
