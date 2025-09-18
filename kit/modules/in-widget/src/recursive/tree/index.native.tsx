@@ -11,7 +11,13 @@ import {
   renamingFeature,
   propMemoizationFeature,
 } from "./src/index.ts";
-import { TreeWrapper, TreeItem, TreeItemLabel } from "./primitive.tsx";
+import {
+  TreeWrapper,
+  TreeItem,
+  TreeItemLabel,
+  TreeAssistiveDescription,
+  TreeDragLine,
+} from "./primitive.tsx";
 import { createTree } from "./create-tree.ts";
 import { Slot, YStack } from "@in/widget/structure/index.ts";
 import { List } from "@in/widget/data-flow/index.ts";
@@ -33,6 +39,7 @@ import { createState, createAction, $ } from "@in/teract/state/index.ts";
 import { Checkbox, SearchField, InputField } from "@in/widget/input/index.ts";
 import { Button } from "@in/widget/ornament/button/index.ts";
 import { isOneEditAway } from "@in/vader";
+import { Text } from "@in/widget/typography/index.ts";
 
 const initialItems: Record<string, TreeAnchorProps> = {
   company: {
@@ -66,6 +73,7 @@ const initialItems: Record<string, TreeAnchorProps> = {
 
 const indent = 10;
 
+/*##############################(TREE COMPONENT)##############################*/
 export function Tree() {
   try {
     /*##############################(STATE)##############################*/
@@ -88,7 +96,7 @@ export function Tree() {
     const tree = createTree<TreeAnchorProps>({
       initialState: {
         expandedItems: ["engineering", "frontend", "design-system"],
-        selectedItems: ["components"],
+        // selectedItems: ["engineering"], // default selected item
         checkedItems: [],
       },
       // Checkbox configuration
@@ -269,9 +277,17 @@ export function Tree() {
     /*##############################(RENDER TREE)##############################*/
     return (
       <>
-        <YStack className="h-full *:first:grow" gap={2}>
+        <YStack gap={2}>
           {/*=============================(CONTROLS)=============================*/}
-          <XStack gap={2} className="h-auto items-center">
+          <XStack
+            gap={2}
+            style={{
+              web: {
+                height: "auto",
+                alignItems: "center",
+              },
+            }}
+          >
             <Button
               format="outlineMuted"
               size="sm"
@@ -291,7 +307,7 @@ export function Tree() {
             </Button>
 
             {/*================================(SEARCH FIELD)================================*/}
-            <XStack className="relative">
+            <XStack>
               <SearchField
                 $ref={(el: HTMLInputElement | null) =>
                   tree.registerSearchInputElement?.(el as any)
@@ -325,8 +341,9 @@ export function Tree() {
             indent={indent}
             tree={tree}
             {...tree.getContainerProps("File tree navigation")}
-            className="overflow-auto flex-1"
+            className="relative overflow-auto flex-1"
           >
+            <TreeDragLine tree={tree} />
             {/* Show "No results" message when search has no matches */}
             <Show
               when={$(
@@ -335,11 +352,22 @@ export function Tree() {
                   filteredItemIds.get().length === 0
               )}
             >
-              <Slot className="px-3 py-4 text-center text-sm text-muted-foreground">
+              <Text
+                style={{
+                  web: {
+                    width: "auto",
+                    overflow: "hidden",
+                    textWrap: "wrap",
+                    textOverflow: "ellipsis",
+                    textAlign: "center",
+                  },
+                }}
+              >
                 No items found for "{$(() => useTree.searchValue.get())}"
-              </Slot>
+              </Text>
             </Show>
 
+            <TreeAssistiveDescription tree={tree} />
             <List each={visibleItems}>
               {(item: any) => {
                 try {
@@ -358,7 +386,7 @@ export function Tree() {
                         console.log("Right-clicked on:", item.getItemName());
                       }}
                     >
-                      <XStack className="flex items-center gap-2 w-full">
+                      <XStack>
                         {/*================================(CHECKBOX)================================*/}
                         <Show
                           when={
@@ -370,13 +398,12 @@ export function Tree() {
                           <Checkbox
                             selected={item.getCheckboxProps().checked}
                             on:input={() => item.toggleCheckedState()}
-                            className="shrink-0"
                             $ref={item.getCheckboxProps().ref}
                           />
                         </Show>
 
                         <TreeItemLabel item={item}>
-                          <XStack className="flex items-center gap-2 flex-1">
+                          <XStack gap={4}>
                             {/*********************(Icons)*********************/}
                             <Show when={item.isFolder()}>
                               <Slot
@@ -449,7 +476,7 @@ export function Tree() {
                               />
                             </Show>
                             <Show when={!item.isRenaming()}>
-                              <span
+                              <Slot
                                 className={$(() => {
                                   const searchValue = useTree.searchValue.get();
                                   const itemName = item
@@ -466,7 +493,7 @@ export function Tree() {
                                 })}
                               >
                                 {item.getItemName()}
-                              </span>
+                              </Slot>
                             </Show>
                           </XStack>
                         </TreeItemLabel>

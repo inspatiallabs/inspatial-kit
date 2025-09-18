@@ -26,6 +26,8 @@ Styling can also be done by calling multiple direct style props e.g
 />
 ```
 
+
+
 While this approach is available, it should mainly be used as an "escape hatch" for special cases. Using multiple direct style props assumes you are only targeting the web, lacks types-safety and can lead to anti-patterns such as parsing the same style prop multiple times within a single component. Prefer the standard reactive style and className patterns for most use cases. If you choose to use this pattern only use it for one style prop e.g
 
 ```typescript
@@ -465,6 +467,95 @@ export const MyStyle = createStyle({
   base: ["bg-(--color-purple-500) text-(--color-white-500)"],
 });
 ```
+
+
+### Styles as Constants
+
+Reusable style constants are like labeled toolboxes. Instead of rebuilding the same screws and wrenches in every file, you create a named set once (for example `ThemeRadius` or `KitBorderStyle`) and grab exactly what you need with a clean import. This keeps style decisions in one place, reduces copy‑paste, and gives you great autocomplete and type safety.
+
+> **Terminology:** A “style constant” is a named export you can import anywhere: either a settings map (like `ThemeRadius`) or a full style object (like `KitBorderStyle`). A “preset” is a specific `getStyle({...})` result you export for frequent use.
+
+#### Why this matters
+
+- **Single source of truth**: Roundness, sizes, and shared variables (e.g., `ThemeRadius`) live in one file.
+- **Typed and portable**: Consumers see exact options; wrong values are caught by TypeScript.
+- **Tree‑shakeable**: Direct file imports only pull what you use.
+- **Composable**: Constants plug into other styles cleanly (e.g., `radius: ThemeRadius`).
+
+#### Example 1: Share theme variables across widgets
+
+```ts
+// @in/widget/theme/style.ts
+import { createStyle } from "@in/style";
+
+export const ThemeRadius = {
+  base: [{ web: { borderRadius: "12px" } }],
+  lg: [{ web: { borderRadius: "16px" } }],
+  // ...more
+} as const;
+
+export const ThemeStyle = createStyle({
+  settings: {
+    radius: ThemeRadius,
+    // ...other theme settings
+  },
+  defaultSettings: { radius: "base" },
+});
+```
+
+```ts
+// @in/widget/ornament/kit-border/style.ts
+import { createStyle } from "@in/style/variant";
+import { ThemeRadius } from "@in/widget/theme/style.ts"; // direct file import
+
+export const KitBorderStyle = createStyle({
+  name: "kit-border",
+  settings: {
+    radius: ThemeRadius, // reuse theme radius everywhere
+    // size, position, format ...
+  },
+  defaultSettings: { radius: "none" },
+});
+```
+
+#### Example 2: Export a preset for common usage
+
+```ts
+// @in/widget/ornament/button/style.ts
+import { createStyle } from "@in/style/variant";
+
+export const ButtonStyle = createStyle({
+  // base + settings ...
+});
+
+// Export a ready-to-use preset (better DX at call sites)
+export const ButtonOutlineSmStyle = ButtonStyle.getStyle({
+  format: "outline",
+  size: "sm",
+});
+```
+
+```tsx
+// usage
+import { iss } from "@in/style";
+import { Button, ButtonOutlineSmStyle } from "@in/widget/ornament/button";
+
+<Button className={iss(ButtonOutlineSmStyle)}>Outline</Button>;
+```
+
+#### What you get back
+
+- **Consistency**: Same radius/spacing across the app without duplication.
+- **Less churn**: Update once; all consumers inherit the change.
+- **Great ergonomics**: Clean call sites via presets; rich options via settings.
+
+#### Common mistakes to avoid
+
+- Don’t use package‑level imports when a direct file import exists. Prefer `@in/.../style.ts`.
+- Don’t export empty settings objects; provide at least one option (even an empty string) to satisfy types.
+- Don’t mix unrelated concerns in a single constant; keep variables (like `ThemeRadius`) separate from full component styles (like `KitBorderStyle`).
+
+
 
 #### Variable ($) Shorthand
 

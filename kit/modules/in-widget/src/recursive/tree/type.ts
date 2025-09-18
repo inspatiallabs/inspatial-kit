@@ -1,14 +1,17 @@
 import type { ChoiceInputProps } from "@in/widget/input/choice-input/type.ts";
 import type { ItemInstance, TreeInstance } from "./src/index.ts";
+import type { StyleProps } from "@in/style/index.ts";
+import type { TreeStyle } from "./style.ts";
 
 /*##############################(TREE ITEM PROPS TYPE)##############################*/
 
-export type TreeItemProps<T = any> = JSX.SharedProps & {
-  item: ItemInstance<T>;
-  indent?: number;
-  asChild?: boolean;
-  // icon?: ChoiceInputProps["icon"];
-};
+export type TreeItemProps<T = any> = JSX.SharedProps &
+  StyleProps<typeof TreeStyle.item> & {
+    item: ItemInstance<T>;
+    indent?: number;
+    asChild?: boolean;
+    // icon?: ChoiceInputProps["icon"];
+  };
 
 export interface TreeAnchorProps {
   name?: string;

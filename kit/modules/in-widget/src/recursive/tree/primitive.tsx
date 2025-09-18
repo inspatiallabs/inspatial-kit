@@ -1,7 +1,14 @@
-import { Slot } from "@in/widget/structure/index.ts";
-import { Button } from "@in/widget/ornament/index.ts";
+import { Slot, XStack } from "@in/widget/structure/index.ts";
 import { iss, type ISSProps } from "@in/style";
 import type { TreeItemLabelProps, TreeItemProps, TreeProps } from "./type.ts";
+import { TreeStyle } from "./style.ts";
+import {
+  type DndState,
+  type HotkeysConfig,
+  type TreeInstance,
+  AssistiveDndState,
+} from "./src/index.ts";
+import { $ } from "@in/teract/state/index.ts";
 
 /*##############################(TREE ITEM)##############################*/
 
@@ -10,6 +17,7 @@ export function TreeItem<T>({
   asChild,
   className,
   children,
+  disabled,
   indent = 10,
   ...props
 }: Omit<TreeItemProps, "indent">) {
@@ -24,7 +32,6 @@ export function TreeItem<T>({
     paddingLeft: `${paddingLeftPx}px`,
   } as ISSProps;
 
-  const Comp = asChild ? Slot : Button;
   const itemProps = typeof item.getProps === "function" ? item.getProps() : {};
 
   // Extract event handlers that need special handling
@@ -63,7 +70,7 @@ export function TreeItem<T>({
     if (typeof handler !== "function") return undefined;
     return (e?: any) => {
       if (!e) return;
-      handler(e);
+      handler(e)
     };
   };
 
@@ -84,18 +91,15 @@ export function TreeItem<T>({
   };
 
   return (
-    <Slot
+    <XStack
       data-slot="tree-item"
       style={{
         web: mergedStyle,
       }}
-      className={iss(
-        "z-10 ps-(--tree-padding) outline-hidden select-none not-last:pb-0.5 focus:z-20 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-        className
-      )}
+      className={iss(TreeStyle.item.getStyle({ className, disabled, ...rest }))}
       {...rest}
     >
-      <Comp
+      <Slot
         {...rest}
         {...(itemPropsSafe as any)}
         format="ghost"
@@ -103,10 +107,15 @@ export function TreeItem<T>({
         style={{
           web: mergedStyle,
         }}
-        className={iss(
-          "z-10 ps-(--tree-padding) outline-hidden select-none not-last:pb-0.5 focus:z-20 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-          className
-        )}
+        className={$(() => {
+          const _ = (item.getTree() as any)?.items?.get?.();
+          const classes = [TreeStyle.item.getStyle({ className, disabled, ...rest })];
+          if (typeof item.isSelected === "function" && item.isSelected()) classes.push("tree-item-selected");
+          if (typeof item.isDragTarget === "function" && item.isDragTarget()) classes.push("tree-item-drag-target");
+          if (typeof item.isDraggingOver === "function" && item.isDraggingOver()) classes.push("tree-item-drag-over");
+          if (typeof (item as any).isMatchingSearch === "function" && (item as any).isMatchingSearch()) classes.push("tree-item-search-match");
+          return iss(classes);
+        })}
         {...({ ["on:tap"]: handleItemTap, ["on:click"]: handleItemTap } as any)}
         {...(dragProps as any)}
         data-focus={
@@ -130,15 +139,15 @@ export function TreeItem<T>({
             : undefined
         }
         data-search-match={
-          typeof item.isMatchingSearch === "function"
-            ? item.isMatchingSearch() || false
+          typeof (item as any).isMatchingSearch === "function"
+            ? (item as any).isMatchingSearch() || false
             : undefined
         }
         aria-expanded={item.isExpanded()}
       >
         {children}
-      </Comp>
-    </Slot>
+      </Slot>
+    </XStack>
   );
 }
 
@@ -177,13 +186,11 @@ export function TreeItemLabel<T = any>({
     }
   };
 
+
   return (
     <Slot
       data-slot="tree-item-label"
-      className={iss(
-        "in-focus-visible:ring-ring/50 bg-(--background) hover:bg-(--brand) in-data-[selected=true]:bg-(--brand) in-data-[selected=true]:text-(--brand) in-data-[drag-target=true]:bg-(--brand) flex items-center gap-1 rounded-sm px-2 py-1.5 text-sm transition-colors not-in-data-[folder=true]:ps-7 in-focus-visible:ring-[3px] in-data-[search-match=true]:bg-red-400/30! [&_svg]:pointer-events-none [&_svg]:shrink-0",
-        className
-      )}
+      className={TreeStyle.label.getStyle({ className, ...props })}
       on:tap={handleLabelClick}
       {...props}
     >
@@ -208,12 +215,74 @@ export function TreeDragLine({ className, ...rest }: JSX.SharedProps) {
   return (
     <Slot
       style={dragLine}
-      className={iss(
-        "bg-(--primary) before:bg-(--background) before:border-(--primary) absolute z-30 -mt-px h-0.5 w-[unset] before:absolute before:-top-[3px] before:left-0 before:size-2 before:rounded-full before:border-2",
-        className
-      )}
+      className={iss(TreeStyle.dragLine.getStyle({ className, ...rest }))}
       {...rest}
     />
+  );
+}
+
+/*##############################(TREE ASSISTIVE DESCRIPTION)##############################*/
+/*========================(Get Default Label)========================*/
+const getDefaultLabel = <T,>(
+  dnd: DndState<T> | null | undefined,
+  assistiveState: AssistiveDndState,
+  hotkeys: HotkeysConfig<T>
+) => {
+  if (!hotkeys.startDrag) return "";
+  const itemNames =
+    dnd?.draggedItems?.map((item) => item.getItemName()).join(", ") ?? "";
+  const position = !dnd?.dragTarget
+    ? "None"
+    : "childIndex" in dnd.dragTarget
+    ? `${dnd.dragTarget.childIndex} of ${
+        dnd.dragTarget.item.getChildren().length
+      } in ${dnd.dragTarget.item.getItemName()}`
+    : `in ${dnd.dragTarget.item.getItemName()}`;
+  const navGuide =
+    `Press ${hotkeys.dragUp?.hotkey} and ${hotkeys.dragDown?.hotkey} to move up or down, ` +
+    `${hotkeys.completeDrag?.hotkey} to drop, ${hotkeys.cancelDrag?.hotkey} to abort.`;
+  switch (assistiveState) {
+    case AssistiveDndState.Started:
+      return itemNames
+        ? `Dragging ${itemNames}. Current position: ${position}. ${navGuide}`
+        : `Current position: ${position}. ${navGuide}`;
+    case AssistiveDndState.Dragging:
+      return itemNames ? `${itemNames}, ${position}` : position;
+    case AssistiveDndState.Completed:
+      return `Drag completed. Press ${hotkeys.startDrag?.hotkey} to move selected items`;
+    case AssistiveDndState.Aborted:
+      return `Drag cancelled. Press ${hotkeys.startDrag?.hotkey} to move selected items`;
+    case AssistiveDndState.None:
+    default:
+      return `Press ${hotkeys.startDrag?.hotkey} to move selected items`;
+  }
+};
+
+/*========================(Tree Assistive Description)========================*/
+export function TreeAssistiveDescription<T>({
+  tree,
+  getLabel = getDefaultLabel,
+  className,
+  ...props
+}: {
+  tree: TreeInstance<T>;
+  getLabel?: typeof getDefaultLabel;
+} & JSX.SharedProps) {
+  const state = tree.getState();
+  return (
+    <Slot
+      aria-live="assertive"
+      className={iss(
+        TreeStyle.assistiveDescription.getStyle({ className, ...props })
+      )}
+      {...props}
+    >
+      {getLabel(
+        state.dnd,
+        state.assistiveDndState ?? AssistiveDndState.None,
+        tree.getHotkeyPresets()
+      )}
+    </Slot>
   );
 }
 
@@ -236,7 +305,7 @@ export function TreeWrapper({
   return (
     <Slot
       data-slot="tree"
-      className={iss("flex flex-col", className)}
+      className={iss(TreeStyle.wrapper.getStyle({ className, ...rest }))}
       style={propStyle}
       {...rest}
     >
