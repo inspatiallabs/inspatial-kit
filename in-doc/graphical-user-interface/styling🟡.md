@@ -105,7 +105,7 @@ If you are unsure and want to reduce cognitive load. By taking a singular approa
 
 Because of how InSpatial Serve builds styles, dynamic JIT classes and complex attribute selectors embedded directly inside style functions are not reliably included in the final style bundle. InServe runs Tailwind CLI over `src/config/app.css` (which imports `kit.css`) and only includes classes it can statically detect from content globs. Runtime‑injected style from the variant system is not visible to Tailwind at build time.
 
-— In short: if you need keyframes/animations or any bracket‑based arbitrary variants or attribute selectors (anything inside `[...]`) to be present at runtime, create explicit utility classes in your `app.css` or use a premade utility from `kit.css` under `@layer utilities`, then reference those simple class variables from your `createStyle()` configs.
+-In short: if you need keyframes/animations or any bracket‑based arbitrary variants or attribute selectors (anything inside `[...]`) to be present at runtime, create explicit utility classes in your `app.css` or use a premade utility from `kit.css` under `@layer utilities`, then reference those simple class variables from your `createStyle()` configs.
 
 **✅ Do this**
 
@@ -472,7 +472,7 @@ export const MyStyle = createStyle({
 
 **How composition styling works (and why you’ll love it)**
 
-- If you’ve ever thought: “I want my Drawer to slide from the right, but I also want only the left corners rounded” — and found that your base settings kept winning — this is where the Composition API comes in.
+- If you’ve ever thought: “I want my Drawer to slide from the right, but I also want only the left corners rounded” -and found that your base settings kept winning -this is where the Composition API comes in.
 - Or: “I set `direction` and `size`, but I also want `radius` to react to `direction` without rewriting the base styles.” Composition does exactly that.
 
 ###### What it is
@@ -500,7 +500,7 @@ export const MyStyle = createStyle({
   - **Left**: round the right corners
   - **Top**: round the bottom corners
   - **Bottom**: round the top corners
-- These rules activate automatically when `direction` changes — no base rewrites.
+- These rules activate automatically when `direction` changes -no base rewrites.
 
 ```typescript
   createStyle({
@@ -658,7 +658,7 @@ composition: [
 
 - Define what’s always true in base/settings.
 - Define what’s true “when X happens” in composition.
-- Composition is your “finishing pass” — clean, conditional, and reliable.
+- Composition is your “finishing pass” -clean, conditional, and reliable.
 
 ##### Cross-Style Composition (Advanced)
 
@@ -1135,7 +1135,7 @@ Reactive Style, Cross-Style Composition, and Component Composition solve differe
 Key guidance:
 
 - Prefer props-led variants for interactivity: Derive a simple prop (e.g., `format: "minimized" | "expanded"`) from state and pass it to all relevant styles.
-- Use cross-style composition for structural or sibling/parent relationships where a style truly depends on another style’s setting — not on app state.
+- Use cross-style composition for structural or sibling/parent relationships where a style truly depends on another style’s setting -not on app state.
 - Avoid mixing: If a style already receives the driving prop (e.g., `format`), prefer prop-based composition over cross-style for that specific relationship to reduce coupling and reactive cycles.
 
 Patterns:
@@ -1364,7 +1364,7 @@ const isMinimized = useSidebar.isMinimized.get()
 
 **`WTF` is forced recomputation?**
 
-Think of a digital photo frame: it auto‑cycles photos (reactive), but when you re‑arrange albums on your phone (change elsewhere), the frame won’t notice until you tap “refresh.” That tap is forced recomputation — a tiny, harmless signal you add so the view knows to re‑run right now and pick up the external change.
+Think of a digital photo frame: it auto‑cycles photos (reactive), but when you re‑arrange albums on your phone (change elsewhere), the frame won’t notice until you tap “refresh.” That tap is forced recomputation -a tiny, harmless signal you add so the view knows to re‑run right now and pick up the external change.
 
 Some reactive styles need an extra “poke” to update. Always force recomputation when you have a style that depends on a function that rebuilds elsewhere, and your component needs a stable dependency to re-run.
 

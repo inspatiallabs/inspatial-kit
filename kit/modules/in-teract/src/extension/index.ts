@@ -123,7 +123,7 @@ export interface ExtensionProps {
 
 /*################################(Extension Renderer)################################*/
 /**
- * RendererExtension (next-gen) — the single canonical shape used everywhere.
+ * RendererExtension (next-gen) -the single canonical shape used everywhere.
  * It carries metadata plus the renderer-facing surface.
  */
 /*##################################################################################*/

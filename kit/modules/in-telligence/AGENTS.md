@@ -13,7 +13,7 @@ IMPORTANT - Always understand the environment you are operating in to reduce ris
 IMPORTANT - After every proposal or multi-agent orchestration cycle, the lead agent MUST always leave a call to action e.g "say enable X and I'll apply it" or ask a question "would you like me to do x"
 
 # PATTERNS
-Got it — I’ll clean this up so it reads as a properly structured guideline without all the `@symbols` and clutter. Here’s a clear refactored version:
+Got it -I’ll clean this up so it reads as a properly structured guideline without all the `@symbols` and clutter. Here’s a clear refactored version:
 
 ---
 
