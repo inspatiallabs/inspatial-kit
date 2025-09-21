@@ -104,11 +104,11 @@
  * @see {@link serialize} - Default serialization function
  */
 
-import { fromFileUrl } from "jsr:@std/path/from-file-url";
-import { parse } from "jsr:@std/path/parse";
-import { resolve } from "jsr:@std/path/resolve";
-import { toFileUrl } from "jsr:@std/path/to-file-url";
-import { ensureFile, ensureFileSync } from "jsr:@std/fs/ensure-file";
+import { fromFileUrl } from "jsr:@std/path@^1.1.1/from-file-url";
+import { parse } from "jsr:@std/path@^1.1.1/parse";
+import { resolve } from "jsr:@std/path@^1.1.1/resolve";
+import { toFileUrl } from "jsr:@std/path@^1.1.1/to-file-url";
+import { ensureFile, ensureFileSync } from "jsr:@std/fs@^1.0.19/ensure-file";
 import { assert, assertEqual as equal, AssertionError } from "../assert.ts";
 import {
   differenceString as diffStr,

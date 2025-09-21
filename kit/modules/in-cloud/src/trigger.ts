@@ -1,6 +1,5 @@
 import { isSignal } from "@in/teract/signal/index.ts";
-import { createTrigger } from "@in/teract/trigger/index.ts";
-import type { SocketStatus } from "jsr:@inspatial/cloud-client/types";
+import type { SocketStatus } from "jsr:@inspatial/cloud-client@^0.1.28/types";
 import { incloud } from "./cloud.ts";
 
 /*######################################(Cloud Triggers)######################################*/
@@ -70,9 +69,6 @@ export const cloudStatusHandler = (node: Element, val: any) => {
   }
 };
 
-// Extension Automatically register the triggers from capabilities.trigger
-// createTrigger("cloudStatus", cloudStatusHandler);
-
 export const cloudReconnectedHandler = (node: Element, val: any) => {
   if (!val) return;
   ensureCloudStatusSubscription();
@@ -81,9 +77,6 @@ export const cloudReconnectedHandler = (node: Element, val: any) => {
     cloudReconnectedCallbacks.set(node, original as () => void);
   }
 };
-
-// Extension Automatically register the triggers from capabilities.trigger
-// createTrigger("cloudReconnected", cloudReconnectedHandler);
 
 // Notification trigger
 type NotifyCb = (info: {
@@ -100,6 +93,3 @@ export const cloudNotifyHandler = (node: Element, val: any) => {
     cloudNotifyCallbacks.set(node, cb as NotifyCb);
   }
 };
-
-// Extension Automatically register the triggers from capabilities.trigger
-// createTrigger("cloudNotify", cloudNotifyHandler);

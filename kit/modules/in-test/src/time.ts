@@ -34,9 +34,9 @@
  * @module
  */
 
-import { RedBlackTree } from "@std/data-structures/red-black-tree";
-import { ascend } from "@std/data-structures/comparators";
-import type { DelayOptions } from "@std/async/delay";
+import { RedBlackTree } from "jsr:@std/data-structures@^1.0.5/red-black-tree";
+import { ascend } from "jsr:@std/data-structures@^1.0.5/comparators";
+import type { DelayOptions } from "jsr:@std/async@^1.0.9/delay";
 
 export type { DelayOptions };
 

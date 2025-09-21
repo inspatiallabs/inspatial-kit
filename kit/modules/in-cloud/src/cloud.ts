@@ -5,14 +5,14 @@ import {
   InLiveClient,
   Currencies,
   MimeTypes,
-} from "jsr:@inspatial/cloud-client";
+} from "jsr:@inspatial/cloud-client@^0.1.28";
 import type {
   Settings,
   SettingsEventMap,
   SettingsListener,
   EntryTypeListener,
   SocketStatus,
-} from "jsr:@inspatial/cloud-client/types";
+} from "jsr:@inspatial/cloud-client@^0.1.28/types";
 import { cloudNotifyCallbacks } from "./trigger.ts";
 
 /*######################################(INIT)######################################*/

@@ -1,7 +1,7 @@
 {
   "name": "@inspatial/kit",
   "license": "Intentional-License-1.0",
-  "version": "1.0.0",
+  "version": "0.7.0",
   "tasks": {
     "test": "deno test --allow-env --allow-read --allow-write --allow-run --allow-net --allow-hrtime --allow-env --allow-all ./src/index.test.ts",
     "lint": "deno lint",

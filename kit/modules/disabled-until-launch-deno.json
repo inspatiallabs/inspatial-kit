@@ -1,8 +1,0 @@
-{
-  "name": "@inspatial/kit",
-  "license": "Intentional-License-1.0",
-  "version": "1.0.0",
-  "exports": {
-    ".": "./index.ts"
-  }
-}

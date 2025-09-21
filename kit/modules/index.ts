@@ -17,6 +17,7 @@ export * from "./in-vader/src/index.ts";
 export * from "./in-style/src/index.ts";
 export * from "./in-zero/src/index.ts";
 export * from "./in-motion/src/index.ts";
-export * from "./in-route/src/index.ts";
+export * from "./in-test/src/index.ts";
+export * from "./in-cloud/src/index.ts";
 // export * from "./in-accesibility/src/index.ts";
 
