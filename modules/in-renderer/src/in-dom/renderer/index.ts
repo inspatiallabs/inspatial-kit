@@ -343,7 +343,7 @@ export function DOMRenderer(options: DOMOptions = {}): any {
     if (!maybeGlobal) {
       queueMicrotask(async function () {
         try {
-          const mod = await import("@in/runtime/index.ts");
+          const mod = await import("@in/runtime");
           const fn = (mod as any).jsxRuntimeWrap;
           if (typeof fn === "function") fn(renderer);
         } catch {}
