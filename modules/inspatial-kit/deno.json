@@ -1,0 +1,130 @@
+{
+  "name": "@inspatial/kit",
+  "license": "Intentional-License-1.0",
+  "version": "0.7.0",
+  "tasks": {
+    "test": "deno test --allow-env --allow-read --allow-write --allow-run --allow-net --allow-hrtime --allow-env --allow-all ./src/index.test.ts",
+    "lint": "deno lint",
+    "fmt": "deno fmt",
+    "check": "deno check **/*.ts",
+    "clean": "rm -rf node_modules && rm -rf deno.lock && rm -rf dist",
+    "publish": "deno publish --allow-slow-types --no-check --allow-dirty"
+  },
+  "imports": {
+    "@in/build": "jsr:@in/build@^0.7.0",
+    "@in/cloud": "jsr:@in/cloud@^0.7.0",
+    "@in/motion": "jsr:@in/motion@^0.7.0",
+    "@in/android-xr": "jsr:@in/android-xr@^0.7.0",
+    "@in/dom": "jsr:@in/dom@^0.7.1",
+    "@in/gpu": "jsr:@in/gpu@^0.7.0",
+    "@in/horizon-os": "jsr:@in/horizon-os@^0.7.0",
+    "@in/nativescript": "jsr:@in/nativescript@^0.7.0",
+    "@in/renderer": "jsr:@in/renderer@^0.7.3",
+    "@in/ssr": "jsr:@in/ssr@^0.7.0",
+    "@in/vision-os": "jsr:@in/vision-os@^0.7.0",
+    "@in/xr": "jsr:@in/xr@^0.7.0",
+    "@in/route": "jsr:@in/route@^0.7.0",
+    "@in/runtime": "jsr:@in/runtime@^0.7.0",
+    "@in/style": "jsr:@in/style@^0.7.1",
+    "@in/teract": "jsr:@in/teract@^0.7.0",
+    "@in/test": "jsr:@in/test@^0.7.1",
+    "@in/vader": "jsr:@in/vader@^0.7.1",
+    "@in/widget": "jsr:@in/widget@^0.7.1",
+    "@in/zero": "jsr:@in/zero@^0.7.0"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./build": "./src/build.ts",
+    "./cloud": "./src/cloud.ts",
+    "./motion": "./src/motion.ts",
+    "./android-xr": "./src/android-xr.ts",
+    "./dom": "./src/dom.ts",
+    "./gpu": "./src/gpu.ts",
+    "./horizon-os": "./src/horizon-os.ts",
+    "./nativescript": "./src/nativescript.ts",
+    "./renderer": "./src/renderer.ts",
+    "./ssr": "./src/ssr.ts",
+    "./vision-os": "./src/vision-os.ts",
+    "./xr": "./src/xr.ts",
+    "./route": "./src/route.ts",
+    "./runtime": "./src/runtime.ts",
+    "./jsx-runtime": "./src/jsx-runtime.ts",
+    "./jsx-dev-runtime": "./src/jsx-dev-runtime.ts",
+    "./style": "./src/style.ts",
+    "./teract": "./src/teract.ts",
+    "./extension": "./src/extension.ts",
+    "./signal": "./src/signal.ts",
+    "./state": "./src/state.ts",
+    "./trigger": "./src/trigger.ts",
+    "./test": "./src/test.ts",
+    "./widget": "./src/widget.ts",
+
+    "./component": "./src/component.ts",
+    "./control-flow": "./src/control-flow.ts",
+    "./data-flow": "./src/data-flow.ts",
+    "./navigation": "./src/navigation.ts",
+    "./structure": "./src/structure.ts",
+    "./media": "./src/media.ts",
+    "./performance": "./src/performance.ts",
+    "./input": "./src/input.ts",
+    "./theme": "./src/theme.ts",
+    "./presentation": "./src/presentation.ts",
+    "./typography": "./src/typography.ts",
+    "./ornament": "./src/ornament.ts",
+    "./icon": "./src/icon.ts",
+    "./recursive": "./src/recursive.ts",
+
+    "./vader": "./src/vader.ts",
+    "./zero": "./src/zero.ts"
+  },
+  "publish": {
+    "exclude": [".github", ".vscode", "**/*.test.ts", "test_deps.ts"]
+  },
+ 
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "deno.ns",
+      "dom.asynciterable",
+      "deno.unstable",
+      "deno.worker",
+      "deno.window",
+      "esnext",
+      "webworker.asynciterable",
+      "webworker",
+      "webworker.importscripts",
+      "webworker.iterable",
+      "decorators",
+      "scripthost"
+    ]
+  },
+  "fmt": {
+    "semiColons": false,
+    "singleQuote": false,
+    "proseWrap": "preserve",
+    "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.mdx"]
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended", "jsx", "jsr"],
+      "include": [
+        "no-var",
+        "no-window",
+        "no-unused-vars",
+        "ban-untagged-todo",
+        "no-empty-interface",
+        "no-slow-types",
+        "no-deprecated-deno-api",
+        "no-duplicate-case",
+        "no-dupe-class-members",
+        "camelcase",
+        "no-dupe-args",
+        "no-sloppy-imports",
+        "no-class-assign",
+        "no-unsafe-finally"
+      ],
+      "exclude": ["no-explicit-any", "ban-ts-comment"]
+    }
+  }
+}

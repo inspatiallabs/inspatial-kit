@@ -1,0 +1,25 @@
+{
+  "name": "@in/build",
+  "license": "Apache-2.0",
+  "version": "0.7.0",
+  "exports": {
+    ".": "./src/index.ts",
+    "./hot-reload": "./src/hot-reload/index.ts",
+    "./inspatial-serve": "./src/inspatial-serve/index.ts",
+    "./vite-rollup": "./src/vite-rollup/index.ts",
+    "./webpack": "./src/webpack/index.ts"
+  },
+  "imports": {
+    "@in/zero": "jsr:@in/zero@^0.7.0"
+  },
+  "tasks": {
+    "lint": "deno lint",
+    "fmt": "deno fmt",
+    "check": "deno check **/*.ts",
+    "clean": "rm -rf node_modules && rm -rf deno.lock && rm -rf dist && rm -rf testing",
+    "publish": "deno publish --allow-slow-types --no-check --allow-dirty"
+  },
+  "publish": {
+    "exclude": [".github", ".vscode", "**/*.test.ts", "test_deps.ts"]
+  }
+}

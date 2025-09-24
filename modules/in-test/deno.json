@@ -1,0 +1,63 @@
+{
+  "name": "@in/test",
+  "license": "Apache-2.0",
+  "version": "0.7.1",
+  "imports": {
+    "@std/path": "jsr:@std/path@^1.0.8",
+    "@std/fs": "jsr:@std/fs@^1.0.15",
+    "@in/vader": "jsr:@in/vader@^0.7.0",
+    "@in/style": "jsr:@in/style@^0.7.0",
+    "@in/zero": "jsr:@in/zero@^0.7.0"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./assert": "./src/assert.ts",
+    "./expect": "./src/expect.ts",
+    "./mock": "./src/mock/index.ts",
+    "./fs": "./src/fs.ts",
+    "./highlight": "./src/highlight.ts",
+    "./log": "./src/log/index.ts",
+    "./snapshot": "./src/snapshot/index.ts",
+    "./bdd": "./src/bdd/bdd.ts",
+    "./time": "./src/time.ts",
+    "./performance": "./src/performance.ts",
+    "./benchmark": "./src/benchmark/index.ts",
+    "./retry": "./src/retry.ts",
+    "./cleanup": "./src/cleanup.ts",
+    "./reporter": "./src/reporter.ts",
+    "./ci-cd": "./src/ci-cd.ts"
+  },
+  "compilerOptions": {
+    "checkJs": false,
+    "noImplicitAny": false,
+    "lib": ["DOM", "ES2022"]
+  },
+  "tasks": {
+    "test": "deno test --no-check --allow-env --allow-read --allow-write --allow-run --allow-net --allow-hrtime",
+    "test:snapshot": "deno test --no-check --allow-env --allow-read --allow-write ./src/snapshot/index.test.ts",
+    "test:snapshot:update": "deno test --no-check --allow-env --allow-read --allow-write ./src/snapshot/index.test.ts -- -u",
+    "test:all": "deno test --allow-env --allow-read --allow-write --allow-run --allow-net --allow-hrtime",
+    "test:spec": "deno test --no-check --allow-env --allow-read --allow-run ./src/run-specs.ts",
+
+    "lint": "deno lint",
+    "fmt": "deno fmt",
+    "check": "deno check **/*.ts",
+    "clean": "rm -rf node_modules && rm -rf deno.lock && rm -rf dist && rm -rf testing",
+    "publish": "deno publish --allow-slow-types --no-check --allow-dirty"
+  },
+  "publish": {
+    "exclude": [
+      ".github",
+      ".vscode",
+      "**/*.test.ts",
+      "**/*.spec.ts",
+      "**/*.test.tsx",
+      "**/*.spec.tsx",
+      "**/*.test.jsx",
+      "**/*.spec.jsx",
+      "**/*.test.js",
+      "**/*.spec.js",
+      "test_deps.ts"
+    ]
+  }
+}

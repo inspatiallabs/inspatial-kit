@@ -1,0 +1,75 @@
+{
+  "name": "@in/teract",
+  "version": "0.7.0",
+  "license": "Apache-2.0",
+  "homepage": "https://www.inspatial.dev",
+  "repository": "https://github.com/InSpatiallabs/inspatial-kit",
+  "author": "InSpatial Labs",
+  "bugs": "https://github.com/InSpatiallabs/inspatial-kit/issues",
+  "description": "Universal interactivity and state management system for cross-platform and spatial applications.",
+  "keywords": [
+    "interact",
+    "interaction",
+    "interactivity",
+    "reactivity",
+    "state",
+    "state management",
+    "state management system",
+    "local state",
+    "global state",
+    "server state",
+    "spatial state",
+    "signals",
+    "context",
+    "trigger",
+    "trigger system",
+    "trigger bridge",
+    "trigger event",
+    "trigger registry",
+    "event",
+    "event handler",
+    "event bridge",
+    "event listener",
+    "event handler",
+    "event bridge"
+  ],
+  "tasks": {
+    "publish": "deno publish --allow-slow-types --no-check --allow-dirty",
+    "test:trigger": "deno test --no-check --allow-env --allow-read --allow-write --allow-net ./tests/trigger/",
+    "test:trigger:coverage": "deno test --no-check --allow-env --allow-read --allow-write --allow-net --coverage=./coverage/trigger ./tests/trigger/",
+
+    "test:signal-lite": "deno test --no-check --allow-env --allow-read --allow-write --allow-net ./tests/signal-lite/",
+    "test:signal-lite:coverage": "deno test --no-check --allow-env --allow-read --allow-write --allow-net --coverage=./coverage/signal-lite ./tests/signal-lite/",
+
+    "test:signal-trigger": "deno test --no-check --allow-env --allow-read --allow-write --allow-net ./tests/signal-trigger/",
+    "test:signal-trigger:coverage": "deno test --no-check --allow-env --allow-read --allow-write --allow-net --coverage=./coverage/signal-trigger ./tests/signal-trigger/",
+
+    "test:signal-core": "deno test --no-check --allow-env --allow-read --allow-write --allow-net ./tests/signal-core/",
+    "test:signal-core:coverage": "deno test --no-check --allow-env --allow-read --allow-write --allow-net --coverage=./coverage/signal-core ./tests/signal-core/",
+
+    "test": "deno test --no-check --allow-env --allow-read --allow-write --allow-net ./tests/trigger/ ./tests/signal-lite/ ./tests/signal-trigger/ ./tests/signal-core/"
+  },
+
+  "exports": {
+    ".": "./src/index.ts",
+    "./state": "./src/state/index.ts",
+    "./signal": "./src/signal/index.ts",
+    "./trigger": "./src/trigger/index.ts",
+    "./extension": "./src/extension/index.ts"
+  },
+  "compilerOptions": {
+    "checkJs": false,
+    "noImplicitAny": false,
+    "lib": [
+      "DOM",
+      "esnext",
+      "deno.ns",
+      "deno.unstable",
+      "deno.window",
+      "deno.worker"
+    ]
+  },
+  "publish": {
+    "exclude": [".github", ".vscode", "**/*.test.ts", "test_deps.ts"]
+  }
+}

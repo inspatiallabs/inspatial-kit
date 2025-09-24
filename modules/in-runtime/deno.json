@@ -1,0 +1,22 @@
+{
+  "name": "@in/runtime",
+  "license": "Apache-2.0",
+  "version": "0.7.0",
+  "exports": {
+    ".": "./src/index.ts",
+    "./jsx-runtime": "./src/jsx-runtime.ts",
+    "./jsx-dev-runtime": "./src/jsx-dev-runtime.ts",
+    "./jsx-global": "./src/jsx-global.d.ts",
+    "./types": "./src/types.ts"
+  },
+  "tasks": {
+    "lint": "deno lint",
+    "fmt": "deno fmt",
+    "check": "deno check **/*.ts",
+    "clean": "rm -rf node_modules && rm -rf deno.lock && rm -rf dist && rm -rf testing",
+    "publish": "deno publish --allow-slow-types --no-check --allow-dirty"
+  },
+  "publish": {
+    "exclude": [".github", ".vscode", "**/*.test.ts", "test_deps.ts"]
+  }
+}

@@ -1,3 +1,0 @@
-# Physics & Motion
-
-InSpatial Motion is built on InSpatial's `@in/motion`. \* \*\*Soon...

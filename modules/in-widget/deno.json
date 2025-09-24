@@ -1,0 +1,63 @@
+{
+  "name": "@in/widget",
+  "license": "Apache-2.0",
+  "version": "0.7.1",
+  "imports": {
+    "@in/widget/component/": "./src/component/",
+    "@in/widget/control-flow/": "./src/control-flow/",
+    "@in/widget/data-flow/": "./src/data-flow/",
+    "@in/widget/navigation/": "./src/navigation/",
+    "@in/widget/structure/": "./src/structure/",
+    "@in/widget/media/": "./src/media/",
+    "@in/widget/performance/": "./src/performance/",
+    "@in/widget/input/": "./src/input/",
+    "@in/widget/theme/": "./src/theme/",
+    "@in/widget/presentation/": "./src/presentation/",
+    "@in/widget/typography/": "./src/typography/",
+    "@in/widget/ornament/": "./src/ornament/",
+    "@in/widget/icon/": "./src/icon/",
+    "@in/widget/recursive/": "./src/recursive/"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./component": "./src/component/index.ts",
+    "./control-flow": "./src/control-flow/index.ts",
+    "./data-flow": "./src/data-flow/index.ts",
+    "./navigation": "./src/navigation/index.ts",
+    "./structure": "./src/structure/index.ts",
+    "./media": "./src/media/index.ts",
+    "./performance": "./src/performance/index.ts",
+    "./input": "./src/input/index.ts",
+    "./theme": "./src/theme/index.ts",
+    "./presentation": "./src/presentation/index.ts",
+    "./typography": "./src/typography/index.ts",
+    "./ornament": "./src/ornament/index.ts",
+    "./icon": "./src/icon/index.ts",
+    "./recursive": "./src/recursive/index.ts"
+  },
+  "tasks": {
+    "lint": "deno lint",
+    "fmt": "deno fmt",
+    "check": "deno check **/*.ts **/*.tsx",
+    "clean": "rm -rf node_modules && rm -rf deno.lock && rm -rf dist && rm -rf testing",
+    "test": "deno test --allow-all",
+    "publish": "deno publish --allow-slow-types --no-check --allow-dirty"
+  },
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "@in/runtime"
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"]
+    }
+  },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 80,
+    "indentWidth": 2,
+    "semiColons": true,
+    "singleQuote": false,
+    "proseWrap": "preserve"
+  }
+}

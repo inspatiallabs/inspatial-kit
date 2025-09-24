@@ -58,7 +58,7 @@ _**"If I have seen further, it is by standing on the shoulders of giants."** —
 
 ---
 
-InSpatial Dev exists because of the incredible open source community and the brilliant minds who've shared their work with the world. This project is built on the foundation of exceptional tools, frameworks, and ideas that have shaped modern software development.
+InSpatial Kit exists because of the incredible open source community and the brilliant minds who've shared their work with the world. This project is built on the foundation of exceptional tools, frameworks, and ideas that have shaped modern software development.
 
 We believe in **giving credit where credit is due** and supporting the ecosystem that makes innovation possible. While we've charted our own course to maintain control over our direction and roadmap, we're deeply grateful for the inspiration, mental models, and technical excellence provided by these projects.
 
