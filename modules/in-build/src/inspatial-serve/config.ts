@@ -58,6 +58,7 @@ const defaultConfig: InServeResolvedConfig = {
       htmlEntrypoints: false,
     },
     css: {
+      engine: "iss",
       input: "./src/config/app.css",
       output: "./dist/kit.css",
       contentGlobs: ["src/**/*.{ts,tsx,js,jsx}"],
@@ -227,6 +228,9 @@ export async function resolveServeConfig(): Promise<InServeResolvedConfig> {
           defaultConfig.build.js.htmlEntrypoints,
       },
       css: {
+        engine: ((env.get("INSPATIAL_SERVE_CSS_ENGINE") as any) ||
+          userCfg.build?.css?.engine ||
+          defaultConfig.build.css.engine) as any,
         input: normalizePath(
           userCfg.build?.css?.input || defaultConfig.build.css.input
         ),

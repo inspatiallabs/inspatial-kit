@@ -1,6 +1,14 @@
 import type { StyleProps } from "@in/style";
 import type { ThemeStyle, ThemeFormat } from "./style.ts";
 
+/*##############################################(THEME SPEC)##############################################*/
+
+export interface ThemeSpec {
+  root: Record<string, string>;
+  [variant: string]: any;
+  attr?: string;
+}
+
 /*##############################################(THEME VARIANT)##############################################*/
 
 export interface ThemeVariant {

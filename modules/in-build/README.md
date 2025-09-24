@@ -251,6 +251,7 @@ You can adjust behavior in `deno.json` using the `inspatial.serve` block. Everyt
           "htmlEntrypoints": false
         },
         "css": {
+          "engine": "iss",
           "input": "./src/config/app.css",
           "output": "./dist/kit.css",
           "contentGlobs": [

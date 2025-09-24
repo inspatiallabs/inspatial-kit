@@ -1,7 +1,7 @@
 import { ButtonStyle } from "./style.ts";
 import type { ButtonProps } from "./type.ts";
-import { Slot } from "../../structure/slot/index.tsx";
-import { LoadingIcon } from "../../icon/loading-icon.tsx";
+import { Slot } from "@in/widget/structure/slot/index.tsx";
+import { LoadingIcon } from "@in/widget/icon/loading-icon.tsx";
 
 /************************************************************************************
  * ================================================================================================
@@ -56,13 +56,18 @@ export function Button(props: ButtonProps) {
   return (
     <>
       <Component
-        className={ButtonStyle.getStyle({ format, size, className, ...rest })}
+        className={ButtonStyle.wrapper.getStyle({
+          format,
+          size,
+          className,
+          ...rest,
+        })}
         disabled={rest.disabled || rest.isLoading}
         $ref={$ref}
         {...rest}
       >
         {rest.isLoading ? (
-          <Slot className="pointer-events-none flex shrink-0 items-center justify-center gap-1.5">
+          <Slot className={ButtonStyle.loader.getStyle()}>
             <LoadingIcon />
 
             <Slot className="sr-only">

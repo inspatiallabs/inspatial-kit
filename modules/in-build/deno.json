@@ -1,7 +1,7 @@
 {
   "name": "@in/build",
   "license": "Apache-2.0",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "exports": {
     ".": "./src/index.ts",
     "./hot-reload": "./src/hot-reload/index.ts",

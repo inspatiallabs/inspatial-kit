@@ -6,6 +6,7 @@
   "bugs": "https://github.com/inspatiallabs/inspatial-kit/issues",
   "description": "InSpatial Kit",
   "workspace": [
+    "./example",
     "./modules/*",
     "./modules/in-accesibility/*",
     "./modules/in-build/*",

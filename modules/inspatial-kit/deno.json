@@ -1,7 +1,7 @@
 {
   "name": "@inspatial/kit",
   "license": "Intentional-License-1.0",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "tasks": {
     "test": "deno test --allow-env --allow-read --allow-write --allow-run --allow-net --allow-hrtime --allow-env --allow-all ./src/index.test.ts",
     "lint": "deno lint",
@@ -11,7 +11,7 @@
     "publish": "deno publish --allow-slow-types --no-check --allow-dirty"
   },
   "imports": {
-    "@in/build": "jsr:@in/build@^0.7.0",
+    "@in/build": "jsr:@in/build@^0.7.1",
     "@in/cloud": "jsr:@in/cloud@^0.7.0",
     "@in/motion": "jsr:@in/motion@^0.7.0",
     "@in/android-xr": "jsr:@in/android-xr@^0.7.0",

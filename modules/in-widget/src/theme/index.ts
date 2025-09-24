@@ -3,3 +3,4 @@ export * from "./type.ts";
 export * from "./state.ts";
 export * from "./extension.ts";
 export * from "./controller.tsx";
+export * from "./create-theme.ts";

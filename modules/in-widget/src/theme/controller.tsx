@@ -16,9 +16,17 @@ export function ThemeController({ className, ...rest }: ThemeProps) {
         material="tilted"
         iconOnly={true}
         on:tap={() => useTheme.action.setToggle()}
-        className={
-          (iss("fixed bottom-4 left-4 flex items-center gap-2 z-50"), className)
-        }
+        className={iss({ className })}
+        style={{
+          web: {
+            position: "fixed",
+            bottom: "4px",
+            left: "4px",
+            zIndex: "50",
+            alignItems: "center",
+            gap: "2",
+          },
+        }}
         {...rest}
       >
         {/* @ts-ignore */}

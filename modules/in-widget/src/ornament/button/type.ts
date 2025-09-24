@@ -4,7 +4,7 @@ import type { JSX } from "@in/runtime";
 
 //##############################################(TYPES)##############################################//
 
-export type ButtonProps = StyleProps<typeof ButtonStyle> &
+export type ButtonProps = StyleProps<typeof ButtonStyle.wrapper> &
   JSX.SharedProps & {
     isLoading?: boolean;
     loadingText?: string;

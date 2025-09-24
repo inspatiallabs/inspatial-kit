@@ -141,7 +141,7 @@ InSpatial Kit is a comprehensive suite of cross-platform tools and infrastructur
       <td align="left">UDE Client Framework</td>
       <td align="left"><code>deno add jsr:@inspatial/kit</code></td>
       <td align="left"><a href="https://www.inspatial.dev/kit">inspatial.dev/kit</a></td>
-      <td align="left">🟢 Stable</td>
+      <td align="left">🟣 Mostly Stable</td>
     </tr>
   </tbody>
 </table>
@@ -180,7 +180,7 @@ InSpatial Kit is a comprehensive suite of cross-platform tools and infrastructur
       <td align="left">Backend Cloud Client</td>
       <td align="left"><code>deno add jsr:@in/cloud</code></td>
       <td align="left"><a href="https://www.inspatial.cloud">inspatial.cloud</a></td>
-      <td align="left">🟢 Stable</td>
+      <td align="left">🟣 Mostly Stable</td>
     </tr>
     <tr style="background-color: #1b2240;">
       <td align="left"><strong>Interact</strong></td>
@@ -190,21 +190,21 @@ InSpatial Kit is a comprehensive suite of cross-platform tools and infrastructur
       <td align="left">🟢 Stable</td>
     </tr>
     <tr>
-      <td align="left"><strong>Instyle</strong></td>
+      <td align="left"><strong>InStyle</strong></td>
       <td align="left">Theming & Styling Engine</td>
       <td align="left"><code>deno add jsr:@in/style</code></td>
       <td align="left"><a href="https://www.inspatial.dev/style">inspatial.dev/style</a></td>
       <td align="left">🟢 Stable</td>
     </tr>
     <tr style="background-color: #1b2240;">
-      <td align="left"><strong>Invader</strong></td>
+      <td align="left"><strong>InVader</strong></td>
       <td align="left">Environment & Utility Functions</td>
       <td align="left"><code>deno add jsr:@in/vader</code></td>
       <td align="left"><a href="https://www.inspatial.dev/vader">inspatial.dev/vader</a></td>
       <td align="left">🟢 Stable</td>
     </tr>
     <tr>
-      <td align="left"><strong>Intest</strong></td>
+      <td align="left"><strong>InTest</strong></td>
       <td align="left">Test Framework</td>
       <td align="left"><code>deno add jsr:@in/test</code></td>
       <td align="left"><a href="https://www.inspatial.dev/test">inspatial.dev/test</a></td>
@@ -218,7 +218,7 @@ InSpatial Kit is a comprehensive suite of cross-platform tools and infrastructur
       <td align="left">🟢 Stable</td>
     </tr>
     <tr>
-      <td align="left"><strong>Inroute</strong></td>
+      <td align="left"><strong>InRoute</strong></td>
       <td align="left">Declarative & File Routing</td>
       <td align="left"><code>deno add jsr:@in/route</code></td>
       <td align="left"><a href="https://www.inspatial.dev/route">inspatial.dev/route</a></td>
@@ -239,11 +239,25 @@ InSpatial Kit is a comprehensive suite of cross-platform tools and infrastructur
       <td align="left">🟢 Stable</td>
     </tr>
     <tr style="background-color: #1b2240;">
-      <td align="left"><strong>Inmotion</strong></td>
+      <td align="left"><strong>InMotion</strong></td>
       <td align="left">Animation & Physics</td>
       <td align="left"><code>deno add jsr:@in/motion</code></td>
       <td align="left"><a href="https://www.inspatial.dev/motion">inspatial.dev/motion</a></td>
+      <td align="left">🟣 Mostly Stable</td>
+    </tr>
+     <tr>
+      <td align="left"><strong>InRenderer</strong></td>
+      <td align="left">Universal Renderer</td>
+      <td align="left"><code>deno add jsr:@in/renderer</code></td>
+      <td align="left"><a href="https://www.inspatial.dev/renderer/">inspatial.dev/renderer</a></td>
       <td align="left">🟡 Preview</td>
+    </tr>
+    <tr style="background-color: #1b2240;">
+      <td align="left"><strong>InXR</strong></td>
+      <td align="left">AR/VR/MR Renderer</td>
+      <td align="left"><code>deno add jsr:@in/xr</code></td>
+      <td align="left"><a href="https://www.inspatial.xr">inspatial.xr</a></td>
+      <td align="left">🔴 Unstable</td>
     </tr>
     <tr>
       <td align="left"><strong>InGPU</strong></td>
@@ -260,10 +274,38 @@ InSpatial Kit is a comprehensive suite of cross-platform tools and infrastructur
       <td align="left">🟢 Stable</td>
     </tr>
     <tr>
-      <td align="left"><strong>InNative</strong></td>
-      <td align="left">iOS, Android, VisionOS Renderer</td>
-      <td align="left"><code>deno add jsr:@in/native</code></td>
-      <td align="left"><a href="https://inspatial.dev/renderer/native">inspatial.dev/renderer/native</a></td>
+      <td align="left"><strong>InSSR</strong></td>
+      <td align="left">Server Side Renderer</td>
+      <td align="left"><code>deno add jsr:@in/ssr</code></td>
+      <td align="left"><a href="https://inspatial.dev/renderer/ssr">inspatial.dev/renderer/ssr</a></td>
+      <td align="left">🟡 Preview</td>
+    </tr>
+    <tr style="background-color: #1b2240;">
+      <td align="left"><strong>InAndroidXR</strong></td>
+      <td align="left">Android Extended Rality Renderer</td>
+      <td align="left"><code>deno add jsr:@in/android-xr</code></td>
+      <td align="left"><a href="https://inspatial.dev/renderer/android-xr">inspatial.dev/renderer/android-xr</a></td>
+      <td align="left">🔴 Unstable</td>
+    </tr>
+    <tr>
+      <td align="left"><strong>InVisionOS</strong></td>
+      <td align="left">VisionOS Renderer</td>
+      <td align="left"><code>deno add jsr:@in/vision-os</code></td>
+      <td align="left"><a href="https://inspatial.dev/renderer/vision-os">inspatial.dev/renderer/vision-os</a></td>
+      <td align="left">🔴 Unstable</td>
+    </tr>
+        <tr style="background-color: #1b2240;">
+      <td align="left"><strong>InHorizonOS</strong></td>
+      <td align="left">HorionOS Renderer</td>
+      <td align="left"><code>deno add jsr:@in/horizon-os</code></td>
+      <td align="left"><a href="https://inspatial.dev/renderer/horizon-os">inspatial.dev/renderer/horizon-os</a></td>
+      <td align="left">🔴 Unstable</td>
+    </tr>
+     <tr>
+      <td align="left"><strong>InNativescript</strong></td>
+      <td align="left">Native (ios, android) Renderer</td>
+      <td align="left"><code>deno add jsr:@in/nativescript</code></td>
+      <td align="left"><a href="https://inspatial.dev/renderer/nativescript">inspatial.dev/renderer/nativescript</a></td>
       <td align="left">🔴 Unstable</td>
     </tr>
      <tr style="background-color: #1b2240;">

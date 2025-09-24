@@ -1,7 +1,7 @@
 // deno-lint-ignore-file no-empty
 import { InZero } from "@in/zero";
-import { resolveServeConfig  } from "./config.ts";
-import type{ InServeResolvedConfig } from "./type.ts"
+import { resolveServeConfig } from "./config.ts";
+import type { InServeResolvedConfig } from "./type.ts";
 
 /**
  * @fileoverview InSpatial Development Server
@@ -65,10 +65,6 @@ import type{ InServeResolvedConfig } from "./type.ts"
  * └── Hot Reload Client    # Browser-side reload script
  * ```
  *
- *
- * @author InSpatial
- * @version 1.0.0
- * @since 1.0.0
  */
 
 /**
@@ -271,38 +267,92 @@ class BuildQueue {
   private async buildCSS(): Promise<void> {
     console.log("🎨 Building CSS...");
     const cfg = this.getConfig();
-    const contentGlobs = [...cfg.build.css.contentGlobs];
-    // Augment with kitRoots if developer didn't already specify
-    for (const root of cfg.discovery.kitRoots || []) {
-      const glob = `${root.replace(/\/$/, "")}/**/*.{ts,tsx,js,jsx}`;
-      if (!contentGlobs.includes(glob)) contentGlobs.push(glob);
+    const engine = (cfg.build.css as any).engine || "iss";
+
+    if (engine === "tailwind") {
+      const contentGlobs = [...cfg.build.css.contentGlobs];
+      // Augment with kitRoots if developer didn't already specify
+      for (const root of cfg.discovery.kitRoots || []) {
+        const glob = `${root.replace(/\/$/, "")}/**/*.{ts,tsx,js,jsx}`;
+        if (!contentGlobs.includes(glob)) contentGlobs.push(glob);
+      }
+      const contentArgs = ([] as string[]).concat(
+        ...contentGlobs.map((g) => ["--content", g])
+      );
+
+      const buildProcess = new InZero.Command("deno", {
+        args: [
+          "run",
+          "-A",
+          "npm:@tailwindcss/cli@latest",
+          "-i",
+          cfg.build.css.input,
+          "-o",
+          cfg.build.css.output,
+          ...contentArgs,
+        ],
+        cwd: InZero.cwd(),
+      });
+
+      const { code, stderr } = await buildProcess.output();
+
+      if (code !== 0) {
+        const errorText = new TextDecoder().decode(stderr);
+        throw new Error(`CSS build failed: ${errorText}`);
+      }
+      console.log("✅ CSS built (tailwind)");
+      return;
     }
-    const contentArgs = ([] as string[]).concat(
-      ...contentGlobs.map((g) => ["--content", g])
-    );
 
-    const buildProcess = new InZero.Command("deno", {
-      args: [
-        "run",
-        "-A",
-        "npm:@tailwindcss/cli@latest",
-        "-i",
-        cfg.build.css.input,
-        "-o",
-        cfg.build.css.output,
-        ...contentArgs,
-      ],
-      cwd: InZero.cwd(),
-    });
+    // iss/none engines: do not invoke tailwind; ensure output exists
+    try {
+      // Read input if present
+      let inputCss = "";
+      try {
+        inputCss = await InZero.readTextFile(cfg.build.css.input);
+      } catch {}
 
-    const { code, stderr } = await buildProcess.output();
+      if (inputCss) {
+        const hasTailwindImport = /@import\s+["']tailwindcss["']/.test(
+          inputCss
+        );
+        const hasApply = /@apply\b/.test(inputCss);
+        const hasTheme = /@theme\b/.test(inputCss);
+        const hasCustomVariant = /@custom-variant\b/.test(inputCss);
 
-    if (code !== 0) {
-      const errorText = new TextDecoder().decode(stderr);
-      throw new Error(`CSS build failed: ${errorText}`);
+        // Strip tailwind import lines only; pass through the rest
+        const stripped = inputCss
+          .split(/\n/)
+          .filter((line) => !/@import\s+["']tailwindcss["']/.test(line))
+          .join("\n");
+
+        if (
+          engine !== "tailwind" &&
+          (hasTailwindImport || hasApply || hasTheme || hasCustomVariant)
+        ) {
+          console.warn(
+            "[InServe] Tailwind-only directives detected in CSS but engine='iss/none'. Consider engine=\"tailwind\" or migrate to runtime styles. Found:",
+            {
+              importTailwind: hasTailwindImport,
+              apply: hasApply,
+              theme: hasTheme,
+              customVariant: hasCustomVariant,
+            }
+          );
+        }
+
+        await InZero.writeTextFile(cfg.build.css.output, stripped);
+      } else {
+        // Ensure output exists even if no input
+        await InZero.writeTextFile(
+          cfg.build.css.output,
+          "/* InSpatial runtime CSS placeholder */\n"
+        );
+      }
+      console.log(`✅ CSS prepared (${engine})`);
+    } catch (e) {
+      throw new Error(`CSS prepare failed (${engine}): ${e}`);
     }
-
-    console.log("✅ CSS built");
   }
 
   private async buildHTML(): Promise<void> {
@@ -323,10 +373,19 @@ class BuildQueue {
       return;
     }
     try {
-      await InZero.copyFile(cfg.paths.htmlEntry, cfg.paths.htmlDist);
-      console.log("✅ HTML updated");
+      // Try copying user-provided HTML if present
+      try {
+        await InZero.copyFile(cfg.paths.htmlEntry, cfg.paths.htmlDist);
+        console.log("✅ HTML updated");
+        return;
+      } catch {}
+
+      // Generate a minimal HTML if no entry file exists
+      const html = `<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\" />\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n  <title>InSpatial App</title>\n  <link rel=\"stylesheet\" href=\"/kit.css\" />\n</head>\n<body>\n  <div id=\"app\"></div>\n  <script type=\"module\" src=\"/bundle.js\"></script>\n</body>\n</html>`;
+      await InZero.writeTextFile(cfg.paths.htmlDist, html);
+      console.log("ℹ️ No htmlEntry found. Generated minimal dist/index.html");
     } catch (error) {
-      throw new Error(`HTML copy failed: ${error}`);
+      throw new Error(`HTML copy/generate failed: ${error}`);
     }
   }
 
@@ -1019,7 +1078,7 @@ export {};
 
     // If only assets changed, notify clients without triggering builds
     if (!needsJS && !needsCSS && assetFiles.length > 0) {
-      await this.notifyClients();
+      await this.notifyClients("assets");
       return;
     }
 
@@ -1036,8 +1095,12 @@ export {};
       }
     }
 
+    // Determine change kind for hot client
+    const changeKind =
+      needsCSS && !needsJS ? "css" : needsJS && !needsCSS ? "js" : "mixed";
+
     // Wait for builds to complete, then notify clients
-    await this.waitForBuildAndNotify();
+    await this.waitForBuildAndNotify(changeKind);
   }
 
   private async handleRootChange(event: any) {
@@ -1050,11 +1113,13 @@ export {};
     if (htmlFiles.length > 0) {
       console.log("📄 HTML files changed, updating...");
       this.buildQueue.add("html");
-      await this.waitForBuildAndNotify();
+      await this.waitForBuildAndNotify("html");
     }
   }
 
-  private async waitForBuildAndNotify() {
+  private async waitForBuildAndNotify(
+    changeKind?: "css" | "js" | "html" | "mixed" | "assets"
+  ) {
     // Wait a bit for the build queue to process
     const timing = this.config.build.timing;
     let attempts = 0;
@@ -1078,7 +1143,7 @@ export {};
     );
 
     // Notify all connected clients
-    await this.notifyClients();
+    await this.notifyClients(changeKind);
   }
 
   private async ensureCSSIsReady(): Promise<void> {
@@ -1118,12 +1183,15 @@ export {};
     }
   }
 
-  private notifyClients() {
+  private notifyClients(
+    changeKind?: "css" | "js" | "html" | "mixed" | "assets"
+  ) {
     if (this.clients.size === 0) return;
 
     const message = JSON.stringify({
       type: "reload",
       timestamp: Date.now(),
+      change: changeKind || "mixed",
     });
 
     const deadClients: WebSocket[] = [];
