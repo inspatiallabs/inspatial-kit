@@ -4,7 +4,7 @@ import type { PresentationProps, PresentationToggleConfig } from "../type.ts";
 import type { PresentationStyle } from "../style.ts";
 import type { IconProps } from "@in/widget/icon/type.ts";
 import type { TypographyProps } from "@in/widget/typography/text/type.ts";
-import type { JSX } from "@in/runtime/types";
+import type { JSX } from "@in/runtime/types.ts";
 
 /*#################################(DOCK ITEM CONFIG)#################################*/
 

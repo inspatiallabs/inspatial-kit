@@ -70,6 +70,7 @@ export interface InServeConfig {
     renderSearch?: string[];
     kitRoots?: string[];
   };
+  triggerTypes?: string[];
 }
 
 /*##############################(IN SERVE RESOLVED CONFIG TYPE)##############################*/
@@ -84,4 +85,6 @@ export interface InServeResolvedConfig {
     timing: Required<NonNullable<InServeConfig["build"]>["timing"]>;
   };
   discovery: Required<Required<InServeConfig>["discovery"]>;
+  /** App-level trigger type files resolved from deno.json (if provided) */
+  appTriggerTypes: string[];
 }

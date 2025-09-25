@@ -773,6 +773,21 @@ export class InSpatialServe {
           }
         }
 
+        // 5) App-level override: add files from resolved config
+        try {
+          const list = this.config.appTriggerTypes || [];
+          for (const p of list) {
+            try {
+              const st = await InZero.stat(p);
+              // deno-lint-ignore no-explicit-any
+              const isFile = !!(st as any)?.isFile;
+              if (isFile && !discoveredTypeFiles.includes(p)) {
+                discoveredTypeFiles.push(p);
+              }
+            } catch {}
+          }
+        } catch {}
+
         // Generate extension trigger types and an optional aggregator for external files
         const outDir = "./src/types";
         try {

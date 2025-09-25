@@ -272,7 +272,18 @@ export async function resolveServeConfig(): Promise<InServeResolvedConfig> {
         userCfg.discovery?.kitRoots || defaultConfig.discovery.kitRoots
       ).map(normalizePath),
     },
+    appTriggerTypes: [],
   };
+
+  // App-level trigger type overrides
+  try {
+    const denoJson = await InZero.readTextFile("./deno.json");
+    const json = JSON.parse(denoJson || "{}");
+    const appLevel = json?.inspatial?.triggerTypes as string[] | undefined;
+    if (Array.isArray(appLevel)) {
+      merged.appTriggerTypes = appLevel.map(normalizePath);
+    }
+  } catch {}
 
   return merged;
 }
