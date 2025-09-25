@@ -1,16 +1,4 @@
 {
-  "inspatial": {
-    "serve": {
-      "build": {
-        "css": {
-          "engine": "iss",
-          "input": "./src/config/app.css",
-          "output": "./dist/kit.css",
-          "contentGlobs": ["src/**/*.{ts,tsx,js,jsx}"]
-        }
-      }
-    }
-  },
   "tasks": {
     "serve": "deno run --allow-net --allow-read --allow-write --allow-env --allow-run src/config/render.ts",
     "build": "deno bundle --platform=browser --output=dist/bundle.js --sourcemap src/config/render.ts",

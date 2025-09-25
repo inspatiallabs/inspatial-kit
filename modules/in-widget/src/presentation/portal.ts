@@ -1,5 +1,5 @@
 import { createSignal, onDispose } from "@in/teract/signal";
-import { removeFromArr } from "@in/vader/remove-from-arr";
+import { removeFromArr } from "@in/vader";
 import { disposeComponent, getCurrentSelf } from "@in/widget/component/index.ts";
 import { Fn } from "@in/widget/control-flow/index.ts";
 import { List } from "@in/widget/data-flow/index.ts";

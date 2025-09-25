@@ -370,11 +370,11 @@ export const ThemeFormat = {
   inspatial: [
     {
       brand: [
-        { web: { color: "var(--brand)" } },
+        { web: { color: "var(--brand, hsla(274, 100%, 50%, 1))" } },
         {
           web: {
             "@media (prefers-color-scheme: dark)": {
-              color: "var(--brand-dark, var(--brand-200))",
+              color: "var(--brand-dark, hsla(274, 100%, 50%, 1))",
             },
           },
         },
@@ -401,72 +401,72 @@ export const ThemeFormat = {
       ],
 
       window: [
-        { web: { color: "var(--window)" } },
+        { web: { color: "var(--window, hsla(0, 0%, 100%, 0.3))" } },
         {
           web: {
             "@media (prefers-color-scheme: dark)": {
-              color: "var(--window-dark, var(--window-200))",
+              color: "var(--window-dark, hsla(229, 41%, 18%, 0.3))",
             },
           },
         },
       ],
       surface: [
-        { web: { color: "var(--surface)" } },
+        { web: { color: "var(--surface, hsla(0, 0%, 100%, 0.7))" } },
         {
           web: {
             "@media (prefers-color-scheme: dark)": {
-              color: "var(--surface-dark, var(--surface-200))",
+              color: "var(--surface-dark, hsla(229, 41%, 18%, 0.6))",
             },
           },
         },
       ],
       background: [
-        { web: { color: "var(--background)" } },
+        { web: { color: "var(--background, hsla(228, 52%, 96%, 1))" } },
         {
           web: {
             "@media (prefers-color-scheme: dark)": {
-              color: "var(--background-dark, var(--background-200))",
+              color: "var(--background-dark, hsla(233, 44%, 12%, 1))",
             },
           },
         },
       ],
       muted: [
-        { web: { color: "var(--muted)" } },
+        { web: { color: "var(--muted, hsla(228, 52%, 96%, 1))" } },
         {
           web: {
             "@media (prefers-color-scheme: dark)": {
-              color: "var(--muted-dark, var(--muted-300))",
+              color: "var(--muted-dark, hsla(233, 44%, 12%, 0.25))",
             },
           },
         },
       ],
       invert: [
-        { web: { color: "var(--invert)" } },
+        { web: { color: "var(--invert, hsla(0, 0%, 100%, 1))" } },
         {
           web: {
             "@media (prefers-color-scheme: dark)": {
-              color: "var(--invert-dark, var(--invert-100))",
+              color: "var(--invert-dark, hsla(231, 42%, 15%, 1))",
             },
           },
         },
       ],
 
       primary: [
-        { web: { color: "var(--primary)" } },
+        { web: { color: "var(--primary, hsla(231, 42%, 15%, 1))" } },
         {
           web: {
             "@media (prefers-color-scheme: dark)": {
-              color: "var(--primary-dark, var(--primary-200))",
+              color: "var(--primary-dark, hsla(0, 0%, 100%, 1))",
             },
           },
         },
       ],
       secondary: [
-        { web: { color: "var(--secondary)" } },
+        { web: { color: "var(--secondary, hsla(224, 46%, 89%, 1))" } },
         {
           web: {
             "@media (prefers-color-scheme: dark)": {
-              color: "var(--secondary-dark, var(--secondary-200))",
+              color: "var(--secondary-dark, hsla(232, 31%, 29%, 1))",
             },
           },
         },

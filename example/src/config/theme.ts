@@ -1,6 +1,8 @@
 import { createTheme } from "../../../modules/in-widget/src/theme/index.ts";
+// #########################################################(CREATE THEME)#########################################################
+// Use this to create your custom theme variables
 const theme = createTheme({
-  root: { "--brand": "hsl(274 100% 50%)", "--background": "hsl(228 52% 96%)" },
+  root: { "--brand": "yellow", "--background": "hsl(228 52% 96%)" },
   dark: { "--background": "hsl(233 44% 12%)" },
   attr: "data-theme",
 });
