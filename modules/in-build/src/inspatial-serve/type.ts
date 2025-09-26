@@ -50,7 +50,12 @@ export interface InServeConfig {
       htmlEntrypoints?: boolean;
     };
     css?: {
-      engine?: "iss" | "tailwind" | "none";
+      engine?: 
+      | "none" 
+      | "iss" 
+      | "tailwindiss" 
+      // | "tailwindcss" 
+      // | "css";
       input?: string;
       output?: string;
       contentGlobs?: string[];

@@ -84,6 +84,7 @@ const defaultConfig: InServeResolvedConfig = {
     ],
     kitRoots: ["@inspatial/kit", "../kit/src", "../kit/modules"],
   },
+  appTriggerTypes: [],
 };
 
 /*##############################(PARSE SOURCE MAP MODE)##############################*/

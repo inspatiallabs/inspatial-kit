@@ -269,7 +269,7 @@ class BuildQueue {
     const cfg = this.getConfig();
     const engine = (cfg.build.css as any).engine || "iss";
 
-    if (engine === "tailwind") {
+    if (engine === "tailwindiss") {
       const contentGlobs = [...cfg.build.css.contentGlobs];
       // Augment with kitRoots if developer didn't already specify
       for (const root of cfg.discovery.kitRoots || []) {
@@ -327,11 +327,11 @@ class BuildQueue {
           .join("\n");
 
         if (
-          engine !== "tailwind" &&
+          engine !== "tailwindiss" &&
           (hasTailwindImport || hasApply || hasTheme || hasCustomVariant)
         ) {
           console.warn(
-            "[InServe] Tailwind-only directives detected in CSS but engine='iss/none'. Consider engine=\"tailwind\" or migrate to runtime styles. Found:",
+            "[InServe] Tailwind-only directives detected in CSS but engine='iss/none'. Consider engine=\"tailwindiss\" or migrate to runtime styles. Found:",
             {
               importTailwind: hasTailwindImport,
               apply: hasApply,

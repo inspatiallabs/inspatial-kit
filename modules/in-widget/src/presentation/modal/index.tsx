@@ -3,13 +3,13 @@ import { $ } from "@in/teract/state";
 import { iss } from "@in/style";
 import { ensureArray } from "@in/vader";
 import { PresentationRegistry } from "../registry.ts";
-import { ModalStyle } from "../style.ts";
+import { ModalStyle } from "./style.ts";
 import type {
   ModalOverlayProps,
   ModalWrapperProps,
   ModalProps,
   ModalViewProps,
-} from "../type.ts";
+} from "./type.ts";
 
 /*#################################(MODAL OVERLAY)#################################*/
 

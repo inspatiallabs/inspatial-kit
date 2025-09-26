@@ -2,8 +2,8 @@ import { Slot } from "@in/widget/structure/slot/index.tsx";
 import { $ } from "@in/teract/state";
 import { iss } from "@in/style";
 import { PresentationRegistry } from "../registry.ts";
-import { DrawerStyle } from "../style.ts";
-import type { DrawerProps } from "../type.ts";
+import { DrawerStyle } from "./style.ts";
+import type { DrawerProps } from "./type.ts";
 
 export function Drawer(props: DrawerProps) {
   const {
