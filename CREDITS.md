@@ -77,7 +77,7 @@ TypeScript’s expressive type system, modern tooling, and ergonomics let us des
 
 _The modern runtime that powers our TypeScript-first development experience_
 
-Deno's security-first approach, built-in TypeScript support, and modern web standards compatibility form the backbone of InSpatial Dev's development environment.
+Deno's security-first approach, built-in TypeScript support, and modern web standards compatibility form the backbone of InSpatial Kit.
 **Thank you Team Deno.**
 
 ---
