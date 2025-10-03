@@ -1,5 +1,5 @@
 import { iss } from "@in/style";
-import { Slot, XStack, YStack } from "../../structure/index.ts";
+import { Slot, XStack, YStack } from "@in/widget/structure/index.ts";
 import type {
   TopbarProps,
   TopbarCenterProps,
@@ -7,13 +7,33 @@ import type {
   TopbarRightProps,
 } from "./type.ts";
 import { TopbarStyle } from "./style.ts";
-import { KitBorder } from "../../ornament/index.ts";
-import { TopbarPresets } from "./preset.tsx";
-import { Show } from "../../control-flow/index.ts";
+import { KitBorder } from "@in/widget/ornament/index.ts";
+import { Show } from "@in/widget/control-flow/index.ts";
+import { Block } from "@in/widget/block/index.ts";
+
+//##################################(RENDER TOPBAR BLOCK)##################################*/
+function renderTopbarBlock(children: any, props: any) {
+  if (children && typeof children === "object" && !Array.isArray(children)) {
+    if ("tab" in children) {
+      return <Block format="ii" variant={children} {...props} />;
+    }
+    if ("switch" in children) {
+      return <Block format="iii" variant={children} {...props} />;
+    }
+    if (
+      "button" in children ||
+      "checkbox" in children ||
+      "avatar" in children
+    ) {
+      return <Block format="i" variant={children} {...props} />;
+    }
+  }
+  return children;
+}
 
 /*##################################(TOPBAR LEFT)##################################*/
 function TopbarLeft(props: TopbarLeftProps) {
-  const { className, class: cls, children, preset, ...rest } = props;
+  const { className, class: cls, children, ...rest } = props;
   return (
     <XStack
       className={iss(
@@ -26,14 +46,7 @@ function TopbarLeft(props: TopbarLeftProps) {
         className={TopbarStyle.left.item.getStyle({ className, class: cls })}
         {...rest}
       >
-        <Show when={preset !== "none"} otherwise={children}>
-          <TopbarPresets
-            preset={preset}
-            className={className}
-            class={cls}
-            {...rest}
-          />
-        </Show>
+        {renderTopbarBlock(children, { className, class: cls })}
       </Slot>
     </XStack>
   );
@@ -41,7 +54,7 @@ function TopbarLeft(props: TopbarLeftProps) {
 
 /*##################################(TOPBAR CENTER)##################################*/
 function TopbarCenter(props: TopbarCenterProps) {
-  const { className, class: cls, children, preset, ...rest } = props;
+  const { className, class: cls, children, ...rest } = props;
   return (
     <XStack
       className={iss(
@@ -57,14 +70,7 @@ function TopbarCenter(props: TopbarCenterProps) {
         })}
         {...rest}
       >
-        <Show when={preset !== "none"} otherwise={children}>
-          <TopbarPresets
-            preset={preset}
-            className={className}
-            class={cls}
-            {...rest}
-          />
-        </Show>
+        {renderTopbarBlock(children, { className, class: cls })}
       </Slot>
     </XStack>
   );
@@ -72,7 +78,7 @@ function TopbarCenter(props: TopbarCenterProps) {
 
 /*##################################(TOPBAR RIGHT)##################################*/
 function TopbarRight(props: TopbarRightProps) {
-  const { className, class: cls, children, preset, ...rest } = props;
+  const { className, class: cls, children, ...rest } = props;
   return (
     <XStack
       className={iss(
@@ -85,14 +91,7 @@ function TopbarRight(props: TopbarRightProps) {
         className={TopbarStyle.right.item.getStyle({ className, class: cls })}
         {...rest}
       >
-        <Show when={preset !== "none"} otherwise={children}>
-          <TopbarPresets
-            preset={preset}
-            className={className}
-            class={cls}
-            {...rest}
-          />
-        </Show>
+        {renderTopbarBlock(children, { className, class: cls })}
       </Slot>
     </XStack>
   );

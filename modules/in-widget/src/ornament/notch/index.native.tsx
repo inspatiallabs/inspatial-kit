@@ -1,4 +1,4 @@
-import { Slot } from "@in/widget/structure/slot/index.tsx";
+import { Slot } from "@in/widget/structure/slot/component.tsx";
 import { iss } from "@in/style";
 import { NotchStyle } from "./style.ts";
 import type { NotchProps } from "./type.ts";

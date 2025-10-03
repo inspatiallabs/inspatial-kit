@@ -1,4 +1,4 @@
-import type { ISSProps, StyleProps } from "@in/style/index.ts";
+import type { StyleProps } from "@in/style/index.ts";
 import type { TopbarStyle } from "./style.ts";
 import type { NotchProps } from "@in/widget/ornament/notch/index.ts";
 import type { ButtonProps } from "@in/widget/ornament/button/type.ts";
@@ -9,6 +9,7 @@ import type { LinkProps } from "@in/widget/navigation/link/type.ts";
 import type { AvatarProps } from "@in/widget/ornament/avatar/type.ts";
 import type { CheckboxProps, SwitchProps } from "@in/widget/input/index.ts";
 import type { JSX } from "@in/runtime/types";
+import type { BlockProps } from "@in/widget";
 
 /***************(Topbar Internals)***************/
 type TopbarTypeBarProps = "bar";
@@ -22,29 +23,22 @@ type TopbarChildrenAnatomyProps =
   | InputFieldProps
   | TabProps
   | AvatarProps;
-// | DropdownProps
 
-/*##################################(TOPBAR PRESETS)##################################*/
-export type TopbarPresetsProps = JSX.SharedProps & {
-  preset: "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10" | "none";
-};
+// | DropdownProps
 
 /*##################################(TOPBAR LEFT)##################################*/
 export type TopbarLeftProps = StyleProps<typeof TopbarStyle.left> & {
-  children?: TopbarChildrenAnatomyProps;
-  preset?: TopbarPresetsProps["preset"];
+  children?: TopbarChildrenAnatomyProps | BlockProps["variant"];
 };
 
 /*##################################(TOPBAR RIGHT)##################################*/
 export type TopbarRightProps = StyleProps<typeof TopbarStyle.right> & {
-  children?: TopbarChildrenAnatomyProps;
-  preset?: TopbarPresetsProps["preset"];
+  children?: TopbarChildrenAnatomyProps | BlockProps["variant"];
 };
 
 /*##################################(TOPBAR CENTER)##################################*/
 export type TopbarCenterProps = StyleProps<typeof TopbarStyle.center> & {
-  children?: TopbarChildrenAnatomyProps;
-  preset?: TopbarPresetsProps["preset"];
+  children?: TopbarChildrenAnatomyProps | BlockProps["variant"];
 };
 
 /*##################################(TOPBAR BORDER)##################################*/

@@ -1,8 +1,8 @@
-import { Slot } from "../../structure/slot/index.tsx";
+import { Slot } from "@in/widget/structure/slot/component.tsx";
 import { PresentationToggleStyle } from "./style.ts";
-import { XPrimeIcon } from "../../icon/x-prime-icon.tsx";
-import { MinimizeIcon } from "../../icon/minimize-icon.tsx";
-import { MaximizeIcon } from "../../icon/maximize-icon.tsx";
+import { XPrimeIcon } from "@in/widget/icon/x-prime-icon.tsx";
+import { MinimizeIcon } from "@in/widget/icon/minimize-icon.tsx";
+import { MaximizeIcon } from "@in/widget/icon/maximize-icon.tsx";
 import type { PresentationToggleConfig } from "../type.ts";
 import type { JSX } from "@in/runtime/types";
 

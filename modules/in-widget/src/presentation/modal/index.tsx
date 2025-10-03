@@ -1,4 +1,4 @@
-import { Slot } from "@in/widget/structure/slot/index.tsx";
+import { Slot } from "@in/widget/structure/slot/component.tsx";
 import { $ } from "@in/teract/state";
 import { iss } from "@in/style";
 import { ensureArray } from "@in/vader";

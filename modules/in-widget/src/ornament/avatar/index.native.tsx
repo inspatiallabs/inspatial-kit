@@ -2,7 +2,7 @@ import { iss } from "@in/style";
 import { AvatarStyle } from "./style.ts";
 import type { AvatarProps } from "./type.ts";
 import { Image } from "@in/widget/media/image/index.ts";
-import { Slot } from "@in/widget/structure/slot/index.tsx";
+import { Slot } from "@in/widget/structure/slot/component.tsx";
 import { XStack } from "@in/widget/structure/stack/index.tsx";
 import type { JSX } from "@in/runtime/types";
 

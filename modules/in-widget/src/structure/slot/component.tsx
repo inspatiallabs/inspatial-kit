@@ -1,5 +1,5 @@
 import { iss } from "@in/style";
-import type { JSX } from "@in/runtime";
+import type { SlotProps } from "./type.ts";
 
 /**
  * Slot
@@ -8,7 +8,7 @@ import type { JSX } from "@in/runtime";
  * passing through shared component props for universal rendering.
  */
 
-type SlotProps = JSX.SharedProps & { content?: any; className?: string };
+/*#####################################(Slot)#####################################*/
 
 export function Slot({ content, children, ...rest }: SlotProps) {
   return (

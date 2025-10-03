@@ -1,4 +1,4 @@
-import { Slot } from "../../structure/slot/index.tsx";
+import { Slot } from "@in/widget/structure/slot/component.tsx";
 import { iss } from "@in/style";
 import { CaretRightPrimeIcon } from "../../icon/caret-right-prime-icon.tsx";
 import { useSidebar } from "./state.ts";

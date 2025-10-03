@@ -1,6 +1,6 @@
 import { ButtonStyle } from "./style.ts";
 import type { ButtonProps } from "./type.ts";
-import { Slot } from "@in/widget/structure/slot/index.tsx";
+import { Slot } from "@in/widget/structure/slot/component.tsx";
 import { LoadingIcon } from "@in/widget/icon/loading-icon.tsx";
 
 /************************************************************************************

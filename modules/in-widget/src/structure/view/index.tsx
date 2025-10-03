@@ -3,7 +3,7 @@ import { createState } from "@in/teract/state";
 // import { createMotion, eases } from "@in/motion";
 import { ViewStyle } from "./style.ts";
 import type { ViewProps } from "./type.ts";
-import { Slot } from "@in/widget/structure/slot/index.tsx";
+import { Slot } from "@in/widget/structure/slot/index.ts";
 
 /*################################ (HELPERS) ###############################*/
 let inViewCssInjected = false;

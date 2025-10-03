@@ -10,4 +10,5 @@ export * from "./icon/index.ts";
 export * from "./ornament/index.ts";
 export * from "./presentation/index.ts";
 export * from "./media/index.ts";
+export * from "./block/index.ts";
 // export * from "./widget/index.ts";

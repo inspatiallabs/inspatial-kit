@@ -1,5 +1,5 @@
 import { iss } from "@in/style";
-import { Stack } from "../stack/index.native.tsx";
+import { Stack } from "../stack/component.tsx";
 import type { StackProps } from "../stack/type.ts";
 
 /*#####################################(Render)#####################################*/

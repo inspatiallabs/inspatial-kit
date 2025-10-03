@@ -1,8 +1,9 @@
-import { $, createState } from "@in/teract/state";
-import { Slot } from "@in/widget/structure/slot/index.tsx";
+import { $ } from "@in/teract/state";
+import { Slot } from "@in/widget/structure/slot/component.tsx";
 import { iss } from "@in/style/variant";
 import type { FPSProps } from "./type.ts";
 import { FPSStyle } from "./style.ts";
+import { useFps } from "./state.ts";
 
 /*###################################(COMPONENT)###################################*/
 export function FPS({
@@ -14,7 +15,7 @@ export function FPS({
 }: FPSProps) {
   /***********(State)***********/
 
-  const ui = createState({ fps: 0 });
+  const ui = useFps;
 
   /***********(Render)***********/
   return (
