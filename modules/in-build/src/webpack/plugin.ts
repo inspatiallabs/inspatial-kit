@@ -1,9 +1,13 @@
-import { env } from "@in/vader/env";
 import {
   createFilter,
   type FilterPattern,
   DEFAULT_INCLUDE_PATTERNS,
 } from "@in/vader";
+import type {
+  InPackPluginOptions,
+  WebpackCompiler,
+  WebpackRule,
+} from "./type.ts";
 
 // Cross-runtime path utilities
 const pathUtils = {
@@ -56,34 +60,8 @@ function createCrossRuntimeRequire(basePath: string): RequireLike {
   }
 }
 
-interface WebpackCompiler {
-  context: string;
-  options: {
-    mode?: string;
-    module?: {
-      rules?: WebpackRule[];
-    };
-  };
-}
-
-interface WebpackRule {
-  test: ((filepath: string) => boolean) | RegExp;
-  use: Array<{
-    loader: string;
-    options?: any;
-  }>;
-}
-
-interface InPackPluginOptions {
-  include?: FilterPattern;
-  exclude?: FilterPattern;
-  importSource?: string;
-  enabled?: boolean;
-  [key: string]: any; // For additional loader options
-}
-
 export class InPack {
-  private importSource: string;
+  private importSource: string | string[];
   private include?: FilterPattern;
   private exclude?: FilterPattern;
   private loaderOpts: any;
@@ -96,7 +74,7 @@ export class InPack {
     const {
       include,
       exclude,
-      importSource = "@inspatial/kit/hot",
+      importSource = ["@inspatial/kit/build", "@in/build"],
       enabled,
       ...loaderOpts
     } = opts;
@@ -109,18 +87,26 @@ export class InPack {
   }
 
   apply(compiler: WebpackCompiler): void {
-    // Use webpack mode if available, fallback to centralized env detection
+    // Use webpack mode if available, fallback to NODE_ENV
     const webpackMode = compiler.options.mode;
     const enabled =
       this.enabled ??
-      (webpackMode ? webpackMode !== "production" : !env.isProduction());
+      (webpackMode
+        ? webpackMode !== "production"
+        : typeof (globalThis as any).process !== "undefined"
+        ? (globalThis as any).process.env?.NODE_ENV !== "production"
+        : true);
     if (!enabled) return;
 
     const contextPath = pathUtils.join(compiler.context, "index.js");
     const requireFn = createCrossRuntimeRequire(contextPath);
-    const importSourcePath = requireFn.resolve(this.importSource);
+    const sources = Array.isArray(this.importSource)
+      ? Array.from(new Set(this.importSource))
+      : [this.importSource];
+    const importSourcePaths = sources.map((s) => requireFn.resolve(s));
 
-    this.loaderOpts.importSourcePath = importSourcePath;
+    this.loaderOpts.importSource = sources;
+    this.loaderOpts.importSourcePaths = importSourcePaths;
 
     const filter = createFilter(
       this.include || DEFAULT_INCLUDE_PATTERNS,
@@ -128,9 +114,7 @@ export class InPack {
     );
 
     const test = (filepath: string): boolean => {
-      if (filepath === importSourcePath) {
-        return true;
-      }
+      if (importSourcePaths.some((p) => filepath === p)) return true;
       return filter(filepath);
     };
 
@@ -138,7 +122,7 @@ export class InPack {
       test,
       use: [
         {
-          loader: "@inspatial/kit/hot",
+          loader: "@inspatial/kit/build",
           options: this.loaderOpts,
         },
       ],

@@ -1,17 +1,14 @@
 /**
- * Tests for the streamlined state management system
+ * Tests for state management system
  */
 
-import {
-  assertEquals,
-  assertExists,
-} from "https://deno.land/std/testing/asserts.ts";
+import { assertEquals, assertExists, test } from "@in/test";
 import { createState } from "./state.ts";
 import { createAction } from "./action.ts";
 import { createStorage, createMemoryStorage } from "./storage.ts";
-import { isSignal, $ } from "../signal/index.ts";
+import { isSignal, $, Signal } from "../signal/index.ts";
 
-InZero.test("State V2 Tests", async (t) => {
+test("State V2 Tests", async (t) => {
   await t.step("createState creates signals for each property", () => {
     const state = createState({ count: 0, name: "test" });
 
@@ -193,7 +190,7 @@ InZero.test("State V2 Tests", async (t) => {
 
     const cleanup = createStorage(state, {
       key: "test-persist",
-      storage,
+      backend: storage,
     });
 
     // Change state
@@ -207,7 +204,7 @@ InZero.test("State V2 Tests", async (t) => {
     const state2 = createState({ count: 0, name: "" });
     createStorage(state2, {
       key: "test-persist",
-      storage,
+      backend: storage,
     });
 
     // Wait for load
@@ -229,7 +226,7 @@ InZero.test("State V2 Tests", async (t) => {
 
     createStorage(state, {
       key: "test-filter",
-      storage,
+      backend: storage,
       include: ["saved", "alsoSaved"],
       exclude: ["excluded"],
     });
@@ -247,6 +244,25 @@ InZero.test("State V2 Tests", async (t) => {
     assertEquals(parsed.alsoSaved, "changed");
     assertEquals(parsed.excluded, undefined);
   });
+
+  await t.step(
+    "createState supports scalar signals (createSignal substitute)",
+    () => {
+      const scalar = createState(10);
+
+      // Basic get/set
+      assertEquals(scalar.get(), 10);
+      scalar.set(25);
+      assertEquals(scalar.get(), 25);
+
+      // Operators should work
+      const isGreater = scalar.gt(20);
+      assertEquals(isGreater.get(), true);
+
+      scalar.set(5);
+      assertEquals(isGreater.get(), false);
+    }
+  );
 
   // Signal operator integration
   await t.step("signal operators work on state properties", () => {

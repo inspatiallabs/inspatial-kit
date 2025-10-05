@@ -1,20 +1,18 @@
 export function cached<T, R>(handler: (arg: T) => R): (arg: T) => R {
-  const store = new Map<T, R>();
-  return function (arg: T): R {
-    let val = store.get(arg);
-    if (val === undefined) {
-      val = handler(arg);
-      store.set(arg, val);
-    }
-    return val;
+  const cache = new Map<T, R>();
+  return (arg: T): R => {
+    if (cache.has(arg)) return cache.get(arg)!;
+    const result = handler(arg);
+    cache.set(arg, result);
+    return result;
   };
 }
 
 export function cachedStrKeyNoFalsy<T>(
   handler: (key: string) => T
 ): (key: string) => T {
-  const store: Record<string, T> = Object.create(null);
+  const cache: Record<string, T> = Object.create(null);
   return function (key: string): T {
-    return store[key] || (store[key] = handler(key));
+    return cache[key] || (cache[key] = handler(key));
   };
 }

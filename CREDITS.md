@@ -82,7 +82,7 @@ Deno's security-first approach, built-in TypeScript support, and modern web stan
 
 ---
 
-## 🔧 **Developer Tooling & Infrastructure**
+## 🔧 **Developer Tooling**
 
 ### **🎯 [rEFui](https://github.com/SudoMaker/rEFui)**
 
@@ -91,43 +91,20 @@ _Reactive primitives that inspired our signal architecture and rendering_
 rEFui demonstrated that reactive programming can achieve both high performance and intuitive design. Their fine-grained reactivity models profoundly shaped our approach to signal-based state management and DOM rendering philosophies.
 **Thank you Team SudoMaker.**
 
-### **🎬 [Tanstack Table & Form](https://tanstack.com/)**
+### **🎬 [Tanstack Table](https://tanstack.com/)**
 
 _Headless systems that make custom framwework integration magical_
 
-Tanstack Table & Form are radically transformative and saved us years of development for our Table & Form infra.
+Tanstack Table has been a game-changer, enabling us to build robust table infrastructure in a fraction of the time it would have otherwise taken.
 **Thank you Team Tanstack.**
 
-### **🏷️ [ArkType](https://arktype.io/)**
+### **🌳 [Headless Tree](https://github.com/lukasbach/headless-tree)**
 
-_Runtime type validation done right_
+_The definitive tree component_
 
-ArkType's refined approach to runtime type validation impressed us so much, we made an exception to our no-npm-dependency rule just to include it.
-**Thank you Team ArkType.**
+Headless Tree provided a robust, framework-agnostic approach to tree data structures and UI, showing how to separate logic from presentation for maximum flexibility.
 
-### **🌟 [Orillusion](https://www.orillusion.com/)**
-
-_The creative collective pushing boundaries in graphics rendering_
-
-Orillusion has been instrumental in shaping our approach to 3D graphics and spatial computing. 
-**Thank you Team Orillusion.**
-
-
----
-
-## 🤖 **AI & Machine Learning**
-
-### **🧠 [OpenAI](https://openai.com/)**
-
-_Advancing the frontier of artificial intelligence_
-
-OpenAI's APIs and models power many of our intelligent features and development tools.
-
-### **🔮 [Anthropic](https://www.anthropic.com/)**
-
-_Constitutional AI and helpful, harmless, honest principles_
-
-Anthropic's approach to AI safety and helpful AI systems influences how we integrate AI capabilities responsibly.
+**Thank you Lukas Bach.**
 
 ---
 

@@ -1,105 +1,82 @@
-import { env } from "@in/vader/env";
-import {
-  createFilter,
-  type FilterPattern,
-  DEFAULT_INCLUDE_PATTERNS,
-} from "@in/vader";
+import { DEFAULT_INCLUDE_PATTERNS, createFilter } from "@in/vader"
+import type { InVitePluginOptions, VitePlugin, VitePluginConfig, ViteEnvArg, TransformResult } from "./type.ts"
 
-const BEGIN = "/* ---- BEGIN INSPATIAL HOT RELOAD INJECT ---- */";
-const END = "/* ----  END INSPATIAL HOT RELOAD INJECT  ---- */";
-
-interface InVitePluginOptions {
-  include?: FilterPattern;
-  exclude?: FilterPattern;
-  importSource?: string;
-  enabled?: boolean;
-}
-
-interface TransformResult {
-  code: string;
-  map: any;
-}
-
-interface RollupPluginContext {
-  meta: {
-    watchMode?: boolean;
-  };
-}
-
-// Define proper Vite plugin interface
-interface VitePlugin {
-  name: string;
-  apply?:
-    | "build"
-    | "serve"
-    | ((this: void, config: any, env: { command: string }) => boolean);
-  buildStart?(
-    this: RollupPluginContext,
-    options: any,
-    inputOptions?: any
-  ): void;
-  transform?(code: string, id: string): TransformResult | null;
-}
-
+/*##################################(InVite)##################################*/
 export function InVite(
   options: InVitePluginOptions = {}
 ): VitePlugin | undefined {
   const {
     include = DEFAULT_INCLUDE_PATTERNS,
     exclude,
-    importSource = "@inspatial/kit/hot",
+    importSource = ["@inspatial/kit/build", "@in/build"],
+    ssr = false,
+    setGlobalFlag = true,
   } = options;
 
-  const filter = createFilter(include, exclude);
-
-  const enabled = options.enabled ?? !env.isProduction();
+  const enabled = options.enabled ?? true;
   if (!enabled) return;
 
-  // pre–serve only for Vite; for plain Rollup we check `command`
-  const apply = "serve"; // Vite hint
-  let isBuild = false; // Rollup flag
+  const filter = createFilter(include, exclude);
+  const processed = new Set<string>();
 
-  const snippet = `${BEGIN}
-if (import.meta.hot) {
-	import("${importSource}").then(({setup}) => setup({
-		data: import.meta.hot.data,
-		current: import(/* @vite-ignore */import.meta.url),
-		accept() { import.meta.hot.accept() },
-		dispose(cb) {	import.meta.hot.dispose(cb)	},
-		invalidate(reason) {
-			if (import.meta.hot.invalidate) {
-				import.meta.hot.invalidate(reason)
-			} else {
-				location.reload()
-			}
-		}
-	}))
-}
-${END}
-`;
+  const sources = Array.isArray(importSource)
+    ? Array.from(new Set(importSource))
+    : [importSource];
+
+  const hmrBootstrap = (
+    srcs: string[]
+  ): string => `if (import.meta && import.meta.hot) {
+  (async () => {
+    let m: any = null;
+    ${srcs
+      .map((s) => `if (!m) { try { m = await import("${s}"); } catch {} }`)
+      .join("\n    ")}
+    if (!m || !m.setup) return;
+    m.setup({
+      data: import.meta.hot.data,
+      current: import(/* @vite-ignore */ import.meta.url),
+      accept() { import.meta.hot.accept() },
+      dispose(cb) { import.meta.hot.dispose(cb) },
+      invalidate(reason) {
+        const hot = (import.meta as any).hot;
+        if (hot && typeof hot.invalidate === "function") hot.invalidate(reason); else location.reload();
+      }
+    });
+  })();
+}`;
 
   return {
     name: "InVite",
-    apply,
+    apply: "serve",
+    enforce: "post",
 
-    // Rollup-only: record whether we are running a production build
-    buildStart(this: RollupPluginContext, _: any, inputOptions?: any): void {
-      // inputOptions is undefined in Vite; OK
-      if (inputOptions) {
-        // rollup passes `{command: 'build'|'serve'}`
-        isBuild = this.meta.watchMode === false; // equals "rollup -c" build
+    config(_user: VitePluginConfig, envArg: ViteEnvArg) {
+      if (!setGlobalFlag) return;
+      if (envArg.command === "serve") {
+        return {
+          define: {
+            ...(typeof _user?.define === "object" ? _user.define : {}),
+            "globalThis.__inspatialHMR": "true",
+          },
+        };
       }
     },
-
-    transform(code: string, id: string): TransformResult | null {
-      if (!filter(id)) return null; // wrong file type
-      if (isBuild) return null; // production build – skip
-      if (code.includes(BEGIN)) return null; // already injected
-
-      return {
-        code: `${code}\n\n${snippet}`,
-        map: null,
-      };
+    transform(
+      code: string,
+      id: string,
+      isSSR?: boolean
+    ): TransformResult | null {
+      if (isSSR && !ssr) return null;
+      if (!filter(id)) return null;
+      if (id.includes("node_modules")) return null;
+      if (id.includes(".d.ts")) return null;
+      if (processed.has(id)) return null;
+      for (const s of sources) {
+        if (id.endsWith(s) || id.includes(s)) return null;
+      }
+      processed.add(id);
+      const appended = `${code}\n\n${hmrBootstrap(sources)}`;
+      return { code: appended, map: null };
     },
   };
 }

@@ -5,7 +5,7 @@ import { FlowVisualizerIcon } from "@in/widget/icon/flow-visualizer-icon.tsx";
 import { Checkbox } from "@in/widget/input/index.ts";
 import { Icon } from "@in/widget/icon/index.ts";
 import type { BlockIProps } from "./type.ts";
-import { ensureArray } from "@in/vader/array";
+import { ensureArray } from "@in/vader";
 
 /*##################################(BLOCK I)##################################*/
 export function BlockI(props: BlockIProps) {

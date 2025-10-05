@@ -1,72 +1,64 @@
+/* Copyright Yukino Song, SudoMaker Ltd.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under
+ * the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may
+ * obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
+ *
+ * Source: https://github.com/SudoMaker/rEFui/blob/main/src/hmr.js
+ */
+
+/* -----------------------------------------------------------------------------
+ * Modifications by InSpatial Labs
+ * SPDX-License-Identifier: Apache-2.0
+ * © 2026 InSpatial Labs. Portions © 2025 Yukino Song, SudoMaker Ltd.
+ *
+ * Description: Hot Reload (InSpatial Hot Reload) – refactors and extensions.
+ * Version: v0.7.0
+ * Project: https://inspatial.dev
+ * --------------------------------------------------------------------------- */
+
 import { createSignal } from "@in/teract/signal";
 import { isPrimitive, env } from "@in/vader";
+import type {
+  ExtendedImportMeta,
+  HotReloadOptions,
+  HotModuleData,
+  SetupOptions,
+  WrappedFunction,
+} from "./type.ts";
+import { KEY_HOTWRAP, KEY_HOTWRAPPED } from "./const.ts";
 
-/*################################(Hot Module Replacement Interfaces)################################*/
-interface HotModuleReplacement {
-  accept(): void;
-  dispose(callback: (data: any) => void): void;
-  invalidate?(reason: string): void;
-  data?: any;
-}
-
-/*################################(Extended Import Meta)################################*/
-interface ExtendedImportMeta {
-  hot?: HotModuleReplacement;
-  webpackHot?: any;
-}
-
+/*##################################(HOT RELOAD ENABLER)##################################*/
 export const hotReloadEnabler =
   !env.isProduction() &&
   (!!(/* @inspatial webpack */ (import.meta as ExtendedImportMeta).hot) ||
     // Enable when served by InSpatial dev server HMR client
     (globalThis as any).__inspatialHMR === true);
 
-export const KEY_HOTWRAP = Symbol("K_HOTWRAP");
-export const KEY_HOTWRAPPED = Symbol("K_HOTWARPPED");
-
 const toString = Object.prototype.toString;
 
-interface HotReloadOptions {
-  builtins: Set<Function>;
-  makeDyn: (fn: Function, errorHandler: Function) => any;
-  Component: new (...args: any[]) => any;
-  createComponentRaw: (tpl: any, props?: any, ...children: any[]) => any;
-}
-
-interface HotModuleData {
-  [KEY_HOTWRAP]?: any;
-}
-
-interface HotModule {
-  data?: HotModuleData;
-  accept(): void;
-  dispose(callback: (data: HotModuleData) => void): void;
-  invalidate?(reason: string): void;
-}
-
-interface SetupOptions {
-  data?: HotModuleData;
-  current: Promise<any>;
-  accept(): void;
-  dispose(callback: (data: HotModuleData) => void): void;
-  invalidate(reason: string): void;
-}
-
-interface WrappedFunction extends Function {
-  [KEY_HOTWRAP]?: any;
-  [KEY_HOTWRAPPED]?: boolean;
-  hot?: boolean;
-  value?: Function;
-}
-
-function compareVal(origVal: any, newVal: any): boolean {
+// Determine if an exported value has materially changed
+function didExportChange(origVal: any, newVal: any): boolean {
   return (
     toString.call(origVal) !== toString.call(newVal) ||
     String(origVal) !== String(newVal)
   );
 }
 
-function createHotReloader(fn: any): any {
+// Bind a stable hot reloader around a function export
+function bindHotReloader(fn: any): any {
   if (typeof fn !== "function") {
     return fn;
   }
@@ -75,8 +67,10 @@ function createHotReloader(fn: any): any {
   return wrapped;
 }
 
-function wrapComponent(fn: Function): any {
-  const wrapped = createSignal(fn as any, createHotReloader) as any;
+// Create a hot-marked component wrapper with a stable indirection target
+// deno-lint-ignore ban-types
+function markHotComponent(fn: Function): any {
+  const wrapped = createSignal(fn as any, bindHotReloader) as any;
   Object.defineProperty(fn, KEY_HOTWRAP, {
     value: wrapped,
     enumerable: false,
@@ -92,7 +86,10 @@ function handleError(
   { name, hot }: { name: string; hot: boolean }
 ): void {
   if (hot) {
-    console.error(`[InSpatial]: Error while rendering <${name}>:\n `, err);
+    console.error(
+      `[InSpatial HMR] Render error in <${name}> during update:`,
+      err
+    );
   } else {
     throw err;
   }
@@ -107,9 +104,9 @@ export function enableHotReload({
   // Use the global debug instance for HOT logging
   const globalDebug = (globalThis as any).debug;
   if (globalDebug?.info) {
-    globalDebug.info("hot", "InSpatial Hot Reload enabled");
+    globalDebug.info("hot", "[InSpatial Hot Reload] Enabled");
   } else {
-    console.info("InSpatial Hot Reload enabled.");
+    console.info("[InSpatial Hot Reload] Enabled.");
   }
   return function (tpl: any, props?: any, ...children: any[]): any {
     let hotLevel = 0;
@@ -120,7 +117,7 @@ export function enableHotReload({
         tpl = wrappedFn[KEY_HOTWRAP];
         hotLevel = 2;
       } else if (!wrappedFn[KEY_HOTWRAPPED]) {
-        tpl = wrapComponent(tpl);
+        tpl = markHotComponent(tpl);
         hotLevel = 1;
       }
     }
@@ -133,7 +130,8 @@ export function enableHotReload({
   };
 }
 
-async function update(
+// Apply an in-place hot update by reconciling exports
+async function applyHotUpdate(
   this: any,
   newModule: Promise<any>,
   invalidate: (reason: string) => void
@@ -143,6 +141,7 @@ async function update(
     return;
   }
   const oldModule = Object.entries(await this);
+  // deno-lint-ignore prefer-const
   for (let [key, origVal] of oldModule) {
     const newVal = resolvedNewModule[key];
 
@@ -155,7 +154,7 @@ async function update(
       if (wrapped) {
         wrapped.hot = true;
       } else {
-        wrapped = wrapComponent(origVal as Function);
+        wrapped = markHotComponent(origVal as Function);
       }
       if (typeof newVal === "function") {
         Object.defineProperty(newVal, KEY_HOTWRAP, {
@@ -170,16 +169,18 @@ async function update(
       if ((isPrimitive(origVal) || isPrimitive(newVal)) && origVal !== newVal) {
         invalid = true;
       } else {
-        invalid = compareVal(origVal, newVal);
+        invalid = didExportChange(origVal, newVal);
         if (!invalid) {
           console.warn(
-            `[InSpatial]: Export "${key}" does not seem to have changed. Refresh the page manually if neessary.`
+            `[InSpatial Hot Reload] No effective change detected for export "${key}". If the UI didn't update as expected, try a manual refresh.`
           );
         }
       }
 
       if (invalid) {
-        invalidate(`[InSpatial]: Non Hot Reload export "${key}" changed.`);
+        invalidate(
+          `[InSpatial Hot Reload] Export "${key}" changed outside hot boundaries. Requesting a full reload.`
+        );
       }
     }
   }
@@ -197,7 +198,7 @@ export function setup({
   invalidate,
 }: SetupOptions): void {
   if (data?.[KEY_HOTWRAP]) {
-    update.call(data[KEY_HOTWRAP], current, invalidate);
+    applyHotUpdate.call(data[KEY_HOTWRAP], current, invalidate);
   }
   dispose(onDispose.bind(current));
   accept();

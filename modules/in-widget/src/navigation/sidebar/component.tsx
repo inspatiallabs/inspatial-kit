@@ -1,12 +1,12 @@
 import { Slot } from "@in/widget/structure/slot/component.tsx";
 import { iss } from "@in/style";
-import { CaretRightPrimeIcon } from "../../icon/caret-right-prime-icon.tsx";
+import { CaretRightPrimeIcon } from "@in/widget/icon/caret-right-prime-icon.tsx";
 import { useSidebar } from "./state.ts";
 import { SidebarStyle } from "./style.ts";
 import { $ } from "@in/teract/signal";
-import { Show } from "../../control-flow/show/index.ts";
+import { Show } from "@in/widget/control-flow/show/index.ts";
 import { getActiveRoute } from "./helpers.ts";
-import { Link } from "../../navigation/link/index.ts";
+import { Link } from "@in/widget/navigation/link/index.ts";
 import type {
   SidebarProps,
   SidebarGroupProps,
@@ -16,7 +16,7 @@ import type {
   SidebarFooterProps,
   SidebarIndicatorProps,
 } from "./type.ts";
-import { XStack, YStack } from "../../structure/index.ts";
+import { XStack, YStack } from "@in/widget/structure/index.ts";
 import { generateUniqueId } from "@in/vader";
 import { createState } from "@in/teract/state";
 import type { JSX } from "@in/runtime/types";

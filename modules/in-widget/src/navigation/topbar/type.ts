@@ -9,7 +9,7 @@ import type { LinkProps } from "@in/widget/navigation/link/type.ts";
 import type { AvatarProps } from "@in/widget/ornament/avatar/type.ts";
 import type { CheckboxProps, SwitchProps } from "@in/widget/input/index.ts";
 import type { JSX } from "@in/runtime/types";
-import type { BlockProps } from "@in/widget";
+import type { BlockIProps, BlockIIProps, BlockIIIProps } from "@in/widget";
 
 /***************(Topbar Internals)***************/
 type TopbarTypeBarProps = "bar";
@@ -24,21 +24,27 @@ type TopbarChildrenAnatomyProps =
   | TabProps
   | AvatarProps;
 
+// Narrow block children to the exact shapes expected by renderTopbarBlock
+type TopbarBlockChildren =
+  | NonNullable<BlockIProps["children"]>
+  | NonNullable<BlockIIProps["children"]>
+  | NonNullable<BlockIIIProps["children"]>;
+
 // | DropdownProps
 
 /*##################################(TOPBAR LEFT)##################################*/
 export type TopbarLeftProps = StyleProps<typeof TopbarStyle.left> & {
-  children?: TopbarChildrenAnatomyProps | BlockProps["variant"];
+  children?: TopbarChildrenAnatomyProps | TopbarBlockChildren;
 };
 
 /*##################################(TOPBAR RIGHT)##################################*/
 export type TopbarRightProps = StyleProps<typeof TopbarStyle.right> & {
-  children?: TopbarChildrenAnatomyProps | BlockProps["variant"];
+  children?: TopbarChildrenAnatomyProps | TopbarBlockChildren;
 };
 
 /*##################################(TOPBAR CENTER)##################################*/
 export type TopbarCenterProps = StyleProps<typeof TopbarStyle.center> & {
-  children?: TopbarChildrenAnatomyProps | BlockProps["variant"];
+  children?: TopbarChildrenAnatomyProps | TopbarBlockChildren;
 };
 
 /*##################################(TOPBAR BORDER)##################################*/

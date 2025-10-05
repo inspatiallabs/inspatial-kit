@@ -1,4 +1,4 @@
-import { createSignal, $ } from "../../../modules/in-teract/src/index.ts";
+import { createState, $ } from "../../../modules/in-teract/src/index.ts";
 import {
   View,
   YStack,
@@ -15,10 +15,10 @@ export function Counter() {
   }
 
   /*################################(State)################################*/
-  const count = createSignal(0);
+  const count = createState(0);
   const message = $(() => `Count is: ${count.value}`);
 
-  const entries = createSignal<EntryProps[]>([
+  const entries = createState<EntryProps[]>([
     { id: 1, name: "Hot reload test working Base! 🔥" },
     { id: 2, name: "DOM renderer is running 🦵" },
     { id: 3, name: "Interactivity is a check ✅" },

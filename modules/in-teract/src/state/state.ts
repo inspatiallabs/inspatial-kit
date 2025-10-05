@@ -209,97 +209,107 @@ export function createState<C extends StateConfig<any>>(
   config: C
 ): State<C["initialState"]> & ExplicitReturnFromConfig<C>;
 
+// Array-specific overload must come before object overload so arrays resolve to Signal<T>
+export function createState<T extends readonly any[]>(initial: T): Signal<T>;
+
 export function createState<T extends Record<string, any>>(
   initialState: T
 ): State<T>;
 
-export function createState<T extends Record<string, any>>(
-  configOrInitialState: StateConfig<T> | T
-): any {
-  // Determine if we're using the separation pattern or explicit pattern
-  const isExplicitPattern =
-    configOrInitialState &&
-    typeof configOrInitialState === "object" &&
-    "initialState" in configOrInitialState;
+// Scalar support: allow createState(value) → Signal<value>
+export function createState<T>(initialValue: T): Signal<T>;
 
-  let initialState: T;
-  let actionConfig: StateConfig<T>["action"];
-  let persistOptions: StorageProps | StorageProps[] | undefined;
-
-  if (isExplicitPattern) {
-    // Explicit pattern
-    const config = configOrInitialState as StateConfig<T>;
-    initialState = config.initialState;
-    actionConfig = config.action;
-    persistOptions = config.storage;
-  } else {
-    // Separation pattern
-    initialState = configOrInitialState as T;
-    actionConfig = undefined;
-    persistOptions = undefined;
+export function createState<T>(
+  configOrInitialState: StateConfig<T & Record<string, any>> | T
+):
+  | Signal<T>
+  | State<T & Record<string, any>>
+  | (State<T & Record<string, any>> &
+      ExplicitReturnFromConfig<StateConfig<T & Record<string, any>>>) {
+  if (isStateConfig<T & Record<string, any>>(configOrInitialState)) {
+    return createStateFromConfig(configOrInitialState);
   }
+  if (isPlainObject<T & Record<string, any>>(configOrInitialState)) {
+    return createStateFromObject(
+      configOrInitialState as T & Record<string, any>
+    );
+  }
+  return createSignal(configOrInitialState as T);
+}
 
-  // Store initial values for reset
-  const initialValues = { ...initialState };
+/*##############################(Type Guards & Helpers)##############################*/
+function isPlainObject<T extends Record<string, any>>(val: unknown): val is T {
+  return (
+    typeof val === "object" &&
+    val !== null &&
+    (Object.getPrototypeOf(val) === Object.prototype ||
+      Object.getPrototypeOf(val) === null)
+  );
+}
 
-  // Create signals for each property
+function isStateConfig<T extends Record<string, any>>(
+  val: unknown
+): val is StateConfig<T> {
+  return (
+    isPlainObject<{ initialState: T }>(val) &&
+    isPlainObject<T>((val as any).initialState)
+  );
+}
+
+function keysOf<T extends Record<string, any>>(o: T): (keyof T)[] {
+  return Object.keys(o) as (keyof T)[];
+}
+
+function entriesOf<T extends Record<string, any>>(
+  o: T
+): [keyof T, T[keyof T]][] {
+  return Object.entries(o) as [keyof T, T[keyof T]][];
+}
+
+/*##############################(Object Pattern)##############################*/
+function createStateFromObject<T extends Record<string, any>>(
+  initialState: T
+): State<T> {
   const signals = {} as { [K in keyof T]: Signal<T[K]> };
-
-  for (const [key, value] of Object.entries(initialState)) {
-    signals[key as keyof T] = createSignal(value);
+  for (const key of keysOf(initialState)) {
+    signals[key] = createSignal(initialState[key]);
   }
 
-  // List of subscriptions
   const subscribers = new Set<(snapshot: T) => void>();
   let notificationsPaused = false;
 
-  // Notify all subscribers
   const notifySubscribers = () => {
     if (!notificationsPaused) {
-      const currentSnapshot = snapshot();
-      subscribers.forEach((listener) => listener(currentSnapshot));
+      const current = snapshot();
+      subscribers.forEach((l) => l(current));
     }
   };
 
-  // Create snapshot function
   const snapshot = (): T => {
     const result = {} as T;
-    for (const [key, signal] of Object.entries(signals)) {
-      result[key as keyof T] = signal.peek();
+    for (const [key, sig] of entriesOf(signals)) {
+      (result as any)[key] = sig.peek();
     }
     return result;
   };
 
-  // Watch all signals for changes
+  // watch all
   let isInitializing = true;
-  Object.values(signals).forEach((signal) => {
+  for (const sig of Object.values(signals)) {
     createSideEffect(() => {
-      signal.get(); // Track this signal
-      if (!isInitializing) {
-        notifySubscribers();
-      }
+      (sig as Signal<any>).get();
+      if (!isInitializing) notifySubscribers();
     });
-  });
+  }
   isInitializing = false;
 
-  // Prepare action creation (will be created after state is constructed)
-  const action: Record<string, (...args: any[]) => void> = {};
-
-  // Storage management for enhanced explicit pattern
-  const storageCleanups = new Map<string, () => void>();
-  const storageConfigs = new Map<string, StorageProps>();
-  let storagesPaused = false;
-
-  // Create the state interface
-  const state: State<T> & {
-    action: Record<string, (...args: any[]) => void>;
-  } = {
-    ...signals,
+  const state: State<T> = {
+    ...(signals as { [K in keyof T]: Signal<T[K]> }),
 
     batch: (updates) => {
       notificationsPaused = true;
       try {
-        updates(signals);
+        updates(state as unknown as { [K in keyof T]: Signal<T[K]> });
       } finally {
         notificationsPaused = false;
         notifySubscribers();
@@ -308,8 +318,8 @@ export function createState<T extends Record<string, any>>(
 
     reset: () => {
       untrack(() => {
-        for (const [key, value] of Object.entries(initialValues)) {
-          signals[key as keyof T].set(value);
+        for (const [key, value] of entriesOf(initialState)) {
+          state[key].set(value);
         }
       });
       tick();
@@ -319,148 +329,95 @@ export function createState<T extends Record<string, any>>(
 
     subscribe: (listener) => {
       subscribers.add(listener);
-      // Call listener immediately with current state
       listener(snapshot());
-
-      // Return unsubscribe function
       return () => {
         subscribers.delete(listener);
       };
     },
+  } as State<T>;
 
-    action,
+  return state;
+}
 
-    // Dynamic action management (only for explicit pattern)
-    addAction: isExplicitPattern
-      ? (name: string, actionDef: UnifiedTriggerDefs[string]) => {
-          if (action[name]) {
-            console.warn(`Action "${name}" already exists. Overwriting.`);
-          }
+/*##############################(Explicit Config Pattern)##############################*/
+function createStateFromConfig<
+  C extends StateConfig<T>,
+  T extends Record<string, any>
+>(config: C): State<T> & ExplicitReturnFromConfig<C> {
+  const base = createStateFromObject<T>(config.initialState);
 
-          // Create single action using enhanced logic
-          const singleActionDef = { [name]: actionDef };
-          const newActions = createAction(state, singleActionDef);
-          Object.assign(action, newActions);
+  const actionStore: Record<string, (...args: any[]) => void> = {};
+  const storageCleanups = new Map<string, () => void>();
+  const storageConfigs = new Map<string, StorageProps>();
+  let storagesPaused = false;
 
-          console.log(`✨ Dynamic action "${name}" added to state`);
-        }
-      : undefined,
+  const enhanced = Object.assign(base, {
+    action: actionStore,
+    addAction: (
+      name: string,
+      def: C["action"] extends TriggerDefsFor<T>
+        ? C["action"][keyof C["action"]]
+        : UnifiedTriggerDefs[string]
+    ) => {
+      // Create single-action record with exact name
+      const single = { [name]: def } as unknown as TriggerDefsFor<T>;
+      const created = createAction(base, single);
+      Object.assign(actionStore, created);
+    },
+    removeAction: (name: string) => {
+      if (actionStore[name]) delete actionStore[name];
+    },
+    addStorage: (storageConfig: StorageProps) => {
+      if (storageCleanups.has(storageConfig.key)) {
+        base.removeStorage?.(storageConfig.key);
+      }
+      const cleanup = createStorage(base, storageConfig);
+      storageCleanups.set(storageConfig.key, cleanup);
+      storageConfigs.set(storageConfig.key, storageConfig);
+      return cleanup;
+    },
+    removeStorage: (key: string) => {
+      const cleanup = storageCleanups.get(key);
+      if (cleanup) {
+        cleanup();
+        storageCleanups.delete(key);
+        storageConfigs.delete(key);
+      }
+    },
+    getStorageInfo: () => {
+      return Array.from(storageConfigs.entries()).map(([key, cfg]) => ({
+        key,
+        backend: typeof cfg.backend === "string" ? cfg.backend : "custom",
+        active: storageCleanups.has(key) && !storagesPaused,
+      }));
+    },
+    pauseStorage: () => {
+      storagesPaused = true;
+    },
+    resumeStorage: () => {
+      storagesPaused = false;
+    },
+  });
 
-    removeAction: isExplicitPattern
-      ? (name: string) => {
-          if (action[name]) {
-            delete action[name];
-            console.log(`🗑️ Action "${name}" removed from state`);
-          } else {
-            console.warn(`Action "${name}" not found`);
-          }
-        }
-      : undefined,
-
-    // Enhanced storage management (only for explicit pattern)
-    addStorage: isExplicitPattern
-      ? (storageConfig: StorageProps) => {
-          if (storageCleanups.has(storageConfig.key)) {
-            console.warn(
-              `Storage with key "${storageConfig.key}" already exists. Removing old one.`
-            );
-            state.removeStorage?.(storageConfig.key);
-          }
-
-          const cleanup = createStorage(state, storageConfig);
-          storageCleanups.set(storageConfig.key, cleanup);
-          storageConfigs.set(storageConfig.key, storageConfig);
-
-          console.log(
-            `💾 Dynamic storage "${storageConfig.key}" added to state`
-          );
-          return cleanup;
-        }
-      : undefined,
-
-    removeStorage: isExplicitPattern
-      ? (key: string) => {
-          const cleanup = storageCleanups.get(key);
-          if (cleanup) {
-            cleanup();
-            storageCleanups.delete(key);
-            storageConfigs.delete(key);
-            console.log(`🗑️ Storage "${key}" removed from state`);
-          } else {
-            console.warn(`Storage "${key}" not found`);
-          }
-        }
-      : undefined,
-
-    getStorageInfo: isExplicitPattern
-      ? () => {
-          return Array.from(storageConfigs.entries()).map(([key, config]) => ({
-            key,
-            backend:
-              typeof config.backend === "string" ? config.backend : "custom",
-            active: storageCleanups.has(key) && !storagesPaused,
-          }));
-        }
-      : undefined,
-
-    pauseStorage: isExplicitPattern
-      ? () => {
-          storagesPaused = true;
-          console.log(`⏸️ Storage operations paused`);
-        }
-      : undefined,
-
-    resumeStorage: isExplicitPattern
-      ? () => {
-          storagesPaused = false;
-          console.log(`▶️ Storage operations resumed`);
-        }
-      : undefined,
-  };
-
-  // Setup automatic actions if configured
-  if (actionConfig) {
-    const createdActions = createAction(
-      state,
-      actionConfig as UnifiedTriggerDefs
-    );
-    Object.assign(action, createdActions);
-    console.log(
-      `🚀 Actions enabled for state: ${Object.keys(createdActions).join(", ")}`
-    );
+  // Auto actions
+  if (config.action) {
+    const created = createAction(base, config.action as TriggerDefsFor<T>);
+    Object.assign(actionStore, created);
   }
 
-  // Setup automatic persistence if configured (supports multiple storages)
-  if (persistOptions) {
-    if (Array.isArray(persistOptions)) {
-      // Multiple storage configurations
-      persistOptions.forEach((storageConfig) => {
-        const cleanup = createStorage(state, storageConfig);
-        if (isExplicitPattern) {
-          storageCleanups.set(storageConfig.key, cleanup);
-          storageConfigs.set(storageConfig.key, storageConfig);
-        }
-      });
-      console.log(
-        `🔄 Multi-storage enabled for state with keys: ${persistOptions
-          .map((s) => s.key)
-          .join(", ")}`
-      );
-    } else {
-      // Single storage configuration
-      const cleanup = createStorage(state, persistOptions);
-      if (isExplicitPattern) {
-        storageCleanups.set(persistOptions.key, cleanup);
-        storageConfigs.set(persistOptions.key, persistOptions);
-      }
-      console.log(
-        `🔄 Auto-persistence enabled for state with key: ${persistOptions.key}`
-      );
+  // Auto storage
+  if (config.storage) {
+    const storages = Array.isArray(config.storage)
+      ? config.storage
+      : [config.storage];
+    for (const s of storages) {
+      const cleanup = createStorage(base, s);
+      storageCleanups.set(s.key, cleanup);
+      storageConfigs.set(s.key, s);
     }
   }
 
-  // Return state (TypeScript will handle the overloading)
-  return state as any;
+  return enhanced as unknown as State<T> & ExplicitReturnFromConfig<C>;
 }
 
 // Attach discoverable explicit alias: createState.in

@@ -10,7 +10,8 @@
     "./webpack": "./src/webpack/index.ts"
   },
   "imports": {
-    "@in/zero": "jsr:@in/zero@^0.7.0"
+    "@in/zero": "jsr:@in/zero@^0.7.0",
+    "@in/vader": "jsr:@in/vader@^0.7.1"
   },
   "tasks": {
     "lint": "deno lint",
