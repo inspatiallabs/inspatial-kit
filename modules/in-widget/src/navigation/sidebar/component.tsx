@@ -20,6 +20,7 @@ import { XStack, YStack } from "@in/widget/structure/index.ts";
 import { generateUniqueId } from "@in/vader";
 import { createState } from "@in/teract/state";
 import type { JSX } from "@in/runtime/types";
+import { ensureArray } from "@in/vader";
 
 /*################################(STATE)################################*/
 
@@ -470,6 +471,55 @@ export function Sidebar(props: SidebarProps) {
   // Hover state to reveal toggle only when hovering the sidebar container
   const hover = createState({ over: false });
 
+  // Children tree: map object shape into nodes
+  const childrenAsAny = children as any;
+  const isChildrenTree =
+    childrenAsAny &&
+    typeof childrenAsAny === "object" &&
+    !Array.isArray(childrenAsAny) &&
+    ("header" in childrenAsAny ||
+      "group" in childrenAsAny ||
+      "item" in childrenAsAny ||
+      "footer" in childrenAsAny ||
+      // "toggle" in childrenAsAny ||
+      // "indicator" in childrenAsAny)
+      true) &&
+    !("$$typeof" in childrenAsAny) &&
+    !("type" in childrenAsAny) &&
+    !("props" in childrenAsAny);
+
+  const treeHeaders = isChildrenTree
+    ? ensureArray<SidebarHeaderProps>(childrenAsAny.header)
+    : [];
+  const treeGroups = isChildrenTree
+    ? ensureArray<SidebarGroupProps>(childrenAsAny.group)
+    : [];
+  const treeItems = isChildrenTree
+    ? ensureArray<SidebarItemProps>(childrenAsAny.item)
+    : [];
+  const treeFooters = isChildrenTree
+    ? ensureArray<SidebarFooterProps>(childrenAsAny.footer)
+    : [];
+
+  const mappedChildren = isChildrenTree ? (
+    <>
+      {treeHeaders.map((h, i) => (
+        <SidebarHeader key={(h as any).key ?? i} {...(h as any)} />
+      ))}
+      {treeGroups.map((g, i) => (
+        <SidebarGroup key={(g as any).id ?? i} {...(g as any)} />
+      ))}
+      {treeItems.map((it, i) => (
+        <SidebarItem key={(it as any).key ?? i} {...(it as any)} />
+      ))}
+      {treeFooters.map((f, i) => (
+        <SidebarFooter key={(f as any).key ?? i} {...(f as any)} />
+      ))}
+    </>
+  ) : (
+    (undefined as any)
+  );
+
   return (
     <Slot
       data-inmotion="fade-r duration-500 once"
@@ -490,7 +540,7 @@ export function Sidebar(props: SidebarProps) {
       on:mouseleave={() => hover.over.set(false)}
       {...rest}
     >
-      {children}
+      {isChildrenTree ? mappedChildren : children}
 
       {/* Toggle Button: always visible when minimized; hover-only when expanded */}
       <Show

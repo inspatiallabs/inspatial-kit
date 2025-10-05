@@ -1,6 +1,5 @@
 import type { StyleProps } from "@in/style";
 import type { SidebarStyle } from "./style.ts";
-import type { RadioProps } from "@in/widget/input/choice-input/radio/type.ts";
 import type { LinkProps } from "@in/widget/navigation/link/index.ts";
 import type { JSX } from "@in/runtime/types";
 
@@ -20,20 +19,6 @@ export interface SidebarMenuItem {
 
 type SidebarSizeProps = "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
 
-// Main Sidebar Props
-export type SidebarProps = JSX.SharedProps &
-  StyleProps<typeof SidebarStyle.wrapper> & {
-    minimized?: boolean;
-    defaultMinimized?: boolean;
-    onMinimizeChange?: (minimized: boolean) => void;
-    children?: JSX.Element | JSX.Element[];
-    showToggle?: boolean;
-
-    // Size configuration for different states
-    minimizedSize?: SidebarSizeProps;
-    expandedSize?: SidebarSizeProps;
-  };
-
 // Sidebar Group Props (collapsible parent items)
 export type SidebarGroupProps = JSX.SharedProps &
   StyleProps<typeof SidebarStyle.group> & {
@@ -52,31 +37,31 @@ type SidebarItemBaseProps = JSX.SharedProps &
     disabled?: boolean;
     // Event handlers (Tab/Radio pattern)
     onChange?: (value: string | number | boolean) => void;
-    'on:input'?: (value: string | number | boolean) => void;
-    'on:change'?: (value: string | number | boolean) => void;
+    "on:input"?: (value: string | number | boolean) => void;
+    "on:change"?: (value: string | number | boolean) => void;
   };
 
 // MPV: MultiPageView (Link anatomy)
 export type SidebarItemMPVProps = SidebarItemBaseProps &
   Partial<LinkProps> & {
-    routeView: 'MPV';
-    to: LinkProps['to'];
+    routeView: "MPV";
+    to: LinkProps["to"];
     // Disallow SPV-only props
     selected?: never;
     defaultSelected?: never;
     name?: never;
     value?: never;
     // Navigation-specific
-    activeMatch?: 'exact' | 'prefix' | 'custom';
+    activeMatch?: "exact" | "prefix" | "custom";
     isActive?: (currentRoute: string) => boolean;
   };
 
 // SPV: SinglePageView (Radio group anatomy)
 export type SidebarItemSPVProps = SidebarItemBaseProps & {
-  routeView: 'SPV';
+  routeView: "SPV";
   name: string;
   value: string;
-  selected?: boolean | import('@in/teract/signal').Signal<boolean>;
+  selected?: boolean | import("@in/teract/signal").Signal<boolean>;
   defaultSelected?: boolean;
   // Disallow MPV-only props
   to?: never;
@@ -103,7 +88,6 @@ export type SidebarToggleProps = JSX.SharedProps &
     };
   };
 
-
 // Sidebar Header Props
 export type SidebarHeaderProps = JSX.SharedProps &
   StyleProps<typeof SidebarStyle.header> & {
@@ -120,11 +104,39 @@ export type SidebarFooterProps = JSX.SharedProps &
   };
 
 // Active Indicator Props
-export type SidebarIndicatorProps = StyleProps<typeof SidebarStyle.indicator> & {
+export type SidebarIndicatorProps = StyleProps<
+  typeof SidebarStyle.indicator
+> & {
   active: boolean;
   minimized?: boolean;
   layoutId?: string;
 };
+
+type SidebarChildrenTree =
+  | JSX.Element
+  | JSX.Element[]
+  | {
+      header?: SidebarHeaderProps | SidebarHeaderProps[];
+      item?: SidebarItemProps | SidebarItemProps[];
+      group?: SidebarGroupProps | SidebarGroupProps[];
+      footer?: SidebarFooterProps | SidebarFooterProps[];
+      // toggle?: SidebarToggleProps | SidebarToggleProps[]; // Not quite certain about this in the anatomy of the widget tree
+      // indicator?: SidebarIndicatorProps | SidebarIndicatorProps[]; // Not quite certain about this in the anatomy of the widget tree
+    };
+
+// Main Sidebar Props
+export type SidebarProps = JSX.SharedProps &
+  StyleProps<typeof SidebarStyle.wrapper> & {
+    minimized?: boolean;
+    defaultMinimized?: boolean;
+    onMinimizeChange?: (minimized: boolean) => void;
+    children?: SidebarChildrenTree;
+    showToggle?: boolean;
+
+    // Size configuration for different states
+    minimizedSize?: SidebarSizeProps;
+    expandedSize?: SidebarSizeProps;
+  };
 
 /*################################(Configuration Types)################################*/
 
