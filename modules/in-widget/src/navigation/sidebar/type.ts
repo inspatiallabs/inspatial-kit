@@ -2,6 +2,7 @@ import type { StyleProps } from "@in/style";
 import type { SidebarStyle } from "./style.ts";
 import type { LinkProps } from "@in/widget/navigation/link/index.ts";
 import type { JSX } from "@in/runtime/types";
+// import type { TreeProps } from "@in/widget/recursive";
 
 /*################################(Base Types)################################*/
 
@@ -120,9 +121,16 @@ type SidebarChildrenTree =
       item?: SidebarItemProps | SidebarItemProps[];
       group?: SidebarGroupProps | SidebarGroupProps[];
       footer?: SidebarFooterProps | SidebarFooterProps[];
+      // tree?: TreeProps | TreeProps[];
       // toggle?: SidebarToggleProps | SidebarToggleProps[]; // Not quite certain about this in the anatomy of the widget tree
       // indicator?: SidebarIndicatorProps | SidebarIndicatorProps[]; // Not quite certain about this in the anatomy of the widget tree
     };
+
+// NOTE: Multiview support is not yet implemented because I haven't figured out the full anatomy of the sidebar: will most likely happen when I finish the design in Figma.
+// Fot now use state and control flow to achieve the same effect.
+// type SidebarViewProps = {
+//   view?: SidebarChildrenTree | SidebarChildrenTree[];
+// };
 
 // Main Sidebar Props
 export type SidebarProps = JSX.SharedProps &
@@ -131,6 +139,7 @@ export type SidebarProps = JSX.SharedProps &
     defaultMinimized?: boolean;
     onMinimizeChange?: (minimized: boolean) => void;
     children?: SidebarChildrenTree;
+    // | SidebarViewProps;
     showToggle?: boolean;
 
     // Size configuration for different states

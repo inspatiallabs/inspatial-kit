@@ -488,31 +488,31 @@ export function Sidebar(props: SidebarProps) {
     !("type" in childrenAsAny) &&
     !("props" in childrenAsAny);
 
-  const treeHeaders = isChildrenTree
+  const sidebarHeaders = isChildrenTree
     ? ensureArray<SidebarHeaderProps>(childrenAsAny.header)
     : [];
-  const treeGroups = isChildrenTree
+  const sidebarGroups = isChildrenTree
     ? ensureArray<SidebarGroupProps>(childrenAsAny.group)
     : [];
-  const treeItems = isChildrenTree
+  const sidebarItems = isChildrenTree
     ? ensureArray<SidebarItemProps>(childrenAsAny.item)
     : [];
-  const treeFooters = isChildrenTree
+  const sidebarFooters = isChildrenTree
     ? ensureArray<SidebarFooterProps>(childrenAsAny.footer)
     : [];
 
   const mappedChildren = isChildrenTree ? (
     <>
-      {treeHeaders.map((h, i) => (
+      {sidebarHeaders.map((h, i) => (
         <SidebarHeader key={(h as any).key ?? i} {...(h as any)} />
       ))}
-      {treeGroups.map((g, i) => (
+      {sidebarGroups.map((g, i) => (
         <SidebarGroup key={(g as any).id ?? i} {...(g as any)} />
       ))}
-      {treeItems.map((it, i) => (
+      {sidebarItems.map((it, i) => (
         <SidebarItem key={(it as any).key ?? i} {...(it as any)} />
       ))}
-      {treeFooters.map((f, i) => (
+      {sidebarFooters.map((f, i) => (
         <SidebarFooter key={(f as any).key ?? i} {...(f as any)} />
       ))}
     </>
@@ -524,7 +524,7 @@ export function Sidebar(props: SidebarProps) {
     <Slot
       data-inmotion="fade-r duration-500 once"
       id={instanceId}
-      className={$(() =>
+      className={$(() => 
         iss(
           minimizedForInstance.get() ? "sidebar-minimized" : "sidebar-expanded",
           SidebarStyle.wrapper.getStyle({

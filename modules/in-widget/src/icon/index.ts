@@ -39,3 +39,4 @@ export * from "./folder-notch-icon.tsx";
 export * from "./file-icon.tsx";
 export * from "./arrow-bottom-icon.tsx";
 export * from "./arrow-up-icon.tsx";
+export * from "./shape-icon.tsx";
