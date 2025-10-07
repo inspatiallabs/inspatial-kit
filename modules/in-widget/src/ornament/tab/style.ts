@@ -17,7 +17,7 @@ export const TabStyle = {
         web: {
           height: "100%",
           width: "100%",
-          display: "inline-flex",
+          display: "flex",
           alignItems: "center",
           cursor: "pointer",
           userSelect: "none",
@@ -32,6 +32,22 @@ export const TabStyle = {
       disabled: false,
     },
     composition: [
+      {
+        "$tab-anchor.axis": "X",
+        style: {
+          web: {
+            flexDirection: "row",
+          },
+        },
+      },
+      {
+        "$tab-anchor.axis": "Y",
+        style: {
+          web: {
+            flexDirection: "column",
+          },
+        },
+      },
       {
         "$tab-anchor.format": "segmented",
         style: {
@@ -153,6 +169,7 @@ export const TabStyle = {
       {
         "$tab-anchor.radius": "full",
         "$tab-anchor.format": "segmented",
+
         style: {
           web: {
             borderRadius: "var(--radius-full)",
@@ -233,6 +250,22 @@ export const TabStyle = {
       },
     ],
     settings: {
+      axis: {
+        X: [
+          {
+            web: {
+              flexDirection: "row",
+            },
+          },
+        ],
+        Y: [
+          {
+            web: {
+              flexDirection: "column",
+            },
+          },
+        ],
+      },
       format: {
         segmented: [
           {
@@ -247,6 +280,26 @@ export const TabStyle = {
               // Checked state - the tab is selected
               ".peer:checked ~ &": {
                 backgroundColor: "var(--surface)",
+                color: "var(--primary)",
+                boxShadow: "var(--shadow-subtle)",
+              },
+            },
+          },
+        ],
+        segmentedV2: [
+          {
+            web: {
+              padding: "4px 4px",
+              backgroundColor: "var(--surface)",
+
+              // Hover state
+              //   "&:hover": {
+              //     backgroundColor: "rgba(255, 255, 255, 0.05)",
+              //   },
+
+              // Checked state - the tab is selected
+              ".peer:checked ~ &": {
+                backgroundColor: "var(--brand)",
                 color: "var(--primary)",
                 boxShadow: "var(--shadow-subtle)",
               },
@@ -371,6 +424,7 @@ export const TabStyle = {
     },
 
     defaultSettings: {
+      axis: "X",
       format: "segmented",
       scale: "none",
       size: "md",

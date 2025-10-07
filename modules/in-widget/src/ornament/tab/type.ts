@@ -41,4 +41,5 @@ export type TabProps = TabRootProps &
     scale?: TabAnchorProps["scale"];
     size?: TabAnchorProps["size"];
     radius?: TabAnchorProps["radius"];
+    axis?: TabAnchorProps["axis"];
   };

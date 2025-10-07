@@ -15,6 +15,7 @@ export function Tab(props: TabProps) {
     children,
     selected,
     defaultSelected,
+    axis,
     format,
     size,
     radius,
@@ -70,6 +71,7 @@ export function Tab(props: TabProps) {
           className,
           class: className,
           // @ts-ignore
+          axis,
           format,
           size,
           radius,
