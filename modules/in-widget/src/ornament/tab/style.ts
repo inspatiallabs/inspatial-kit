@@ -325,7 +325,11 @@ export const TabStyle = {
         rabi: [
           {
             web: {
-              borderRight: "1px solid var(--background)",
+              backgroundColor: "var(--window)",
+              // borderRight: "2px solid var(--background)",
+              // marginLeft: "-2px",
+              // marginRight: "-3px",
+              // padding: "0 2.5px",
 
               // Hover state
               //   "&:hover": {

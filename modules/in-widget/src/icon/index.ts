@@ -40,3 +40,6 @@ export * from "./file-icon.tsx";
 export * from "./arrow-bottom-icon.tsx";
 export * from "./arrow-up-icon.tsx";
 export * from "./shape-icon.tsx";
+export * from "./pan-icon.tsx";
+export * from "./select-icon.tsx";
+export * from "./orbit-icon.tsx";

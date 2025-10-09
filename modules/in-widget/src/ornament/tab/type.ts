@@ -5,7 +5,7 @@ import type { JSX } from "@in/runtime/types";
 /*#################################(TAB ITEM PROPS)#################################*/
 
 export type TabItemProps = JSX.SharedProps & {
-  label: string;
+  label?: string;
   /**
    * Optional explicit value. If omitted, the component derives a deterministic value from label.
    * Use when you need to distinguish between tabs with the same label.
