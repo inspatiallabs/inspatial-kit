@@ -28,6 +28,18 @@ export function registerPresentationTrigger(): void {
 
       const { id, action, open } = currentPayload;
 
+      // capture anchor (node and optional pointer coordinates)
+      try {
+        const me: any = _event as any;
+        const x = typeof me?.clientX === "number" ? me.clientX : undefined;
+        const y = typeof me?.clientY === "number" ? me.clientY : undefined;
+        const point =
+          typeof x === "number" && typeof y === "number" ? { x, y } : null;
+        PresentationRegistry.setAnchor(id, { node, point });
+      } catch (_) {
+        // ignore anchor capture failures
+      }
+
       if (typeof open === "boolean") {
         PresentationRegistry.setOpen(id, open);
         return;

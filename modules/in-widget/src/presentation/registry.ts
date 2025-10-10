@@ -1,6 +1,9 @@
 import { createSignal, type Signal } from "@in/teract/signal";
 
 const idToOpenSignal = new Map<string, Signal<boolean>>();
+type AnchorPoint = { x: number; y: number };
+type AnchorData = { node?: Element | null; point?: AnchorPoint | null } | null;
+const idToAnchor = new Map<string, AnchorData>();
 
 export const PresentationRegistry = {
   ensureOpenSignal(id: string): Signal<boolean> {
@@ -21,5 +24,11 @@ export const PresentationRegistry = {
     const sig = this.ensureOpenSignal(id);
 
     return sig;
+  },
+  setAnchor(id: string, anchor: AnchorData): void {
+    idToAnchor.set(id, anchor ?? null);
+  },
+  getAnchor(id: string): AnchorData {
+    return idToAnchor.get(id) ?? null;
   },
 };

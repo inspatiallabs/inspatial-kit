@@ -2,7 +2,7 @@
   "tasks": {
     "serve": "deno run --allow-net --allow-read --allow-write --allow-env --allow-run src/config/render.ts",
     "build": "deno bundle --platform=browser --output=dist/bundle.js --sourcemap src/config/render.ts",
-    "clean": "rm -rf dist && rm -rf node_modules && rm -rf deno.lock && rm -rf src/app/.inroute && rm -f src/types/extension-trigger-types.generated.d.ts"
+    "clean": "rm -rf dist && rm -rf node_modules && rm -rf deno.lock && rm -rf src/app/.inroute && rm -f src/types/extension-trigger-types.generated.d.ts && rm -f src/types/jsx-global.generated.d.ts"
   },
   "imports": {
     "@inspatial/kit": "jsr:@inspatial/kit@^0.7.2"

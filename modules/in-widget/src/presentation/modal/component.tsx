@@ -50,7 +50,7 @@ function ModalWrapper(props: ModalWrapperProps) {
   );
 }
 
-/*#################################(MODAL WINDOW)#################################*/
+/*#################################(MODAL VIEW)#################################*/
 
 function ModalView(props: ModalViewProps) {
   const {

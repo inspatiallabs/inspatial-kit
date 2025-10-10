@@ -1,5 +1,5 @@
 import { createStyle } from "@in/style";
-import { ThemeRadius } from "@in/widget/theme/style.ts";
+import { ThemeMaterial, ThemeRadius } from "@in/widget/theme/style.ts";
 import { PresentationStyle } from "../style.ts";
 
 //##############################################(MODAL STYLE)##############################################//
@@ -12,13 +12,6 @@ export const ModalStyle = {
   /*******************************(Wrapper)********************************/
   wrapper: createStyle({
     base: [
-      "fixed",
-      "inset-0",
-      "flex",
-      "items-center",
-      "justify-center",
-      "pointer-events-none",
-      "z-[2147483647]",
       {
         web: {
           position: "fixed",
@@ -35,18 +28,11 @@ export const ModalStyle = {
   /*******************************(View)********************************/
   view: createStyle({
     base: [
-      "pointer-events-auto",
-      "bg-(--window)",
-      "material-tilted",
-      "border border-(--muted)",
-      "shadow-effect",
       {
         web: {
           pointerEvents: "auto",
           background: "var(--window)",
           border: "1px solid var(--muted)",
-          boxShadow: "var(--shadow-effect)",
-          backdropFilter: "blur(var(--blur-base))",
         },
       },
     ],
@@ -60,8 +46,6 @@ export const ModalStyle = {
 
       size: {
         auto: [
-          "h-auto",
-          "w-auto",
           {
             web: {
               width: "auto",
@@ -70,8 +54,6 @@ export const ModalStyle = {
           },
         ],
         base: [
-          "w-[50%]",
-          "h-[80vh]",
           {
             web: {
               width: "50%",
@@ -80,8 +62,6 @@ export const ModalStyle = {
           },
         ],
         fit: [
-          "min-h-fit",
-          "min-w-fit",
           {
             web: {
               minHeight: "fit-content",
@@ -90,8 +70,6 @@ export const ModalStyle = {
           },
         ],
         full: [
-          "min-h-full",
-          "min-w-full",
           {
             web: {
               minHeight: "100%",
@@ -101,12 +79,14 @@ export const ModalStyle = {
         ],
       },
 
+      material: ThemeMaterial,
       radius: ThemeRadius,
     },
     defaultSettings: {
       direction: "bottom",
       size: "base",
-      radius: "4xl",
+      radius: "base",
+      material: "tilted",
     },
   }),
 };
