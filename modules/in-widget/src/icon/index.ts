@@ -43,3 +43,6 @@ export * from "./shape-icon.tsx";
 export * from "./pan-icon.tsx";
 export * from "./select-icon.tsx";
 export * from "./orbit-icon.tsx";
+export * from "./redo-icon.tsx";
+export * from "./undo-icon.tsx";
+export * from "./comment-icon.tsx";

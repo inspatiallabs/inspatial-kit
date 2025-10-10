@@ -59,6 +59,8 @@
     "./test": "./src/test.ts",
     "./widget": "./src/widget.ts",
 
+
+    "./block": "./src/block.ts",
     "./component": "./src/component.ts",
     "./control-flow": "./src/control-flow.ts",
     "./data-flow": "./src/data-flow.ts",

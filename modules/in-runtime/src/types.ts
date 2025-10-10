@@ -169,7 +169,7 @@ export namespace JSX {
     [elemName: string]: SharedProps;
   }
   // Attributes available on all intrinsic elements
-  export interface IntrinsicAttributes extends SharedProps {
+  export interface IntrinsicAttributes {
     key?: any;
   }
 
