@@ -96,40 +96,40 @@ export const PopoverStyle = {
       {
         direction: "bottom",
         offset: "2xs",
-        style: { web: { marginTop: "2px" } },
+        style: { web: { marginTop: "2px" } }, // TODO: add the correct margin
       },
       {
         direction: "bottom",
         offset: "xs",
-        style: { web: { marginTop: "4px" } },
+        style: { web: { marginTop: "4px" } }, // TODO: add the correct margin
       },
       {
         direction: "bottom",
         offset: "sm",
-        style: { web: { marginTop: "8px" } },
+        style: { web: { marginTop: "8px" } }, // TODO: add the correct margin
       },
       {
         direction: "bottom",
         offset: "md",
-        style: { web: { marginTop: "12px" } },
+        style: { web: { marginTop: "12px" } }, // TODO: add the correct margin
       },
       {
         direction: "bottom",
         offset: "lg",
-        style: { web: { marginTop: "76px" } },
+        style: { web: { marginTop: "6px" } },
       },
       // top margins (negative)
       {
         direction: "top",
         offset: "2xs",
-        style: { web: { marginTop: "-2px" } },
+        style: { web: { marginTop: "-2px" } }, // TODO: add the correct margin
       },
-      { direction: "top", offset: "xs", style: { web: { marginTop: "-4px" } } },
-      { direction: "top", offset: "sm", style: { web: { marginTop: "-8px" } } },
+      { direction: "top", offset: "xs", style: { web: { marginTop: "-4px" } } }, // TODO: add the correct margin
+      { direction: "top", offset: "sm", style: { web: { marginTop: "-8px" } } }, // TODO: add the correct margin
       {
         direction: "top",
         offset: "md",
-        style: { web: { marginTop: "-12px" } },
+        style: { web: { marginTop: "-12px" } }, // TODO: add the correct margin
       },
       {
         direction: "top",
@@ -140,22 +140,22 @@ export const PopoverStyle = {
       {
         direction: "right",
         offset: "2xs",
-        style: { web: { marginLeft: "2px" } },
+        style: { web: { marginLeft: "2px" } }, // TODO: add the correct margin
       },
       {
         direction: "right",
         offset: "xs",
-        style: { web: { marginLeft: "50px" } },
+        style: { web: { marginLeft: "50px" } }, // TODO: add the correct margin
       },
       {
         direction: "right",
         offset: "sm",
-        style: { web: { marginLeft: "8px" } },
+        style: { web: { marginLeft: "8px" } }, // TODO: add the correct margin
       },
       {
         direction: "right",
         offset: "md",
-        style: { web: { marginLeft: "12px" } },
+        style: { web: { marginLeft: "12px" } }, // TODO: add the correct margin
       },
       {
         direction: "right",
@@ -166,22 +166,22 @@ export const PopoverStyle = {
       {
         direction: "left",
         offset: "2xs",
-        style: { web: { marginLeft: "-2px" } },
+        style: { web: { marginLeft: "-2px" } }, // TODO: add the correct margin
       },
       {
         direction: "left",
         offset: "xs",
-        style: { web: { marginLeft: "-4px" } },
+        style: { web: { marginLeft: "-4px" } }, // TODO: add the correct margin
       },
       {
         direction: "left",
         offset: "sm",
-        style: { web: { marginLeft: "-8px" } },
+        style: { web: { marginLeft: "-8px" } }, // TODO: add the correct margin
       },
       {
         direction: "left",
         offset: "md",
-        style: { web: { marginLeft: "-12px" } },
+        style: { web: { marginLeft: "-12px" } }, // TODO: add the correct margin
       },
       {
         direction: "left",

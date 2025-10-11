@@ -1,13 +1,13 @@
 import { Slot } from "@in/widget/structure/slot/component.tsx";
 import { $, createState } from "@in/teract/state";
-import { Show } from "../../control-flow/show/index.ts";
+import { Show } from "@in/widget/control-flow/show/index.ts";
 import { iss } from "@in/style";
 import { PresentationRegistry } from "../registry.ts";
 import { DockStyle } from "./style.ts";
 import {
   renderPresentationToggles,
   getPresentationToggleIcon,
-} from "../toggle/index.tsx";
+} from "../toggle-api/index.tsx";
 import type {
   DockProps,
   DockItemConfig,

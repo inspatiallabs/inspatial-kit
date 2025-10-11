@@ -2,6 +2,7 @@ import type { JSX } from "@in/runtime/types";
 import type { StyleProps } from "@in/style";
 import type { PresentationOverlayProps, PresentationProps } from "../type.ts";
 import type { PopoverStyle } from "./style.ts";
+import type { InPositioningOptions } from "../positioning-api/type.ts";
 
 /*#################################(Popover TYPES)#################################*/
 
@@ -20,7 +21,8 @@ export type PopoverWrapperProps = StyleProps<typeof PopoverStyle.wrapper> &
 export type PopoverViewProps = StyleProps<typeof PopoverStyle.view> &
   JSX.SharedProps & {
     align?: "start" | "center" | "end";
-    arrow?: boolean;
+    arrow?: boolean | { size?: number };
+    positioning?: InPositioningOptions;
   };
 
 /******************************(Popover)******************************/

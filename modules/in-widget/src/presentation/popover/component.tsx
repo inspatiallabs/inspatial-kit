@@ -1,6 +1,6 @@
 import { Slot } from "@in/widget/structure/slot/component.tsx";
 import { $ } from "@in/teract/state";
-import { createSignal, onDispose } from "@in/teract/signal";
+import { createSignal, onDispose, nextTick } from "@in/teract/signal";
 import { iss } from "@in/style";
 import { ensureArray } from "@in/vader";
 import { PresentationRegistry } from "../registry.ts";
@@ -11,6 +11,16 @@ import type {
   PopoverViewProps,
   PopoverProps,
 } from "./type.ts";
+import {
+  computePosition,
+  autoUpdate,
+  getElementRect,
+  getFloatingSize,
+  getNearestScrollRoot,
+  getRect,
+  isRTL,
+  getVirtualPointRect,
+} from "../positioning-api/index.ts";
 
 /*##################################(POPOVER OVERLAY)##################################*/
 export function PopoverOverlay(props: PopoverOverlayProps) {
@@ -63,6 +73,7 @@ export function PopoverView(props: PopoverViewProps) {
     direction,
     align = "center",
     arrow = false,
+    positioning,
     ...rest
   } = props;
   return (
@@ -93,7 +104,7 @@ export function PopoverView(props: PopoverViewProps) {
 export function Popover(props: PopoverProps) {
   const {
     id,
-    backdrop = "none",
+    backdrop = "transparent", // Prefer transparent over none as default because the anatomy of a popver almost always demand a close on backdrop tap regardless of the backdrop type.
     open,
     defaultOpen,
     closeOnEsc = true,
@@ -105,14 +116,14 @@ export function Popover(props: PopoverProps) {
     radius,
     offset,
     align = "start",
+    positioning,
+    arrow,
     ...rest
   } = props as any;
 
   const sig = PresentationRegistry.getSignal(id);
-  const position = createSignal<{ top: number; left: number }>({
-    top: 0,
-    left: 0,
-  });
+  const pos = createSignal<{ top: number; left: number }>({ top: 0, left: 0 });
+  const ready = createSignal(false);
 
   if (open !== undefined) {
     if (typeof open === "boolean") sig.value = open;
@@ -128,59 +139,74 @@ export function Popover(props: PopoverProps) {
 
     const anchor = PresentationRegistry.getAnchor(id);
 
-    // Continuously track anchor position while open (scroll/resize safe)
-    let raf: any = 0;
-    const updatePosition = () => {
-      const viewportW = (globalThis as any)?.innerWidth ?? 0;
-      const viewportH = (globalThis as any)?.innerHeight ?? 0;
+    let viewRef: any = null;
+    let stop: any = null;
 
-      let rect = { top: 0, left: 0, width: 0, height: 0 } as any;
-      if (anchor?.node && (anchor.node as any).getBoundingClientRect) {
-        const r = (anchor.node as any).getBoundingClientRect();
-        rect = { top: r.top, left: r.left, width: r.width, height: r.height };
-      } else if (anchor?.point) {
-        const { x, y } = anchor.point;
-        rect = { top: y, left: x, width: 1, height: 1 };
-      }
+    const update = () => {
+      if (!viewRef) return;
+      const scrollRoot = getNearestScrollRoot(anchor?.node || null);
+      const boundaryRect = getRect(scrollRoot);
 
-      const clamp = (n: number, min: number, max: number): number =>
-        Number.isNaN(n) ? min : Math.max(min, Math.min(n, max));
+      const anchorRect = anchor?.node
+        ? getElementRect(anchor.node)
+        : anchor?.point
+        ? getVirtualPointRect(anchor.point)
+        : { top: 0, left: 0, width: 0, height: 0 };
 
-      let top = rect.top;
-      let left = rect.left;
-      // Base placement by direction (no JS gap; spacing via style offset)
-      if (direction === "bottom") top = rect.top + rect.height;
-      if (direction === "top") top = rect.top;
-      if (direction === "right") left = rect.left + rect.width;
-      if (direction === "left") left = rect.left;
+      const measured = getFloatingSize(viewRef);
+      const floatingSize =
+        measured.width > 0 && measured.height > 0
+          ? measured
+          : { width: 350, height: 420 };
 
-      // Align along cross-axis
-      if (direction === "top" || direction === "bottom") {
-        if (align === "center") left = rect.left + rect.width / 2;
-        if (align === "end") left = rect.left + rect.width;
-      } else {
-        if (align === "center") top = rect.top + rect.height / 2;
-        if (align === "end") top = rect.top + rect.height;
-      }
+      const result = computePosition({
+        anchorRect,
+        floatingSize,
+        direction,
+        align,
+        rtl: isRTL(viewRef),
+        boundaryRect,
+        options: positioning,
+      });
 
-      position.value = {
-        left: clamp(left, 0, Math.max(viewportW - 1, 0)),
-        top: clamp(top, 0, Math.max(viewportH - 1, 0)),
-      };
-
-      raf = (globalThis as any)?.requestAnimationFrame?.(updatePosition) || 0;
+      pos.value = { left: result.x, top: result.y } as any;
     };
-    updatePosition();
+
     onDispose(() => {
-      if (raf && (globalThis as any)?.cancelAnimationFrame) {
-        (globalThis as any).cancelAnimationFrame(raf);
-      }
+      try {
+        stop?.();
+      } catch {}
     });
 
+    // Compute an initial position before mount using default size (no hiding)
+    const initialStyle: any = { web: {} };
+    {
+      const scrollRoot = getNearestScrollRoot(anchor?.node || null);
+      const boundaryRect = getRect(scrollRoot);
+      const anchorRect = anchor?.node
+        ? getElementRect(anchor.node)
+        : anchor?.point
+        ? getVirtualPointRect(anchor.point)
+        : { top: 0, left: 0, width: 0, height: 0 };
+      const preferredSize = { width: 350, height: 420 };
+      const initial = computePosition({
+        anchorRect,
+        floatingSize: preferredSize,
+        direction,
+        align,
+        rtl: false,
+        boundaryRect,
+        options: positioning,
+      });
+      initialStyle.web.top = `${initial.y}px`;
+      initialStyle.web.left = `${initial.x}px`;
+    }
+
     const viewStyle: any = { web: {} };
-    const pos = position.get();
-    viewStyle.web.top = `${pos.top}px`;
-    viewStyle.web.left = `${pos.left}px`;
+    const { top, left } = pos.get();
+    const useInitial = !ready.get();
+    viewStyle.web.top = useInitial ? initialStyle.web.top : `${top}px`;
+    viewStyle.web.left = useInitial ? initialStyle.web.left : `${left}px`;
 
     const hasOverlay = backdrop !== "none";
 
@@ -242,6 +268,20 @@ export function Popover(props: PopoverProps) {
                 direction={ct?.direction ?? direction}
                 data-state={isOpen ? "open" : "closed"}
                 style={{ web: viewStyle.web }}
+                $ref={(el: any) => (viewRef = el)}
+                on:mount={() => {
+                  // First compute immediately, then after layout, then start updates
+                  update();
+                  nextTick(() => {
+                    update();
+                    stop = autoUpdate({
+                      anchor: anchor?.node,
+                      floating: () => viewRef,
+                      onUpdate: update,
+                    });
+                    ready.value = true;
+                  });
+                }}
                 {...ct}
               >
                 {ct?.children}
@@ -253,6 +293,19 @@ export function Popover(props: PopoverProps) {
               direction={direction}
               data-state={isOpen ? "open" : "closed"}
               style={{ web: viewStyle.web }}
+              $ref={(el: any) => (viewRef = el)}
+              on:mount={() => {
+                update();
+                nextTick(() => {
+                  update();
+                  stop = autoUpdate({
+                    anchor: anchor?.node,
+                    floating: () => viewRef,
+                    onUpdate: update,
+                  });
+                  ready.value = true;
+                });
+              }}
               {...rest}
               {...(tree.view && typeof tree.view === "object" ? tree.view : {})}
             >
