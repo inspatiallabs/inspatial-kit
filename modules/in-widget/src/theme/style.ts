@@ -607,7 +607,7 @@ export const ThemeDisabled = {
     {
       web: {
         opacity: 0.5,
-        color: "var(--muted)",
+        // color: "var(--muted)",
         pointerEvents: "none",
         cursor: ThemeCursor.disabled,
       },

@@ -30,7 +30,7 @@ export function Tab(props: TabProps) {
   const tabGroupName = name || generateUniqueId();
 
   /**************************(Functions)**************************/
-  const handleChange = (value: string) => {
+  const handleChange = (value: string | boolean) => {
     // Support both onChange prop and trigger props
     onChange?.(value);
     // Also trigger on:input and on:change if they exist in rest props
@@ -45,12 +45,13 @@ export function Tab(props: TabProps) {
   const { resolvedItems, computedValues } = computeTabValues(children);
 
   // Map external (label or value) -> computed value
-  function resolveToComputed(val?: string): string | undefined {
-    if (!val) return undefined;
-    if (computedValues.includes(val)) return val;
+  function resolveToComputed(val?: string | boolean): string | undefined {
+    if (val === undefined || val === null) return undefined;
+    const v = typeof val === "boolean" ? String(val) : val;
+    if (computedValues.includes(v)) return v;
     for (let i = 0; i < resolvedItems.length; i++) {
       const it = resolvedItems[i]!;
-      if (!it.value && val === it.label) return computedValues[i]!;
+      if (!it.value && v === it.label) return computedValues[i]!;
     }
     return undefined;
   }
@@ -108,7 +109,10 @@ export function Tab(props: TabProps) {
               value={computedValue}
               checked={isSelected}
               defaultChecked={
-                selected == null && defaultSelected === computedValue
+                selected == null &&
+                (typeof defaultSelected === "boolean"
+                  ? String(defaultSelected) === computedValue
+                  : defaultSelected === computedValue)
               }
               disabled={disabled || item.disabled}
               // @ts-ignore

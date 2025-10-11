@@ -36,6 +36,7 @@ export const PresentationStyle = {
     ],
     settings: {
       backdrop: {
+        // You can't close the presentation on backdrop tap. And all the elementts outside the presentation are interactable.
         none: [
           "hidden",
           {
@@ -44,6 +45,7 @@ export const PresentationStyle = {
             },
           },
         ],
+        // InSpatial's signature tilted backdrop.
         tilted: [
           "material-tilted",
           {
@@ -53,6 +55,7 @@ export const PresentationStyle = {
             },
           },
         ],
+        // A standard RGB backdrop.
         rgb: [
           "bg-black/40",
           {
@@ -61,6 +64,7 @@ export const PresentationStyle = {
             },
           },
         ],
+        // It's like none but you close the presentation on backdrop tap.
         transparent: [
           "bg-transparent",
           {

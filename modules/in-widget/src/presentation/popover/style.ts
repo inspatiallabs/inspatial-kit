@@ -66,10 +66,42 @@ export const PopoverStyle = {
             },
           },
         ],
-        base: [
+        xs: [
+          {
+            web: {
+              width: "250px",
+              height: "420px",
+            },
+          },
+        ],
+        sm: [
+          {
+            web: {
+              width: "300px",
+              height: "420px",
+            },
+          },
+        ],
+        md: [
           {
             web: {
               width: "350px",
+              height: "420px",
+            },
+          },
+        ],
+        lg: [
+          {
+            web: {
+              width: "400px",
+              height: "420px",
+            },
+          },
+        ],
+        xl: [
+          {
+            web: {
+              width: "428px",
               height: "420px",
             },
           },
@@ -88,7 +120,7 @@ export const PopoverStyle = {
       offset: "lg",
       material: "tilted",
       direction: "left",
-      size: "base",
+      size: "sm",
       radius: "base",
     },
     composition: [

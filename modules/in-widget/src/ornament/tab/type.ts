@@ -11,7 +11,7 @@ export type TabItemProps = JSX.SharedProps & {
    * Use when you need to distinguish between tabs with the same label.
    * e.g when your tab item is an icon and you need to distinguish between tabs with the same icon.
    */
-  value?: string;
+  value?: string | boolean;
   to?: string;
   icon?: JSX.Element;
 };
@@ -30,8 +30,8 @@ export type TabProps = TabRootProps &
   JSX.SharedProps & {
     children?: TabItemProps[];
 
-    selected?: string;
-    defaultSelected?: string;
+    selected?: string | boolean;
+    defaultSelected?: string | boolean;
 
     // Commented out [Rationale]: The anatomy of a tab make this feel like cognitive load relative to a Radio Group which thrives on having these.
     // onChange?: (value: string) => void;

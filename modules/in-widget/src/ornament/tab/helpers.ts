@@ -31,15 +31,17 @@ export function computeTabValues(children?: TabItemProps[]) {
 
   for (let i = 0; i < resolvedItems.length; i++) {
     const item = resolvedItems[i]!;
-    const base = item.value ?? slugifyLabel(item.label);
+    const baseRaw = item.value ?? slugifyLabel(item.label ?? "");
+    const base =
+      typeof baseRaw === "boolean" ? String(baseRaw) : String(baseRaw);
 
     let value = base;
     if (!item.value) {
-      const count = missingValueCounts.get(item.label) ?? 0;
+      const count = missingValueCounts.get(item.label ?? "") ?? 0;
       if (count > 1) {
-        const nextIdx = (labelRunningIndex.get(item.label) ?? 0) + 1;
-        labelRunningIndex.set(item.label, nextIdx);
-        value = `${slugifyLabel(item.label)}-${nextIdx}`;
+        const nextIdx = (labelRunningIndex.get(item.label ?? "") ?? 0) + 1;
+        labelRunningIndex.set(item.label ?? "", nextIdx);
+        value = `${slugifyLabel(item.label ?? "")}-${nextIdx}`;
       }
     }
 
