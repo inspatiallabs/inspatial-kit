@@ -1,4 +1,4 @@
-import { Slot } from "@in/widget/structure/slot/component.tsx";
+import { Slot } from "@in/widget/structure/slot/index.ts";
 import { KitBorderStyle } from "./style.ts";
 import { iss } from "@in/style";
 import type { KitBorderProps } from "./type.ts";

@@ -1,5 +1,5 @@
 import { $ } from "@in/teract/state";
-import { Slot } from "@in/widget/structure/slot/component.tsx";
+import { Slot } from "@in/widget/structure/slot/index.ts";
 import { iss } from "@in/style/variant";
 import type { FPSProps } from "./type.ts";
 import { FPSStyle } from "./style.ts";

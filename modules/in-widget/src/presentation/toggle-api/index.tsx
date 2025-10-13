@@ -1,4 +1,4 @@
-import { Slot } from "@in/widget/structure/slot/component.tsx";
+import { Slot } from "@in/widget/structure/slot/index.ts";
 import { PresentationToggleStyle } from "./style.ts";
 import { XPrimeIcon } from "@in/widget/icon/x-prime-icon.tsx";
 import { MinimizeIcon } from "@in/widget/icon/minimize-icon.tsx";

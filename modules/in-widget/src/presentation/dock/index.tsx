@@ -1,4 +1,4 @@
-import { Slot } from "@in/widget/structure/slot/component.tsx";
+import { Slot } from "@in/widget/structure/slot/index.ts";
 import { $, createState } from "@in/teract/state";
 import { Show } from "@in/widget/control-flow/show/index.ts";
 import { iss } from "@in/style";
