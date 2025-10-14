@@ -33,7 +33,8 @@
     "fmt": "deno fmt",
     "check": "deno check **/*.ts",
     "clean": "rm -rf node_modules && rm -rf deno.lock && rm -rf dist && rm -rf testing",
-    "publish": "deno publish --allow-slow-types --no-check --allow-dirty"
+    "update:icon": "deno run -A modules/in-widget/scripts/generate-icon-variants.ts",
+    "publish": "deno task update:icon && deno publish --allow-slow-types --no-check --allow-dirty"
   },
   "publish": {
     "exclude": [

@@ -4,7 +4,7 @@ import { iss } from "@in/style";
 
 //##############################################(COMPONENT)##############################################//
 
-export function Icon({
+export function BrandIcon({
   size,
   format,
   disabled,

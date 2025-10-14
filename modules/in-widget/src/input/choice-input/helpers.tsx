@@ -1,9 +1,6 @@
-import { Icon } from "../../icon/icon.tsx";
-import { PlusPrimeIcon } from "../../icon/plus-prime-icon.tsx";
-import { RoundIcon } from "../../icon/round-icon.tsx";
-import { ArrowsHorizontalLineIcon } from "../../icon/arrows-horizontal-line-icon.tsx";
-import { CheckIcon } from "../../icon/check-icon.tsx";
+import { Icon } from "@in/widget/icon/component.tsx";
 import type { ChoiceInputProps } from "./type.ts";
+import type { IconVariant } from "@in/widget/icon/icon-variants.generated.d.ts";
 
 /*#################################(CHOICE INPUT ICON)#################################*/
 export function getChoiceInputIcon(
@@ -15,37 +12,15 @@ export function getChoiceInputIcon(
     return icon;
   }
 
-  // Handle string icon types
-  switch (icon) {
-    case "brand":
-      return <Icon size="8xs" />;
-    case "tick":
-      return <CheckIcon size="8xs" />;
-    case "ball":
-      return (
-        <RoundIcon
-          size="8xs"
-          style={{
-            web: {
-              fill: isChosen ? "white" : "currentColor",
-            },
-          }}
-        />
-      );
-    case "cross":
-      return <PlusPrimeIcon size="8xs" />;
-    case "dash":
-      return (
-        <ArrowsHorizontalLineIcon
-          size="8xs"
-          style={{
-            web: {
-              maxWidth: "10px",
-            },
-          }}
-        />
-      );
-    default:
-      return <Icon size="8xs" />;
-  }
+  return (
+    <Icon
+      variant={icon as IconVariant}
+      size="8xs"
+      style={{
+        web: {
+          fill: isChosen ? "white" : "currentColor",
+        },
+      }}
+    />
+  );
 }

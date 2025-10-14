@@ -54,6 +54,7 @@ export * from "./tolower.ts";
 export * from "./toupper.ts";
 export * from "./create-attribute-filter.ts";
 export * from "./safe-lookup-map.ts";
+export * from "./pascalize.ts";
 
 export * from "./nop.ts";
 export * from "./cached.ts";

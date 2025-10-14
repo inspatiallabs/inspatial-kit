@@ -3,7 +3,7 @@ import { iss } from "@in/style";
 import { Avatar, Button } from "@in/widget/ornament/index.ts";
 import { FlowVisualizerIcon } from "@in/widget/icon/flow-visualizer-icon.tsx";
 import { Checkbox } from "@in/widget/input/index.ts";
-import { Icon } from "@in/widget/icon/index.ts";
+import { BrandIcon } from "@in/widget/icon/index.ts";
 import type { BlockIProps } from "./type.ts";
 import { ensureArray } from "@in/vader";
 
@@ -32,7 +32,7 @@ export function BlockI(props: BlockIProps) {
           radius={btn?.radius || "md"}
           {...(btn ?? {})}
         >
-          <Icon size={btn?.icon?.size || "3xs"} />
+          <BrandIcon size={btn?.icon?.size || "3xs"} />
         </Button>
 
         <Checkbox
