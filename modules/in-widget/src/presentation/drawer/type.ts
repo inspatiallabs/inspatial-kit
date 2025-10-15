@@ -16,5 +16,6 @@ export type DrawerProps = StyleProps<typeof DrawerStyle.view> &
   JSX.SharedProps &
   PresentationProps & {
     id: string;
+    as?: any;
     backdrop?: StyleProps<typeof PresentationStyle.overlay>["backdrop"];
   };

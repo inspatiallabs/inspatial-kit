@@ -21,6 +21,7 @@ import {
   isRTL,
   getVirtualPointRect,
 } from "../positioning-api/index.ts";
+import { Controller } from "@in/widget/control-flow/controller/index.ts";
 
 /*##################################(POPOVER OVERLAY)##################################*/
 export function PopoverOverlay(props: PopoverOverlayProps) {
@@ -104,6 +105,7 @@ export function PopoverView(props: PopoverViewProps) {
 export function Popover(props: PopoverProps) {
   const {
     id,
+    as,
     backdrop = "transparent", // Prefer transparent over none as default because the anatomy of a popver almost always demand a close on backdrop tap regardless of the backdrop type.
     open,
     defaultOpen,
@@ -309,7 +311,7 @@ export function Popover(props: PopoverProps) {
               {...rest}
               {...(tree.view && typeof tree.view === "object" ? tree.view : {})}
             >
-              {viewNode}
+              {viewNode ?? Controller(as)}
             </PopoverView>
           )}
         </Slot>

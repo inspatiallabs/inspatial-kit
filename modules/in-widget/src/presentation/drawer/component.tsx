@@ -4,10 +4,12 @@ import { iss } from "@in/style";
 import { PresentationRegistry } from "../registry.ts";
 import { DrawerStyle } from "./style.ts";
 import type { DrawerProps } from "./type.ts";
+import { Controller } from "@in/widget/control-flow/controller/index.ts";
 
 export function Drawer(props: DrawerProps) {
   const {
     id,
+    as,
     direction,
     backdrop = "rgb",
     open,
@@ -73,7 +75,7 @@ export function Drawer(props: DrawerProps) {
             }}
             {...rest}
           >
-            {children}
+            {children ?? Controller(as)}
           </Slot>
         </Slot>
       </>

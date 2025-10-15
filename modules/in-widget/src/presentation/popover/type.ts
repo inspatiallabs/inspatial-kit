@@ -41,6 +41,7 @@ type PopoverPropsTree = StyleProps<typeof PopoverStyle.wrapper> &
 type PopoverPropsDirect = StyleProps<typeof PopoverStyle.wrapper> &
   PopoverViewProps & {
     id: string;
+    as?: any;
     children?: PopoverChildrenTree;
     format?: PopoverViewProps["format"];
     backdrop?: PopoverOverlayProps["backdrop"];

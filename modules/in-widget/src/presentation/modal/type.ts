@@ -43,6 +43,7 @@ type ModalPropsTree = StyleProps<typeof ModalStyle.wrapper> &
 type ModalPropsDirect = StyleProps<typeof ModalStyle.wrapper> &
   ModalViewProps & {
     id: string;
+    as?: any;
     children?: ModalChildrenTree;
     format?: ModalViewProps["format"];
     backdrop?: ModalOverlayProps["backdrop"];

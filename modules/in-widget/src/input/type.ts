@@ -1,6 +1,7 @@
 import type { Signal } from "@in/teract/signal";
 import type { TextInputProps } from "./text-input/type.ts";
 import type { ChoiceInputProps } from "./choice-input/type.ts";
+import type { JSX } from "@in/runtime/types";
 
 /*################################(INPUT FIELD SCHEMA)################################*/
 export interface InputFieldSchema {

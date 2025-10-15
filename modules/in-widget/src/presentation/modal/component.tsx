@@ -10,6 +10,7 @@ import type {
   ModalProps,
   ModalViewProps,
 } from "./type.ts";
+import { Controller } from "@in/widget/control-flow/controller/index.ts";
 
 /*#################################(MODAL OVERLAY)#################################*/
 
@@ -91,6 +92,7 @@ export function Modal(props: ModalProps) {
   /*********************************(Props)*********************************/
   const {
     id,
+    as,
     format,
     backdrop,
     direction,
@@ -103,7 +105,7 @@ export function Modal(props: ModalProps) {
     className,
     children,
     ...rest
-  } = props;
+  } = props as any;
 
   // Normalize widget tree props
   let modalChildren: any = {};
@@ -140,7 +142,7 @@ export function Modal(props: ModalProps) {
       view: undefined,
       ...rest,
     };
-    modalViewNode = children;
+    modalViewNode = children ?? Controller(as);
   }
 
   /*********************************(State)*********************************/
