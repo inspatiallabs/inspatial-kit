@@ -1,5 +1,5 @@
 // deno-lint-ignore-file jsx-no-children-prop
-import { Tab } from "@in/widget/ornament/index.ts";
+import { Button, Tab } from "@in/widget/ornament/index.ts";
 import { YStack, XStack, Slot } from "@in/widget/structure/index.ts";
 import { Text } from "@in/widget/typography/index.ts";
 import { List } from "@in/widget/data-flow/list/index.ts";
@@ -14,61 +14,83 @@ import type {
 } from "./type.ts";
 import { ControllerStyle } from "./style.ts";
 import { iss } from "@in/style";
+import { $ } from "@in/teract/state";
+import { Icon } from "@in/widget/icon";
 
-/*####################################(CONTROLLER)####################################*/
+/*####################################(RENDER CONTROLLER)####################################*/
 
-export function Controller<T extends Record<string, any>>(
+function renderController<T extends Record<string, any>>(
   ctl?: ControllerSettingsProps<T> | null,
   children?: ControllerProps<T>
 ): any {
   /*******************************(Props)********************************/
+  const hasReset = children?.hasReset ?? ctl?.hasReset ?? true;
+  const slots =
+    children && (children as any).children
+      ? (children as any).children
+      : (children as any);
 
-  const { className, $ref, ...rest } = children?.children?.root || {};
+  const { className, $ref, style, ...rest } = slots?.root || {};
   const {
     className: wrapperClassName,
+    style: wrapperStyle,
     $ref: wrapperRef,
     ...wrapperRest
-  } = children?.children?.wrapper || {};
+  } = slots?.wrapper || {};
+  const {
+    className: resetClassName,
+    style: resetStyle,
+    $ref: resetRef,
+    ...resetRest
+  } = slots?.reset || {};
   const {
     className: labelClassName,
+    style: labelStyle,
     $ref: labelRef,
     ...labelRest
-  } = children?.children?.label || {};
+  } = slots?.label || {};
   const {
     className: tabClassName,
+    style: tabStyle,
     $ref: tabRef,
     ...tabRest
-  } = children?.children?.tab || {};
+  } = slots?.tab || {};
   const {
     className: colorClassName,
+    style: colorStyle,
     $ref: colorRef,
     ...colorRest
-  } = children?.children?.color || {};
+  } = slots?.color || {};
   const {
     className: numberfieldClassName,
+    style: numberfieldStyle,
     $ref: numberfieldRef,
     ...numberfieldRest
-  } = children?.children?.numberfield || {};
+  } = slots?.numberfield || {};
   const {
     className: switchClassName,
+    style: switchStyle,
     $ref: switchRef,
     ...switchRest
-  } = children?.children?.switch || {};
+  } = slots?.switch || {};
   const {
     className: checkboxClassName,
+    style: checkboxStyle,
     $ref: checkboxRef,
     ...checkboxRest
-  } = children?.children?.checkbox || {};
+  } = slots?.checkbox || {};
   const {
     className: radioClassName,
+    style: radioStyle,
     $ref: radioRef,
     ...radioRest
-  } = children?.children?.radio || {};
+  } = slots?.radio || {};
   const {
     className: notSupportedClassName,
+    style: notSupportedStyle,
     $ref: notSupportedRef,
     ...notSupportedRest
-  } = children?.children?.notSupported || {};
+  } = slots?.notSupported || {};
 
   /******************************(Guard)******************************/
 
@@ -81,6 +103,7 @@ export function Controller<T extends Record<string, any>>(
     <YStack
       //@ts-ignore
       className={iss(ControllerStyle.root.getStyle({ className }))}
+      style={style}
       $ref={$ref}
       {...rest}
     >
@@ -97,6 +120,7 @@ export function Controller<T extends Record<string, any>>(
                   className: wrapperClassName,
                 })
               )}
+              style={wrapperStyle}
               $ref={wrapperRef}
               {...wrapperRest}
             >
@@ -110,12 +134,49 @@ export function Controller<T extends Record<string, any>>(
                       className: labelClassName,
                     })
                   )}
+                  style={labelStyle}
                   $ref={labelRef}
                   {...labelRest}
                 >
                   {s.name}
                 </Text>
               </Show>
+
+              <Show when={$(() => reg.isDirty?.get?.() && hasReset)}>
+                <Button
+                  //@ts-ignore
+                  className={iss(
+                    ControllerStyle.reset.getStyle({
+                      className: resetClassName,
+                    })
+                  )}
+                  style={resetStyle}
+                  $ref={resetRef}
+                  {...resetRest}
+                  format="surface"
+                  size="sm"
+                  on:tap={() => {
+                    ctl.set(
+                      path as any,
+                      (s.initialValue ??
+                        (s.field.component === "tab"
+                          ? (s.field.options || []).find(
+                              (o: any) => !o?.disabled
+                            )?.value
+                          : s.field.component === "color"
+                          ? ""
+                          : reg.value?.get?.())) as any,
+                      { touch: false, dirty: true }
+                    );
+                    if (ctl._dirty && ctl._dirty[path as any]) {
+                      ctl._dirty[path as any].value = false as any;
+                    }
+                  }}
+                >
+                  <Icon variant="UndoIcon" size="2xs" />
+                </Button>
+              </Show>
+
               <Choose
                 cases={[
                   {
@@ -128,11 +189,12 @@ export function Controller<T extends Record<string, any>>(
                             className: tabClassName,
                           })
                         )}
+                        style={tabStyle}
                         $ref={tabRef}
                         radius="md"
                         size="sm"
                         children={(s.field.options || []) as any}
-                        defaultSelected={reg.value?.peek?.()}
+                        selected={reg.value?.get?.()}
                         on:input={(v: any) => reg.oninput(v)}
                         {...(s.field.props || {})}
                         {...tabRest}
@@ -149,6 +211,7 @@ export function Controller<T extends Record<string, any>>(
                             className: colorClassName,
                           })
                         )}
+                        style={colorStyle}
                         $ref={colorRef}
                         type="color"
                         value={reg.value?.get?.()}
@@ -168,6 +231,7 @@ export function Controller<T extends Record<string, any>>(
                             className: numberfieldClassName,
                           })
                         )}
+                        style={numberfieldStyle}
                         $ref={numberfieldRef}
                         type="number"
                         value={reg.value?.get?.()}
@@ -187,6 +251,7 @@ export function Controller<T extends Record<string, any>>(
                             className: switchClassName,
                           })
                         )}
+                        style={switchStyle}
                         $ref={switchRef}
                         selected={reg.value?.get?.()}
                         on:input={(v: any) => reg.oninput(v)}
@@ -205,6 +270,7 @@ export function Controller<T extends Record<string, any>>(
                             className: checkboxClassName,
                           })
                         )}
+                        style={checkboxStyle}
                         $ref={checkboxRef}
                         selected={reg.value?.get?.()}
                         on:input={(v: any) => reg.oninput(v)}
@@ -224,6 +290,7 @@ export function Controller<T extends Record<string, any>>(
                             className: radioClassName,
                           })
                         )}
+                        style={radioStyle}
                         $ref={radioRef}
                         selected={reg.value?.get?.()}
                         on:input={(v: any) => reg.oninput(v)}
@@ -242,6 +309,7 @@ export function Controller<T extends Record<string, any>>(
                         className: notSupportedClassName,
                       })
                     )}
+                    style={notSupportedStyle}
                     $ref={notSupportedRef}
                     {...notSupportedRest}
                   >
@@ -255,4 +323,24 @@ export function Controller<T extends Record<string, any>>(
       </List>
     </YStack>
   );
+}
+
+/*####################################(CONTROLLER)####################################*/
+export function Controller(
+  as?: any,
+  children?: ControllerProps<any>["children"]
+): any {
+  if (
+    arguments.length === 1 &&
+    as &&
+    typeof as === "object" &&
+    ("ctl" in (as as any) || "as" in (as as any) || "children" in (as as any))
+  ) {
+    const props = as as any;
+    const instance = props.ctl ?? props.as ?? null;
+    const slots = props.children;
+    return renderController(instance, slots);
+  }
+
+  return renderController(as, children as any);
 }

@@ -28,6 +28,18 @@ export const ControllerStyle = {
       },
     ],
   }),
+  /*==============================(RESET)==============================*/
+  reset: createStyle({
+    base: [
+      {
+        web: {
+          position: "absolute",
+          left: "calc(100% + 1px)",
+          borderRadius: "0 32px 32px 0",
+        },
+      },
+    ],
+  }),
   /*==============================(LABEL)==============================*/
   label: createStyle({
     base: [

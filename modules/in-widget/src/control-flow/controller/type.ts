@@ -3,7 +3,7 @@ import type { JSX } from "@in/runtime/types";
 import type { StyleProps } from "@in/style";
 import type { ControllerStyle } from "./style.ts";
 import type { CheckboxProps, RadioProps, SwitchProps } from "@in/widget/input";
-import type { TabProps } from "@in/widget/ornament";
+import type { ButtonProps, TabProps } from "@in/widget/ornament";
 import type { TypographyProps } from "@in/widget/typography";
 
 /*####################################(STATE-LIKE)####################################*/
@@ -97,7 +97,7 @@ type FieldFor<V> = V extends string
 
 /*####################################(CONTROLLER SETTING ITEM)####################################*/
 export type ControllerSettingItem<T, P extends FormPath<T> = FormPath<T>> = {
-  name: string;
+  name?: string;
   path?: P;
   initialValue?: ValueAtPath<T, P>;
   description?: string;
@@ -115,6 +115,8 @@ export type ControllerConfig<
 > = {
   id: string;
   mode?: ControllerMode;
+  /** Whether to show reset buttons for when a field is dirty (changed) */
+  hasReset?: boolean;
   /** Optional external state to operate on (embedded mode) */
   state?: StateLike<TT>;
   /** Optional path aliasing: controllerPath -> targetPath */
@@ -152,6 +154,8 @@ export type ControllerSettingsProps<T extends Record<string, any>> = {
   state: { [K in keyof T]: Signal<T[K]> };
   /** True if operating over an external target state */
   embedded?: boolean;
+  /** Whether to show reset buttons for when a field is dirty (changed) */
+  hasReset?: boolean;
   settings?: ControllerSettingItem<T>[];
   set: <P extends FormPath<T>>(
     path: P,
@@ -190,6 +194,10 @@ export type ControllerWrapperProps = StyleProps<
   typeof ControllerStyle.wrapper
 > &
   JSX.SharedProps;
+
+/*####################################(CONTROLLER (COMPONENT) RESET PROPS)####################################*/
+export type ControllerResetProps = StyleProps<typeof ControllerStyle.reset> &
+  ButtonProps;
 
 /*####################################(CONTROLLER (COMPONENT) LABEL PROPS)####################################*/
 export type ControllerLabelProps = StyleProps<typeof ControllerStyle.label> &
@@ -232,9 +240,11 @@ export type ControllerNotSupportedProps = StyleProps<
 
 export type ControllerProps<T extends Record<string, any>> = {
   ctl?: ControllerSettingsProps<T> | null;
+  hasReset?: boolean;
   children?: {
     root?: ControllerRootProps;
     wrapper?: ControllerWrapperProps;
+    reset?: ControllerResetProps;
     label?: ControllerLabelProps;
     tab?: ControllerTabProps;
     color?: ControllerColorProps;

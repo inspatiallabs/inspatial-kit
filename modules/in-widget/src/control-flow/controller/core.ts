@@ -1,5 +1,4 @@
 import { createSignal, type Signal, nextTick } from "@in/teract/signal";
-// createState is only used for non-embedded mode; fallback type if unavailable
 import { createState } from "@in/teract/state";
 import { coerceEventValue, slugify, toFormPath } from "./helpers.ts";
 import type {
@@ -12,18 +11,15 @@ import type {
 } from "./type.ts";
 
 /*####################################(CREATE CONTROLLER)####################################*/
-// Overload (embedded mode): infer controller and target separately
 export function createController<
   TC extends Record<string, any>,
   TT extends Record<string, any>
 >(
   cfg: ControllerConfig<TC, TT> & { state: StateLike<TT> }
 ): ControllerSettingsProps<TC>;
-// Overload (internal state)
 export function createController<TC extends Record<string, any>>(
   cfg: Omit<ControllerConfig<TC, TC>, "state">
 ): ControllerSettingsProps<TC>;
-// Implementation
 export function createController<
   TC extends Record<string, any>,
   TT extends Record<string, any> = TC
@@ -246,7 +242,6 @@ export function createController<
         return cur;
       }) as Signal<any>;
     } else {
-      // Fallback: compute from snapshot (non-reactive if top-level missing)
       valueSig = createSignal(
         getValue(store.snapshot?.() || store, targetPath)
       );
@@ -324,6 +319,7 @@ export function createController<
     mode: mode as any,
     state: store as any,
     embedded: usingExternal,
+    hasReset: cfg.hasReset ?? true,
     settings: cfg.settings,
     set: set as any,
     register: register as any,
