@@ -28,16 +28,10 @@
  * SPDX-License-Identifier: Apache-2.0
  * © 2026 InSpatial Labs. Portions © 2025 Yukino Song, SudoMaker Ltd.
  *
- * Description: Hot Reload (InSpatial Hot Reload) – refactors and extensions.
- * Version: v0.7.0
+ * Description: Create Filter (InSpatial Create Filter) – refactors and extensions.
+ * Version: v0.1.0
  * Project: https://inspatial.dev
  * --------------------------------------------------------------------------- */
-
-/**
- * @fileoverview Shared utilities for HOT plugins
- * @module @inspatial/kit/hot/utils
- */
-
 /**
  * Filter pattern types for file inclusion/exclusion
  */

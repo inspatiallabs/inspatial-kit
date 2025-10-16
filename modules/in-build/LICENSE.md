@@ -64,13 +64,15 @@ END OF TERMS AND CONDITIONS
 
 # Bundled dependencies:
 
-## refurbish
+## refurbish & rEFui
 
 #### License: Apache
 
 #### By: Yukino Song, SudoMaker Ltd
 
-#### Repository: https://github.com/SudoMaker/refurbish
+#### Repositories: 
+##### https://github.com/SudoMaker/refurbish
+##### https://github.com/SudoMaker/rEFui
 
 Copyright 2023-2025 Yukino Song, SudoMaker Ltd.
 
