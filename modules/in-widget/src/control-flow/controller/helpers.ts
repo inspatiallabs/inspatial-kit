@@ -1,7 +1,5 @@
-import type { FormPath } from "./type.ts";
-
 /*####################################(TO FORM PATH)####################################*/
-export function toFormPath<T>(name: FormPath<T>): (string | number)[] {
+export function toFormPath(name: string | (string | number)[]): (string | number)[] {
   if (Array.isArray(name)) return name;
 
   const parts: (string | number)[] = [];

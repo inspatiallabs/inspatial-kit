@@ -1,4 +1,5 @@
 import { createSignal, type Signal, nextTick } from "@in/teract/signal";
+// createState is only used for non-embedded mode; fallback type if unavailable
 import { createState } from "@in/teract/state";
 import { coerceEventValue, slugify, toFormPath } from "./helpers.ts";
 import type {
@@ -7,22 +8,44 @@ import type {
   FormPath,
   ValueAtPath,
   RegisteredField,
+  StateLike,
 } from "./type.ts";
 
 /*####################################(CREATE CONTROLLER)####################################*/
-export function createController<T extends Record<string, any>>(
-  cfg: ControllerConfig<T>
-): ControllerSettingsProps<T> {
+// Overload (embedded mode): infer controller and target separately
+export function createController<
+  TC extends Record<string, any>,
+  TT extends Record<string, any>
+>(
+  cfg: ControllerConfig<TC, TT> & { state: StateLike<TT> }
+): ControllerSettingsProps<TC>;
+// Overload (internal state)
+export function createController<TC extends Record<string, any>>(
+  cfg: Omit<ControllerConfig<TC, TC>, "state">
+): ControllerSettingsProps<TC>;
+// Implementation
+export function createController<
+  TC extends Record<string, any>,
+  TT extends Record<string, any> = TC
+>(cfg: ControllerConfig<TC, TT>): ControllerSettingsProps<TC> {
   const mode = cfg.mode || (cfg.initialValue ? "form" : "manipulator");
   const usingExternal = !!cfg.state;
-  const pathMap = cfg.map || {};
-  const resolvePath = (p: string) => pathMap[p] || p;
+  const pathMap = (cfg.map || {}) as Partial<Record<string, string>>;
+  const resolvePath = (p: string) => (pathMap as any)[p] || p;
+  const inverseMap: Record<string, string> = (() => {
+    const inv: Record<string, string> = {};
+    for (const k in pathMap) {
+      const v = (pathMap as any)[k];
+      if (typeof v === "string") inv[v] = k;
+    }
+    return inv;
+  })();
 
   const initial: any = usingExternal
-    ? ({} as T)
+    ? ({} as TC)
     : ((mode === "form"
         ? cfg.initialValue || {}
-        : cfg.initialState || {}) as T);
+        : cfg.initialState || {}) as TC);
 
   if (Array.isArray(cfg.settings)) {
     for (const s of cfg.settings) {
@@ -80,9 +103,9 @@ export function createController<T extends Record<string, any>>(
   }
 
   /*******************************(Validate Field)******************************/
-  async function validateField<P extends FormPath<T>>(
+  async function validateField<P extends FormPath<TC>>(
     path: P,
-    val?: ValueAtPath<T, P>
+    val?: ValueAtPath<TC, P>
   ): Promise<string | undefined> {
     ensureFieldSignals(path);
     const targetPath = resolvePath(path);
@@ -92,7 +115,7 @@ export function createController<T extends Record<string, any>>(
         : getValue(store.snapshot?.() || store, targetPath);
 
     const s = (cfg.settings || []).find(
-      (i) => (i.path || slugify(i.name)) === path
+      (i: any) => (i.path || slugify(i.name)) === path
     );
     if (s?.validate) {
       const msg = await Promise.resolve(
@@ -108,10 +131,12 @@ export function createController<T extends Record<string, any>>(
       );
       const e = r.errors || {};
       for (const [k, v] of Object.entries(e)) {
-        ensureFieldSignals(k);
-        errors[k].value = v as any;
+        const ctlKey = inverseMap[k] || k;
+        ensureFieldSignals(ctlKey);
+        errors[ctlKey].value = v as any;
       }
-      return e[path];
+      const tp = resolvePath(path as any);
+      return (e as any)[path as any] ?? (e as any)[tp as any];
     }
     errors[path].value = undefined;
     return undefined;
@@ -125,9 +150,10 @@ export function createController<T extends Record<string, any>>(
         cfg.resolver(store.snapshot?.() || store)
       );
       for (const [k, v] of Object.entries(r.errors || {})) {
-        ensureFieldSignals(k);
-        errors[k].value = v as any;
-        out[k] = v as any;
+        const ctlKey = inverseMap[k] || k;
+        ensureFieldSignals(ctlKey);
+        errors[ctlKey].value = v as any;
+        out[ctlKey] = v as any;
       }
       return out;
     }
@@ -150,9 +176,9 @@ export function createController<T extends Record<string, any>>(
   }
 
   /*******************************(Set)******************************/
-  function set<P extends FormPath<T>>(
+  function set<P extends FormPath<TC>>(
     path: P,
-    value: ValueAtPath<T, P>,
+    value: ValueAtPath<TC, P>,
     opts?: { validate?: boolean; touch?: boolean; dirty?: boolean }
   ) {
     ensureFieldSignals(path);
@@ -199,12 +225,32 @@ export function createController<T extends Record<string, any>>(
   }
 
   /*******************************(Register)******************************/
-  function register<P extends FormPath<T>>(
+  function register<P extends FormPath<TC>>(
     path: P,
     _opts?: { validate?: boolean }
-  ): RegisteredField<ValueAtPath<T, P>> {
+  ): RegisteredField<ValueAtPath<TC, P>> {
     ensureFieldSignals(path);
     const targetPath = resolvePath(path);
+    const parts = toFormPath(targetPath);
+    let valueSig: Signal<any> | undefined = undefined;
+    if (parts.length === 1 && (store as any)[parts[0]]) {
+      valueSig = (store as any)[parts[0]] as Signal<any>;
+    } else if (parts.length > 1 && (store as any)[parts[0]]) {
+      const rootSig = (store as any)[parts[0]] as Signal<any>;
+      valueSig = createSignal(rootSig, function (root: any): any {
+        let cur = root;
+        for (let i = 1; i < parts.length; i++) {
+          const seg = parts[i] as any;
+          cur = cur == null ? undefined : cur[seg];
+        }
+        return cur;
+      }) as Signal<any>;
+    } else {
+      // Fallback: compute from snapshot (non-reactive if top-level missing)
+      valueSig = createSignal(
+        getValue(store.snapshot?.() || store, targetPath)
+      );
+    }
     const oninput = (evOrVal: any) => {
       const val = coerceEventValue(evOrVal);
       set(path, val, {
@@ -224,19 +270,19 @@ export function createController<T extends Record<string, any>>(
     const onblur = onchange;
     return {
       name: path,
-      value: (store as any)[targetPath],
+      value: valueSig as any,
       error: errors[path],
       touched: touched[path],
       isDirty: dirty[path],
       oninput,
       onchange,
       onblur,
-    } as unknown as RegisteredField<ValueAtPath<T, P>>;
+    } as unknown as RegisteredField<ValueAtPath<TC, P>>;
   }
 
   /*******************************(Handle Submit)******************************/
   function handleSubmit(
-    success: (values: T) => void,
+    success: (values: TC) => void,
     error?: (errors: Record<string, string | undefined>) => void
   ) {
     return async (e?: Event) => {
@@ -245,17 +291,17 @@ export function createController<T extends Record<string, any>>(
       const errs = await validateForm();
       const hasErr = Object.values(errs).some(Boolean);
       if (hasErr) error?.(errs);
-      else success((store.snapshot?.() || store) as T);
+      else success((store.snapshot?.() || store) as TC);
       nextTick(() => {});
     };
   }
 
   /*******************************(Reset)******************************/
   function reset(
-    values?: Partial<T>,
+    values?: Partial<TC>,
     opts?: { keepDirty?: boolean; keepTouched?: boolean; keepError?: boolean }
   ) {
-    const next = { ...(values || {}) } as Partial<T>;
+    const next = { ...(values || {}) } as Partial<TC>;
     store.batch((_s: any) => {
       const snap = store.snapshot();
       const merged = { ...snap, ...next };
@@ -273,7 +319,7 @@ export function createController<T extends Record<string, any>>(
   }
 
   /*******************************(Controller Settings)******************************/
-  const ctl: ControllerSettingsProps<T> = {
+  const ctl: ControllerSettingsProps<TC> = {
     id: cfg.id,
     mode: mode as any,
     state: store as any,

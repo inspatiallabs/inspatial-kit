@@ -1,11 +1,21 @@
 import type { Signal } from "@in/teract/signal";
-import type { State } from "@in/teract/state";
 import type { JSX } from "@in/runtime/types";
 import type { StyleProps } from "@in/style";
 import type { ControllerStyle } from "./style.ts";
 import type { CheckboxProps, RadioProps, SwitchProps } from "@in/widget/input";
 import type { TabProps } from "@in/widget/ornament";
 import type { TypographyProps } from "@in/widget/typography";
+
+/*####################################(STATE-LIKE)####################################*/
+export type StateLike<T> = {
+  snapshot: () => T;
+  batch?: (fn: (s: any) => void) => void;
+} & { [K in keyof T]?: Signal<T[K]> };
+
+/*####################################(STATE VALUE EXTRACTOR)####################################*/
+export type StateValueFromLike<S> = S extends { snapshot: () => infer V }
+  ? V
+  : never;
 
 /*####################################(PATH SEGMENTS)####################################*/
 type PathSegments<S extends string> = S extends `${infer A}.${infer B}`
@@ -99,22 +109,27 @@ export type ControllerSettingItem<T, P extends FormPath<T> = FormPath<T>> = {
 };
 
 /*####################################(CONTROLLER CONFIG)####################################*/
-export type ControllerConfig<T extends Record<string, any>> = {
+export type ControllerConfig<
+  TC extends Record<string, any>,
+  TT extends Record<string, any> = TC
+> = {
   id: string;
   mode?: ControllerMode;
   /** Optional external state to operate on (embedded mode) */
-  state?: State<T>;
+  state?: StateLike<TT>;
   /** Optional path aliasing: controllerPath -> targetPath */
-  map?: Partial<Record<FormPath<T>, string>>;
-  initialState?: T;
-  initialValue?: Partial<T>;
+  map?: Partial<Record<FormPath<TC>, FormPath<TT> | string>>;
+  /** Initial controller-owned state (when not embedded) */
+  initialState?: TC;
+  /** Initial controller-owned values (when in form mode) */
+  initialValue?: Partial<TC>;
   validateOn?: ValidateOn;
   resolver?: (
-    values: Partial<T>
+    values: Partial<TC>
   ) =>
     | Promise<{ errors?: Record<string, string> }>
     | { errors?: Record<string, string> };
-  settings?: ControllerSettingItem<T>[];
+  settings?: ControllerSettingItem<TC>[];
   storage?: any;
 };
 
