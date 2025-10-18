@@ -11,13 +11,22 @@ export const SimulatorStyle = {
   /*======================(Wrapper)=========================*/
   wrapper: createStyle({
     name: "simulator-wrapper",
+    base: [
+      {
+        web: {
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        },
+      },
+    ],
     settings: {
       disabled: ThemeDisabled,
       size: ThemeScreenSize,
     },
     defaultSettings: {
       disabled: false,
-      size: "xs",
+      size: "lg",
     },
   }),
 
@@ -39,6 +48,7 @@ export const SimulatorStyle = {
       },
 
       composition: [
+       
         // inner frame width & height conforms to wrapper size
         {
           "$simulator-wrapper.size": "xs",
@@ -63,7 +73,9 @@ export const SimulatorStyle = {
           style: {
             web: {
               width: "98.2%",
+              minWidth: "98.2%",
               height: "98%",
+              minHeight: "98%",
             },
           },
         },

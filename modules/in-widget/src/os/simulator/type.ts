@@ -18,8 +18,10 @@ export type SimulatorOuterFrameProps = StyleProps<
 > &
   JSX.SharedProps;
 
-export type SimulatorFrameProps = SimulatorInnerFrameProps &
-  SimulatorOuterFrameProps;
+export type SimulatorFrameProps = {
+  inner?: SimulatorInnerFrameProps;
+  outer?: SimulatorOuterFrameProps;
+} & JSX.SharedProps;
 
 /*#########################(Status Bar Props)#############################*/
 export type SimulatorStatusBarProps = StyleProps<
@@ -37,5 +39,8 @@ export type SimulatorBrowserBarProps = StyleProps<
 export type SimulatorProps = StyleProps<typeof SimulatorStyle.wrapper> & {
   format: EmulatorProps["variant"];
   radius?: SimulatorInnerFrameProps["radius"];
-  size?: SimulatorWrapperProps["size"];
-} & JSX.SharedProps;
+  children?: {
+    inner?: SimulatorFrameProps["inner"];
+    outer?: SimulatorFrameProps["outer"];
+  };
+};

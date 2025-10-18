@@ -118,7 +118,7 @@ export namespace JSX {
     id?: string;
 
     /** Reference to a widget or component instance. */
-    $ref?: string;
+    $ref?: Signal;
 
     /** Trigger props are used to handle events and actions within the widget or component.
      *
