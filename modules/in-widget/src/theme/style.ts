@@ -323,6 +323,69 @@ export const ThemeBoxSize = {
   ],
 } as const;
 
+//##############################################(THEME SCREEN SIZE)##############################################//
+
+export const ThemeScreenSize = {
+  xs: [
+    {
+      web: {
+        width: "412px",
+        maxWidth: "412px",
+        height: "calc(100vh - 150px)",
+        maxHeight: "834px",
+      },
+    },
+  ],
+  sm: [
+    {
+      web: {
+        width: "692px",
+        maxWidth: "692px",
+        height: "640px",
+        maxHeight: "640px",
+      },
+    },
+  ],
+  md: [
+    {
+      web: {
+        width: "820px",
+        maxWidth: "820px",
+        height: "632px",
+        maxHeight: "632px",
+      },
+    },
+  ],
+  lg: [
+    {
+      web: {
+        width: "1082px",
+        maxWidth: "1082px",
+        height: "762px",
+        maxHeight: "762px",
+      },
+    },
+  ],
+  xl: [
+    {
+      web: {
+        width: "1332px",
+        maxWidth: "1332px",
+        height: "816px",
+        maxHeight: "816px",
+      },
+    },
+  ],
+  fill: [
+    {
+      web: {
+        width: "100%",
+        height: "100dvh",
+      },
+    },
+  ],
+} as const;
+
 //##############################################(THEME SPACING)##############################################//
 
 export const ThemeSpacing = {

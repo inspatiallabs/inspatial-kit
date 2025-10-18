@@ -35,12 +35,12 @@ type SizeSubscriber = (size: WindowSize) => void;
 /**
  * ScreenSize type matching the Flipper component
  */
-export type ScreenSize = "4xl" | "3xl" | "2xl" | "xl" | "lg" | "md" | "sm";
+export type ScreenSizeProps = "4xl" | "3xl" | "2xl" | "xl" | "lg" | "md" | "sm";
 
 /**
  * Screen size breakpoints matching the Flipper component
  */
-export const screensizes: Record<ScreenSize, number> = {
+export const screensizes: Record<ScreenSizeProps, number> = {
   "4xl": 3840,
   "3xl": 1920,
   "2xl": 1535,
@@ -78,12 +78,12 @@ class DOMWindowSizeProvider implements WindowSizeProvider {
 
   constructor() {
     this.currentSize = {
-      width: typeof window !== "undefined" ? window.innerWidth : 0,
-      height: typeof window !== "undefined" ? window.innerHeight : 0,
+      width: typeof window !== "undefined" ? globalThis.innerWidth : 0,
+      height: typeof window !== "undefined" ? globalThis.innerHeight : 0,
     };
 
     if (typeof window !== "undefined") {
-      window.addEventListener("resize", this.handleResize.bind(this));
+      globalThis.addEventListener("resize", this.handleResize.bind(this));
       // Initialize with correct values
       this.handleResize();
     }
@@ -91,8 +91,8 @@ class DOMWindowSizeProvider implements WindowSizeProvider {
 
   private handleResize(): void {
     this.currentSize = {
-      width: window.innerWidth,
-      height: window.innerHeight,
+      width: globalThis.innerWidth,
+      height: globalThis.innerHeight,
     };
 
     // Notify all subscribers
@@ -120,7 +120,7 @@ class DOMWindowSizeProvider implements WindowSizeProvider {
 
   cleanup(): void {
     if (typeof window !== "undefined") {
-      window.removeEventListener("resize", this.handleResize.bind(this));
+      globalThis.removeEventListener("resize", this.handleResize.bind(this));
     }
   }
 }
@@ -142,7 +142,7 @@ class GPUWindowSizeProvider implements WindowSizeProvider {
     this.currentSize = this.domProvider.getSize();
 
     // Find or create a canvas element if in DOM environment
-    if (typeof window !== "undefined" && typeof document !== "undefined") {
+    if (typeof globalThis !== "undefined" && typeof document !== "undefined") {
       this.setupCanvasTracking();
     } else {
       // Fallback to DOM provider if not in a DOM environment
@@ -318,15 +318,15 @@ class NativeWindowSizeProvider implements WindowSizeProvider {
   private setupFallback(): void {
     // Fallback implementation using DOM if available
     if (typeof window !== "undefined") {
-      this.updateSize(window.innerWidth, window.innerHeight);
+      this.updateSize(globalThis.innerWidth, globalThis.innerHeight);
 
       const handleResize = () => {
-        this.updateSize(window.innerWidth, window.innerHeight);
+        this.updateSize(globalThis.innerWidth, globalThis.innerHeight);
       };
 
-      window.addEventListener("resize", handleResize);
+      globalThis.addEventListener("resize", handleResize);
       this.unsubscribeFromNative = () => {
-        window.removeEventListener("resize", handleResize);
+        globalThis.removeEventListener("resize", handleResize);
       };
     } else {
       // Default size when nothing else is available
@@ -448,7 +448,7 @@ export interface WindowSizeUtilType {
   getSize(): WindowSize;
 
   /** Check if current Window width is below a specific breakpoint */
-  isBelowBreakpoint(size: ScreenSize): boolean;
+  isBelowBreakpoint(size: ScreenSizeProps): boolean;
 
   /** Subscribe to Window size changes */
   subscribe(callback: SizeSubscriber): () => void;
@@ -479,7 +479,7 @@ const WindowSize: WindowSizeUtilType = (function () {
      * @param size - Breakpoint size to check against
      * @returns Boolean indicating if Window is below the specified breakpoint
      */
-    isBelowBreakpoint: function (size: ScreenSize): boolean {
+    isBelowBreakpoint: function (size: ScreenSizeProps): boolean {
       return provider.getSize().width <= screensizes[size];
     },
 

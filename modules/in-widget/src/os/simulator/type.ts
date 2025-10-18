@@ -1,0 +1,41 @@
+import type { StyleProps } from "@in/style";
+import type { SimulatorStyle } from "./style.ts";
+import type { JSX } from "@in/runtime/types";
+import type { EmulatorProps } from "../emulator/type.ts";
+
+/*#########################(Wrapper Props)#############################*/
+export type SimulatorWrapperProps = StyleProps<typeof SimulatorStyle.wrapper> &
+  JSX.SharedProps;
+
+/*#########################(Frame Props)#############################*/
+export type SimulatorInnerFrameProps = StyleProps<
+  typeof SimulatorStyle.frame.inner
+> &
+  JSX.SharedProps;
+
+export type SimulatorOuterFrameProps = StyleProps<
+  typeof SimulatorStyle.frame.outer
+> &
+  JSX.SharedProps;
+
+export type SimulatorFrameProps = SimulatorInnerFrameProps &
+  SimulatorOuterFrameProps;
+
+/*#########################(Status Bar Props)#############################*/
+export type SimulatorStatusBarProps = StyleProps<
+  typeof SimulatorStyle.statusBar
+> &
+  JSX.SharedProps;
+
+/*#########################(Browser Bar Props)#############################*/
+export type SimulatorBrowserBarProps = StyleProps<
+  typeof SimulatorStyle.browserBar
+> &
+  JSX.SharedProps;
+
+/*#########################(Simulator Props)#############################*/
+export type SimulatorProps = StyleProps<typeof SimulatorStyle.wrapper> & {
+  format: EmulatorProps["variant"];
+  radius?: SimulatorInnerFrameProps["radius"];
+  size?: SimulatorWrapperProps["size"];
+} & JSX.SharedProps;

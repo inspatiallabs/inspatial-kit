@@ -75,6 +75,7 @@ export * from "./typography.ts";
 export * from "./ornament.ts";
 export * from "./icon.ts";
 export * from "./recursive.ts";
+export * from "./os.ts";
 
 /*#################################(in-zero)#################################*/
 

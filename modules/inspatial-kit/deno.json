@@ -75,6 +75,7 @@
     "./ornament": "./src/ornament.ts",
     "./icon": "./src/icon.ts",
     "./recursive": "./src/recursive.ts",
+    "./os": "./src/os.ts",
 
     "./vader": "./src/vader.ts",
     "./zero": "./src/zero.ts"
