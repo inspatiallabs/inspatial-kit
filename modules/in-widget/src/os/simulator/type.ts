@@ -1,7 +1,7 @@
 import type { StyleProps } from "@in/style";
 import type { SimulatorStyle } from "./style.ts";
 import type { JSX } from "@in/runtime/types";
-import type { EmulatorProps } from "../emulator/type.ts";
+import type { EmulatorFormat } from "../emulator/type.ts";
 
 /*#########################(Wrapper Props)#############################*/
 export type SimulatorWrapperProps = StyleProps<typeof SimulatorStyle.wrapper> &
@@ -37,7 +37,7 @@ export type SimulatorBrowserBarProps = StyleProps<
 
 /*#########################(Simulator Props)#############################*/
 export type SimulatorProps = StyleProps<typeof SimulatorStyle.wrapper> & {
-  format: EmulatorProps["variant"];
+  format: EmulatorFormat;
   radius?: SimulatorInnerFrameProps["radius"];
   children?: {
     inner?: SimulatorFrameProps["inner"];

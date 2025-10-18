@@ -9,4 +9,8 @@ export {
 export { $ as $, createSideEffect } from "../signal/index.ts";
 
 // #####################(Action Trigger)#####################
-export { createAction, type ActionTriggerProps } from "./action.ts";
+export {
+  createAction,
+  type ActionTriggerProps,
+  type TriggerDefsFor,
+} from "./action.ts";

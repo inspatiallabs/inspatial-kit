@@ -19,6 +19,7 @@ export function SimulatorWrapper(props: SimulatorWrapperProps) {
     <Slot
       // @ts-ignore
       className={iss(SimulatorStyle.wrapper.getStyle({ className, ...rest }))}
+      {...rest}
     >
       {children}
     </Slot>
@@ -34,6 +35,7 @@ export function SimulatorInnerFrame(props: SimulatorInnerFrameProps) {
       className={iss(
         SimulatorStyle.frame.inner.getStyle({ className, ...rest })
       )}
+      {...rest}
     >
       {children}
     </Slot>
@@ -48,6 +50,7 @@ export function SimulatorOuterFrame(props: SimulatorOuterFrameProps) {
         // @ts-ignore
         SimulatorStyle.frame.outer.getStyle({ className, ...rest })
       )}
+      {...rest}
     >
       {children}
     </Slot>
@@ -70,6 +73,7 @@ export function SimulatorStatusBar(props: SimulatorStatusBarProps) {
     <Slot
       // @ts-ignore
       className={iss(SimulatorStyle.statusBar.getStyle({ className, ...rest }))}
+      {...rest}
     >
       {children}
     </Slot>
@@ -85,6 +89,7 @@ export function SimulatorBrowserBar(props: SimulatorBrowserBarProps) {
       className={iss(
         SimulatorStyle.browserBar.getStyle({ className, ...rest })
       )}
+      {...rest}
     >
       {children}
     </Slot>
@@ -101,12 +106,13 @@ export function Simulator(props: SimulatorProps) {
       radius={radius}
       size={size}
       disabled={disabled}
+      {...rest}
     >
       <SimulatorFrame
         inner={{ radius, ...children?.inner }}
         outer={{ radius, ...children?.outer }}
       >
-        <Emulator variant={format ?? "none"} {...rest} />
+        <Emulator format={format ?? { none: true }} />
       </SimulatorFrame>
     </SimulatorWrapper>
   );

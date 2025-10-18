@@ -39,6 +39,7 @@ export const SimulatorStyle = {
         {
           web: {
             border: "8px solid var(--surface)",
+            overflow: "hidden",
           },
         },
       ],
