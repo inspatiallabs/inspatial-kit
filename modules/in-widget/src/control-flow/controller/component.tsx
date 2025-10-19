@@ -327,7 +327,7 @@ function renderController<T extends Record<string, any>>(
 
 /*####################################(CONTROLLER)####################################*/
 export function Controller(
-  as?: any,
+  as: any,
   children?: ControllerProps<any>["children"]
 ): any {
   if (

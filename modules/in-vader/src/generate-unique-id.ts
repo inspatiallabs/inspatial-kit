@@ -22,3 +22,15 @@
 export function generateUniqueId(): string {
   return `in_${crypto.randomUUID()}`;
 }
+
+/**
+ * Creates a unique identifier using the generateUniqueId function.
+ *
+ * @returns {string} A prefixed UUID v4 string (e.g., 'in_123e4567-e89b-12d3-a456-426614174000')
+ *
+ * @example
+ * // Create a unique ID
+ * const id = createUniqueId();
+ * // => 'in_123e4567-e89b-12d3-a456-426614174000'
+ */
+export const createUniqueId = generateUniqueId;
