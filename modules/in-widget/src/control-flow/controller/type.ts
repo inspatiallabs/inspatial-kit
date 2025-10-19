@@ -57,40 +57,47 @@ type OptionItem<V = any> = {
 
 type ControllerMode = "manipulator" | "form";
 
+/*####################################(FIELD KIND)####################################*/
+const FieldKind = {
+  alphabet: { component: ["textfield", "color"] as const },
+  choice: {component: ["tab", "select", "radio", "switch", "checkbox"] as const},
+  numeric: { component: ["numberfield"] as const },
+} as const;
+
+type FieldKind = keyof typeof FieldKind;
+type ComponentsOf<K extends FieldKind> =
+  (typeof FieldKind)[K]["component"][number];
+
 /*####################################(FIELD FOR)####################################*/
 type FieldFor<V> = V extends string
   ?
-      | { type: "string"; component: "textfield"; props?: Record<string, any> }
-      | { type: "color"; component: "color"; props?: Record<string, any> }
       | {
-          type: "enum";
-          component: "tab" | "select" | "radio";
+          type: "alphabet";
+          component: ComponentsOf<"alphabet">;
+          props?: Record<string, any>;
+        }
+      | {
+          type: "choice";
+          component: ComponentsOf<"choice">;
           options: readonly OptionItem<V>[];
           props?: Record<string, any>;
         }
   : V extends number
   ?
       | {
-          type: "number";
-          component: "numberfield";
+          type: "numeric";
+          component: ComponentsOf<"numeric">;
           props?: Record<string, any>;
         }
       | {
-          type: "enum";
-          component: "tab" | "select" | "radio";
+          type: "choice";
+          component: ComponentsOf<"choice">;
           options: readonly OptionItem<V>[];
           props?: Record<string, any>;
         }
-  : V extends boolean
-  ? {
-      type: "boolean";
-      component: "switch" | "checkbox" | "tab";
-      options?: readonly OptionItem<V>[];
-      props?: Record<string, any>;
-    }
   : {
-      type: "enum";
-      component: "tab" | "select" | "radio";
+      type: "choice";
+      component: ComponentsOf<"choice">;
       options: readonly OptionItem<V>[];
       props?: Record<string, any>;
     };

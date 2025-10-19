@@ -44,3 +44,12 @@ export type SimulatorProps = StyleProps<typeof SimulatorStyle.wrapper> & {
     outer?: SimulatorFrameProps["outer"];
   };
 };
+
+/*#########################(Simulator Controls)#############################*/
+export type SimulatorControls = {
+  frame: "All" | "Inner" | "Outer" | "None";
+  screenFill: boolean;
+  screenSize: Exclude<SimulatorProps["size"], "fill">;
+  os: "Android" | "AndroidXR" | "iOS" | "VisionOS" | "HorizonOS";
+  isWeb: boolean;
+};

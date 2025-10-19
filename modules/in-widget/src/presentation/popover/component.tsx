@@ -1,6 +1,7 @@
 import { Slot } from "@in/widget/structure/slot/index.ts";
 import { $ } from "@in/teract/state";
 import { createSignal, onDispose, nextTick } from "@in/teract/signal";
+import { isSignal } from "@in/teract/signal";
 import { iss } from "@in/style";
 import { ensureArray } from "@in/vader";
 import { PresentationRegistry } from "../registry.ts";
@@ -311,7 +312,7 @@ export function Popover(props: PopoverProps) {
               {...rest}
               {...(tree.view && typeof tree.view === "object" ? tree.view : {})}
             >
-              {viewNode ?? Controller(as)}
+              {viewNode ?? Controller(isSignal(as) ? (as as any).get() : as)}
             </PopoverView>
           )}
         </Slot>

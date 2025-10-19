@@ -11,6 +11,7 @@ import type {
   ModalViewProps,
 } from "./type.ts";
 import { Controller } from "@in/widget/control-flow/controller/index.ts";
+import { isSignal } from "@in/teract/signal";
 
 /*#################################(MODAL OVERLAY)#################################*/
 
@@ -142,7 +143,8 @@ export function Modal(props: ModalProps) {
       view: undefined,
       ...rest,
     };
-    modalViewNode = children ?? Controller(as);
+    modalViewNode =
+      children ?? Controller(isSignal(as) ? (as as any).get() : as);
   }
 
   /*********************************(State)*********************************/

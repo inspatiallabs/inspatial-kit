@@ -45,7 +45,7 @@ export function createController<
 
   if (Array.isArray(cfg.settings)) {
     for (const s of cfg.settings) {
-      const p = (s.path || slugify(s.name)) as string;
+      const p = (s.path || slugify(s.name || "")) as string;
       if (s.initialValue !== undefined && initial[p] === undefined)
         (initial as any)[p] = s.initialValue;
     }
@@ -154,7 +154,7 @@ export function createController<
       return out;
     }
     for (const s of cfg.settings || []) {
-      const p = (s.path || slugify(s.name)) as string;
+      const p = (s.path || slugify(s.name || "")) as string;
       const tp = resolvePath(p);
       if (s.validate) {
         const msg = await Promise.resolve(

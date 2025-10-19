@@ -109,7 +109,7 @@ function renderController<T extends Record<string, any>>(
     >
       <List each={settings}>
         {(s: ControllerSettingItem<T>) => {
-          const path = (s.path || slugify(s.name)) as string;
+          const path = (s.path || slugify(s.name || "")) as string;
           const reg = ctl.register(path as any);
 
           return (
@@ -193,7 +193,7 @@ function renderController<T extends Record<string, any>>(
                         $ref={tabRef}
                         radius="md"
                         size="sm"
-                        children={(s.field.options || []) as any}
+                        children={(s.field.options ?? []) as any}
                         selected={reg.value?.get?.()}
                         on:input={(v: any) => reg.oninput(v)}
                         {...(s.field.props || {})}

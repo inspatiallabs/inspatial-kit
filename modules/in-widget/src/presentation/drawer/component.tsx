@@ -5,6 +5,7 @@ import { PresentationRegistry } from "../registry.ts";
 import { DrawerStyle } from "./style.ts";
 import type { DrawerProps } from "./type.ts";
 import { Controller } from "@in/widget/control-flow/controller/index.ts";
+import { isSignal } from "@in/teract/signal";
 
 export function Drawer(props: DrawerProps) {
   const {
@@ -75,7 +76,7 @@ export function Drawer(props: DrawerProps) {
             }}
             {...rest}
           >
-            {children ?? Controller(as)}
+            {children ?? Controller(isSignal(as) ? (as as any).get() : as)}
           </Slot>
         </Slot>
       </>
