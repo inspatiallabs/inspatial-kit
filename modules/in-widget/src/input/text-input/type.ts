@@ -8,7 +8,7 @@ export type TextInputProps = JSX.SharedProps & {
     action?: () => void;
   };
   placeholder?: string;
-  type:
+  type?:
     | "emailfield"
     | "passwordfield"
     | "textfield"
@@ -22,3 +22,18 @@ export type TextInputProps = JSX.SharedProps & {
     | "datefield"
     | "timefield";
 };
+
+/*####################################(SEARCHFIELD PROPS)####################################*/
+export type SearchFieldProps = TextInputProps;
+
+/*####################################(EMAILFIELD PROPS)####################################*/
+export type EmailFieldProps = TextInputProps;
+
+/*####################################(PASSWORDFIELD PROPS)####################################*/
+export type PasswordFieldProps = TextInputProps;
+
+/*####################################(NUMBERFIELD PROPS)####################################*/
+export type NumberFieldProps = TextInputProps;
+
+/*####################################(TEXTFIELD PROPS)####################################*/
+export type TextFieldProps = TextInputProps;

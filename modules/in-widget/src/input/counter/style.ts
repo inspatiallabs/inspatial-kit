@@ -6,7 +6,7 @@ import {
   ThemeRadius,
   ThemeScale,
 } from "@in/widget/theme/style.ts";
-import { ButtonFormat } from "@in/widget/ornament";
+import { ButtonFormat } from "@in/widget/ornament/button/index.ts";
 
 /*####################################(COUNTER STYLE)####################################*/
 export const CounterStyle = {

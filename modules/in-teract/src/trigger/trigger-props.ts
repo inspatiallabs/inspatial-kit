@@ -1,9 +1,4 @@
-import {
-  nextTick,
-  bind,
-  isSignal,
-  type Signal,
-} from "../signal/index.ts";
+import { nextTick, bind, isSignal, type Signal } from "../signal/index.ts";
 import { detectEnvironment } from "@in/vader/env";
 
 /*#################################(Types)
@@ -435,7 +430,7 @@ export function InDOMTriggerProps(): void {
       platforms: ["dom"],
     });
   });
-  
+
   // Drag and drop events
   DOM_DRAG_EVENTS.forEach((event: (typeof DOM_DRAG_EVENTS)[number]) => {
     triggerBridgeRegistry.register(event, {
@@ -498,6 +493,59 @@ function DOMLongPressHandler(durationMs = 500): TriggerPropHandler {
     node.addEventListener("pointerdown", onDown);
     node.addEventListener("pointerup", onUp);
     node.addEventListener("pointerleave", onLeave);
+  };
+}
+
+function DOMPressHoldHandler(
+  intervalMs = 50
+): TriggerPropHandler<
+  | AnyEventHandler
+  | { fn: AnyEventHandler; interval?: number; immediate?: boolean }
+> {
+  return function (node: Element, val: any): void {
+    if (!val) return;
+
+    let timer: number | null = null;
+    const getConfig = () => {
+      if (typeof val === "function")
+        return {
+          fn: val as AnyEventHandler,
+          interval: intervalMs,
+          immediate: false,
+        };
+      const cfg = val || {};
+      return {
+        fn: (cfg.fn ?? (() => {})) as AnyEventHandler,
+        interval: Number(cfg.interval ?? intervalMs) || intervalMs,
+        immediate: !!cfg.immediate,
+      };
+    };
+
+    const start = () => {
+      const { fn, interval, immediate } = getConfig();
+      if (timer != null) clearInterval(timer);
+      if (immediate) {
+        try {
+          fn({ type: "presshold" });
+        } catch {}
+      }
+      timer = setInterval(() => {
+        try {
+          fn({ type: "presshold" });
+        } catch {}
+      }, interval) as unknown as number;
+    };
+
+    const stop = () => {
+      if (timer != null) {
+        clearInterval(timer);
+        timer = null;
+      }
+    };
+
+    node.addEventListener("pointerdown", start as AnyEventHandler);
+    node.addEventListener("pointerup", stop as AnyEventHandler);
+    node.addEventListener("pointerleave", stop as AnyEventHandler);
   };
 }
 
@@ -1258,6 +1306,8 @@ export function InUniversalTriggerProps(): void {
     createTrigger("escape", DOMEscapeHandler());
     // longpress → synth from pointer events
     createTrigger("longpress", DOMLongPressHandler());
+    // presshold → repeat callback while pointer is down
+    createTrigger("presshold", DOMPressHoldHandler());
     // change → change
     createTrigger("change", DOMEventHandler("change"));
     // submit → submit
@@ -1290,6 +1340,7 @@ export function InUniversalTriggerProps(): void {
     createTrigger("rightclick", DOMRightClickHandler());
     createTrigger("escape", DOMEscapeHandler());
     createTrigger("longpress", DOMLongPressHandler());
+    createTrigger("presshold", DOMPressHoldHandler());
     createTrigger("change", DOMEventHandler("change"));
     createTrigger("submit", DOMEventHandler("submit"));
     createTrigger("focus", DOMEventHandler("focus"));

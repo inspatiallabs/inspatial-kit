@@ -14,7 +14,7 @@ export const useCounter = createState.in({
   initialState: <CounterControls>{
     value: 0,
     format: "None",
-    axis: "X",
+    axis: "x",
     reset: true,
     increment: true,
     decrement: true,
@@ -22,6 +22,11 @@ export const useCounter = createState.in({
 
   /******************************(Action)******************************/
   action: <TriggerDefsFor<CounterControls>>{
+    setValue: {
+      key: "value",
+      fn: (_: CounterControls["value"], v: number) => v,
+      options: { name: "counter-set-value" },
+    },
     showIncrement: {
       key: "increment",
       fn: (current: CounterControls["increment"]) => !current,
@@ -61,3 +66,4 @@ export const useCounter = createState.in({
     debounce: 300,
   },
 });
+

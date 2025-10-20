@@ -20,8 +20,8 @@ export function CounterController(id: string) {
           component: "tab",
           options: [
             { label: "Number", value: "Number" },
-            { label: "Progress", value: "Progress" },
             { label: "None", value: "None" },
+            // { label: "Progress", value: "Progress" }, // TODO: Add Progress Bar when Visualization Widget is ready
           ],
         },
       },
@@ -32,8 +32,8 @@ export function CounterController(id: string) {
           type: "choice",
           component: "tab",
           options: [
-            { label: "X", value: "X" },
-            { label: "Y", value: "Y" },
+            { label: "X", value: "x" },
+            { label: "Y", value: "y" },
           ],
         },
       },
