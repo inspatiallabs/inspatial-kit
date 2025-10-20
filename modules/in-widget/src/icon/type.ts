@@ -4,7 +4,7 @@ import type { JSX } from "@in/runtime/types";
 import type { IconVariant } from "./icon-variants.generated.d.ts";
 
 //##############################################(TYPES)##############################################//
-export type IconProps = StyleProps<typeof IconStyle> & JSX.SharedProps;
-export type AllIconProps = IconProps & {
-  variant: IconVariant;
-};
+export type IconProps = StyleProps<typeof IconStyle> &
+  JSX.SharedProps & {
+    variant: IconVariant;
+  };

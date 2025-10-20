@@ -1,7 +1,7 @@
 import { iss } from "@in/style";
 import { Choose } from "@in/widget/control-flow/choose/index.ts";
 import * as Icons from "@in/widget/icon/index.ts";
-import type { AllIconProps } from "./type.ts";
+import type { IconProps } from "./type.ts";
 import { pascalize } from "@in/vader";
 import { BrandIcon } from "./brand-icon.tsx";
 
@@ -32,7 +32,7 @@ function buildCases(normalized: string, passProps: any) {
 }
 
 //##############################################(COMPONENT)##############################################//
-export function Icon(props: AllIconProps) {
+export function Icon(props: IconProps) {
   const { variant, className, class: cls, ...rest } = props;
 
   const normalized =

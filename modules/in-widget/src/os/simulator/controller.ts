@@ -1,18 +1,17 @@
 import { createController } from "@in/widget/control-flow";
 import { useSimulator } from "./state.ts";
-import type { ControllerSettingsProps } from "@in/widget/control-flow/controller/type.ts";
+import type { ControllerSettingItem } from "@in/widget/control-flow/controller/type.ts";
+import type { SimulatorControls } from "./type.ts";
 
 /*####################################(SIMULATOR CONTROLLER)####################################*/
 
-export function SimulatorController(
-  id: string
-): ControllerSettingsProps<any> {
+export function SimulatorController(id: string) {
   return createController({
     id,
     mode: "manipulator",
     hasReset: true,
     state: useSimulator,
-    settings: [
+    settings: <ControllerSettingItem<SimulatorControls>[]>[
       {
         name: "Frame",
         path: "frame",

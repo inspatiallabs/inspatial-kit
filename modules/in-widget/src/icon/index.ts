@@ -50,3 +50,5 @@ export * from "./cube-gizmo-icon.tsx";
 export * from "./round-icon.tsx";
 export * from "./arrows-horizontal-line-icon.tsx";
 export * from "./check-icon.tsx";
+export * from "./crosshair-icon.tsx";
+export * from "./minus-icon.tsx";
