@@ -1,5 +1,6 @@
 import type { JSX } from "@in/runtime/types";
 
+/*####################################(TEXT INPUT PROPS)####################################*/
 export type TextInputProps = JSX.SharedProps & {
   value?: string;
   cta?: {

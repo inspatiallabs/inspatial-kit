@@ -1,4 +1,4 @@
-export * from "./index.native.tsx";
+export * from "./component.tsx";
 
 export * from "./text-input/index.ts";
 export * from "./choice-input/index.ts";
