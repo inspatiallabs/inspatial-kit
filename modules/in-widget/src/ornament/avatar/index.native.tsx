@@ -3,7 +3,7 @@ import { AvatarStyle } from "./style.ts";
 import type { AvatarProps } from "./type.ts";
 import { Image } from "@in/widget/media/image/index.ts";
 import { Slot } from "@in/widget/structure/slot/index.ts";
-import { XStack } from "@in/widget/structure/stack/index.tsx";
+import { XStack } from "@in/widget/structure/stack/index.ts";
 import type { JSX } from "@in/runtime/types";
 
 export function Avatar(props: AvatarProps) {

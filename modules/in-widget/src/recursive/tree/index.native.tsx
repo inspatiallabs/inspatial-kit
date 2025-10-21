@@ -31,7 +31,7 @@ import {
   Icon,
   XPrimeIcon,
 } from "@in/widget/icon/index.ts";
-import { XStack } from "@in/widget/structure/stack/index.tsx";
+import { XStack } from "@in/widget/structure/stack/index.ts";
 import { Show } from "@in/widget/control-flow/index.ts";
 import type { TreeAnchorProps } from "./type.ts";
 import type { ItemInstance } from "./src/index.ts";

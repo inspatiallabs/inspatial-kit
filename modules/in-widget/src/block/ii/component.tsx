@@ -1,4 +1,4 @@
-import { Stack, XStack } from "@in/widget/structure/stack/index.tsx";
+import { Stack, XStack } from "@in/widget/structure/stack/index.ts";
 import { iss } from "@in/style";
 import { Tab } from "@in/widget/ornament/index.ts";
 import type { BlockIIProps } from "./type.ts";

@@ -1,4 +1,4 @@
-import { Stack, XStack } from "@in/widget/structure/stack/index.tsx";
+import { Stack, XStack } from "@in/widget/structure/stack/index.ts";
 import { iss } from "@in/style";
 import { Avatar, Button } from "@in/widget/ornament/index.ts";
 import { FlowVisualizerIcon } from "@in/widget/icon/flow-visualizer-icon.tsx";
