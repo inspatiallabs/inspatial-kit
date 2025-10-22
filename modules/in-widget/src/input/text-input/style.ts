@@ -1,5 +1,13 @@
 import { createStyle } from "@in/style";
-import { ThemeDisabled } from "@in/widget/theme/style.ts";
+import {
+  ThemeAxis,
+  ThemeBoxSize,
+  ThemeDisabled,
+  ThemeEffect,
+  ThemeRadius,
+  ThemeScale,
+} from "@in/widget/theme/style.ts";
+import { ButtonFormat } from "@in/widget/ornament/button/style.ts";
 
 /*################################(TEXT INPUT FIELD BASE STYLE)################################*/
 
@@ -43,6 +51,13 @@ export const TextInputWrapperBase = {
   },
 } as const;
 
+/*################################(TEXT INPUT WRAPPER SETTINGS)################################*/
+export const TextInputWrapperSettings = {
+  radius: ThemeRadius,
+  effect: ThemeEffect,
+  disabled: ThemeDisabled,
+} as const;
+
 /*################################(TEXT INPUT ACTION BASE STYLE)################################*/
 
 export const TextInputActionBase = {
@@ -53,73 +68,81 @@ export const TextInputActionBase = {
   },
 } as const;
 
+/*################################(TEXT INPUT ACTION SETTINGS)################################*/
+export const TextInputActionSettings = {
+  format: ButtonFormat,
+  size: ThemeBoxSize,
+  scale: ThemeScale,
+  axis: ThemeAxis,
+  disabled: ThemeDisabled,
+} as const;
+
+/*################################(TEXT INPUT SIZE BASE STYLE)################################*/
+
+export const TextInputSizeBase = {
+  xs: [
+    {
+      web: {
+        height: "2rem",
+        paddingLeft: "0.5rem",
+        paddingRight: "0.5rem",
+        paddingTop: "0.25rem",
+        paddingBottom: "0.25rem",
+        fontSize: "0.75rem",
+        lineHeight: "1rem",
+      },
+    },
+  ],
+  sm: [
+    {
+      web: {
+        height: "2.25rem",
+        paddingLeft: "0.75rem",
+        paddingRight: "0.75rem",
+        paddingTop: "0.5rem",
+        paddingBottom: "0.5rem",
+        fontSize: "0.875rem",
+        lineHeight: "1.25rem",
+      },
+    },
+  ],
+  base: [
+    {
+      web: {
+        height: "2.5rem",
+        paddingLeft: "0.75rem",
+        paddingRight: "0.75rem",
+        paddingTop: "0.5rem",
+        paddingBottom: "0.5rem",
+        fontSize: "0.875rem",
+        lineHeight: "1.25rem",
+      },
+    },
+  ],
+  lg: [
+    {
+      web: {
+        height: "3rem",
+        paddingLeft: "1rem",
+        paddingRight: "1rem",
+        paddingTop: "0.75rem",
+        paddingBottom: "0.75rem",
+        fontSize: "1rem",
+        lineHeight: "1.5rem",
+      },
+    },
+  ],
+} as const;
+
 /*################################(TEXT INPUT STYLE)################################*/
 export const TextInputStyle = createStyle({
-  /*******************************(Base)********************************/
   base: [TextInputFieldBase],
 
-  /*******************************(Settings)********************************/
   settings: {
     disabled: ThemeDisabled,
-
-    //##############################################(SIZE PROP)##############################################//
-    size: {
-      xs: [
-        {
-          web: {
-            height: "2rem",
-            paddingLeft: "0.5rem",
-            paddingRight: "0.5rem",
-            paddingTop: "0.25rem",
-            paddingBottom: "0.25rem",
-            fontSize: "0.75rem",
-            lineHeight: "1rem",
-          },
-        },
-      ],
-      sm: [
-        {
-          web: {
-            height: "2.25rem",
-            paddingLeft: "0.75rem",
-            paddingRight: "0.75rem",
-            paddingTop: "0.5rem",
-            paddingBottom: "0.5rem",
-            fontSize: "0.875rem",
-            lineHeight: "1.25rem",
-          },
-        },
-      ],
-      base: [
-        {
-          web: {
-            height: "2.5rem",
-            paddingLeft: "0.75rem",
-            paddingRight: "0.75rem",
-            paddingTop: "0.5rem",
-            paddingBottom: "0.5rem",
-            fontSize: "0.875rem",
-            lineHeight: "1.25rem",
-          },
-        },
-      ],
-      lg: [
-        {
-          web: {
-            height: "3rem",
-            paddingLeft: "1rem",
-            paddingRight: "1rem",
-            paddingTop: "0.75rem",
-            paddingBottom: "0.75rem",
-            fontSize: "1rem",
-            lineHeight: "1.5rem",
-          },
-        },
-      ],
-    },
+    size: TextInputSizeBase,
   },
 
-  /*******************************(Default Settings)********************************/
   defaultSettings: {
     disabled: false,
     size: "lg",

@@ -28,7 +28,7 @@ export const CounterStyle = {
       disabled: ThemeDisabled,
     },
     defaultSettings: {
-      axis: "x",
+      axis: "y",
       radius: "md",
       disabled: false,
     },
@@ -54,7 +54,7 @@ export const CounterStyle = {
     },
     defaultSettings: {
       format: "base",
-      size: "base",
+      size: "md",
       scale: "none",
       radius: "md",
       axis: "x",
@@ -77,7 +77,6 @@ export const CounterStyle = {
       size: ThemeBoxSize,
       scale: ThemeScale,
       radius: ThemeRadius,
-      axis: ThemeAxis,
       disabled: ThemeDisabled,
     },
     defaultSettings: {
@@ -85,7 +84,6 @@ export const CounterStyle = {
       size: "base",
       scale: "none",
       radius: "md",
-      axis: "x",
       disabled: false,
     },
     composition: [
@@ -138,7 +136,6 @@ export const CounterStyle = {
       size: ThemeBoxSize,
       scale: ThemeScale,
       radius: ThemeRadius,
-      axis: ThemeAxis,
       disabled: ThemeDisabled,
     },
     defaultSettings: {
@@ -146,7 +143,6 @@ export const CounterStyle = {
       size: "base",
       scale: "none",
       radius: "md",
-      axis: "x",
       disabled: false,
     },
     composition: [

@@ -1,6 +1,7 @@
 import type { TextInputProps } from "../type.ts";
-import { TextInputStyle } from "../style.ts";
 import { iss } from "@in/style";
+import { TextFieldStyle } from "./style.ts";
+import { XStack } from "@in/widget/structure/stack/index.ts";
 
 /*################################(TEXTFIELD)################################*/
 export function TextField(props: TextInputProps) {
@@ -27,16 +28,16 @@ export function TextField(props: TextInputProps) {
 
   /***************************(Render)***************************/
   return (
-    <>
+    <XStack className={iss(TextFieldStyle.wrapper.getStyle({ ...styleProps }))}>
       <input
         type="text"
         required={required || false}
         placeholder={placeholder || "Text Value..."}
-        className={iss(TextInputStyle.getStyle({ ...styleProps }))}
+        className={iss(TextFieldStyle.field.getStyle({ ...styleProps }))}
         disabled={disabled || false}
         $ref={$ref}
         {...rest}
       />
-    </>
+    </XStack>
   );
 }

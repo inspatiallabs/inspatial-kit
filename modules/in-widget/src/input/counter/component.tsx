@@ -17,7 +17,7 @@ import {
   read as readSig,
   write as writeSig,
 } from "@in/teract/signal";
-import { getCounterIcon } from "./helper.tsx";
+import { getIcon } from "@in/widget/icon";
 
 /*####################################(RESET BUTTON)####################################*/
 export function CounterReset(props: CounterResetProps) {
@@ -28,7 +28,7 @@ export function CounterReset(props: CounterResetProps) {
       className={iss(CounterStyle.reset.getStyle({ className, ...rest }))}
       {...rest}
     >
-      {resetChildren ?? iconNode ?? getCounterIcon(icon, "CrosshairIcon")}
+      {resetChildren ?? iconNode ?? getIcon(icon, "CrosshairIcon")}
     </Button>
   );
 }
@@ -50,7 +50,7 @@ export function CounterIncrement(props: CounterIncrementProps) {
       title="Increment"
       {...rest}
     >
-      {incChildren ?? iconNode ?? getCounterIcon(icon, "PlusIcon")}
+      {incChildren ?? iconNode ?? getIcon(icon, "PlusIcon")}
     </Button>
   );
 }
@@ -72,7 +72,7 @@ export function CounterDecrement(props: CounterDecrementProps) {
       title="Decrement"
       {...rest}
     >
-      {decChildren ?? iconNode ?? getCounterIcon(icon, "MinusIcon")}
+      {decChildren ?? iconNode ?? getIcon(icon, "MinusIcon")}
     </Button>
   );
 }
@@ -98,8 +98,6 @@ export function Counter(props: CounterProps) {
       ?.toString?.()
       ?.toLowerCase?.();
 
-    // Wrapper props (aligns with Switch pattern)
-    const wrapperProps = { axis: axisSetting, className } as const;
     const holdInterval = Math.max(
       10,
       Number(props?.rateLimit?.interval ?? 100) || 100
@@ -149,10 +147,10 @@ export function Counter(props: CounterProps) {
     /*******************(Render)*******************/
     return (
       <Stack
+        // variant={axisSetting === "x" ? "xStack" : "yStack"}
         className={iss(
           CounterStyle.wrapper.getStyle({
-            className: wrapperProps.className,
-            axis: wrapperProps.axis,
+            className,
           })
         )}
         {...rest}
@@ -254,12 +252,12 @@ export function Counter(props: CounterProps) {
         error,
         props,
         snapshot: {
-          value: useCounter.value.get(),
-          axis: useCounter.axis.get(),
-          format: useCounter.format.get(),
-          reset: useCounter.reset.get(),
-          increment: useCounter.increment.get(),
-          decrement: useCounter.decrement.get(),
+          value: useCounter.value.peek(),
+          axis: useCounter.axis.peek(),
+          format: useCounter.format.peek(),
+          reset: useCounter.reset.peek(),
+          increment: useCounter.increment.peek(),
+          decrement: useCounter.decrement.peek(),
         },
       });
     } catch {}

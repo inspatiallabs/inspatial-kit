@@ -1,6 +1,7 @@
 import type { TextInputProps } from "../type.ts";
-import { TextInputStyle } from "../style.ts";
 import { iss } from "@in/style";
+import { PasswordFieldStyle } from "./style.ts";
+import { XStack } from "@in/widget/structure/stack/index.ts";
 
 /*################################(TEXTFIELD)################################*/
 export function PasswordField(props: TextInputProps) {
@@ -27,16 +28,18 @@ export function PasswordField(props: TextInputProps) {
 
   /***************************(Render)***************************/
   return (
-    <>
+    <XStack
+      className={iss(PasswordFieldStyle.wrapper.getStyle({ ...styleProps }))}
+    >
       <input
         type="password"
         required={required || false}
         placeholder={placeholder || "Password..."}
-        className={iss(TextInputStyle.getStyle({ ...styleProps }))}
+        className={iss(PasswordFieldStyle.field.getStyle({ ...styleProps }))}
         disabled={disabled || false}
         $ref={$ref}
         {...rest}
       />
-    </>
+    </XStack>
   );
 }

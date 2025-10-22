@@ -55,6 +55,17 @@ export function Icon(props: IconProps) {
   );
 }
 
+/*####################################(GET ICON)####################################*/
+export function getIcon(icon: any, fallbackVariant: IconProps["variant"]) {
+  if (icon == null) return <Icon variant={fallbackVariant} />;
+  if (typeof icon === "string") return <Icon variant={icon} />;
+  if (typeof icon === "object" && typeof icon.variant === "string") {
+    return <Icon variant={icon.variant} {...icon} />;
+  }
+  // Treat any other non-string truthy value as JSX node (custom icon component)
+  return icon as any;
+}
+
 //##############################################(LIST UTILITY)##############################################//
 export function listIconVariants(): string[] {
   return Object.keys(Icons).filter((k) => /Icon$/.test(k) && k !== "Icon");

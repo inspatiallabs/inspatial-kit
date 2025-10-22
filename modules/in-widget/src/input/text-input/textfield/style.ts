@@ -7,12 +7,12 @@ import {
   TextInputWrapperSettings,
 } from "../style.ts";
 
-/*################################(NUMBERFIELD STYLE)################################*/
-export const NumberFieldStyle = {
+/*################################(TEXTFIELD STYLE)################################*/
+export const TextFieldStyle = {
   /*=========================(Wrapper)=========================*/
   // The layout wrapper for the input field and the action
   wrapper: createStyle({
-    name: "numberfield-wrapper",
+    name: "textfield-wrapper",
     base: [TextInputWrapperBase],
 
     settings: {
@@ -29,14 +29,14 @@ export const NumberFieldStyle = {
   /*=========================(Field)=========================*/
   // The input field
   field: createStyle({
-    name: "numberfield-field",
+    name: "textfield-field",
     base: [TextInputFieldBase],
   }),
 
   /*=========================(Action)=========================*/
   // The call to action inside the field i.e unit-changer, dictatate, clear, search  etc...
   action: createStyle({
-    name: "numberfield-action",
+    name: "textfield-action",
     base: [TextInputActionBase],
     settings: {
       ...TextInputActionSettings,
@@ -48,7 +48,7 @@ export const NumberFieldStyle = {
     },
     composition: [
       {
-        "$numberfield-wrapper.radius": "full",
+        "$textfield-wrapper.radius": "full",
         style: {
           web: {
             borderRadius: "100%",
