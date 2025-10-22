@@ -18,7 +18,8 @@ export function PasswordField(props: PasswordFieldProps) {
           className,
           format: props.format,
           radius,
-          disabled,
+          disabled: disabled,
+          ...rest,
         })
       )}
     >
@@ -31,10 +32,11 @@ export function PasswordField(props: PasswordFieldProps) {
             className,
             format: props.format,
             size: props.size,
-            disabled,
+            disabled: disabled,
+            ...rest,
           })
         )}
-        disabled={disabled || false}
+        disabled={disabled}
         $ref={$ref}
         {...rest}
       />

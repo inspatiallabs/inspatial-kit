@@ -17,9 +17,10 @@ export function NumberFieldAction(props: ButtonProps) {
       className={iss(
         NumberFieldStyle.action.getStyle({
           className: props.className,
-          format: (props as any).format,
-          size: (props as any).size,
-          disabled: (props as any).disabled,
+          format: props.format,
+          size: props.size,
+          disabled: props.disabled,
+          ...rest,
         })
       )}
       title="Unit"
@@ -34,24 +35,19 @@ export function NumberFieldAction(props: ButtonProps) {
 export function NumberField(props: NumberFieldProps) {
   /***************************(Props)***************************/
 
-  const {
-    required,
-    placeholder,
-    disabled,
-    $ref,
-    ...rest
-  } = props;
+  const { required, placeholder, disabled, $ref, ...rest } = props;
 
   /***************************(Render)***************************/
   return (
     <XStack
       className={iss(
         NumberFieldStyle.wrapper.getStyle({
-          className: (props as any).className,
-          format: (props as any).format,
-          radius: (props as any).radius,
-          size: (props as any).size,
+          className: props.className,
+          format: props.format,
+          radius: props.radius,
+          size: props.size,
           disabled,
+          ...rest,
         })
       )}
     >
@@ -61,18 +57,19 @@ export function NumberField(props: NumberFieldProps) {
         placeholder={placeholder || "Number Value..."}
         className={iss(
           NumberFieldStyle.field.getStyle({
-            className: (props as any).className,
-            format: (props as any).format,
-            radius: (props as any).radius,
-            size: (props as any).size,
+            className: props.className,
+            format: props.format,
+            radius: props.radius,
+            size: props.size,
             disabled,
+            ...rest,
           })
         )}
         disabled={disabled || false}
         $ref={$ref}
         {...rest}
       />
-      <NumberFieldAction {...(props as any)} />
+      <NumberFieldAction {...props} />
     </XStack>
   );
 }

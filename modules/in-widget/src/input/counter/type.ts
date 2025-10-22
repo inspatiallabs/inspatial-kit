@@ -54,4 +54,8 @@ export type CounterControls = {
   reset: boolean;
   increment: boolean;
   decrement: boolean;
+  /** Hold press rate limit in milliseconds */
+  // rateLimit: number;
+  // /** Fire one step immediately when holding */
+  // holdImmediate: boolean;
 };

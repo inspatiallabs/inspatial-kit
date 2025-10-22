@@ -56,7 +56,8 @@ export function SearchField(props: SearchFieldProps) {
           format: props.format,
           radius: props.radius,
           size: props.size,
-          disabled,
+          disabled: disabled,
+          ...rest,
         })
       )}
     >
@@ -72,10 +73,11 @@ export function SearchField(props: SearchFieldProps) {
             format: props.format,
             radius: props.radius,
             size: props.size,
-            disabled,
+            disabled: disabled,
+            ...rest,
           })
         )}
-        disabled={disabled || false}
+        disabled={disabled}
         $ref={$ref}
         {...rest}
       />

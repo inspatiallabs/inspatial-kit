@@ -100,9 +100,13 @@ export function Counter(props: CounterProps) {
 
     const holdInterval = Math.max(
       10,
-      Number(props?.rateLimit?.interval ?? 100) || 100
+      Number(
+        props?.rateLimit?.interval ?? useCounter?.rateLimit?.peek?.() ?? 100
+      ) || 100
     );
-    const holdImmediate = !!props?.rateLimit?.immediate;
+    const holdImmediate = !!(
+      props?.rateLimit?.immediate ?? useCounter?.holdImmediate?.peek?.()
+    );
 
     const incValue = children?.increment?.value ?? 1;
     const extVal = props?.value as any;
@@ -187,7 +191,6 @@ export function Counter(props: CounterProps) {
           }
         >
           <CounterIncrement
-            axis={axisSetting}
             on:tap={children?.increment?.["on:tap"] ?? (() => incOnce())}
             on:presshold={incPresshold}
             icon={children?.increment?.icon}
@@ -210,8 +213,7 @@ export function Counter(props: CounterProps) {
                           ? extVal?.get?.() ?? read(extVal)
                           : read(valueControl)
                       )}
-                      radius="full"
-                      
+                      radius="none"
                       value={hasExternal ? extVal : valueControl}
                       on:input={(e: any) =>
                         externalSet
@@ -236,7 +238,6 @@ export function Counter(props: CounterProps) {
           }
         >
           <CounterDecrement
-            axis={axisSetting}
             on:tap={children?.decrement?.["on:tap"] ?? (() => decOnce())}
             on:presshold={decPresshold}
             icon={children?.decrement?.icon}

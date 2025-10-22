@@ -76,6 +76,18 @@ export const ControllerStyle = {
       },
     ],
   }),
+  /*==============================(COUNTER)==============================*/
+  counter: createStyle({
+    base: [
+      {
+        web: {
+          width: "100%",
+          minWidth: "60%",
+          maxWidth: "100%",
+        },
+      },
+    ],
+  }),
   /*==============================(SWITCH)==============================*/
   switch: createStyle({
     base: [

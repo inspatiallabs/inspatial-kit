@@ -5,7 +5,13 @@ import { Text } from "@in/widget/typography/index.ts";
 import { List } from "@in/widget/data-flow/list/index.ts";
 import { Choose } from "@in/widget/control-flow/choose/index.ts";
 import { Show } from "@in/widget/control-flow/show/index.ts";
-import { Switch, Checkbox, Radio } from "@in/widget/input/index.ts";
+import {
+  Switch,
+  Checkbox,
+  Radio,
+  NumberField,
+  Counter,
+} from "@in/widget/input/index.ts";
 import { slugify } from "./helpers.ts";
 import type {
   ControllerSettingsProps,
@@ -67,6 +73,12 @@ function renderController<T extends Record<string, any>>(
     $ref: numberfieldRef,
     ...numberfieldRest
   } = slots?.numberfield || {};
+  const {
+    className: counterClassName,
+    style: counterStyle,
+    $ref: counterRef,
+    ...counterRest
+  } = slots?.counter || {};
   const {
     className: switchClassName,
     style: switchStyle,
@@ -224,7 +236,7 @@ function renderController<T extends Record<string, any>>(
                   {
                     when: () => s.field.component === "numberfield",
                     children: (
-                      <input
+                      <NumberField
                         //@ts-ignore
                         className={iss(
                           ControllerStyle.numberfield.getStyle({
@@ -238,6 +250,27 @@ function renderController<T extends Record<string, any>>(
                         on:input={(e: any) => reg.oninput(e)}
                         {...(s.field.props || {})}
                         {...numberfieldRest}
+                      />
+                    ),
+                  },
+                  {
+                    when: () => s.field.component === "counter",
+                    children: (
+                      <Counter
+                        //@ts-ignore
+                        className={iss(
+                          ControllerStyle.counter.getStyle({
+                            className: counterClassName,
+                          })
+                        )}
+                        style={counterStyle}
+                        $ref={counterRef}
+                        value={reg.value?.get?.()}
+                        // rateLimit={s.field.props?.rateLimit?.interval ?? 100}
+                        format="Number"
+                        on:input={(v: any) => reg.oninput(v)}
+                        {...(s.field.props || {})}
+                        {...counterRest}
                       />
                     ),
                   },

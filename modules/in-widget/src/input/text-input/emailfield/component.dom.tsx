@@ -6,14 +6,7 @@ import { EmailFieldStyle } from "./style.ts";
 export function EmailField(props: TextInputProps) {
   /***************************(Props)***************************/
 
-  const {
-    className,
-    required,
-    placeholder,
-    disabled,
-    $ref,
-    ...rest
-  } = props;
+  const { className, required, placeholder, disabled, $ref, ...rest } = props;
 
   /***************************(Render)***************************/
   return (
@@ -26,8 +19,9 @@ export function EmailField(props: TextInputProps) {
           EmailFieldStyle.field.getStyle({
             className,
             format: props.format,
-            size: (props as any).size,
-            disabled,
+            size: props.size,
+            disabled: disabled,
+            ...rest,
           })
         )}
         disabled={disabled || false}

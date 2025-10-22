@@ -73,6 +73,30 @@ export function CounterController(id: string) {
           ],
         },
       },
+      // {
+      //   name: "Rate Limit (ms)",
+      //   path: "rateLimit",
+      //   field: {
+      //     type: "numeric",
+      //     component: "numberfield",
+      //     props: {
+      //       children: {
+      //         // make the numeric field step by 10
+      //         increment: { value: 10 },
+      //         decrement: { value: 10 },
+      //       },
+      //     },
+      //   },
+      // },
+      // {
+      //   name: "Hold Immediate",
+      //   path: "holdImmediate",
+      //   field: {
+      //     type: "choice",
+      //     component: "switch",
+      //     props: {},
+      //   },
+      // },
     ],
   });
 }

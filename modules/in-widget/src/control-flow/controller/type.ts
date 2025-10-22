@@ -60,8 +60,10 @@ type ControllerMode = "manipulator" | "form";
 /*####################################(FIELD KIND)####################################*/
 const FieldKind = {
   alphabet: { component: ["textfield", "color"] as const },
-  choice: {component: ["tab", "select", "radio", "switch", "checkbox"] as const},
-  numeric: { component: ["numberfield"] as const },
+  choice: {
+    component: ["tab", "select", "radio", "switch", "checkbox"] as const,
+  },
+  numeric: { component: ["numberfield", "counter"] as const },
 } as const;
 
 type FieldKind = keyof typeof FieldKind;

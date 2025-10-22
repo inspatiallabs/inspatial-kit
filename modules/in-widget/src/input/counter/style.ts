@@ -19,6 +19,7 @@ export const CounterStyle = {
         web: {
           display: "flex",
           gap: "2px",
+          // border: "2px solid var(--background)",
         },
       },
     ],
@@ -26,11 +27,6 @@ export const CounterStyle = {
       axis: ThemeAxis,
       radius: ThemeRadius,
       disabled: ThemeDisabled,
-    },
-    defaultSettings: {
-      axis: "x",
-      radius: "md",
-      disabled: false,
     },
     composition: [
       {
@@ -41,33 +37,18 @@ export const CounterStyle = {
           },
         },
       },
-    ],
-  }),
-
-  /**============================= RESET =============================*/
-  reset: createStyle({
-    name: "counter-reset",
-    base: [
       {
-        web: {
-          display: "flex",
+        "$counter-wrapper.axis": "y",
+        style: {
+          web: {
+            flexDirection: "column",
+          },
         },
       },
     ],
-    settings: {
-      format: ButtonFormat,
-      size: ThemeBoxSize,
-      scale: ThemeScale,
-      radius: ThemeRadius,
-      axis: ThemeAxis,
-      disabled: ThemeDisabled,
-    },
     defaultSettings: {
-      format: "base",
-      size: "md",
-      scale: "none",
-      radius: "md",
       axis: "x",
+      radius: "md",
       disabled: false,
     },
   }),
@@ -86,14 +67,12 @@ export const CounterStyle = {
       format: ButtonFormat,
       size: ThemeBoxSize,
       scale: ThemeScale,
-      // radius: ThemeRadius,
       disabled: ThemeDisabled,
     },
     defaultSettings: {
       format: "background",
       size: "base",
       scale: "none",
-      // radius: "md",
       disabled: false,
     },
     composition: [
@@ -101,8 +80,8 @@ export const CounterStyle = {
         "$counter-wrapper.axis": "x",
         style: {
           web: {
-            borderTopLeftRadius: "0px",
             borderBottomLeftRadius: "0px",
+            borderTopLeftRadius: "0px",
           },
         },
       },
@@ -110,8 +89,8 @@ export const CounterStyle = {
         "$counter-wrapper.axis": "y",
         style: {
           web: {
-            borderBottomLeftRadius: "0",
-            borderBottomRightRadius: "0",
+            borderBottomLeftRadius: "0px",
+            borderBottomRightRadius: "0px",
           },
         },
       },
@@ -175,5 +154,33 @@ export const CounterStyle = {
         },
       },
     ],
+  }),
+
+  /**============================= RESET =============================*/
+  reset: createStyle({
+    name: "counter-reset",
+    base: [
+      {
+        web: {
+          display: "flex",
+        },
+      },
+    ],
+    settings: {
+      format: ButtonFormat,
+      size: ThemeBoxSize,
+      scale: ThemeScale,
+      radius: ThemeRadius,
+      axis: ThemeAxis,
+      disabled: ThemeDisabled,
+    },
+    defaultSettings: {
+      format: "base",
+      size: "md",
+      scale: "none",
+      radius: "md",
+      axis: "x",
+      disabled: false,
+    },
   }),
 };

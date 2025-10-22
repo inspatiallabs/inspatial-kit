@@ -9,21 +9,23 @@ export function TextField(props: TextInputProps) {
 
   const { className, required, placeholder, disabled, $ref, ...rest } = props;
 
-  const styleProps = {
-    format: props.format,
-    state: disabled ? "disabled" : (props as any).state,
-    size: (props as any).size,
-    className,
-  } as const;
-
   /***************************(Render)***************************/
   return (
-    <XStack className={iss(TextFieldStyle.wrapper.getStyle({ ...styleProps }))}>
+    <XStack
+      className={iss(
+        TextFieldStyle.wrapper.getStyle({
+          className,
+          format: props.format,
+          size: props.size,
+          disabled,
+        })
+      )}
+    >
       <input
         type="text"
         required={required || false}
         placeholder={placeholder || "Text Value..."}
-        className={iss(TextFieldStyle.field.getStyle({ ...styleProps }))}
+        className={iss(TextFieldStyle.field.getStyle({ className, ...rest }))}
         disabled={disabled || false}
         $ref={$ref}
         {...rest}

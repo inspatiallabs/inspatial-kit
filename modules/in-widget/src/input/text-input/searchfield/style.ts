@@ -23,7 +23,7 @@ export const SearchFieldStyle = {
       format: "base",
       radius: "md",
       effect: "hollow",
-      size: "base",
+      size: "lg",
       disabled: false,
     },
   }),

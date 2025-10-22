@@ -18,6 +18,8 @@ export const useCounter = createState.in({
     reset: true,
     increment: true,
     decrement: true,
+    // rateLimit: 100,
+    // holdImmediate: false,
   },
 
   /******************************(Action)******************************/
