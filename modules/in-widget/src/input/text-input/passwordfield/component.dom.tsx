@@ -1,41 +1,39 @@
-import type { TextInputProps } from "../type.ts";
+import type { PasswordFieldProps } from "../type.ts";
 import { iss } from "@in/style";
 import { PasswordFieldStyle } from "./style.ts";
 import { XStack } from "@in/widget/structure/stack/index.ts";
 
 /*################################(TEXTFIELD)################################*/
-export function PasswordField(props: TextInputProps) {
+export function PasswordField(props: PasswordFieldProps) {
   /***************************(Props)***************************/
 
-  const {
-    format,
-    state,
-    size,
-    className,
-    required,
-    placeholder,
-    disabled,
-    $ref,
-    ...rest
-  } = props;
-
-  const styleProps = {
-    format,
-    state: disabled ? "disabled" : state,
-    size,
-    className,
-  } as const;
+  const { radius, className, required, placeholder, disabled, $ref, ...rest } =
+    props;
 
   /***************************(Render)***************************/
   return (
     <XStack
-      className={iss(PasswordFieldStyle.wrapper.getStyle({ ...styleProps }))}
+      className={iss(
+        PasswordFieldStyle.wrapper.getStyle({
+          className,
+          format: props.format,
+          radius,
+          disabled,
+        })
+      )}
     >
       <input
         type="password"
         required={required || false}
         placeholder={placeholder || "Password..."}
-        className={iss(PasswordFieldStyle.field.getStyle({ ...styleProps }))}
+        className={iss(
+          PasswordFieldStyle.field.getStyle({
+            className,
+            format: props.format,
+            size: props.size,
+            disabled,
+          })
+        )}
         disabled={disabled || false}
         $ref={$ref}
         {...rest}

@@ -7,22 +7,12 @@ import { XStack } from "@in/widget/structure/stack/index.ts";
 export function TextField(props: TextInputProps) {
   /***************************(Props)***************************/
 
-  const {
-    format,
-    state,
-    size,
-    className,
-    required,
-    placeholder,
-    disabled,
-    $ref,
-    ...rest
-  } = props;
+  const { className, required, placeholder, disabled, $ref, ...rest } = props;
 
   const styleProps = {
-    format,
-    state: disabled ? "disabled" : state,
-    size,
+    format: props.format,
+    state: disabled ? "disabled" : (props as any).state,
+    size: (props as any).size,
     className,
   } as const;
 

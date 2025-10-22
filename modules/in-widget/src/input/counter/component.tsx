@@ -6,7 +6,7 @@ import type {
   CounterProps,
   CounterResetProps,
 } from "./type.ts";
-import { Stack } from "@in/widget/structure";
+import { Slot, Stack } from "@in/widget/structure";
 import { useCounter } from "./state.ts";
 import { Show, Choose } from "@in/widget/control-flow";
 import { NumberField } from "@in/widget/input/text-input/index.ts";
@@ -146,8 +146,7 @@ export function Counter(props: CounterProps) {
 
     /*******************(Render)*******************/
     return (
-      <Stack
-        // variant={axisSetting === "x" ? "xStack" : "yStack"}
+      <Slot
         className={iss(
           CounterStyle.wrapper.getStyle({
             className,
@@ -189,11 +188,11 @@ export function Counter(props: CounterProps) {
         >
           <CounterIncrement
             axis={axisSetting}
-            {...children?.increment}
             on:tap={children?.increment?.["on:tap"] ?? (() => incOnce())}
             on:presshold={incPresshold}
             icon={children?.increment?.icon}
             value={incValue}
+            {...children?.increment}
           />
         </Show>
         {(() => {
@@ -211,6 +210,8 @@ export function Counter(props: CounterProps) {
                           ? extVal?.get?.() ?? read(extVal)
                           : read(valueControl)
                       )}
+                      radius="full"
+                      
                       value={hasExternal ? extVal : valueControl}
                       on:input={(e: any) =>
                         externalSet
@@ -236,14 +237,14 @@ export function Counter(props: CounterProps) {
         >
           <CounterDecrement
             axis={axisSetting}
-            {...children?.decrement}
             on:tap={children?.decrement?.["on:tap"] ?? (() => decOnce())}
             on:presshold={decPresshold}
             icon={children?.decrement?.icon}
             value={decValue}
+            {...children?.decrement}
           />
         </Show>
-      </Stack>
+      </Slot>
     );
     /*[[[[[[[[[[[[[[[[[[[[[[[CATCH]]]]]]]]]]]]]]]]]]]]]]]*/
   } catch (error) {

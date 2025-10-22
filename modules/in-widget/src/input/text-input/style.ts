@@ -1,4 +1,3 @@
-import { createStyle } from "@in/style";
 import {
   ThemeAxis,
   ThemeBoxSize,
@@ -9,7 +8,11 @@ import {
 } from "@in/widget/theme/style.ts";
 import { ButtonFormat } from "@in/widget/ornament/button/style.ts";
 
+
 /*################################(TEXT INPUT FIELD BASE STYLE)################################*/
+// NOTE: Text Input is different from TextField.
+// NOTE: TextField is a variant of TextInput.
+// NOTE: TextInput is a variant of InputField.
 
 export const TextInputFieldBase = {
   web: {
@@ -37,44 +40,6 @@ export const TextInputFieldBase = {
       outline: "none",
     },
   },
-} as const;
-
-/*################################(TEXT INPUT WRAPPER BASE STYLE)################################*/
-
-export const TextInputWrapperBase = {
-  web: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "var(--muted)",
-    padding: "0px 6px",
-  },
-} as const;
-
-/*################################(TEXT INPUT WRAPPER SETTINGS)################################*/
-export const TextInputWrapperSettings = {
-  radius: ThemeRadius,
-  effect: ThemeEffect,
-  disabled: ThemeDisabled,
-} as const;
-
-/*################################(TEXT INPUT ACTION BASE STYLE)################################*/
-
-export const TextInputActionBase = {
-  web: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-} as const;
-
-/*################################(TEXT INPUT ACTION SETTINGS)################################*/
-export const TextInputActionSettings = {
-  format: ButtonFormat,
-  size: ThemeBoxSize,
-  scale: ThemeScale,
-  axis: ThemeAxis,
-  disabled: ThemeDisabled,
 } as const;
 
 /*################################(TEXT INPUT SIZE BASE STYLE)################################*/
@@ -134,17 +99,61 @@ export const TextInputSizeBase = {
   ],
 } as const;
 
-/*################################(TEXT INPUT STYLE)################################*/
-export const TextInputStyle = createStyle({
-  base: [TextInputFieldBase],
+/*################################(TEXT INPUT WRAPPER BASE STYLE)################################*/
 
-  settings: {
-    disabled: ThemeDisabled,
-    size: TextInputSizeBase,
+export const TextInputWrapperBase = {
+  web: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "var(--muted)",
+    padding: "0px 6px",
   },
+} as const;
 
-  defaultSettings: {
-    disabled: false,
-    size: "lg",
+/*################################(TEXT INPUT FORMAT STYLE)################################*/
+export const TextInputFormat = {
+  base: [
+    {
+      web: {
+        outline: "none",
+      },
+    },
+  ],
+  outline: [
+    {
+      web: {
+        outlineStyle: "solid",
+        outlineWidth: "2px",
+      },
+    },
+  ],
+} as const;
+
+/*################################(TEXT INPUT WRAPPER SETTINGS)################################*/
+export const TextInputWrapperSettings = {
+  format: TextInputFormat,
+  radius: ThemeRadius,
+  effect: ThemeEffect,
+  size: TextInputSizeBase,
+  disabled: ThemeDisabled,
+} as const;
+
+/*################################(TEXT INPUT ACTION BASE STYLE)################################*/
+
+export const TextInputActionBase = {
+  web: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
-});
+} as const;
+
+/*################################(TEXT INPUT ACTION SETTINGS)################################*/
+export const TextInputActionSettings = {
+  format: ButtonFormat,
+  size: ThemeBoxSize,
+  scale: ThemeScale,
+  axis: ThemeAxis,
+  disabled: ThemeDisabled,
+} as const;

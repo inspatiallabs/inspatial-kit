@@ -1,5 +1,5 @@
 import { iss } from "@in/style";
-import type { SearchFieldProps } from "./type.ts";
+import type { SearchFieldProps } from "../type.ts";
 import { $ } from "@in/teract/state";
 import { Show } from "@in/widget/control-flow/index.ts";
 import { Button } from "@in/widget/ornament/index.ts";
@@ -11,11 +11,18 @@ import { SearchFieldStyle } from "./style.ts";
 
 function SearchFieldClearAction(props: SearchFieldProps) {
   /***************************(Props)***************************/
-  const { format, state, size, className, ...rest } = props;
+  const { ...rest } = props;
 
   return (
     <Button
-      className={iss(SearchFieldStyle.action.getStyle({ className, ...rest }))}
+      className={iss(
+        SearchFieldStyle.action.getStyle({
+          className: props.className,
+          format: props.format,
+          size: props.size,
+          disabled: props.disabled,
+        })
+      )}
       on:tap={() => props?.cta?.clear?.()}
       title="Clear search"
       {...rest}
@@ -26,15 +33,10 @@ function SearchFieldClearAction(props: SearchFieldProps) {
 }
 
 /*################################(SEARCHFIELD)################################*/
-
-/*################################(SEARCHFIELD)################################*/
 export function SearchField(props: SearchFieldProps) {
   /***************************(Props)***************************/
 
   const {
-    format,
-    state,
-    size,
     value,
     className,
     required,
@@ -45,17 +47,18 @@ export function SearchField(props: SearchFieldProps) {
     ...rest
   } = props;
 
-  const styleProps = {
-    format,
-    state: disabled ? "disabled" : state,
-    size,
-    className,
-  } as const;
-
   /***************************(Render)***************************/
   return (
     <XStack
-      className={iss(SearchFieldStyle.wrapper.getStyle({ ...styleProps }))}
+      className={iss(
+        SearchFieldStyle.wrapper.getStyle({
+          className,
+          format: props.format,
+          radius: props.radius,
+          size: props.size,
+          disabled,
+        })
+      )}
     >
       {/*=============================(INPUT)=============================*/}
       <input
@@ -63,7 +66,15 @@ export function SearchField(props: SearchFieldProps) {
         value={value}
         required={required || false}
         placeholder={placeholder || "Search..."}
-        className={iss(SearchFieldStyle.field.getStyle({ ...styleProps }))}
+        className={iss(
+          SearchFieldStyle.field.getStyle({
+            className,
+            format: props.format,
+            radius: props.radius,
+            size: props.size,
+            disabled,
+          })
+        )}
         disabled={disabled || false}
         $ref={$ref}
         {...rest}

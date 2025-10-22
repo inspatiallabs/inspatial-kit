@@ -1,15 +1,12 @@
 import type { TextInputProps } from "../type.ts";
-import { TextInputStyle } from "../style.ts";
 import { iss } from "@in/style";
+import { EmailFieldStyle } from "./style.ts";
 
 /*################################(TEXTFIELD)################################*/
 export function EmailField(props: TextInputProps) {
   /***************************(Props)***************************/
 
   const {
-    format,
-    state,
-    size,
     className,
     required,
     placeholder,
@@ -18,13 +15,6 @@ export function EmailField(props: TextInputProps) {
     ...rest
   } = props;
 
-  const styleProps = {
-    format,
-    state: disabled ? "disabled" : state,
-    size,
-    className,
-  } as const;
-
   /***************************(Render)***************************/
   return (
     <>
@@ -32,7 +22,14 @@ export function EmailField(props: TextInputProps) {
         type="email"
         required={required || false}
         placeholder={placeholder || "Email..."}
-        className={iss(TextInputStyle.getStyle({ ...styleProps }))}
+        className={iss(
+          EmailFieldStyle.field.getStyle({
+            className,
+            format: props.format,
+            size: (props as any).size,
+            disabled,
+          })
+        )}
         disabled={disabled || false}
         $ref={$ref}
         {...rest}

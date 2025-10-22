@@ -20,8 +20,10 @@ export const NumberFieldStyle = {
     },
 
     defaultSettings: {
+      format: "base",
       radius: "md",
       effect: "hollow",
+      size: "base",
       disabled: false,
     },
   }),

@@ -1,4 +1,10 @@
 import type { JSX } from "@in/runtime/types";
+import type { StyleProps } from "@in/style";
+import type { NumberFieldStyle } from "./numberfield/style.ts";
+import type { PasswordFieldStyle } from "./passwordfield/style.ts";
+import type { SearchFieldStyle } from "./searchfield/style.ts";
+import type { TextFieldStyle } from "./textfield/style.ts";
+import type { EmailFieldStyle } from "./emailfield/style.ts";
 
 /*####################################(TEXT INPUT PROPS)####################################*/
 export type TextInputProps = JSX.SharedProps & {
@@ -24,16 +30,21 @@ export type TextInputProps = JSX.SharedProps & {
 };
 
 /*####################################(SEARCHFIELD PROPS)####################################*/
-export type SearchFieldProps = TextInputProps;
+export type SearchFieldProps = StyleProps<typeof SearchFieldStyle.wrapper> &
+  Omit<TextInputProps, "type">;
 
 /*####################################(EMAILFIELD PROPS)####################################*/
-export type EmailFieldProps = TextInputProps;
+export type EmailFieldProps = StyleProps<typeof EmailFieldStyle.wrapper> &
+  Omit<TextInputProps, "type">;
 
 /*####################################(PASSWORDFIELD PROPS)####################################*/
-export type PasswordFieldProps = TextInputProps;
+export type PasswordFieldProps = StyleProps<typeof PasswordFieldStyle.wrapper> &
+  Omit<TextInputProps, "type">;
 
 /*####################################(NUMBERFIELD PROPS)####################################*/
-export type NumberFieldProps = TextInputProps;
+export type NumberFieldProps = StyleProps<typeof NumberFieldStyle.wrapper> &
+  Omit<TextInputProps, "type">;
 
 /*####################################(TEXTFIELD PROPS)####################################*/
-export type TextFieldProps = TextInputProps;
+export type TextFieldProps = StyleProps<typeof TextFieldStyle.wrapper> &
+  Omit<TextInputProps, "type">;

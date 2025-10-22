@@ -28,10 +28,20 @@ export const CounterStyle = {
       disabled: ThemeDisabled,
     },
     defaultSettings: {
-      axis: "y",
+      axis: "x",
       radius: "md",
       disabled: false,
     },
+    composition: [
+      {
+        "$counter-wrapper.axis": "x",
+        style: {
+          web: {
+            flexDirection: "row-reverse",
+          },
+        },
+      },
+    ],
   }),
 
   /**============================= RESET =============================*/
@@ -76,14 +86,14 @@ export const CounterStyle = {
       format: ButtonFormat,
       size: ThemeBoxSize,
       scale: ThemeScale,
-      radius: ThemeRadius,
+      // radius: ThemeRadius,
       disabled: ThemeDisabled,
     },
     defaultSettings: {
       format: "background",
       size: "base",
       scale: "none",
-      radius: "md",
+      // radius: "md",
       disabled: false,
     },
     composition: [
@@ -91,8 +101,8 @@ export const CounterStyle = {
         "$counter-wrapper.axis": "x",
         style: {
           web: {
-            borderTopLeftRadius: "0",
-            borderBottomLeftRadius: "0",
+            borderTopLeftRadius: "0px",
+            borderBottomLeftRadius: "0px",
           },
         },
       },
@@ -109,17 +119,17 @@ export const CounterStyle = {
   }),
 
   /**============================= FORMAT =============================*/
-//   format: createStyle({
-//     name: "counter-format-wrapper",
-//     base: [
-//       {
-//         web: {
-//           display: "flex",
-//           padding: "3px",
-//         },
-//       },
-//     ],
-//   }),
+  //   format: createStyle({
+  //     name: "counter-format-wrapper",
+  //     base: [
+  //       {
+  //         web: {
+  //           display: "flex",
+  //           padding: "3px",
+  //         },
+  //       },
+  //     ],
+  //   }),
 
   /**============================= DECREMENT =============================*/
   decrement: createStyle({
