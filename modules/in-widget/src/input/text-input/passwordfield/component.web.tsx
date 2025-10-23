@@ -7,7 +7,7 @@ import { XStack } from "@in/widget/structure/stack/index.ts";
 export function PasswordField(props: PasswordFieldProps) {
   /***************************(Props)***************************/
 
-  const { radius, className, required, placeholder, disabled, $ref, ...rest } =
+  const { id, radius, className, required, placeholder, disabled, $ref, ...rest } =
     props;
 
   /***************************(Render)***************************/
@@ -24,6 +24,7 @@ export function PasswordField(props: PasswordFieldProps) {
       )}
     >
       <input
+        id={id}
         type="password"
         required={required || false}
         placeholder={placeholder || "Password..."}

@@ -35,7 +35,7 @@ export function NumberFieldAction(props: ButtonProps) {
 export function NumberField(props: NumberFieldProps) {
   /***************************(Props)***************************/
 
-  const { required, placeholder, disabled, $ref, ...rest } = props;
+  const { id, required, placeholder, disabled, $ref, ...rest } = props;
 
   /***************************(Render)***************************/
   return (
@@ -52,6 +52,7 @@ export function NumberField(props: NumberFieldProps) {
       )}
     >
       <input
+        id={id}
         type="number"
         required={required || false}
         placeholder={placeholder || "Number Value..."}

@@ -6,12 +6,13 @@ import { EmailFieldStyle } from "./style.ts";
 export function EmailField(props: TextInputProps) {
   /***************************(Props)***************************/
 
-  const { className, required, placeholder, disabled, $ref, ...rest } = props;
+  const { id, className, required, placeholder, disabled, $ref, ...rest } = props;
 
   /***************************(Render)***************************/
   return (
     <>
       <input
+        id={id}
         type="email"
         required={required || false}
         placeholder={placeholder || "Email..."}

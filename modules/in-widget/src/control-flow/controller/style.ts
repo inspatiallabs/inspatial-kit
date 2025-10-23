@@ -146,6 +146,18 @@ export const ControllerStyle = {
       },
     ],
   }),
+  /*==============================(SLIDER)==============================*/
+  slider: createStyle({
+    base: [
+      {
+        web: {
+          width: "100%",
+          minWidth: "60%",
+          maxWidth: "100%",
+        },
+      },
+    ],
+  }),
   /*==============================(NOT SUPPORTED)==============================*/
   notSupported: createStyle({
     base: [

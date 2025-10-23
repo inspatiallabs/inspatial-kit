@@ -14,6 +14,7 @@ import { getChoiceInputIcon } from "../helpers.tsx";
 export function Switch(props: SwitchProps) {
   /**************************(Props)**************************/
   const {
+    id,
     className,
     class: cls,
     style,
@@ -54,6 +55,7 @@ export function Switch(props: SwitchProps) {
         style={style}
       >
         <input
+          id={id}
           type="checkbox"
           className={iss(SwitchStyle.input.getStyle({}))}
           checked={isSelected}

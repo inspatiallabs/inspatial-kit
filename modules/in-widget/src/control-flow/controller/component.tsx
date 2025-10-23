@@ -11,6 +11,7 @@ import {
   Radio,
   NumberField,
   Counter,
+  Slider,
 } from "@in/widget/input/index.ts";
 import { slugify } from "./helpers.ts";
 import type {
@@ -97,6 +98,12 @@ function renderController<T extends Record<string, any>>(
     $ref: radioRef,
     ...radioRest
   } = slots?.radio || {};
+  const {
+    className: sliderClassName,
+    style: sliderStyle,
+    $ref: sliderRef,
+    ...sliderRest
+  } = slots?.slider || {};
   const {
     className: notSupportedClassName,
     style: notSupportedStyle,
@@ -329,6 +336,35 @@ function renderController<T extends Record<string, any>>(
                         on:input={(v: any) => reg.oninput(v)}
                         {...(s.field.props || {})}
                         {...radioRest}
+                      />
+                    ),
+                  },
+                  {
+                    when: () => s.field.component === "slider",
+                    children: (
+                      <Slider
+                        //@ts-ignore
+                        className={iss(
+                          ControllerStyle.slider.getStyle({
+                            className: sliderClassName,
+                          })
+                        )}
+                        style={sliderStyle}
+                        $ref={sliderRef}
+                        min={s.field.props?.min}
+                        max={s.field.props?.max}
+                        step={s.field.props?.step}
+                        value={reg.value}
+                        format={s.field.props?.format}
+                        size={s.field.props?.size}
+                        radius={s.field.props?.radius}
+                        truncate={s.field.props?.truncate}
+                        showValue={s.field.props?.showValue}
+                        disabled={s.field.props?.disabled}
+                        on:input={(v: number) => reg.oninput(v)}
+                        on:blur={() => reg.onblur?.()}
+                        {...(s.field.props || {})}
+                        {...sliderRest}
                       />
                     ),
                   },

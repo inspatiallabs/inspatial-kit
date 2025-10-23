@@ -2,7 +2,12 @@ import type { Signal } from "@in/teract/signal";
 import type { JSX } from "@in/runtime/types";
 import type { StyleProps } from "@in/style";
 import type { ControllerStyle } from "./style.ts";
-import type { CheckboxProps, RadioProps, SwitchProps } from "@in/widget/input";
+import type {
+  CheckboxProps,
+  RadioProps,
+  SwitchProps,
+  SliderProps,
+} from "@in/widget/input";
 import type { ButtonProps, TabProps } from "@in/widget/ornament";
 import type { TypographyProps } from "@in/widget/typography";
 
@@ -63,7 +68,7 @@ const FieldKind = {
   choice: {
     component: ["tab", "select", "radio", "switch", "checkbox"] as const,
   },
-  numeric: { component: ["numberfield", "counter"] as const },
+  numeric: { component: ["numberfield", "counter", "slider"] as const },
 } as const;
 
 type FieldKind = keyof typeof FieldKind;
@@ -240,6 +245,10 @@ export type ControllerCheckboxProps = StyleProps<
 export type ControllerRadioProps = StyleProps<typeof ControllerStyle.radio> &
   RadioProps;
 
+/*####################################(CONTROLLER (COMPONENT) SLIDER PROPS)####################################*/
+export type ControllerSliderProps = StyleProps<typeof ControllerStyle.slider> &
+  SliderProps;
+
 /*####################################(CONTROLLER (COMPONENT) NOT SUPPORTED PROPS)####################################*/
 export type ControllerNotSupportedProps = StyleProps<
   typeof ControllerStyle.notSupported
@@ -261,6 +270,7 @@ export type ControllerProps<T extends Record<string, any>> = {
     switch?: ControllerSwitchProps;
     checkbox?: ControllerCheckboxProps;
     radio?: ControllerRadioProps;
+    slider?: ControllerSliderProps;
     notSupported?: ControllerNotSupportedProps;
   };
 };

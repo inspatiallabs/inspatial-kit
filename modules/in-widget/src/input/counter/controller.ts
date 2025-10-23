@@ -89,6 +89,24 @@ export function CounterController(id: string) {
       //   },
       // },
       // {
+      //   name: "Rate Limit (ms)",
+      //   path: "rateLimit",
+      //   field: {
+      //     type: "numeric",
+      //     component: "slider",
+      //     props: {
+      //       min: 0,
+      //       max: 100,
+      //       step: 1,
+      //       format: "bare",
+      //       size: "md",
+      //       radius: "rounded",
+      //       truncate: { mid: false, edge: false },
+      //       showValue: true,
+      //     },
+      //   },
+      // },
+      // {
       //   name: "Hold Immediate",
       //   path: "holdImmediate",
       //   field: {

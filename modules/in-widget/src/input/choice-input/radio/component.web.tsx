@@ -9,6 +9,7 @@ import { getChoiceInputIcon } from "../helpers.tsx";
 export function Radio(props: RadioProps) {
   /**************************(Props)**************************/
   const {
+    id,
     className,
     class: cls,
     format,
@@ -45,6 +46,7 @@ export function Radio(props: RadioProps) {
         aria-checked={isSelected}
       >
         <input
+          id={id}
           type="radio"
           // @ts-ignore
           className={iss(RadioStyle.input.getStyle(styleProps))}

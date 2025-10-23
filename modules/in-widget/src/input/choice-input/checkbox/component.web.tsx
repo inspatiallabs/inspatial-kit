@@ -10,6 +10,7 @@ import { getChoiceInputIcon } from "../helpers.tsx";
 export function Checkbox(props: CheckboxProps) {
   /**************************(Props)**************************/
   const {
+    id,
     className,
     format,
     size,
@@ -40,6 +41,7 @@ export function Checkbox(props: CheckboxProps) {
     <>
       <label className={iss(CheckboxStyle.wrapper.getStyle(styleProps))}>
         <input
+          id={id}
           type="checkbox"
           className={iss(CheckboxStyle.input.getStyle(styleProps))}
           checked={isSelected}

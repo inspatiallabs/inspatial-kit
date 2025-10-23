@@ -37,6 +37,7 @@ export function SearchField(props: SearchFieldProps) {
   /***************************(Props)***************************/
 
   const {
+    id,
     value,
     className,
     required,
@@ -63,6 +64,7 @@ export function SearchField(props: SearchFieldProps) {
     >
       {/*=============================(INPUT)=============================*/}
       <input
+        id={id}
         type="search"
         value={value}
         required={required || false}

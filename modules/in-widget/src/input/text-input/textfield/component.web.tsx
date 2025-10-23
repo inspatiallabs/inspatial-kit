@@ -7,7 +7,7 @@ import { XStack } from "@in/widget/structure/stack/index.ts";
 export function TextField(props: TextInputProps) {
   /***************************(Props)***************************/
 
-  const { className, required, placeholder, disabled, $ref, ...rest } = props;
+  const { id, className, required, placeholder, disabled, $ref, ...rest } = props;
 
   /***************************(Render)***************************/
   return (
@@ -22,6 +22,7 @@ export function TextField(props: TextInputProps) {
       )}
     >
       <input
+        id={id}
         type="text"
         required={required || false}
         placeholder={placeholder || "Text Value..."}
