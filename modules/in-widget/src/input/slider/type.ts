@@ -7,14 +7,16 @@ import type { Signal } from "@in/teract/signal";
 
 export type SliderWrapperProps = StyleProps<typeof SliderStyle.wrapper>;
 export type SliderInputProps = StyleProps<typeof SliderStyle.input>;
-export type SliderTrackProps = StyleProps<typeof SliderStyle.track>;
+export type SliderTrackProps = StyleProps<typeof SliderStyle.track.background>;
 export type SliderRangeProps = StyleProps<typeof SliderStyle.range>;
 export type SliderHandleProps = StyleProps<typeof SliderStyle.handle>;
 export type SliderValueProps = StyleProps<typeof SliderStyle.value>;
-export type SliderMarkersProps = StyleProps<typeof SliderStyle.markers>;
-export type SliderMarkerProps = StyleProps<typeof SliderStyle.marker>;
+export type SliderMarkerContainerProps = StyleProps<
+  typeof SliderStyle.marker.container
+>;
+export type SliderMarkerKnobProps = StyleProps<typeof SliderStyle.marker.knob>;
 export type SliderTrackContainerProps = StyleProps<
-  typeof SliderStyle.trackContainer
+  typeof SliderStyle.track.container
 >;
 export type SliderEdgeLabelProps = StyleProps<typeof SliderStyle.edgeLabel>;
 
@@ -68,7 +70,7 @@ export type SliderProps = StyleProps<typeof SliderStyle.wrapper> &
     onBlur?: (event: FocusEvent) => void;
 
     /**
-     * Format variant of the slider
+     * Format of the slider
      * @default "base"
      * - base: Full-featured with markers and labels
      * - prime: Minimal slider with optional value display
@@ -120,17 +122,18 @@ export type SliderProps = StyleProps<typeof SliderStyle.wrapper> &
      * Custom children for advanced composition
      */
     children?: {
-      /**
-       * Track container wrapper
-       */
-      trackContainer?: SliderTrackContainerProps & {
-        style?: JSX.SharedProps["style"];
+      track?: {
+        /**
+         * Track container wrapper
+         */
+        container?: SliderTrackContainerProps & {
+          style?: JSX.SharedProps["style"];
+        };
+        /**
+         * The track background
+         */
+        background?: SliderTrackProps & { style?: JSX.SharedProps["style"] };
       };
-
-      /**
-       * The track background
-       */
-      track?: SliderTrackProps & { style?: JSX.SharedProps["style"] };
 
       /**
        * The filled range indicator
@@ -148,9 +151,20 @@ export type SliderProps = StyleProps<typeof SliderStyle.wrapper> &
       value?: SliderValueProps & { style?: JSX.SharedProps["style"] };
 
       /**
-       * Markers container
+       * Markers container and individual knob
        */
-      markers?: SliderMarkersProps & { style?: JSX.SharedProps["style"] };
+      markers?: {
+        /**
+         * Markers container
+         */
+        container?: SliderMarkerContainerProps & {
+          style?: JSX.SharedProps["style"];
+        };
+        /**
+         * Markers individual knob
+         */
+        knob?: SliderMarkerKnobProps & { style?: JSX.SharedProps["style"] };
+      };
 
       /**
        * Edge labels (min/max)

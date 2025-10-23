@@ -4,9 +4,10 @@ import { List } from "@in/widget/data-flow";
 import { iss } from "@in/style";
 import { SliderStyle } from "./style.ts";
 import type { SliderProps } from "./type.ts";
-import { $, createState } from "@in/teract/state";
-import type { Signal } from "@in/teract/signal";
+import { $ } from "@in/teract/state";
 import { Text } from "@in/widget/typography/index.ts";
+import { useSlider } from "./state.ts";
+import { unwrapValue, clamp, toPercentage } from "@in/vader";
 
 /*##############################(SLIDER)####################################*/
 
@@ -40,16 +41,8 @@ export function Slider(props: SliderProps) {
     const { mid: truncateMid = false, edge: truncateEdge = false } = truncate;
 
     /**************************(State)**************************/
-    /** Helper to unwrap value (could be signal or plain value) */
-    const unwrapValue = (val: number | Signal<number>) => {
-      if (val && typeof val === "object" && "get" in val) {
-        return val.get();
-      }
-      return val;
-    };
 
-    /** Local dragging state to disable transitions during drag */
-    const dragging = createState(false);
+    const { dragging, action } = useSlider;
 
     /** Computed current value - tracks external signal if provided */
     const currentValue = $(() => {
@@ -66,7 +59,8 @@ export function Slider(props: SliderProps) {
 
     /** Must be computed signal for reactive updates */
     const rangePercentage = $(() => {
-      return ((currentValue.get() - min) / (max - min)) * 100;
+      const clamped = clamp(currentValue.get(), min, max);
+      return toPercentage(clamped, min, max);
     });
 
     /** Markers data (min, mids, max) */
@@ -94,14 +88,15 @@ export function Slider(props: SliderProps) {
     const valueProps = { format } as const;
     const trackContainerProps = { format } as const;
 
-    /**************************(Handlers)**************************/
-    const startDrag = () => {
-      dragging.set(true);
-    };
+    // Determine if truncate props were explicitly provided
+    const hasExplicitTruncateMid =
+      props?.truncate &&
+      Object.prototype.hasOwnProperty.call(props.truncate, "mid");
+    const hasExplicitTruncateEdge =
+      props?.truncate &&
+      Object.prototype.hasOwnProperty.call(props.truncate, "edge");
 
-    const endDrag = () => {
-      dragging.set(false);
-    };
+    /**************************(Handlers)**************************/
 
     const handleChange = (e: Event) => {
       const target = e.target as HTMLInputElement;
@@ -121,13 +116,10 @@ export function Slider(props: SliderProps) {
       }
     };
 
-    const handleBlur = (e: any) => {
+    const handleBlur = (e: FocusEvent) => {
       onBlur?.(e);
-      endDrag();
+      action.endDrag();
     };
-
-    /**************************(Render Helpers)**************************/
-    // Using @in/widget/data-flow/list for rendering markers reactively
 
     /**************************(Render)**************************/
     return (
@@ -139,13 +131,13 @@ export function Slider(props: SliderProps) {
         {/* Track Container with optional edge labels for bare format */}
         <Slot
           className={iss(
-            SliderStyle.trackContainer.getStyle({
+            SliderStyle.track.container.getStyle({
               ...trackContainerProps,
-              className: children?.trackContainer?.className,
-              class: children?.trackContainer?.class,
+              className: children?.track?.container?.className,
+              class: children?.track?.container?.class,
             })
           )}
-          style={children?.trackContainer?.style}
+          style={children?.track?.container?.style}
         >
           {/* Edge Label - Min (for bare format with truncateEdge) */}
           <Show when={format === "bare" && truncateEdge}>
@@ -166,13 +158,13 @@ export function Slider(props: SliderProps) {
           {/* Track with Range and Handle */}
           <Slot
             className={iss(
-              SliderStyle.track.getStyle({
+              SliderStyle.track.background.getStyle({
                 ...trackProps,
-                className: children?.track?.className,
-                class: children?.track?.class,
+                className: children?.track?.background?.className,
+                class: children?.track?.background?.class,
               })
             )}
-            style={children?.track?.style}
+            style={children?.track?.background?.style}
           >
             {/* Range (filled portion) */}
             <Slot
@@ -229,9 +221,9 @@ export function Slider(props: SliderProps) {
               )}
               aria-describedby={id}
               on:input={handleChange}
-              on:pointerdown={startDrag}
-              on:pointerup={endDrag}
-              on:pointerleave={endDrag}
+              on:pointerdown={action.startDrag}
+              on:pointerup={action.endDrag}
+              on:pointerleave={action.endDrag}
               on:blur={handleBlur}
               $ref={$ref}
             />
@@ -283,12 +275,12 @@ export function Slider(props: SliderProps) {
           <Slot
             className={iss(
               // @ts-ignore
-              SliderStyle.markers.getStyle({
-                className: children?.markers?.className,
-                class: children?.markers?.class,
+              SliderStyle.marker.container.getStyle({
+                className: children?.markers?.container?.className,
+                class: children?.markers?.container?.class,
               })
             )}
-            style={children?.markers?.style}
+            style={children?.markers?.container?.style}
           >
             <List each={markersData}>
               {(m: {
@@ -299,19 +291,25 @@ export function Slider(props: SliderProps) {
                 <Slot
                   key={m.key}
                   className={iss(
-                    SliderStyle.marker.getStyle({
-                      variant:
-                        m.type === "mid"
-                          ? truncateMid
-                            ? "dot"
-                            : "label"
-                          : truncateEdge
-                          ? "dot"
-                          : "label",
-                      className: children?.markers?.className,
-                      class: children?.markers?.class,
+                    SliderStyle.marker.knob.getStyle({
+                      ...(children?.markers?.knob?.format
+                        ? { format: children?.markers?.knob?.format }
+                        : m.type === "mid"
+                        ? hasExplicitTruncateMid
+                          ? { format: truncateMid ? "dot" : "label" }
+                          : {}
+                        : hasExplicitTruncateEdge
+                        ? { format: truncateEdge ? "dot" : "label" }
+                        : {}),
+                      className: children?.markers?.knob?.className,
+                      class: children?.markers?.knob?.class,
                     })
                   )}
+                  style={$(() => ({
+                    web: {
+                      left: `${((m.label - min) / (max - min)) * 100}%`,
+                    },
+                  }))}
                   on:tap={() => {
                     if (disabled) return;
                     const next =
@@ -340,13 +338,10 @@ export function Slider(props: SliderProps) {
       </Slot>
     );
   } catch (error) {
-    /** Log error for debugging */
     console.error("[InSpatial Slider Component Error]:", error);
-
-    /** Return fallback UI */
     return (
       <Stack>
-        <Text>
+        <Text style={{ web: { color: "red" } }} size="sm">
           InSpatial Slider Component Error:{" "}
           {error instanceof Error ? error.message : "Unknown error"}
         </Text>

@@ -67,11 +67,14 @@ export * from "./keydown.ts";
 export * from "./debug/index.ts";
 export * from "./env/index.ts";
 
-
 export * from "./normalize-path.ts";
 export * from "./parse-x.ts";
 export * from "./is-one-edit-away.ts";
 export * from "./file-system/index.ts";
+
+export * from "./clamp.ts";
+export * from "./unwrap-value.ts";
+export * from "./to-percentage.ts";
 
 // export * from "./getletterspacing.ts";
 // export * from "./server-action.ts"; moved to InSpatial Run as part of the Framework Runtime

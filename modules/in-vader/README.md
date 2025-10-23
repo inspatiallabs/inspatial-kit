@@ -141,43 +141,44 @@ InVader includes the following utility functions:
 33. `countries`: Utilities for handling country data.
 34. `encoding`: Utilities for encoding and decoding data.
 35. `regexEscape`: Escapes special characters in a regex pattern.
-36. `buildMessage`: Constructs a formatted message to represent differences between data sets.
-37. `sameStart`: Checks if two strings start with the same sequence.
-38. `farthestPoint`: Finds the farthest point in a dataset.
-39. `difference`: Calculates the difference between two datasets.
-40. `convertImageToBase64DOM`: Converts an image file to a base64 string using the DOM.
-41. `svgToTinyDataUri`: Converts an SVG to a tiny data URI.
-42. `svgToSrcSet`: Converts an SVG to a srcset-compatible data URI.
-43. `stringify`: Converts an object to a string.
-
-44. `abortable`: Allows cancellation of promises or async iterables using AbortSignal for graceful operation termination.
-45. `array`: Provides utility functions for array operations like ensuring arrays, flattening, and grouping.
-46. `backoffJitter`: Calculates exponential backoff delays with jitter for retry mechanisms and rate limiting.
-47. `backtrace`: Analyzes differences between two lists and tracks what was added, removed, or changed.
-48. `cached`: Provides caching utilities for memoizing function results and improving performance.
-49. `createAttributeFilter`: Creates filter functions that match objects by namespace and name with case-insensitive matching.
-50. `createFilter`: Creates filter functions for file inclusion/exclusion based on glob patterns.
-51. `debug`: Comprehensive debugging utilities with different log levels and categories for development.
-52. `delay`: Creates promises that resolve after a specified delay with optional cancellation support.
-53. `env`: Environment detection and management utilities for runtime, platform, and feature detection.
-54. `escapeHtml`: Escapes HTML special characters to prevent XSS attacks and ensure safe rendering.
-55. `file-system`: Utilities for managing your file system across all runtime and platforms.
-56. `getPackageVersion`: Retrieves the current package version for display or comparison purposes.
-57. `hyphenize`: Converts camelCase or PascalCase strings to hyphen-case/kebab-case format.
-58. `isOneEditAway`: Checks if two strings are only one edit operation apart (insert, delete, or replace).
-59. `isPrimitive`: Type guard that checks if a value is a primitive type (string, number, boolean, etc.).
-60. `isThenable`: Checks if a value has a `then` method, identifying Promise-like objects.
-61. `keydown`: Handles keyboard navigation for radio groups and interactive elements.
-62. `nop`: No-operation function that does nothing, useful as a default or placeholder.
-63. `normalizePath`: Normalizes file paths by converting backslashes to forward slashes.
-64. `parseX`: Parses comma-separated strings into arrays of numbers or strings.
-65. `removeFromArr`: Removes specific elements from arrays efficiently.
-66. `safeLookupMap`: Provides a safe lookup map that handles both object keys and primitive keys.
-67. `splice`: Advanced array splicing utilities with filtering and search capabilities.
-68. `splitFirst`: Splits a string at the first occurrence of a delimiter.
-69. `tolower`: Converts values to lowercase strings.
-70. `toupper`: Converts values to uppercase strings.
-71. `windowSize`: Tracks and responds to window size changes across different environments.
+36. `sameStart`: Checks if two strings start with the same sequence.
+37. `farthestPoint`: Finds the farthest point in a dataset.
+38. `difference`: Calculates the difference between two datasets.
+39. `convertImageToBase64DOM`: Converts an image file to a base64 string using the DOM.
+40. `svgToTinyDataUri`: Converts an SVG to a tiny data URI.
+41. `svgToSrcSet`: Converts an SVG to a srcset-compatible data URI.
+42. `stringify`: Converts an object to a string.
+43. `clamp`: Restricts a numeric value to an inclusive range defined by min and max.
+44. `unwrapValue`: Unwraps a value that may be a number or a reactive signal containing a number.
+45. `toPercentage`: Converts a value to a percentage within a specified range.
+46. `abortable`: Allows cancellation of promises or async iterables using AbortSignal for graceful operation termination.
+47. `array`: Provides utility functions for array operations like ensuring arrays, flattening, and grouping.
+48. `backoffJitter`: Calculates exponential backoff delays with jitter for retry mechanisms and rate limiting.
+49. `backtrace`: Analyzes differences between two lists and tracks what was added, removed, or changed.
+50. `cached`: Provides caching utilities for memoizing function results and improving performance.
+51. `createAttributeFilter`: Creates filter functions that match objects by namespace and name with case-insensitive matching.
+52. `createFilter`: Creates filter functions for file inclusion/exclusion based on glob patterns.
+53. `debug`: Comprehensive debugging utilities with different log levels and categories for development.
+54. `delay`: Creates promises that resolve after a specified delay with optional cancellation support.
+55. `env`: Environment detection and management utilities for runtime, platform, and feature detection.
+56. `escapeHtml`: Escapes HTML special characters to prevent XSS attacks and ensure safe rendering.
+57. `file-system`: Utilities for managing your file system across all runtime and platforms.
+58. `getPackageVersion`: Retrieves the current package version for display or comparison purposes.
+59. `hyphenize`: Converts camelCase or PascalCase strings to hyphen-case/kebab-case format.
+60. `isOneEditAway`: Checks if two strings are only one edit operation apart (insert, delete, or replace).
+61. `isPrimitive`: Type guard that checks if a value is a primitive type (string, number, boolean, etc.).
+62. `isThenable`: Checks if a value has a `then` method, identifying Promise-like objects.
+63. `keydown`: Handles keyboard navigation for radio groups and interactive elements.
+64. `nop`: No-operation function that does nothing, useful as a default or placeholder.
+65. `normalizePath`: Normalizes file paths by converting backslashes to forward slashes.
+66. `parseX`: Parses comma-separated strings into arrays of numbers or strings.
+67. `removeFromArr`: Removes specific elements from arrays efficiently.
+68. `safeLookupMap`: Provides a safe lookup map that handles both object keys and primitive keys.
+69. `splice`: Advanced array splicing utilities with filtering and search capabilities.
+70. `splitFirst`: Splits a string at the first occurrence of a delimiter.
+71. `tolower`: Converts values to lowercase strings.
+72. `toupper`: Converts values to uppercase strings.
+73. `windowSize`: Tracks and responds to window size changes across different environments.
 
 For detailed usage and parameters of each utility, please refer to the source code or our comprehensive documentation.
 

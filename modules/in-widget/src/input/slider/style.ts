@@ -25,7 +25,7 @@ import {
  * - bare: Minimal slider with just track and handle
  */
 export const SliderStyle = {
-  /*******************************(WRAPPER)******************************/
+  /*========================================(WRAPPER)========================================*/
   wrapper: createStyle({
     name: "slider-wrapper",
     base: [
@@ -58,12 +58,12 @@ export const SliderStyle = {
       disabled: ThemeDisabled,
     },
     defaultSettings: {
-      format: "base",
+      format: "bare",
       disabled: "false",
     },
   }),
 
-  /*******************************(INPUT)******************************/
+  /*========================================(INPUT)========================================*/
   input: createStyle({
     name: "slider-input",
     base: [
@@ -156,82 +156,121 @@ export const SliderStyle = {
     },
   }),
 
-  /*******************************(TRACK)******************************/
-  track: createStyle({
-    name: "slider-track",
-    base: [
-      {
-        web: {
-          position: "relative",
-          display: "flex",
-          alignItems: "center",
-          width: "100%",
-          backgroundColor: "var(--muted)",
-          overflow: "visible",
+  /*========================================(TRACK)========================================*/
+  track: {
+    /*******************************(TRACK_CONTAINER)******************************/
+    container: createStyle({
+      name: "slider-track-container",
+      base: [
+        {
+          web: {
+            display: "flex",
+            width: "100%",
+            height: "auto",
+            alignItems: "center",
+            gap: "8px",
+          },
+        },
+      ],
+      settings: {
+        format: {
+          base: [
+            {
+              web: {
+                gap: "0",
+              },
+            },
+          ],
+          bare: [
+            {
+              web: {
+                gap: "4px",
+              },
+            },
+          ],
         },
       },
-    ],
-    settings: {
-      format: {
-        base: [
-          {
-            web: {
-              border: "none",
-            },
-          },
-        ],
-        bare: [
-          {
-            web: {
-              border: "none",
-            },
-          },
-        ],
+      defaultSettings: {
+        format: "base",
       },
-      size: {
-        sm: [
-          {
-            web: {
-              height: "4px",
-            },
+    }),
+    /*******************************(TRACK_BACKGROUND)******************************/
+    background: createStyle({
+      name: "slider-track",
+      base: [
+        {
+          web: {
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            width: "100%",
+            backgroundColor: "var(--muted)",
+            overflow: "visible",
           },
-        ],
-        md: [
-          {
+        },
+      ],
+      settings: {
+        format: {
+          base: [
+            {
+              web: {
+                border: "none",
+              },
+            },
+          ],
+          bare: [
+            {
+              web: {
+                border: "none",
+              },
+            },
+          ],
+        },
+        size: {
+          sm: [
+            {
+              web: {
+                height: "4px",
+              },
+            },
+          ],
+          md: [
+            {
+              web: {
+                height: "6px",
+              },
+            },
+          ],
+          lg: [
+            {
+              web: {
+                height: "8px",
+              },
+            },
+          ],
+        },
+        effect: ThemeEffect,
+        radius: ThemeRadius,
+      },
+      defaultSettings: {
+        effect: "hollow",
+        format: "base",
+        size: "md",
+        radius: "full",
+      },
+      composition: [
+        {
+          format: "bare",
+          size: "sm",
+          style: {
             web: {
               height: "6px",
             },
           },
-        ],
-        lg: [
-          {
-            web: {
-              height: "8px",
-            },
-          },
-        ],
-      },
-      effect: ThemeEffect,
-      radius: ThemeRadius,
-    },
-    defaultSettings: {
-      effect: "hollow",
-      format: "base",
-      size: "md",
-      radius: "full",
-    },
-    composition: [
-      {
-        format: "bare",
-        size: "sm",
-        style: {
-          web: {
-            height: "6px",
-          },
         },
-      },
-    ],
-  }),
+      ],
+    }),
+  },
 
   /*******************************(RANGE)******************************/
   range: createStyle({
@@ -264,12 +303,13 @@ export const SliderStyle = {
     ],
   }),
 
-  /*******************************(HANDLE)******************************/
+  /*========================================(HANDLE)========================================*/
   handle: createStyle({
     name: "slider-handle",
     base: [
       {
         web: {
+          cursor: "grab",
           position: "absolute",
           top: "50%",
           transform: "translate(-50%, -50%)",
@@ -362,7 +402,7 @@ export const SliderStyle = {
     ],
   }),
 
-  /*******************************(VALUE)******************************/
+  /*========================================(VALUE)========================================*/
   value: createStyle({
     name: "slider-value",
     base: [
@@ -423,114 +463,73 @@ export const SliderStyle = {
       },
     },
     defaultSettings: {
-      format: "base",
+      format: "bare",
     },
   }),
 
-  /*******************************(MARKERS)******************************/
-  markers: createStyle({
-    name: "slider-markers",
-    base: [
-      {
-        web: {
-          display: "flex",
-          width: "100%",
-          height: "auto",
-          marginTop: "4px",
-          justifyContent: "space-between",
-          alignItems: "center",
-          fontSize: "12px",
-          fontFamily: "var(--font-heading)",
-          paddingLeft: "8px",
-          paddingRight: "8px",
-          gap: "8px",
+  /*========================================(MARKER)========================================*/
+  marker: {
+    /* container for markers */
+    container: createStyle({
+      name: "slider-markers",
+      base: [
+        {
+          web: {
+            position: "relative",
+            display: "block",
+            width: "100%",
+            height: "auto",
+            marginTop: "4px",
+            fontSize: "12px",
+            fontFamily: "var(--font-heading)",
+          },
+        },
+      ],
+    }),
+    /* individual marker knob */
+    knob: createStyle({
+      name: "slider-marker",
+      base: [
+        {
+          web: {
+            position: "absolute",
+            top: "0",
+            transform: "translateX(-50%)",
+            color: "var(--muted)",
+            cursor: "pointer",
+            userSelect: "none",
+          },
+        },
+      ],
+      settings: {
+        format: {
+          dot: [
+            {
+              web: {
+                width: "6px",
+                height: "6px",
+                borderRadius: "var(--radius-full)",
+                backgroundColor: "var(--secondary)",
+              },
+            },
+          ],
+          label: [
+            {
+              web: {
+                fontSize: "var(--text-xs)",
+                color: "var(--secondary)",
+              },
+            },
+          ],
         },
       },
-    ],
-  }),
+      defaultSettings: {
+        format: "dot",
+      },
+    }),
+  },
 
-  /*******************************(MARKER)******************************/
-  marker: createStyle({
-    name: "slider-marker",
-    base: [
-      {
-        web: {
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: "var(--muted)",
-          minWidth: "12px",
-          minHeight: "12px",
-          cursor: "pointer",
-          userSelect: "none",
-        },
-      },
-    ],
-    settings: {
-      variant: {
-        dot: [
-          {
-            web: {
-              width: "6px",
-              height: "6px",
-              borderRadius: "var(--radius-full)",
-              backgroundColor: "var(--secondary)",
-            },
-          },
-        ],
-        label: [
-          {
-            web: {
-              fontSize: "12px",
-              color: "var(--primary)",
-            },
-          },
-        ],
-      },
-    },
-    defaultSettings: {
-      variant: "label",
-    },
-  }),
-
-  /*******************************(TRACK_CONTAINER)******************************/
-  trackContainer: createStyle({
-    name: "slider-track-container",
-    base: [
-      {
-        web: {
-          display: "flex",
-          width: "100%",
-          height: "auto",
-          alignItems: "center",
-          gap: "8px",
-        },
-      },
-    ],
-    settings: {
-      format: {
-        base: [
-          {
-            web: {
-              gap: "0",
-            },
-          },
-        ],
-        bare: [
-          {
-            web: {
-              gap: "4px",
-            },
-          },
-        ],
-      },
-    },
-    defaultSettings: {
-      format: "base",
-    },
-  }),
-
-  /*******************************(EDGE_LABEL)******************************/
+  /*========================================(EDGE_LABEL)========================================*/
   edgeLabel: createStyle({
     name: "slider-edge-label",
     base: [
