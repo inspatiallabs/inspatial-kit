@@ -1,7 +1,7 @@
 import { iss } from "@in/style";
 import { RadioStyle } from "./style.ts";
 import type { RadioProps } from "./type.ts";
-import { Slot } from "../../../structure/index.ts";
+import { Slot } from "@in/widget/structure";
 import { getChoiceInputIcon } from "../helpers.tsx";
 
 /*##############################(CHECKBOX)####################################*/

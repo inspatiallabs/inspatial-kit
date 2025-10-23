@@ -1,8 +1,8 @@
 import { iss } from "@in/style";
 import { CheckboxStyle } from "./style.ts";
 import type { CheckboxProps } from "./type.ts";
-import { Slot } from "../../../structure/index.ts";
-import { Show } from "../../../control-flow/show/index.ts";
+import { Slot } from "@in/widget/structure";
+import { Show } from "@in/widget/control-flow";
 import { getChoiceInputIcon } from "../helpers.tsx";
 
 /*##############################(CHECKBOX)####################################*/

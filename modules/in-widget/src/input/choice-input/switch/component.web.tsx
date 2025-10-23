@@ -1,7 +1,12 @@
 import { iss } from "@in/style";
 import { SwitchStyle } from "./style.ts";
-import type { SwitchProps } from "./type.ts";
-import { Slot } from "../../../structure/index.ts";
+import type {
+  SwitchHandleProps,
+  SwitchIconProps,
+  SwitchProps,
+  SwitchTrackProps,
+} from "./type.ts";
+import { Slot } from "@in/widget/structure";
 import { getChoiceInputIcon } from "../helpers.tsx";
 
 /*##############################(SWITCH)####################################*/
@@ -30,7 +35,7 @@ export function Switch(props: SwitchProps) {
   const wrapperProps = { disabled, className, class: cls } as const;
 
   /**************************(State)**************************/
-  
+
   const isSelected = selected === true;
 
   /**************************(Handlers)**************************/
@@ -65,19 +70,19 @@ export function Switch(props: SwitchProps) {
             class: trackClass,
             style: trackStyle,
             ...trackRest
-          } = children?.track ?? ({} as any);
+          } = children?.track ?? ({} as SwitchTrackProps);
           const {
             className: handleClassName,
             class: handleClass,
             style: handleStyle,
             ...handleRest
-          } = children?.handle ?? ({} as any);
+          } = children?.handle ?? ({} as SwitchHandleProps);
           const {
             className: iconClassName,
             class: iconClass,
             style: iconStyle,
             ...iconRest
-          } = children?.icon ?? ({} as any);
+          } = children?.icon ?? ({} as SwitchIconProps);
 
           return (
             <Slot
@@ -108,6 +113,7 @@ export function Switch(props: SwitchProps) {
                 <Slot
                   className={iss(
                     SwitchStyle.icon.getStyle({
+                      ...iconRest,
                       className: iconClassName,
                       class: iconClass,
                     })

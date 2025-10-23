@@ -1,9 +1,5 @@
 import { createStyle } from "@in/style";
-import {
-  ThemeBoxSize,
-  ThemeRadius,
-  ThemeDisabled,
-} from "../../../theme/index.ts";
+import { ThemeBoxSize, ThemeRadius, ThemeDisabled } from "@in/widget/theme";
 
 //##############################################(SHARED INDICATOR CONSTS)##############################################//
 
@@ -98,7 +94,6 @@ const CheckboxIndicatorSettings = {
   size: ThemeBoxSize,
   radius: ThemeRadius,
 } as const;
-
 
 const CheckboxIndicatorDefaults = {
   format: "outline" as keyof (typeof CheckboxIndicatorSettings)["format"],
