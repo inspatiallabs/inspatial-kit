@@ -4,6 +4,7 @@ import {
   ThemeRadius,
   ThemeDisabled,
   ThemeEffect,
+  ThemeBoxSize,
 } from "@in/widget/theme/style.ts";
 
 //##############################################(SLIDER STYLE)##############################################//
@@ -363,11 +364,13 @@ export const SliderStyle = {
       },
     ],
     settings: {
+      // size: ThemeBoxSize,
       material: ThemeMaterial,
       radius: ThemeRadius,
       disabled: ThemeDisabled,
     },
     defaultSettings: {
+      // size: "md",
       material: "flat",
       radius: "full",
       disabled: "false",

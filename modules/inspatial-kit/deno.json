@@ -73,6 +73,7 @@
     "./presentation": "./src/presentation.ts",
     "./typography": "./src/typography.ts",
     "./ornament": "./src/ornament.ts",
+    "./template": "./src/template.ts",
     "./icon": "./src/icon.ts",
     "./recursive": "./src/recursive.ts",
     "./os": "./src/os.ts",

@@ -1,7 +1,7 @@
 import { ButtonStyle } from "./style.ts";
 import type { ButtonProps } from "./type.ts";
 import { Slot } from "@in/widget/structure/slot/index.ts";
-import { LoadingIcon } from "@in/widget/icon/loading-icon.tsx";
+import { Icon } from "@in/widget/icon";
 
 /*##################################(BUTTON COMPONENT)##################################*/
 
@@ -30,7 +30,7 @@ export function Button(props: ButtonProps) {
       >
         {rest.isLoading ? (
           <Slot className={ButtonStyle.loader.getStyle()}>
-            <LoadingIcon />
+            <Icon variant="LoadingIcon" />
 
             <Slot className="sr-only">
               {rest.loadingText ? rest.loadingText : "Loading"}

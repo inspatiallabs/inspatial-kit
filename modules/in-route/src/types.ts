@@ -45,6 +45,7 @@ export interface RouteFiles {
   env?: string;
   doc?: string; // folder
   api?: string;
+  controller?: string;
   render?: string; // can only have one render.ts file
   window?: string; // can only have one window.tsx per folder
   scene?: string; // can only have one scene.tsx per folder

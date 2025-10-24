@@ -17,7 +17,8 @@
     "@in/widget/ornament/": "./src/ornament/",
     "@in/widget/icon/": "./src/icon/",
     "@in/widget/recursive/": "./src/recursive/",
-    "@in/widget/block/": "./src/block/"
+    "@in/widget/block/": "./src/block/",
+    "@in/widget/template/": "./src/template/"
   },
   "exports": {
     ".": "./src/index.ts",
@@ -35,7 +36,8 @@
     "./ornament": "./src/ornament/index.ts",
     "./icon": "./src/icon/index.ts",
     "./recursive": "./src/recursive/index.ts",
-    "./block": "./src/block/index.ts"
+    "./block": "./src/block/index.ts",
+    "./template": "./src/template/index.ts"
   },
   "tasks": {
     "lint": "deno lint",

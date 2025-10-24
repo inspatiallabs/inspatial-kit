@@ -83,7 +83,7 @@ export function Slider(props: SliderProps) {
     /**************************(Style Props)**************************/
     const wrapperProps = { format, disabled, className, class: cls } as const;
     const trackProps = { format, size, radius } as const;
-    const handleProps = { size, radius, disabled } as const;
+    const handleProps = { radius, disabled } as const;
     const rangeProps = { radius } as const;
     const valueProps = { format } as const;
     const trackContainerProps = { format } as const;
@@ -220,7 +220,7 @@ export function Slider(props: SliderProps) {
               disabled={disabled}
               className={iss(
                 SliderStyle.input.getStyle({
-                  size,
+                  // size,
                 })
               )}
               aria-describedby={id}
@@ -342,11 +342,11 @@ export function Slider(props: SliderProps) {
       </Slot>
     );
   } catch (error) {
-    console.error("[InSpatial Slider Component Error]:", error);
+    console.error("[@in/widget (Slider) Error]:", error);
     return (
       <Stack>
         <Text style={{ web: { color: "red" } }} size="sm">
-          InSpatial Slider Component Error:{" "}
+          @in/widget (Slider) Error:{" "}
           {error instanceof Error ? error.message : "Unknown error"}
         </Text>
       </Stack>
