@@ -179,7 +179,11 @@ export function Slider(props: SliderProps) {
                 ...(children?.range?.style ?? {}),
                 web: {
                   ...(children?.range?.style?.web ?? {}),
-                  width: `${rangePercentage.get()}%`,
+                  width:
+                    currentValue.get() <= 0
+                      ? "0%"
+                      : `min(100%, calc(${rangePercentage.get()}% + 2px))`,
+                  minWidth: currentValue.get() > 0 ? "2px" : undefined,
                   transitionDuration: dragging.get() ? "0ms" : "150ms",
                 },
               }))}

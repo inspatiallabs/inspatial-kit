@@ -206,6 +206,19 @@ export const SliderStyle = {
             width: "100%",
             backgroundColor: "var(--muted)",
             overflow: "visible",
+            // When the overlaid input is hovered, tint the first child (range)
+            "&:has(> input:hover) > *:first-child": {
+              background:
+                "radial-gradient(101.08% 100% at 50% 100%, rgba(94, 94, 94, 0.14) 0%, rgba(94, 94, 94, 0.00) 73.85%), radial-gradient(100.02% 100% at 50% 100%, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.00) 55.59%), var(--color-inherit-default, var(--brand))",
+              backgroundBlendMode: "color-dodge, normal, normal",
+              scaleX: "10",
+            },
+            // When hovering the input, also emphasize the handle (second child)
+            "&:has(> input:hover) > *:nth-child(2)": {
+              display: "block",
+              // transform: "translate(-50%, -50%) scale(1)",
+              border: "2px solid var(--brand)",
+            },
           },
         },
       ],
@@ -227,24 +240,45 @@ export const SliderStyle = {
           ],
         },
         size: {
-          sm: [
+          xs: [
             {
               web: {
                 height: "4px",
               },
             },
           ],
+          sm: [
+            {
+              web: {
+                height: "12px",
+              },
+            },
+          ],
           md: [
             {
               web: {
-                height: "6px",
+                height: "16px",
               },
             },
           ],
           lg: [
             {
               web: {
-                height: "8px",
+                height: "20px",
+              },
+            },
+          ],
+          xl: [
+            {
+              web: {
+                height: "28px",
+              },
+            },
+          ],
+          "2xl": [
+            {
+              web: {
+                height: "40px",
               },
             },
           ],
@@ -309,12 +343,13 @@ export const SliderStyle = {
     base: [
       {
         web: {
+          display: "none",
           cursor: "grab",
           position: "absolute",
           top: "50%",
           transform: "translate(-50%, -50%)",
           backgroundColor: "var(--color-white)",
-          border: "2px solid var(--brand)",
+          // border: "2px solid var(--brand)",
           pointerEvents: "none",
           transitionProperty: "left, transform",
           transitionDuration: "150ms",
@@ -322,59 +357,39 @@ export const SliderStyle = {
           zIndex: "5",
 
           "&:hover": {
-            transform: "translate(-50%, -50%) scale(1.1)",
-          },
-
-          "&:active": {
-            transform: "translate(-50%, -50%) scale(0.95)",
+            display: "block",
           },
         },
       },
     ],
     settings: {
-      size: {
-        sm: [
-          {
-            web: {
-              width: "16px",
-              height: "16px",
-            },
-          },
-        ],
-        md: [
-          {
-            web: {
-              width: "20px",
-              height: "20px",
-            },
-          },
-        ],
-        lg: [
-          {
-            web: {
-              width: "24px",
-              height: "24px",
-            },
-          },
-        ],
-      },
       material: ThemeMaterial,
       radius: ThemeRadius,
       disabled: ThemeDisabled,
     },
     defaultSettings: {
-      size: "md",
       material: "flat",
       radius: "full",
       disabled: "false",
     },
     composition: [
       {
+        "$slider-track.size": "xs",
+        style: {
+          web: {
+            width: "8px",
+            padding: "2px",
+            marginLeft: "-4px",
+          },
+        },
+      },
+      {
         "$slider-track.size": "sm",
         style: {
           web: {
-            width: "16px",
-            height: "16px",
+            width: "12px",
+            padding: "2px",
+            marginLeft: "-4px",
           },
         },
       },
@@ -383,7 +398,8 @@ export const SliderStyle = {
         style: {
           web: {
             width: "20px",
-            height: "20px",
+            padding: "2px",
+            marginLeft: "-4px",
           },
         },
       },
@@ -392,13 +408,43 @@ export const SliderStyle = {
         style: {
           web: {
             width: "24px",
-            height: "24px",
+            padding: "2px",
+            marginLeft: "-4px",
+          },
+        },
+      },
+      {
+        "$slider-track.size": "xl",
+        style: {
+          web: {
+            width: "32px",
+            padding: "2px",
+            marginLeft: "-4px",
+          },
+        },
+      },
+      {
+        "$slider-track.size": "2xl",
+        style: {
+          web: {
+            width: "36px",
+            padding: "2px",
+            marginLeft: "-4px",
           },
         },
       },
       {
         "$slider-track.radius": ThemeRadius,
       },
+      // {
+      //   "$slider-track.size": "md",
+      //   style: {
+      //     web: {
+      //       borderTopLeftRadius: "0px",
+      //       borderBottomLeftRadius: "0px",
+      //     },
+      //   },
+      // },
     ],
   }),
 
